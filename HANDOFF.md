@@ -66,6 +66,12 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Siparişler (sv3+, `ORDER_LEVEL`): `S.orders` 3 yuva; dolu yuva `{p: köylü, it:{ürün:adet}, g, x}`, boş yuva `{w: geleceği zaman}`. Ödül ürün değerinin 1.4 katı, XP değer/5+3. Teslimden sonra 5 dk, reddedince 15 dk bekleme. Sadece oyuncunun üretebildiği ürünler istenir (`orderItems`).
 - Görevler penceresi sekmeli (`qtab`: tut/daily/orders, `#qtabs_v8`). Çiftlikteki tabela (`OBJ.sign`, "Sipariş tabelası") menüsünde Siparişler var; teslim edilebilir sipariş varsa 3D'de tabelanın üstünde 📋 rozeti.
 
+## v90 pazar ve yeni bina görünümleri
+- Pazar (sv5, `PAZAR_LEVEL`): `market/{id}` = `{seller, sn, item, q, price, ts, buyer?, bn?, bt?}`. Satıcı ürünü koyunca depodan düşer; alıcı `update({buyer,bn,bt})` ile bir kez alır; satıcının oyunu `pzCollect()` ile kaydı siler ve altını ekler (`S.pzGot` son 40 kimlik, çift ödeme olmasın). En fazla 4 tezgah, fiyat en fazla depo değerinin 3 katı. Meydandaki tezgahlara dokununca ya da dock'taki Pazar düğmesiyle açılır (`openPazar`).
+- Firebase kuralı: `"market": {".read": "auth != null", ".indexOn": ["seller","ts"], "$id": {".write": "auth != null && ((!data.exists() && newData.child('seller').val() === auth.uid) || (data.exists() && data.child('seller').val() === auth.uid && !newData.exists()) || (data.exists() && !data.child('buyer').exists() && newData.child('buyer').val() === auth.uid && newData.child('seller').val() === data.child('seller').val() && newData.child('item').val() === data.child('item').val() && newData.child('q').val() === data.child('q').val() && newData.child('price').val() === data.child('price').val()))"}}`.
+- 3D: yeni `buildCoop`, `buildCowbarn` (önü üçgen cepheli ahır, `gableZ`), `buildCow`, `buildHen`, `buildBarn` (kemerli çatılı depo), `buildMill` (yel değirmenli, silolu ambar). Fırın seviyeye göre: `buildOven(a, baking, lv)` → 1 taş, 2 `buildOven2` tuğla, 3 `buildOven3` modern. `fx.ovens` öğelerinde baca noktası `cx/cy/cz`, parlayan yüzeyler `inners`.
+- Görev çubuğu dokununca küçülür (`qMini`, localStorage `lucky-qmin`); hazır görevde pencereyi açar.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

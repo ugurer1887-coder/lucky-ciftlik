@@ -520,6 +520,8 @@ body{font-family:var(--body);letter-spacing:.1px}
 .qtrack{display:flex;align-items:center;gap:9px;width:min(310px,100%);padding:7px 10px 7px 7px;border:0;border-radius:18px;text-align:left;color:#3a2410;cursor:pointer;
   background:linear-gradient(135deg,#fff7dc,#ffe7a8);box-shadow:0 6px 18px rgba(80,50,10,.28),inset 0 0 0 2px rgba(255,255,255,.6);font-family:Nunito,sans-serif}
 .qtrack[hidden]{display:none!important}
+.qtrack.mini{position:relative;width:auto;padding:5px;border-radius:16px;gap:0}.qtrack.mini .qt,.qtrack.mini .qg{display:none}
+.qtrack.mini .qe{position:relative;flex-basis:40px;height:40px}.qtrack.mini::after{content:"";position:absolute;left:8px;right:8px;bottom:3px;height:4px;border-radius:9px;background:linear-gradient(90deg,#2f9a43 var(--qp,0%),rgba(0,0,0,.15) var(--qp,0%))}
 .qtrack .qe{flex:0 0 38px;height:38px;border-radius:13px;display:grid;place-items:center;font-size:1.3rem;background:linear-gradient(160deg,#ffbe55,#f08a1a);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
 .qtrack .qt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .qtrack b{font:700 .8rem Fredoka,Nunito,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -575,6 +577,11 @@ body{font-family:var(--body);letter-spacing:.1px}
 .oit{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 5px;border-radius:99px;background:#fbe1dc;color:#9a2a1c;font:700 .82rem Fredoka,Nunito,sans-serif}
 .oit i{font-style:normal;font-size:1.1rem}.oit.ok{background:#dcf3d2;color:#256b2a}
 .obtns{display:flex;gap:8px;flex-wrap:wrap}.obtns .big[disabled]{opacity:.45;filter:grayscale(.5)}
+.pzcard .thumb{position:relative}.pzq{position:absolute;right:-4px;bottom:-4px;font:700 .8rem/1 Fredoka,Nunito,sans-serif;font-style:normal;color:#fff;background:#2f9a43;border:2px solid #fff;border-radius:99px;padding:3px 7px}
+.pzcheap{color:#2f9a43;font-weight:800}.pzunit{color:var(--ink2)}.pznote{margin:0 0 8px}.pzchips{margin:0 0 10px}
+.pzform{display:flex;flex-direction:column;gap:7px;background:var(--panel2);border-radius:18px;padding:12px}.pzform>b{font-family:Fredoka,Nunito,sans-serif}
+.pzrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pzrow .big.sm{width:auto;min-width:44px;padding:6px 10px}.pzval{min-width:46px;text-align:center;font:700 1.15rem Fredoka,Nunito,sans-serif}
+#pzPrice_v8{width:90px;padding:8px;border-radius:12px;border:2px solid var(--line);font:700 1.05rem Fredoka,Nunito,sans-serif;text-align:center}
 .admreset{width:auto!important;min-height:30px!important;padding:4px 12px!important;font-size:.76rem!important;margin-left:auto}
 #notifAsk_v8 .box{max-width:380px;background:linear-gradient(180deg,#fff8e1,#e9f8ff);color:#2a2410}
 #notifAsk_v8 h1{font-size:1.25rem;margin:4px 0 6px}#notifAsk_v8 p{font-size:.88rem;color:#5c5240;margin:0 0 12px}
@@ -746,6 +753,11 @@ body{font-family:var(--body);letter-spacing:.1px}
   <section class="sheet" id="jobs_v8" aria-label="İş ilanları">
     <div class="sheet-head"><h2>İş ilanları</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
     <div class="sheet-body" id="jobsBody_v8"></div>
+  </section>
+  <section class="sheet" id="pazar_v8" aria-label="Pazar">
+    <div class="sheet-head"><h2>🛒 Pazar</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" data-ptab="buy">Satın al</button><button class="tab" role="tab" aria-selected="false" data-ptab="mine" id="pzMineTab_v8">Tezgahım</button></div>
+    <div class="sheet-body" id="pazarBody_v8"></div>
   </section>
   <section class="sheet" id="friends_v8" aria-label="Arkadaşlar">
     <div class="sheet-head"><h2>Arkadaşlar</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
@@ -1135,7 +1147,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "89";
+const VERSION = "90";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2963,6 +2975,7 @@ function tapPlaza(i) {
   if (P_JOBS.includes(i)) { cancelAll(); if (!walkTo(neighborsOf(P_JOBS), () => { renderJobs(); openSheet($("jobs")); })) { renderJobs(); openSheet($("jobs")); } return; }
 
   if (P_FOUNTAIN.includes(i)) { cancelAll(); if (!walkTo(neighborsOf(P_FOUNTAIN), openWish)) openWish(); return; }
+  { const st = P_DECOR.find(d => d.t === "stall" && d.cell === i); if (st) { cancelAll(); if (!walkTo(neighborsOf([i]), openPazar)) openPazar(); return; } }
   if (P_BLOCK.has(i)) return;
   walkPlain(i);
 }
@@ -3423,6 +3436,12 @@ const ICON = {
     <path d="M19 17c-4 1-7 5-8 12M29 17c4 1 7 5 8 12" stroke="#bfe9ff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-dasharray="2.4 2"/>
     <circle cx="16" cy="35" r="1.5" fill="#ffd34d"/><circle cx="30" cy="36" r="1.4" fill="#ffd34d"/><circle cx="25" cy="37" r="1.2" fill="#ffe27a"/>
     <path d="M36 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#fff6c0"/>`),
+  pazar: fico(`<ellipse cx="24" cy="45" rx="17" ry="2" fill="rgba(0,0,0,.18)"/>
+    <rect x="8" y="16" width="3" height="28" rx="1" fill="#7b4f27"/><rect x="37" y="16" width="3" height="28" rx="1" fill="#7b4f27"/>
+    <path d="M5 10h38l-2 9H7z" fill="#e0473a"/><path d="M11.3 10l-1 9M17.6 10l-.5 9M24 10v9M30.4 10l.5 9M36.7 10l1 9" stroke="#fff" stroke-width="3.2"/>
+    <path d="M7 19q2.6 3 5.3 0q2.6 3 5.3 0q2.6 3 5.3 0q2.6 3 5.3 0q2.6 3 5.3 0q2.6 3 5.3 0" fill="#e0473a" stroke="#b8322a" stroke-width=".8"/>
+    <rect x="9" y="30" width="30" height="12" rx="2" fill="#c08a4f" stroke="#7b4f27" stroke-width="1.4"/><path d="M9 34h30" stroke="#a8743f" stroke-width="1"/>
+    <circle cx="16" cy="28.5" r="3.4" fill="#e0473a"/><circle cx="23" cy="28" r="3.6" fill="#f2b821"/><circle cx="30" cy="28.5" r="3.4" fill="#7bbf4a"/><circle cx="20" cy="26" r="2.6" fill="#f08a24"/>`),
   jobs: fico(`<ellipse cx="24" cy="45" rx="16" ry="2" fill="rgba(0,0,0,.18)"/>
     <rect x="11" y="24" width="3.2" height="21" rx="1" fill="#7b4f27"/><rect x="33.8" y="24" width="3.2" height="21" rx="1" fill="#7b4f27"/>
     <rect x="5" y="7" width="38" height="25" rx="3" fill="#b9782c"/><rect x="7" y="9" width="34" height="21" rx="2" fill="#d9a066"/><path d="M7 16h34M7 23h34" stroke="#c4884e" stroke-width="1"/>
@@ -3448,7 +3467,7 @@ function renderDock() {
   if (k === "home") h += b("market", "Market", ICON.market);
   if (k !== "home") h += b("home", "Çiftliğim", ICON.home);
   if (k !== "plaza") h += b("plaza", "Meydan", ICON.plaza);
-  if (k === "plaza") h += b("jobs", "İş ilanı", ICON.jobs);
+  if (k === "plaza") h += b("jobs", "İş ilanı", ICON.jobs) + b("pazar", "Pazar", ICON.pazar);
   h += b("friends", "Arkadaş", ICON.friends, "", "fbadge");
   h += b("chat", "Sohbet", ICON.chat, "green", "badge");
   $("dock").innerHTML = h; renderBadges(); if (S && S.tut) questPulse(questCur() && !questReady(questCur()) ? questCur() : null);
@@ -3468,11 +3487,12 @@ $("dock").addEventListener("click", e => {
   else if (a === "home") enterScene({ kind: "home" });
   else if (a === "plaza") enterScene({ kind: "plaza" });
   else if (a === "jobs") { renderJobs(); openSheet($("jobs")); }
+  else if (a === "pazar") openPazar();
   else if (a === "friends") { renderFriends(); openSheet($("friends")); }
   else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; renderBadges(); scrollChat(); }
 });
 function openSheet(el) { closeAll(); $("scrim").classList.add("on"); el.classList.add("on"); }
-function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "farmb", "jobs", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
+function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "farmb", "jobs", "pazar", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
 $("scrim").onclick = closeAll;
 document.querySelectorAll("#root_v8 [data-close]").forEach(b => b.onclick = closeAll);
 
@@ -3779,6 +3799,130 @@ $("depotBody").addEventListener("click", e => {
   S.store[pr.key] = have - k; S.gold = round1(S.gold + k * pr.price); questEv("sell", k); dailyEv("sellg", k * pr.price);
   renderHud(); renderPlots(); save(); renderDepot();
   popAt(me.x, me.y - .3, "+" + fmtG(k * pr.price) + " altın", "#ffe27a");
+});
+
+// ---------- Pazar: players sell their products to each other on the plaza stalls ----------
+// market/{id}: { seller, sn: seller name, item, q, price, ts, buyer?, bn?: buyer name, bt? }
+// the seller's goods leave the depot when listed; the buyer marks the listing as bought (once), the seller's game collects the gold and removes it
+const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk"];
+let pzAll = [], pzMine = [], pzTab = "buy", pzFilter = "all", pzForm = null, pzAllOn = false, pzMineOn = false, pzBusy = false, pzDenied = false;
+const pzVal = (k, q) => itemPrice(k) * q, pzMax = (k, q) => Math.max(10, Math.ceil(pzVal(k, q) * 3));
+const pzThumb = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.thumb() : ""; };
+const pzAgo = ts => { const m = Math.max(0, Math.floor((Date.now() - (+ts || 0)) / 60000)); return m < 1 ? "az önce" : m < 60 ? m + " dk önce" : m < 1440 ? Math.floor(m / 60) + " sa önce" : Math.floor(m / 1440) + " gün önce"; };
+const pzOk = l => l && typeof l.seller === "string" && PAZAR_KEYS.includes(l.item) && +l.q > 0 && +l.price > 0;
+function listenPazarMine() {
+  if (!db || !uid || pzMineOn) return; pzMineOn = true;
+  try { db.collection("market").where("seller", "==", uid).onSnapshot(s => { pzMine = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(pzOk); pzCollect(); if ($("pazar").classList.contains("on")) renderPazar(); }, () => { pzMineOn = false; }); } catch (e) { pzMineOn = false; }
+}
+function listenPazarAll() {
+  if (!db || !uid || pzAllOn) return; pzAllOn = true;
+  try { db.collection("market").orderBy("ts", "desc").limit(150).onSnapshot(s => { pzDenied = false; pzAll = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(pzOk); if ($("pazar").classList.contains("on")) renderPazar(); },
+    e => { pzAllOn = false; if (e && e.code === "PERMISSION_DENIED") pzDenied = true; if ($("pazar").classList.contains("on")) renderPazar(); }); } catch (e) { pzAllOn = false; }
+}
+// gold for my sold goods comes in by itself (each sale is paid only once)
+const pzPaying = new Set();
+async function pzCollect() {
+  for (const l of pzMine) {
+    if (!l.buyer || pzPaying.has(l.id)) continue; pzPaying.add(l.id);
+    S.pzGot = toArr(S.pzGot); if (S.pzGot.includes(l.id)) { db.doc("market/" + l.id).delete().catch(() => {}); continue; }
+    try { await db.doc("market/" + l.id).delete(); } catch (e) { pzPaying.delete(l.id); continue; }
+    S.pzGot = toArr(S.pzGot).concat(l.id).slice(-40);
+    S.gold = round1(S.gold + (+l.price || 0)); gainXp(Math.max(1, Math.round(+l.price / 25)));
+    saveNow(); renderHud();
+    toast((l.bn || "Bir çiftçi") + " pazardan " + l.q + " " + itemName(l.item).toLocaleLowerCase("tr") + " aldı: +" + fmtG(l.price) + " altın 💰");
+  }
+}
+async function pzBuy(id) {
+  const l = pzAll.find(x => x.id === id); if (pzBusy || !l || l.buyer || l.seller === uid) return;
+  if (S.gold < l.price) { hint("Yeterli altının yok."); return; }
+  pzBusy = true; renderPazar();
+  try {
+    const cur = await db.doc("market/" + id).get(), d = cur.exists ? cur.data() : null;
+    if (!pzOk(d) || d.buyer) { toast("Bu ürünü başka bir çiftçi aldı."); return; }
+    if (S.gold < +d.price) { hint("Yeterli altının yok."); return; }
+    await db.doc("market/" + id).update({ buyer: uid, bn: String(S.name || "Çiftçi").slice(0, 24), bt: Date.now() });
+    S.gold = round1(S.gold - (+d.price)); S.store[d.item] = (+S.store[d.item] || 0) + Math.floor(+d.q);
+    saveNow(); renderHud(); renderPlots(); coinBurst($("pazarBody"), 6);
+    toast(d.q + " " + itemName(d.item).toLocaleLowerCase("tr") + " aldın, depona kondu 📦");
+  } catch (e) { toast("Satın alınamadı, başka bir çiftçi almış olabilir."); }
+  finally { pzBusy = false; renderPazar(); }
+}
+async function pzPut() {
+  const f = pzForm; if (pzBusy || !f) return;
+  const have = +S.store[f.k] || 0, q = Math.min(have, Math.max(1, Math.floor(f.q))), p = Math.min(pzMax(f.k, q), Math.max(1, Math.floor(+f.p || 0)));
+  if (!have || q < 1) return; if (pzMine.length >= PAZAR_SLOTS) { hint("Bütün tezgahların dolu."); return; }
+  pzBusy = true; S.store[f.k] = have - q; saveNow(); renderPlots();
+  try { await db.doc("market/" + uid + "_" + Date.now().toString(36)).set({ seller: uid, sn: String(S.name || "Çiftçi").slice(0, 24), item: f.k, q, price: p, ts: Date.now() });
+    toast(q + " " + itemName(f.k).toLocaleLowerCase("tr") + " tezgaha kondu 🛒"); pzForm = null; }
+  catch (e) { S.store[f.k] = (+S.store[f.k] || 0) + q; saveNow(); renderPlots(); toast(e && e.code === "PERMISSION_DENIED" ? "Pazar sunucuda henüz açılmadı." : "Tezgaha konamadı, tekrar dene."); }
+  finally { pzBusy = false; renderPazar(); }
+}
+async function pzCancel(id) {
+  if (pzBusy) return; pzBusy = true; renderPazar();
+  try { const cur = await db.doc("market/" + id).get(), d = cur.exists ? cur.data() : null;
+    if (!pzOk(d) || d.seller !== uid) return; if (d.buyer) { pzCollect(); return; }
+    await db.doc("market/" + id).delete(); S.store[d.item] = (+S.store[d.item] || 0) + Math.floor(+d.q); saveNow(); renderPlots(); toast("Ürünlerin depoya geri döndü"); }
+  catch (e) { toast("Geri alınamadı, tekrar dene."); }
+  finally { pzBusy = false; renderPazar(); }
+}
+function openPazar() { if (!S) return; listenPazarAll(); listenPazarMine(); renderPazar(); openSheet($("pazar")); }
+function renderPazar() {
+  document.querySelectorAll("#pazar_v8 [data-ptab]").forEach(b => b.setAttribute("aria-selected", b.getAttribute("data-ptab") === pzTab));
+  const sold = pzMine.filter(l => l.buyer).length; $("pzMineTab").textContent = "Tezgahım (" + pzMine.length + "/" + PAZAR_SLOTS + ")";
+  const body = $("pazarBody");
+  if (!db || !uid || !online) { body.innerHTML = `<p class="empty">Pazar için oyunun sunucuya bağlı olması gerekiyor.</p>`; return; }
+  if (S.level < PAZAR_LEVEL && !isAdmin()) { body.innerHTML = `<p class="empty">🛒 Pazar ${PAZAR_LEVEL}. seviyede açılır.<br>Şu an ${S.level}. seviyedesin.</p>`; return; }
+  if (pzDenied) { body.innerHTML = `<p class="empty">Pazar sunucuda henüz açılmadı. Kısa süre sonra tekrar dene.</p>`; return; }
+  if (pzTab === "buy") {
+    const open = pzAll.filter(l => !l.buyer && l.seller !== uid), kinds = PAZAR_KEYS.filter(k => open.some(l => l.item === k));
+    if (pzFilter !== "all" && !kinds.includes(pzFilter)) pzFilter = "all";
+    const list = open.filter(l => pzFilter === "all" || l.item === pzFilter);
+    let h = `<p class="note pznote">Başka çiftçilerin tezgahları. Satın aldığın ürün depona gelir, altını satıcıya gider.</p>`;
+    if (kinds.length > 1) h += `<div class="chips pzchips"><button data-pzf="all" aria-pressed="${pzFilter === "all"}">Hepsi</button>${kinds.map(k => `<button data-pzf="${k}" aria-pressed="${pzFilter === k}">${ITEM_EMO[k]} ${esc(itemName(k))}</button>`).join("")}</div>`;
+    h += list.length ? list.map(l => { const unit = l.price / l.q, cheap = unit < itemPrice(l.item);
+      return `<div class="card pzcard"><div class="thumb">${pzThumb(l.item)}<i class="pzq">${l.q}</i></div><div><h3>${l.q} ${esc(itemName(l.item))}</h3>
+      <p>Satıcı: <b>${esc(String(l.sn || "Çiftçi").slice(0, 24))}</b> · ${pzAgo(l.ts)}</p>
+      <p><span class="price">${fmtG(l.price)} altın</span> <small class="${cheap ? "pzcheap" : "pzunit"}">tanesi ${fmtG(round1(unit))}${cheap ? " · depodan ucuz!" : ""}</small></p>
+      <div class="row"><button class="big green sm" data-pzbuy="${l.id}" ${S.gold < l.price || pzBusy ? "disabled" : ""}>${S.gold < l.price ? "Altının yetmiyor" : "Satın al"}</button></div></div></div>`; }).join("")
+      : `<p class="empty">Şu an pazarda satılan ürün yok.<br>Sen de <b>Tezgahım</b> bölümünden ürün satabilirsin.</p>`;
+    body.innerHTML = h; return;
+  }
+  let h = `<p class="note pznote">Ürününü kendi belirlediğin fiyatla tezgaha koy. Bir çiftçi satın alınca altın kendiliğinden sana gelir.${sold ? "" : ""}</p>`;
+  h += pzMine.slice().sort((a, b) => (+a.ts || 0) - (+b.ts || 0)).map(l => `<div class="card pzcard"><div class="thumb">${pzThumb(l.item)}<i class="pzq">${l.q}</i></div><div><h3>${l.q} ${esc(itemName(l.item))}</h3>
+    <p>${l.buyer ? `<b class="pzcheap">Satıldı!</b> ${esc(String(l.bn || "Bir çiftçi"))} aldı` : `Satışta · ${pzAgo(l.ts)}`}</p><p><span class="price">${fmtG(l.price)} altın</span></p>
+    ${l.buyer ? "" : `<div class="row"><button class="big ghost sm" data-pzcancel="${l.id}" ${pzBusy ? "disabled" : ""}>Geri al</button></div>`}</div></div>`).join("");
+  if (pzMine.length >= PAZAR_SLOTS) h += `<p class="empty">Bütün tezgahların dolu. Bir ürün satılınca ya da geri alınca yer açılır.</p>`;
+  else if (!pzForm) h += `<button class="big green" data-pznew="1">+ Tezgaha ürün koy</button>`;
+  else {
+    const stock = PAZAR_KEYS.filter(k => (+S.store[k] || 0) > 0);
+    if (!stock.length) h += `<p class="empty">Depoda satacak ürünün yok.</p><button class="big ghost" data-pzx="1">Vazgeç</button>`;
+    else {
+      if (!stock.includes(pzForm.k)) Object.assign(pzForm, { k: stock[0], q: Math.min(+S.store[stock[0]], 10), pe: false });
+      const f = pzForm, have = +S.store[f.k] || 0; f.q = Math.min(have, Math.max(1, f.q)); if (!f.pe) f.p = Math.max(1, Math.round(pzVal(f.k, f.q) * 1.2)); f.p = Math.min(pzMax(f.k, f.q), Math.max(1, f.p));
+      h += `<div class="pzform"><b>Ne satacaksın?</b><div class="chips pzchips">${stock.map(k => `<button data-pzk="${k}" aria-pressed="${k === f.k}">${ITEM_EMO[k]} ${esc(itemName(k))} (${+S.store[k]})</button>`).join("")}</div>
+        <b>Kaç tane?</b><div class="pzrow"><button class="big ghost sm" data-pzq="-10">-10</button><button class="big ghost sm" data-pzq="-1">-1</button><span class="pzval">${f.q}</span><button class="big ghost sm" data-pzq="1">+1</button><button class="big ghost sm" data-pzq="10">+10</button><button class="big ghost sm" data-pzq="max">Hepsi</button></div>
+        <b>Fiyat (toplam altın)</b><div class="pzrow"><button class="big ghost sm" data-pzp="-10">-10</button><button class="big ghost sm" data-pzp="-1">-1</button><input id="pzPrice_v8" type="number" inputmode="numeric" min="1" max="${pzMax(f.k, f.q)}" value="${f.p}"><button class="big ghost sm" data-pzp="1">+1</button><button class="big ghost sm" data-pzp="10">+10</button></div>
+        <p class="note">Depoda satsan ${fmtG(pzVal(f.k, f.q))} altın eder. En fazla ${fmtG(pzMax(f.k, f.q))} altın isteyebilirsin.</p>
+        <div class="row"><button class="big green" data-pzput="1" ${pzBusy ? "disabled" : ""}>Tezgaha koy</button><button class="big ghost" data-pzx="1">Vazgeç</button></div></div>`;
+    }
+  }
+  body.innerHTML = h;
+}
+document.querySelectorAll("#pazar_v8 [data-ptab]").forEach(b => b.onclick = () => { pzTab = b.getAttribute("data-ptab"); renderPazar(); });
+$("pazarBody").addEventListener("input", e => { if (e.target.id === "pzPrice_v8" && pzForm) { pzForm.p = Math.floor(+e.target.value || 0); pzForm.pe = true; } });
+$("pazarBody").addEventListener("change", e => { if (e.target.id === "pzPrice_v8") renderPazar(); });
+$("pazarBody").addEventListener("click", e => {
+  const A = n => { const el = e.target.closest("[" + n + "]"); return el ? el.getAttribute(n) : null; };
+  if (A("data-pzf")) { pzFilter = A("data-pzf"); renderPazar(); return; }
+  if (A("data-pzbuy")) { pzBuy(A("data-pzbuy")); return; }
+  if (A("data-pzcancel")) { pzCancel(A("data-pzcancel")); return; }
+  if (A("data-pznew")) { pzForm = { k: null, q: 10, p: 0, pe: false }; renderPazar(); return; }
+  if (A("data-pzx")) { pzForm = null; renderPazar(); return; }
+  if (!pzForm) return;
+  if (A("data-pzk")) { pzForm.k = A("data-pzk"); pzForm.q = Math.min(+S.store[pzForm.k] || 1, 10); pzForm.pe = false; renderPazar(); return; }
+  if (A("data-pzq")) { const v = A("data-pzq"), have = +S.store[pzForm.k] || 0; pzForm.q = v === "max" ? have : Math.min(have, Math.max(1, pzForm.q + (+v))); renderPazar(); return; }
+  if (A("data-pzp")) { pzForm.p = Math.max(1, (+pzForm.p || 0) + (+A("data-pzp"))); pzForm.pe = true; renderPazar(); return; }
+  if (A("data-pzput")) { const inp = $("pzPrice"); if (inp) pzForm.p = Math.floor(+inp.value || 0); pzPut(); }
 });
 
 // ---------- Job board ----------
@@ -4699,8 +4843,8 @@ function renderQuest() {
   if (!q || !entered) { t.hidden = true; questPulse(null); return; }
   t.hidden = false;
   const ready = questReady(q);
-  t.classList.toggle("ready", ready);
-  t.innerHTML = `<span class="qe">${q.e}</span><span class="qt"><b>${ready ? "Görev tamamlandı!" : "Görev " + (S.tut.i + 1) + ": " + q.t}</b><small>${ready ? "Dokun, ödülünü al" : questLine(q)}</small><i><u style="width:${questPct(q).toFixed(0)}%"></u></i></span><span class="qg">+${q.gold}</span>`;
+  t.classList.toggle("ready", ready); t.classList.toggle("mini", qMini && !ready);
+  t.innerHTML = `<span class="qe">${q.e}</span><span class="qt"><b>${ready ? "Görev tamamlandı!" : "Görev " + (S.tut.i + 1) + ": " + q.t}</b><small>${ready ? "Dokun, ödülünü al" : questLine(q)}</small><i><u style="width:${questPct(q).toFixed(0)}%"></u></i></span><span class="qg">+${q.gold}</span>`; t.style.setProperty("--qp", questPct(q).toFixed(0) + "%");
   questPulse(ready ? null : q);
   if ($("quests").classList.contains("on")) renderQuestList();
 }
@@ -4759,7 +4903,14 @@ function coinBurst(from, amount) {
   }
 }
 $("questBtn").onclick = () => openQuests();
-$("qtrack").onclick = () => openQuests("tut");
+// tapping the quest bar folds it into a small round button (and back); a finished quest opens the window
+let qMini = false; try { qMini = localStorage.getItem("lucky-qmin") === "1"; } catch (e) {}
+$("qtrack").onclick = () => {
+  const q = questCur(); if (q && questReady(q)) { openQuests("tut"); return; }
+  qMini = !qMini; try { localStorage.setItem("lucky-qmin", qMini ? "1" : "0"); } catch (e) {}
+  if (qMini) hint("Görev çubuğu küçüldü. Açmak için yeniden dokun, ayrıntılar için yukarıdaki görev düğmesi.");
+  renderQuest();
+};
 $("questClose").onclick = () => $("quests").classList.remove("on");
 $("quests").addEventListener("click", e => {
   if (e.target === $("quests")) { $("quests").classList.remove("on"); return; }
@@ -5128,6 +5279,13 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 90, d: "9 Ekim 2026", e: "🛒", t: "Pazar ve yeni binalar", c: "#2f9a43", b: "#e3f7dc", items: [
+    "<b>Pazar</b> (5. sv): Meydandaki tezgahlarda oyuncular birbirine ürün satıyor. Ürününü kendi fiyatınla tezgaha koy, biri alınca altın kendiliğinden sana gelir. En fazla 4 tezgah.",
+    "Yeni <b>tavuk kümesi</b> ve <b>inek ahırı</b>, daha sevimli tavuklar ve inekler.",
+    "<b>Depo</b> artık kemerli çatılı, büyük DEPO tabelalı bir ambar binası. <b>Ambar</b> yel değirmenli, parlak silolu lüks bir bina oldu.",
+    "<b>Fırınlar</b> geliştirdikçe değişiyor: 2. seviye tuğla fırın, 3. seviye modern fırın.",
+    "Görev çubuğuna dokununca küçülüyor, yeniden dokununca açılıyor.",
+  ] },
   { v: 89, d: "9 Ekim 2026", e: "📋", t: "Siparişler ve günlük görevler", c: "#2f7fbf", b: "#dcefff", items: [
     "<b>Sipariş tabelası</b> (3. sv): Köylüler ürün istiyor. Depodan teslim et, normal satıştan daha çok altın ve XP kazan. Çiftliğindeki tabelaya dokunarak da bakabilirsin.",
     "<b>Günlük görevler</b> (3. sv): Her gün 3 yeni görev. Üçünü de bitirirsen <b>günün sandığı</b> açılır.",
@@ -5529,6 +5687,15 @@ function setup3D(T) {
     [-1, 1].forEach(s => { const p = mesh(G.box, roofMat(color), cx, y0 + rise / 2, cz + s * half / 2, w + over * 2, .1, len + .05); p.rotation.x = s * ang; g.add(p); });
     g.add(mesh(G.box, M(COL.roofD), cx, y0 + rise + .02, cz, w + over * 2 + .02, .08, .14));
   }
+  // a roof whose gable faces the front (ridge runs front to back)
+  const prismZ = (() => { const s = new T.Shape(); s.moveTo(-.5, 0); s.lineTo(.5, 0); s.lineTo(0, 1); s.closePath(); const g = new T.ExtrudeGeometry(s, { depth: 1, bevelEnabled: false }); g.translate(0, 0, -.5); return g; })();
+  const roofMatZ = c => { const k = "rz" + c; if (!mats[k]) { const t = TEX.shingle.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1.6, 3); t.rotation = Math.PI / 2; mats[k] = LAM({ color: c, map: t }); } return mats[k]; };
+  function gableZ(g, cx, cz, w, d, y0, rise, color, over, wallCol, wallTex) {
+    g.add(mesh(prismZ, TM(wallCol, wallTex || "siding", 2, 1), cx, y0, cz, w, rise, d));
+    const half = w / 2 + over, len = Math.hypot(half, rise), ang = Math.atan2(rise, half);
+    [-1, 1].forEach(s => { const p = mesh(G.box, roofMatZ(color), cx + s * half / 2, y0 + rise / 2, cz, len + .05, .1, d + over * 2); p.rotation.z = -s * ang; g.add(p); });
+    g.add(mesh(G.box, M(COL.roofD), cx, y0 + rise + .02, cz, .14, .08, d + over * 2 + .02));
+  }
   function gableWalls(g, cx, cz, w, d, y0, rise, color, tex = "siding") { const p = mesh(prism, TM(color, tex, 2, 1), cx, y0, cz, w, rise, d); g.add(p); }
   // soft contact shadow on the ground under things, so nothing looks like it floats
   const blobTex = canvasTex("blob", 128, 128, (x) => { const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.6, "rgba(0,0,0,.22)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 128); });
@@ -5553,25 +5720,46 @@ function setup3D(T) {
     return g;
   }
   function buildBarn(a) {
-    const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + 1.5, cz = r + 1.0, w = 2.7, d = 1.5, h = 1.25;
-    blob(g, cx, cz + .1, w + 1.4, d + 1.4);
-    g.add(mesh(G.box, TM("#d8d2c6", "stone", 4, 1), cx, .08, cz, w + .14, .16, d + .14));
-    g.add(mesh(G.box, TM(COL.barn, "planks", 4, 1.2), cx, .16 + h / 2, cz, w, h, d));
-    gableWalls(g, cx, cz, w, d, .16 + h, .75, COL.barn, "planks");
-    gableRoof(g, cx, cz, w, d, .16 + h - .02, .8, COL.barnRoof, .14);
-    const fz = cz + d / 2 + .02;
-    g.add(mesh(G.box, M("#a32e22"), cx, .7, fz, 1.1, 1.0, .05));
-    [[0, .7, 1.1, .07, 0], [0, .7, 1.45, .07, .74], [0, .7, 1.45, .07, -.74]].forEach(([dx, y, l, t, rot]) => { const b = mesh(G.box, M(COL.trim), cx + dx, y, fz + .04, l, t, .04, false); b.rotation.z = rot; g.add(b); });
-    g.add(mesh(G.box, M(COL.trim), cx, 1.22, fz + .04, 1.2, .07, .04, false)); g.add(mesh(G.box, M(COL.trim), cx, .2, fz + .04, 1.2, .07, .04, false));
-    g.add(mesh(G.box, M(COL.trim), cx - .58, .7, fz + .04, .07, 1.05, .04, false)); g.add(mesh(G.box, M(COL.trim), cx + .58, .7, fz + .04, .07, 1.05, .04, false));
-    g.add(mesh(G.box, M("#3a2a1c"), cx, 1.75, fz - .2, .5, .38, .06)); g.add(mesh(G.box, M(COL.hay), cx, 1.62, fz - .17, .44, .12, .06, false));
-    [[-1.55, .25], [1.55, .3]].forEach(([dx, dz]) => { const b = mesh(G.cyl, M(COL.hay), cx + dx, .22, fz + dz, .24, .44, .24); b.rotation.z = Math.PI / 2; g.add(b); });
-    // it is the depot: a big DEPO board over the door, crates and sacks around it
-    const dt = canvasTex("depoSign", 512, 160, (x, w, h) => { x.fillStyle = "#6b4423"; rr(x, 4, 4, w - 8, h - 8, 26); x.fill(); x.fillStyle = "#c08a4f"; rr(x, 16, 16, w - 32, h - 32, 18); x.fill();
-      x.fillStyle = "#fff6d6"; x.font = "700 92px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.lineWidth = 12; x.strokeStyle = "#5a3315"; x.strokeText("📦 DEPO", w / 2, h / 2 + 4); x.fillText("📦 DEPO", w / 2, h / 2 + 4); });
-    const sb = boardMesh(1.25, .4, dt); sb.position.set(cx, 1.42, fz + .07); g.add(sb);
-    [[-1.05, .55, "#b07a42"], [-1.32, .55, "#c08a4f"], [-1.18, .55, "#a8743f"]].forEach(([dx, dz, c], k) => { const y = k === 2 ? .45 : .15; g.add(mesh(G.box, TM(c, "planks", 1, 1), cx + dx, y, fz + dz - (k === 2 ? .03 : 0), .28, .28, .28)); });
-    [[1.05, .55], [1.3, .6], [1.17, .78]].forEach(([dx, dz]) => { g.add(mesh(G.sph, M("#e9d6a8"), cx + dx, .17, fz + dz, .14, .17, .12)); g.add(mesh(G.cyl8, M("#8a6a3a"), cx + dx, .33, fz + dz, .04, .04, .04, false)); });
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + 1.5, cz = r + .86, w = 2.7, d = 1.4, h = .98, y0 = .12;
+    blob(g, cx, cz + .25, w + 1.4, d + 1.7);
+    g.add(mesh(G.box, TM("#c9c0ae", "stone", 4, 1), cx, y0 / 2, cz, w + .14, y0, d + .14));
+    g.add(mesh(G.box, TM("#c8643c", "brick", 4, 1.4), cx, y0 + h / 2, cz, w, h, d));
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => g.add(mesh(G.box, M("#efe3c8"), cx + sx * (w / 2 - .02), y0 + h / 2, cz + sz * (d / 2 - .02), .14, h, .14)));
+    g.add(mesh(G.box, M("#efe3c8"), cx, y0 + h, cz, w + .1, .08, d + .1));
+    // arched corrugated roof (half cylinder along the depth)
+    const top = y0 + h + .04, ry = .66, rx = w / 2 + .12, fzR = cz + d / 2 + .1;
+    { const rg = new T.CylinderGeometry(1, 1, 1, 28, 1, true, -Math.PI / 2, Math.PI), rf = new T.Mesh(rg, TM("#4f8a5a", "siding", 1, 7, { side: T.DoubleSide }));
+      rf.rotation.x = -Math.PI / 2; rf.position.set(cx, top, cz); rf.scale.set(rx, d + .2, ry); rf.castShadow = true; g.add(rf);
+      const sh = new T.Shape(); sh.absellipse(0, 0, rx - .01, ry - .01, 0, Math.PI, false);
+      [fzR - .02, cz - d / 2 - .08].forEach((zz, k) => { const f = new T.Mesh(new T.ShapeGeometry(sh, 24), M("#efe3c8", { side: T.DoubleSide })); f.position.set(cx, top, zz); g.add(f); });
+      const rim = new T.Mesh(new T.TorusGeometry(1, .035, 6, 28, Math.PI), M("#2f5f3c")); rim.position.set(cx, top, fzR); rim.scale.set(rx, ry, 1); g.add(rim); }
+    const st = canvasTex("depoSign2", 512, 150, (x, w2, h2) => { x.fillStyle = "#7a4a1a"; rr(x, 4, 4, w2 - 8, h2 - 8, 26); x.fill(); x.fillStyle = "#f6c445"; rr(x, 16, 16, w2 - 32, h2 - 32, 18); x.fill();
+      x.fillStyle = "#4a2c0c"; x.font = "700 92px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("📦 DEPO", w2 / 2, h2 / 2 + 4); });
+    { const sb = boardMesh(1.45, .42, st); sb.position.set(cx, top + .3, fzR + .01); g.add(sb); }
+    const fz = cz + d / 2 + .005;
+    // roller door, half open, with shelves of crates inside
+    g.add(mesh(G.box, M("#efe3c8"), cx, y0 + .44, fz, 1.36, .9, .03, false));
+    g.add(mesh(G.box, M("#251a12"), cx, y0 + .41, fz + .01, 1.2, .82, .03, false));
+    g.add(mesh(G.box, TM("#a7b0b8", "siding", 1, 3), cx, y0 + .7, fz + .03, 1.18, .28, .03, false));
+    g.add(mesh(G.box, M("#5d666e"), cx, y0 + .56, fz + .05, 1.18, .03, .03, false));
+    g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), cx, y0 + .27, fz + .015, 1.14, .03, .02, false));
+    [[-.4, "#e8a33a"], [-.13, "#d9483a"], [.14, "#f2d06b"], [.41, "#e0702a"]].forEach(([dx, col]) => { g.add(mesh(G.box, TM("#b07a42", "planks", 1, 1), cx + dx, y0 + .38, fz + .02, .24, .17, .02, false)); g.add(mesh(G.box, M(col), cx + dx, y0 + .48, fz + .02, .2, .04, .02, false)); });
+    [[-.3, "#b07a42"], [0, "#c08a4f"], [.3, "#a8743f"]].forEach(([dx, col]) => g.add(mesh(G.box, TM(col, "planks", 1, 1), cx + dx, y0 + .12, fz + .02, .26, .2, .02, false)));
+    // lamp over the door, small windows
+    g.add(mesh(G.box, M("#2a2a2a"), cx, y0 + .93, fz + .06, .05, .05, .12, false)); g.add(mesh(G.sph, new T.MeshBasicMaterial({ color: "#ffe9a8" }), cx, y0 + .88, fz + .12, .05, .05, .05, false));
+    [-1, 1].forEach(s => { const wx = cx + s * .98; g.add(mesh(G.box, M("#efe3c8"), wx, y0 + .6, fz, .36, .32, .04)); g.add(mesh(G.box, MS(COL.glass, { roughness: .25 }), wx, y0 + .6, fz + .02, .28, .24, .03, false));
+      g.add(mesh(G.box, M("#efe3c8"), wx, y0 + .6, fz + .04, .03, .24, .02, false)); });
+    // loading dock with crates of produce, sacks, barrels and a hand truck
+    g.add(mesh(G.box, TM(COL.wood, "planks", 4, 1), cx, .05, cz + d / 2 + .27, w - .1, .1, .5));
+    const crate = (x, y, z, s, fill, round) => { g.add(mesh(G.box, TM("#b07a42", "planks", 1, 1), x, y + s * .4, z, s, s * .8, s * .8));
+      if (round) for (let k = 0; k < 4; k++) g.add(mesh(G.sph, M(fill), x + (k % 2 - .5) * s * .45, y + s * .82, z + ((k >> 1) - .5) * s * .35, s * .22, s * .2, s * .22, false));
+      else g.add(mesh(G.box, M(fill), x, y + s * .82, z, s * .86, s * .1, s * .66, false)); };
+    crate(cx - 1.05, .1, cz + d / 2 + .25, .32, "#e3b44a"); crate(cx - .7, .1, cz + d / 2 + .3, .3, "#d63c2e", true); crate(cx - .9, .36, cz + d / 2 + .25, .28, "#f08a24", true);
+    [[1.0, .3], [1.22, .36], [1.1, .52]].forEach(([dx, dz]) => { g.add(mesh(G.sph, M("#e9d6a8"), cx + dx, .27, cz + d / 2 + dz - .1, .13, .16, .11)); g.add(mesh(G.cyl8, M("#8a6a3a"), cx + dx, .43, cz + d / 2 + dz - .1, .04, .04, .04, false)); });
+    [-1, 1].forEach((s, k) => { const bx = cx + s * 1.5, bz = cz + .2 + k * .35; g.add(mesh(G.cyl, TM("#9a6a3a", "wood"), bx, .22, bz, .14, .44, .14)); [.08, .36].forEach(y => g.add(mesh(G.cyl, M("#4a3a2a"), bx, y, bz, .145, .03, .145, false))); });
+    { const ht = new T.Group(); ht.position.set(cx + .62, 0, cz + d / 2 + .45); ht.rotation.x = -.25;
+      [-.09, .09].forEach(dx => ht.add(mesh(G.box, M("#c8453a"), dx, .3, 0, .025, .55, .025, false))); ht.add(mesh(G.box, M("#5d666e"), 0, .05, .06, .22, .02, .12, false));
+      [-.11, .11].forEach(dx => { const wh = mesh(G.cyl, M("#222"), dx, .06, -.02, .06, .03, .06, false); wh.rotation.z = Math.PI / 2; ht.add(wh); }); g.add(ht); }
     return g;
   }
   function buildWell(a, lv) {
@@ -5595,77 +5783,167 @@ function setup3D(T) {
   }
   // turn a building around its centre (n quarter turns)
   function spin(g, cx, cz, n) { if (!n) return g; const p = new T.Group(); p.position.set(cx, 0, cz); g.position.set(-cx, 0, -cz); p.add(g); p.rotation.y = -n * Math.PI / 2; return p; }
-  function fenceRun(g, x0, z0, x1, z1, gap) {   // a low wooden fence from (x0,z0) to (x1,z1) with an optional opening in the middle
+  function fenceRun(g, x0, z0, x1, z1, gap, post, rail) {   // a low fence from (x0,z0) to (x1,z1) with an optional opening in the middle
+    post = post || COL.wood; rail = rail || "#c08a4f";
     const len = Math.hypot(x1 - x0, z1 - z0), n = Math.max(2, Math.round(len / .5)), dx = (x1 - x0) / n, dz = (z1 - z0) / n;
-    for (let k = 0; k <= n; k++) { const t = k / n; if (gap && Math.abs(t - .5) < gap / 2) continue; g.add(mesh(G.box, TM(COL.wood, "wood"), x0 + dx * k, .2, z0 + dz * k, .06, .4, .06)); }
-    for (let k = 0; k < n; k++) { const t = (k + .5) / n; if (gap && Math.abs(t - .5) < gap / 2) continue; const r = mesh(G.box, M("#c08a4f"), x0 + dx * (k + .5), .3, z0 + dz * (k + .5), Math.abs(dx) + .02 || .04, .05, Math.abs(dz) + .02 || .04); g.add(r); const r2 = r.clone(); r2.position.y = .16; g.add(r2); }
+    for (let k = 0; k <= n; k++) { const t = k / n; if (gap && Math.abs(t - .5) < gap / 2) continue; g.add(mesh(G.box, TM(post, "wood"), x0 + dx * k, .2, z0 + dz * k, .07, .4, .07)); g.add(mesh(G.box, M(post), x0 + dx * k, .41, z0 + dz * k, .09, .03, .09, false)); }
+    for (let k = 0; k < n; k++) { const t = (k + .5) / n; if (gap && Math.abs(t - .5) < gap / 2) continue; const r = mesh(G.box, M(rail), x0 + dx * (k + .5), .32, z0 + dz * (k + .5), Math.abs(dx) + .02 || .04, .05, Math.abs(dz) + .02 || .04); g.add(r); const r2 = r.clone(); r2.position.y = .17; g.add(r2); }
   }
+  const boardTex = (key, text, bg, fg, edge) => canvasTex(key, 512, 150, (x, w, h) => { x.fillStyle = edge; rr(x, 4, 4, w - 8, h - 8, 26); x.fill(); x.fillStyle = bg; rr(x, 16, 16, w - 32, h - 32, 18); x.fill();
+    x.fillStyle = fg; x.font = "700 84px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, h / 2 + 4); });
+  const sunflower = (g, x, z, hgt) => { g.add(mesh(G.cyl8, M("#4f8a2f"), x, hgt / 2, z, .018, hgt, .018, false)); [-.6, .5].forEach((a, k) => { const lf = mesh(G.sph, M("#5aa03a"), x + Math.sin(a) * .06, hgt * (.4 + k * .2), z, .06, .02, .035, false); lf.rotation.z = a; g.add(lf); });
+    const hd = mesh(G.cyl, M("#f6c21c"), x, hgt, z + .03, .11, .02, .11, false); hd.rotation.x = 1.2; g.add(hd); const ce = mesh(G.cyl, M("#6b3f1a"), x, hgt + .005, z + .045, .05, .02, .05, false); ce.rotation.x = 1.2; g.add(ce); };
   function buildCoop(a, nHens) {
-    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .1, x1 = c + 2.9, z0 = r + .1, z1 = r + 2.9;
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .08, x1 = c + 2.92, z0 = r + .08, z1 = r + 2.92;
     blob(g, c + 1.5, r + 1.5, 3.4, 3.4, .45);
-    { const fl = new T.Mesh(G.plane, M("#e3cf8f")); fl.position.set(c + 1.5, .012, r + 1.5); fl.scale.set(2.8, 1, 2.8); g.add(fl); }
-    fenceRun(g, x0, z0, x1, z0); fenceRun(g, x0, z0, x0, z1); fenceRun(g, x1, z0, x1, z1); fenceRun(g, x0, z1, x1, z1, .3);
-    // little henhouse on stilts in the back corner, nest boxes and a ramp
-    const hx = c + .85, hz = r + .75;
-    [[-.4, -.3], [.4, -.3], [-.4, .3], [.4, .3]].forEach(([dx, dz]) => g.add(mesh(G.box, M(COL.woodD), hx + dx, .15, hz + dz, .06, .3, .06)));
-    g.add(mesh(G.box, TM("#c8453a", "planks", 2, 1), hx, .55, hz, 1.0, .5, .8)); gableRoof(g, hx, hz, 1.0, .8, .78, .38, "#6b4423", .1);
-    g.add(mesh(G.box, M("#3a2a1c"), hx + .2, .48, hz + .41, .22, .26, .02, false)); g.add(mesh(G.box, M(COL.trim), hx - .22, .6, hz + .41, .24, .18, .02, false));
-    { const rp = mesh(G.box, TM(COL.wood, "planks", 1, 2), hx + .2, .17, hz + .66, .2, .03, .5); rp.rotation.x = .62; g.add(rp); }
-    // feeder and water dish
-    g.add(mesh(G.box, TM(COL.wood, "wood"), c + 2.2, .1, r + .7, .7, .12, .18)); g.add(mesh(G.box, M("#e9d29a"), c + 2.2, .17, r + .7, .62, .03, .12, false));
-    g.add(mesh(G.cyl, M("#9aa5ad"), c + 2.4, .05, r + 1.5, .18, .08, .18)); g.add(mesh(G.cyl, MS("#5ab0d6", { roughness: .1 }), c + 2.4, .09, r + 1.5, .15, .01, .15, false));
-    // hens walking around inside the pen
-    const pen = { items: [], x0: c + .4, x1: c + 2.6, z0: r + 1.35, z1: r + 2.6 };
-    for (let k = 0; k < nHens; k++) { const m = buildHen(k % 3 === 1); m.g.scale.setScalar(.9); const px = pen.x0 + Math.random() * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+    { const fl = new T.Mesh(G.plane, TM("#e6d08f", "soil", 2, 2)); fl.position.set(c + 1.5, .012, r + 1.5); fl.scale.set(2.84, 1, 2.84); fl.receiveShadow = true; g.add(fl); }
+    const WF = "#f4f0e6", WR = "#ffffff";
+    fenceRun(g, x0, z0, x1, z0, 0, WF, WR); fenceRun(g, x0, z0, x0, z1, 0, WF, WR); fenceRun(g, x1, z0, x1, z1, 0, WF, WR); fenceRun(g, x0, z1, x1, z1, .3, WF, WR);
+    // the henhouse on short stilts: butter-yellow planks, red roof, green door, round window, ramp and a sign
+    const hx = c + 1.12, hz = r + .72, w = 1.62, d = .98, y0 = .24, h = .64, WALL = "#f2d99a";
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => g.add(mesh(G.box, M(COL.woodD), hx + sx * (w / 2 - .06), y0 / 2, hz + sz * (d / 2 - .06), .08, y0, .08)));
+    g.add(mesh(G.box, TM(COL.wood, "planks", 3, 1), hx, y0 - .02, hz, w + .08, .06, d + .08));
+    g.add(mesh(G.box, TM(WALL, "planks", 4, 1), hx, y0 + h / 2, hz, w, h, d));
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => g.add(mesh(G.box, M(COL.trim), hx + sx * w / 2, y0 + h / 2, hz + sz * d / 2, .07, h, .07, false)));
+    gableWalls(g, hx, hz, w, d, y0 + h, .44, WALL, "planks");
+    gableRoof(g, hx, hz, w, d, y0 + h - .02, .46, "#b8402c", .12);
+    const fz = hz + d / 2 + .01;
+    g.add(mesh(G.box, M(COL.trim), hx - .36, y0 + .3, fz, .42, .6, .03, false)); g.add(mesh(G.box, M("#4f8a4a"), hx - .36, y0 + .28, fz + .01, .34, .54, .03, false));
+    [.7, -.7].forEach(rz => { const br = mesh(G.box, M(COL.trim), hx - .36, y0 + .28, fz + .03, .04, .58, .02, false); br.rotation.z = rz; g.add(br); });
+    g.add(mesh(G.sph, M("#e2b33c"), hx - .23, y0 + .28, fz + .05, .025, .025, .025, false));
+    { const wn = mesh(G.cyl, MS("#9fd0e8", { roughness: .2 }), hx + .32, y0 + .44, fz, .12, .03, .12, false); wn.rotation.x = Math.PI / 2; g.add(wn);
+      const fr = new T.Mesh(new T.TorusGeometry(.13, .025, 6, 20), M(COL.trim)); fr.position.set(hx + .32, y0 + .44, fz + .015); g.add(fr); }
+    g.add(mesh(G.box, M("#2a1d12"), hx + .32, y0 + .11, fz, .2, .18, .03, false));
+    { const rp = new T.Group(); rp.position.set(hx + .32, y0 / 2 + .01, fz + .24); rp.rotation.x = .78; rp.add(mesh(G.box, TM(COL.wood, "planks", 1, 2), 0, 0, 0, .22, .025, .5));
+      [-.15, 0, .15].forEach(dz => rp.add(mesh(G.box, M(COL.woodD), 0, .02, dz, .22, .02, .025, false))); g.add(rp); }
+    { const sb = boardMesh(.74, .22, boardTex("kumesSign", "🥚 KÜMES", "#fff3cf", "#7a3a14", "#b8402c")); sb.position.set(hx, y0 + h + .17, fz + .01); g.add(sb); }
+    // nest box with eggs on the side, egg basket
+    const nx = hx + w / 2 + .17; g.add(mesh(G.box, TM("#c8453a", "planks", 1, 1), nx, y0 + .26, hz + .05, .32, .3, .66));
+    { const lid = mesh(G.box, M("#7b2f22"), nx + .02, y0 + .45, hz + .05, .4, .04, .72); lid.rotation.z = -.4; g.add(lid); }
+    g.add(mesh(G.cyl, TM("#a8743f", "wood"), hx + w / 2 + .25, .07, hz + .66, .13, .14, .13)); [[0, 0], [.06, .04], [-.05, .04], [0, -.06]].forEach(([dx, dz]) => g.add(mesh(G.sph, M("#fff8ea"), hx + w / 2 + .25 + dx, .16, hz + .66 + dz, .04, .05, .04, false)));
+    // inside the run: a red hanging-style feeder with grain, a water bell, a perch, a straw bale and sunflowers
+    const fx0 = c + 2.5, fz0 = r + 1.6;
+    g.add(mesh(G.cyl, M("#d9483a"), fx0, .2, fz0, .09, .2, .09)); g.add(mesh(G.cone, M("#b8402c"), fx0, .36, fz0, .13, .12, .13)); g.add(mesh(G.cyl, M("#d9483a"), fx0, .05, fz0, .16, .04, .16));
+    g.add(mesh(G.cyl, M("#e6c35a"), fx0, .075, fz0, .14, .01, .14, false));
+    g.add(mesh(G.cyl, M("#9aa5ad"), fx0, .03, r + 2.35, .13, .04, .13)); g.add(mesh(G.cyl, MS("#5ab0d6", { roughness: .1 }), fx0, .052, r + 2.35, .11, .01, .11, false));
+    g.add(mesh(G.sph, MS("#cfeaf7", { roughness: .1, transparent: true, opacity: .7 }), fx0, .1, r + 2.35, .08, .1, .08, false)); g.add(mesh(G.cyl8, M("#d9483a"), fx0, .21, r + 2.35, .03, .04, .03, false));
+    [.45, 1.15].forEach(dx => g.add(mesh(G.box, TM(COL.wood, "wood"), c + dx, .14, r + 2.62, .05, .28, .05))); { const pb = mesh(G.cyl8, TM(COL.wood, "wood"), c + .8, .28, r + 2.62, .025, .74, .025); pb.rotation.z = Math.PI / 2; g.add(pb); }
+    g.add(mesh(G.box, M(COL.hay), c + .42, .13, r + 1.62, .42, .26, .3)); [-.08, .08].forEach(dx => g.add(mesh(G.box, M("#b38a3a"), c + .42 + dx, .13, r + 1.62, .02, .27, .31, false)));
+    sunflower(g, x0 + .18, z1 - .18, .55); sunflower(g, x0 + .38, z1 - .14, .45);
+    let sd = a * 7 + 3; const rnd3 = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    for (let k = 0; k < 16; k++) g.add(mesh(G.box, M(k % 3 ? "#e3b44a" : "#c99a3a"), fx0 - .45 + rnd3() * .6, .016, fz0 - .2 + rnd3() * .5, .025, .01, .02, false));
+    const pen = { items: [], x0: c + .45, x1: c + 2.25, z0: r + 1.5, z1: r + 2.6 };
+    for (let k = 0; k < nHens; k++) { const m = buildHen(k % 3 === 1); m.g.scale.setScalar(.95); const px = pen.x0 + Math.random() * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: Math.random() * 3, sp: .45 }); }
     fx.pens.push(pen);
     return g;
   }
+  // a Holstein cow: rounded body with black patches, pink muzzle and udder, horns, ears, a red collar with a little bell
   function buildCow() {
     const g = new T.Group(), b = new T.Group(); g.add(b);
-    b.add(mesh(G.box, M("#fbfaf6"), 0, .42, 0, .34, .3, .62)); b.add(mesh(G.box, M("#2f2a26"), .1, .5, .1, .2, .16, .22, false)); b.add(mesh(G.box, M("#2f2a26"), -.11, .43, -.16, .14, .14, .18, false));
-    const hd = new T.Group(); hd.position.set(0, .56, .36); b.add(hd);
-    hd.add(mesh(G.box, M("#fbfaf6"), 0, 0, 0, .24, .24, .24)); hd.add(mesh(G.box, M("#f2a9b0"), 0, -.06, .13, .2, .12, .06, false));
-    [-.07, .07].forEach(dx => { hd.add(mesh(G.sph, M("#1d1a14"), dx, .05, .125, .02, .02, .02, false)); hd.add(mesh(G.cone, M("#f3e0b0"), dx * 1.6, .16, -.02, .03, .1, .03, false)); hd.add(mesh(G.box, M("#2f2a26"), dx * 2.2, .06, -.02, .1, .05, .06, false)); });
-    [[-.12, -.22], [.12, -.22], [-.12, .22], [.12, .22]].forEach(([dx, dz]) => g.add(mesh(G.box, M("#efe9e0"), dx, .14, dz, .08, .28, .08)));
-    g.add(mesh(G.sph, M("#f2a9b0"), 0, .26, -.08, .07, .05, .07, false));
-    { const tl = mesh(G.cyl8, M("#2f2a26"), 0, .4, -.33, .015, .25, .015, false); tl.rotation.x = .3; g.add(tl); }
+    const W = "#fbfaf6", K = "#2b2724", P = "#f3a7ae";
+    b.add(mesh(G.sph, M(W), 0, .46, -.04, .18, .165, .31)); b.add(mesh(G.sph, M(W), 0, .5, .17, .16, .155, .15));
+    [[.12, .52, .04, .1, .09, .13], [-.13, .48, -.15, .09, .1, .11], [0, .6, -.1, .1, .05, .12], [-.12, .53, .17, .07, .07, .07], [.13, .44, -.22, .06, .07, .08]].forEach(([x, y, z, sx, sy, sz]) => b.add(mesh(G.sph, M(K), x, y, z, sx, sy, sz, false)));
+    b.add(mesh(G.sph, M(P), 0, .3, -.15, .085, .06, .085, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .25, -.15 + dz, .012, .05, .012, false)));
+    [[-.1, -.22], [.1, -.22], [-.1, .18], [.1, .18]].forEach(([dx, dz]) => { g.add(mesh(G.cyl8, M(W), dx, .18, dz, .045, .3, .045)); g.add(mesh(G.cyl8, M(K), dx, .03, dz, .05, .06, .05, false)); });
+    { const col = mesh(G.cyl, M("#c8453a"), 0, .52, .28, .105, .035, .1, false); col.rotation.x = 1.0; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .7, roughness: .3 }), 0, .42, .33, .035, .04, .035, false)); }
+    { const tl = mesh(G.cyl8, M(W), 0, .4, -.36, .014, .26, .014, false); tl.rotation.x = .25; b.add(tl); b.add(mesh(G.sph, M(K), 0, .27, -.39, .03, .05, .03, false)); }
+    const hd = new T.Group(); hd.position.set(0, .6, .3); b.add(hd);
+    hd.add(mesh(G.sph, M(W), 0, 0, .04, .1, .11, .12)); hd.add(mesh(G.sph, M(K), .05, .05, .03, .065, .07, .08, false));
+    hd.add(mesh(G.sph, M(P), 0, -.05, .14, .085, .065, .06, false)); [-.03, .03].forEach(dx => hd.add(mesh(G.sph, M("#9a4a52"), dx, -.04, .195, .012, .014, .008, false)));
+    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#fff"), s * .065, .03, .11, .022, .022, .015, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .07, .03, .122, .013, .014, .008, false));
+      const ear = mesh(G.sph, M(s > 0 ? K : W), s * .13, .05, .0, .06, .022, .035, false); ear.rotation.z = s * .35; hd.add(ear);
+      const hn = mesh(G.cone, M("#efe2c0"), s * .065, .13, .0, .018, .07, .018, false); hn.rotation.z = -s * .5; hd.add(hn); });
     g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .7, .9);
     return { g, hd };
   }
   function buildCowbarn(a, nCows) {
-    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .1, x1 = c + 3.9, z0 = r + .1, z1 = r + 3.9;
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .08, x1 = c + 3.92, z0 = r + .08, z1 = r + 3.92;
     blob(g, c + 2, r + 2, 4.4, 4.4, .45);
-    { const fl = new T.Mesh(G.plane, M("#b9c97a")); fl.position.set(c + 2, .012, r + 2); fl.scale.set(3.8, 1, 3.8); g.add(fl); }
-    fenceRun(g, x0, z0, x1, z0); fenceRun(g, x0, z0, x0, z1); fenceRun(g, x1, z0, x1, z1); fenceRun(g, x0, z1, x1, z1, .22);
-    // open shelter along the back: posts, slanted roof, hay rack and a trough
-    [[.5, .3], [2, .3], [3.5, .3], [.5, 1.05], [2, 1.05], [3.5, 1.05]].forEach(([dx, dz]) => g.add(mesh(G.box, TM(COL.wood, "wood"), c + dx, .5, r + dz, .09, 1.0 - (dz > 1 ? .14 : 0), .09)));
-    { const rf = mesh(G.box, TM("#7b2f22", "shingle", 3, 1), c + 2, 1.0, r + .68, 3.3, .05, .95); rf.rotation.x = -.2; g.add(rf); }
-    g.add(mesh(G.box, TM("#9c6a3a", "planks", 3, 1), c + 2, .42, r + .22, 3.1, .84, .06));
-    g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), c + 2, .12, r + 1.55, 2.2, .18, .26)); g.add(mesh(G.box, M("#d9c26a"), c + 2, .22, r + 1.55, 2.1, .04, .2, false));
-    [[.7, .7], [3.2, .7]].forEach(([dx, dz]) => { const b = mesh(G.cyl, M(COL.hay), c + dx, .2, r + dz, .22, .4, .22); b.rotation.z = Math.PI / 2; g.add(b); });
-    const pen = { items: [], x0: c + .6, x1: c + 3.4, z0: r + 2.1, z1: r + 3.4 };
-    for (let k = 0; k < nCows; k++) { const m = buildCow(), px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+    { const fl = new T.Mesh(G.plane, TM("#a3c463", "soil", 3, 3)); fl.position.set(c + 2, .012, r + 2); fl.scale.set(3.84, 1, 3.84); fl.receiveShadow = true; g.add(fl); }
+    const WF = "#f4f0e6", WR = "#ffffff";
+    fenceRun(g, x0, z0, x1, z0, 0, WF, WR); fenceRun(g, x0, z0, x0, z1, 0, WF, WR); fenceRun(g, x1, z0, x1, z1, 0, WF, WR); fenceRun(g, x0, z1, x1, z1, .22, WF, WR);
+    // the red barn at the back: stone foundation, white trim, big X door, hay loft, small windows, AHIR board
+    const bx = c + 1.55, bz = r + .86, w = 2.55, d = 1.3, y0 = .1, h = .92, RED = "#a8322a";
+    g.add(mesh(G.box, TM("#bdb5a6", "stone", 4, 1), bx, y0 / 2, bz, w + .1, y0, d + .1));
+    g.add(mesh(G.box, TM(RED, "planks", 5, 1.2), bx, y0 + h / 2, bz, w, h, d));
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => g.add(mesh(G.box, M(COL.trim), bx + sx * w / 2, y0 + h / 2, bz + sz * d / 2, .08, h, .08, false)));
+    g.add(mesh(G.box, M(COL.trim), bx, y0 + h, bz, w + .06, .06, d + .06, false));
+    gableZ(g, bx, bz, w, d, y0 + h, .82, "#5b5550", .15, RED, "planks");
+    const fz = bz + d / 2 + .01;
+    g.add(mesh(G.box, M(COL.trim), bx, y0 + .4, fz, 1.0, .82, .03, false)); g.add(mesh(G.box, M("#8e2a22"), bx, y0 + .38, fz + .01, .9, .74, .03, false));
+    [.66, -.66].forEach(rz => { const br = mesh(G.box, M(COL.trim), bx, y0 + .38, fz + .03, .05, 1.02, .02, false); br.rotation.z = rz; g.add(br); });
+    g.add(mesh(G.box, M(COL.trim), bx, y0 + .38, fz + .03, .04, .74, .02, false));
+    g.add(mesh(G.box, M(COL.trim), bx, y0 + h + .3, fz, .44, .38, .03, false)); g.add(mesh(G.box, M("#3a2a1c"), bx, y0 + h + .29, fz + .01, .36, .32, .03, false)); g.add(mesh(G.box, M(COL.hay), bx, y0 + h + .17, fz + .03, .34, .09, .05, false));
+    [[-1, .41], [1, .41]].forEach(([s2, ang]) => { const tr = mesh(G.box, M(COL.trim), bx + s2 * w / 4, y0 + h + .41, fz + .02, Math.hypot(w / 2, .82) + .06, .06, .03, false); tr.rotation.z = -s2 * Math.atan2(.82, w / 2); g.add(tr); });
+    [-1, 1].forEach(s => { const wx = bx + s * .86; g.add(mesh(G.box, M(COL.trim), wx, y0 + .58, fz, .3, .28, .03, false)); g.add(mesh(G.box, MS(COL.glass, { roughness: .25 }), wx, y0 + .58, fz + .01, .22, .2, .03, false));
+      g.add(mesh(G.box, M(COL.trim), wx, y0 + .58, fz + .02, .025, .2, .02, false)); g.add(mesh(G.box, M(COL.trim), wx, y0 + .58, fz + .02, .22, .025, .02, false)); });
+    { const sb = boardMesh(.6, .17, boardTex("ahirSign", "🐄 AHIR", "#fff3cf", "#6b1f18", "#4a4440")); sb.position.set(bx, y0 + .86, fz + .02); g.add(sb); }
+    // open shelter on the right with round hay bales
+    const lx = c + 3.38; [[2.92, .25], [3.82, .25], [2.92, 1.45], [3.82, 1.45]].forEach(([dx, dz]) => g.add(mesh(G.box, TM(COL.wood, "wood"), c + dx, .42, r + dz, .07, .84, .07)));
+    { const rf = mesh(G.box, TM("#4a4440", "shingle", 2, 2), lx, .9, r + .85, 1.06, .05, 1.42); rf.rotation.z = -.22; g.add(rf); }
+    [r + .58, r + 1.12].forEach(zz => { const hb = mesh(G.cyl, M(COL.hay), lx, .22, zz, .22, .4, .22); hb.rotation.z = Math.PI / 2; g.add(hb); const hs = mesh(G.cyl, M("#c9a24a"), lx, .22, zz, .225, .03, .225, false); hs.rotation.z = Math.PI / 2; g.add(hs); });
+    // milk cans by the door, a feeding trough with hay and a water trough
+    [[-.85, .25], [-1.0, .32], [-.7, .36]].forEach(([dx, dz]) => { const mx = bx + dx, mz = fz + dz; const SS = MS("#d6dbe0", { metalness: .6, roughness: .35 });
+      g.add(mesh(G.cyl, SS, mx, .11, mz, .07, .22, .07)); g.add(mesh(G.cyl, SS, mx, .25, mz, .045, .06, .045, false)); g.add(mesh(G.cyl, SS, mx, .29, mz, .055, .02, .055, false)); g.add(mesh(G.cyl, M("#4f93d8"), mx, .14, mz, .072, .03, .072, false)); });
+    g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), c + 1.7, .12, r + 1.88, 1.7, .18, .26)); g.add(mesh(G.box, M("#d9c26a"), c + 1.7, .22, r + 1.88, 1.6, .05, .2, false));
+    g.add(mesh(G.box, TM("#9a9286", "stone", 1, 2), c + 3.4, .11, r + 2.75, .32, .2, .9)); g.add(mesh(G.box, MS("#4fa8d6", { roughness: .1 }), c + 3.4, .21, r + 2.75, .24, .01, .8, false));
+    const pen = { items: [], x0: c + .55, x1: c + 3.0, z0: r + 2.2, z1: r + 3.45 };
+    for (let k = 0; k < nCows; k++) { const m = buildCow(); m.g.scale.setScalar(.95); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: 1 + Math.random() * 4, sp: .22, cow: 1 }); }
     fx.pens.push(pen);
     return g;
   }
   function buildMill(a, busy) {
-    const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + .8, cz = r + 1.05, w = 1.3, d = 1.2, h = .95;
-    blob(g, c + 1, r + 1, 2.4, 2.4);
-    g.add(mesh(G.box, TM("#d8d2c6", "stone", 2, 1), cx, .06, cz, w + .1, .12, d + .1));
-    g.add(mesh(G.box, TM("#b9864f", "planks", 3, 1.2), cx, .12 + h / 2, cz, w, h, d)); gableWalls(g, cx, cz, w, d, .12 + h, .55, "#b9864f", "planks"); gableRoof(g, cx, cz, w, d, .12 + h - .02, .6, "#6b4423", .12);
-    const fz = cz + d / 2 + .02; g.add(mesh(G.box, M("#3a2a1c"), cx, .5, fz, .5, .7, .04, false));
-    const st = canvasTex("ambarSign", 512, 140, (x, w2, h2) => { x.fillStyle = "#5a3315"; rr(x, 4, 4, w2 - 8, h2 - 8, 24); x.fill(); x.fillStyle = "#e3a72f"; rr(x, 14, 14, w2 - 28, h2 - 28, 16); x.fill();
-      x.fillStyle = "#3e2a17"; x.font = "700 84px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("AMBAR", w2 / 2, h2 / 2 + 4); });
-    const sb = boardMesh(.95, .26, st); sb.position.set(cx, 1.0, fz + .03); g.add(sb);
-    // a silo beside it and grain sacks
-    g.add(mesh(G.cyl, TM("#c9c2b5", "siding", 2, 2), c + 1.65, .7, r + .55, .3, 1.4, .3)); g.add(mesh(G.cone, M("#8e3322"), c + 1.65, 1.58, r + .55, .36, .36, .36));
-    [[1.55, 1.6], [1.75, 1.45], [1.65, 1.75]].forEach(([dx, dz]) => g.add(mesh(G.sph, M("#ead7a6"), c + dx, .16, r + dz, .13, .16, .11)));
-    // a small grinding wheel on the front that turns while feed is being made
-    const hub = new T.Group(); hub.position.set(cx + .45, .75, fz + .05); g.add(hub);
-    hub.add(mesh(G.cyl8, M("#5e3a1c"), 0, 0, 0, .05, .06, .05)); for (let q = 0; q < 6; q++) { const arm = new T.Group(); arm.rotation.z = q * Math.PI / 3; arm.add(mesh(G.box, TM(COL.wood, "wood"), 0, .14, 0, .04, .28, .025)); hub.add(arm); }
-    hub.rotation.x = Math.PI / 2 * 0; hub.userData.spin = busy ? 3 : 0; if (busy) fx.mills.push(hub);
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + .76, cz = r + 1.0, w = 1.3, d = 1.12, BEAM = "#4a2e1a", PL = "#f6ecd4";
+    const GOLD = MS("#e2b33c", { metalness: .8, roughness: .3 }), STEEL = MS("#d9dee3", { metalness: .55, roughness: .35 });
+    blob(g, c + 1, r + 1, 2.5, 2.5);
+    g.add(mesh(G.box, TM("#d8d2c6", "stone", 2, 1), cx, .06, cz, w + .16, .12, d + .16));
+    g.add(mesh(G.box, TM("#b9b0a0", "stone", 3, 1), cx, .32, cz, w, .4, d));
+    const W2 = w + .06, D2 = d + .06, yU = .52, hU = .52;
+    g.add(mesh(G.box, M(PL), cx, yU + hU / 2, cz, W2, hU, D2));
+    const fzU = cz + D2 / 2 + .005, fzS = cz + d / 2 + .005;
+    [yU + .02, yU + hU - .02].forEach(y => { g.add(mesh(G.box, M(BEAM), cx, y, fzU, W2 + .02, .05, .03, false)); g.add(mesh(G.box, M(BEAM), cx + W2 / 2 + .005, y, cz, .03, .05, D2, false)); });
+    [-W2 / 2, -W2 / 6, W2 / 6, W2 / 2].forEach(dx => g.add(mesh(G.box, M(BEAM), cx + dx, yU + hU / 2, fzU, .05, hU, .03, false)));
+    [[-W2 / 3, .62], [W2 / 3, -.62]].forEach(([dx, rz]) => { const br = mesh(G.box, M(BEAM), cx + dx, yU + hU / 2, fzU + .005, .04, hU * 1.05, .02, false); br.rotation.z = rz; g.add(br); });
+    gableZ(g, cx, cz, W2, D2, yU + hU, .7, "#7a2a1e", .14, PL, "siding");
+    g.add(mesh(G.box, M(BEAM), cx, yU + hU + .02, fzU, W2 + .02, .05, .03, false));
+    [-1, 1].forEach(s2 => { const tr = mesh(G.box, M(BEAM), cx + s2 * W2 / 4, yU + hU + .35, fzU + .01, Math.hypot(W2 / 2, .7) + .04, .05, .03, false); tr.rotation.z = -s2 * Math.atan2(.7, W2 / 2); g.add(tr); });
+    { const vx = cx, vz = cz - D2 / 2 + .05, vy = yU + hU + .72; g.add(mesh(G.cyl8, GOLD, vx, vy + .14, vz, .012, .28, .012, false)); g.add(mesh(G.sph, GOLD, vx, vy + .2, vz, .03, .03, .03, false));
+      const ar = mesh(G.cone, GOLD, vx + .1, vy + .26, vz, .03, .1, .03, false); ar.rotation.z = -Math.PI / 2; g.add(ar); g.add(mesh(G.box, GOLD, vx - .08, vy + .26, vz, .12, .08, .01, false)); }
+    // door with iron bands, lanterns, upper windows with flower boxes
+    g.add(mesh(G.box, TM("#d8d2c6", "stone", 1, 1), cx - .22, .32, fzS, .5, .4, .03, false)); g.add(mesh(G.box, TM("#7a4a24", "planks", 2, 1), cx - .22, .3, fzS + .01, .4, .36, .03, false));
+    [.2, .4].forEach(y => g.add(mesh(G.box, M("#2a2a2a"), cx - .22, y, fzS + .03, .4, .025, .01, false))); g.add(mesh(G.box, M("#2a2a2a"), cx - .22, .3, fzS + .03, .015, .36, .01, false));
+    [-.52, .08].forEach(dx => { const lx = cx + dx; g.add(mesh(G.box, M("#2a2a2a"), lx, .44, fzS + .05, .02, .02, .1, false)); g.add(mesh(G.box, M("#2a2a2a"), lx, .4, fzS + .1, .07, .1, .07, false));
+      g.add(mesh(G.sph, new T.MeshBasicMaterial({ color: "#ffd27a" }), lx, .4, fzS + .1, .028, .04, .028, false)); });
+    g.add(mesh(G.box, M("#d8d2c6"), cx + .35, .3, fzS, .22, .2, .03, false)); g.add(mesh(G.box, MS(COL.glass, { roughness: .25 }), cx + .35, .3, fzS + .01, .16, .15, .03, false));
+    [-.38, .38].forEach(dx => { const wx = cx + dx; g.add(mesh(G.box, M(BEAM), wx, yU + .26, fzU + .005, .24, .22, .02, false)); g.add(mesh(G.box, MS(COL.glass, { roughness: .25 }), wx, yU + .26, fzU + .012, .18, .16, .02, false));
+      g.add(mesh(G.box, M("#4f7a52"), wx - .16, yU + .26, fzU + .01, .07, .22, .02, false)); g.add(mesh(G.box, M("#4f7a52"), wx + .16, yU + .26, fzU + .01, .07, .22, .02, false));
+      g.add(mesh(G.box, M(COL.wood), wx, yU + .12, fzU + .05, .3, .05, .08, false)); [-.08, 0, .08].forEach((ox, k) => g.add(mesh(G.sph, M(k % 2 ? "#f2c14e" : "#e05a7a"), wx + ox, yU + .16, fzU + .06, .035, .035, .035, false))); });
+    // gold-framed AMBAR board on the gable
+    { const st = canvasTex("ambarSign2", 512, 150, (x, w2, h2) => { const gr = x.createLinearGradient(0, 0, w2, h2); gr.addColorStop(0, "#f7d774"); gr.addColorStop(.5, "#c8901e"); gr.addColorStop(1, "#f7d774");
+        x.fillStyle = gr; rr(x, 4, 4, w2 - 8, h2 - 8, 30); x.fill(); x.fillStyle = "#3a2210"; rr(x, 18, 18, w2 - 36, h2 - 36, 20); x.fill();
+        x.fillStyle = "#f7d774"; x.font = "700 82px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("AMBAR", w2 / 2, h2 / 2 + 4); });
+      const sb = boardMesh(.62, .19, st); sb.position.set(cx, yU + hU + .16, fzU + .01); g.add(sb); }
+    // windmill sails on the gable: they turn slowly all the time, fast while feed is being made
+    const hub = new T.Group(); hub.position.set(cx, yU + hU + .74, fzU + .12); g.add(hub);
+    hub.add((() => { const m = mesh(G.cyl8, M(BEAM), 0, 0, 0, .05, .08, .05); m.rotation.x = Math.PI / 2; return m; })());
+    for (let q = 0; q < 4; q++) { const arm = new T.Group(); arm.rotation.z = q * Math.PI / 2 + Math.PI / 4; arm.add(mesh(G.box, M(BEAM), 0, .2, 0, .025, .4, .02));
+      arm.add(mesh(G.box, TM("#efe6d2", "planks", 1, 2), .05, .24, -.005, .09, .3, .01)); [.14, .24, .34].forEach(y => arm.add(mesh(G.box, M(BEAM), .05, y, .002, .1, .012, .012, false))); hub.add(arm); }
+    hub.userData.spin = busy ? 3 : .7; fx.mills.push(hub);
+    // silo
+    const sx = c + 1.62, sz = r + .58, sR = .3, sH = 1.55;
+    g.add(mesh(G.cyl, TM("#c9c0ae", "stone", 2, 1), sx, .06, sz, sR + .05, .12, sR + .05));
+    g.add(mesh(G.cyl, STEEL, sx, .12 + sH / 2, sz, sR, sH, sR));
+    for (let k = 1; k <= 5; k++) g.add(mesh(G.cyl, MS("#9aa3ab", { metalness: .6, roughness: .4 }), sx, .12 + k * sH / 6, sz, sR + .008, .03, sR + .008, false));
+    g.add(mesh(G.half, STEEL, sx, .12 + sH, sz, sR, .22, sR)); g.add(mesh(G.cyl8, GOLD, sx, .12 + sH + .26, sz, .025, .1, .025, false));
+    [-.07, .07].forEach(dx => g.add(mesh(G.box, M("#5d666e"), sx + dx, .12 + sH / 2, sz + sR + .03, .015, sH, .015, false)));
+    for (let k = 0; k < 11; k++) g.add(mesh(G.box, M("#5d666e"), sx, .2 + k * .13, sz + sR + .03, .14, .012, .012, false));
+    // pallet with grain sacks
+    const px = c + 1.6, pz = r + 1.5; g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), px, .04, pz, .56, .07, .44));
+    [[-.13, -.08], [.13, -.08], [0, .1]].forEach(([dx, dz]) => { g.add(mesh(G.sph, M("#ead7a6"), px + dx, .2, pz + dz, .13, .14, .11)); g.add(mesh(G.cyl8, M("#8a6a3a"), px + dx, .34, pz + dz, .035, .04, .035, false)); });
+    g.add(mesh(G.sph, M("#e2cc95"), px, .4, pz - .04, .12, .11, .1));
+    g.add(mesh(G.cyl, M("#ead7a6"), px + .36, .13, pz + .2, .1, .24, .1)); g.add(mesh(G.cyl, M("#e3b44a"), px + .36, .26, pz + .2, .09, .02, .09, false));
     return g;
   }
   function stepPens(dt, sec) {
@@ -5698,8 +5976,83 @@ function setup3D(T) {
   // the stone bread oven: stone plinth, brick dome with an arched mouth, brick chimney, firewood and a bread peel.
   // While bread is baking the mouth glows, flames dance inside, embers rise and the chimney smokes (fx.oven, stepOven).
   const emberTex = canvasTex("ember", 64, 64, (x) => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 30); g.addColorStop(0, "rgba(255,240,180,1)"); g.addColorStop(.3, "rgba(255,150,40,.85)"); g.addColorStop(1, "rgba(255,80,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); });
-  function buildOven(a, baking) {
-    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, O = { baking, flames: [], embers: [], smoke: [], glow: null, inner: null }; (fx.ovens = fx.ovens || []).push(O);
+  // arched oven mouth (stone frame + inner face that glows while baking)
+  function ovenMouth(g, O, x, y, z, rad, frameCol, baking) {
+    const arch = (R, s) => { s.moveTo(-R, 0); s.lineTo(-R, rad * .55); s.absarc(0, rad * .55, R, Math.PI, 0, true); s.lineTo(R, 0); s.lineTo(-R, 0); };
+    const sh = new T.Shape(); arch(rad + .1, sh); const ho = new T.Path(); arch(rad, ho); sh.holes.push(ho);
+    const fr = new T.Mesh(new T.ExtrudeGeometry(sh, { depth: .1, bevelEnabled: false }), TM(frameCol, "stone", 1, 1)); fr.position.set(x, y, z - .04); g.add(fr);
+    const inS = new T.Shape(); arch(rad, inS);
+    const inner = new T.Mesh(new T.ShapeGeometry(inS), new T.MeshBasicMaterial({ color: baking ? "#ff7a1a" : "#1e130c" })); inner.position.set(x, y, z - .01); O.inners.push(inner); g.add(inner);
+  }
+  function ovenFire(g, O, x, y, z, s) {
+    [["#ff4a12", .14, .34, 0], ["#ff8a1a", .1, .27, .1], ["#ffb52a", .09, .24, -.11], ["#ffe066", .06, .17, .04], ["#ffd23a", .05, .14, -.05]].forEach(([c, w, h, dx], k) => {
+      const fl = mesh(G.cone, new T.MeshBasicMaterial({ color: c, transparent: true, opacity: .95 }), x + dx * s, y + h * s / 2, z + .03 + k * .006, w * s, h * s, w * s * .6, false); fl.userData = { flame: 3, h: h * s, ph: k * 1.7, y0: y }; O.flames.push(fl); g.add(fl); });
+    g.add(mesh(G.box, M("#3a1a0a"), x, y, z + .01, .34 * s, .04, .08, false));
+  }
+  function ovenGlowFx(g, O, x, y, z, emb) {
+    const glow = sprite(emberTex, 1.8, 1.4, { blending: T.AdditiveBlending, opacity: .7 }); glow.position.set(x, y, z); glow.renderOrder = 7; O.glow = glow; g.add(glow);
+    if (emb) for (let k = 0; k < 6; k++) { const e = sprite(emberTex, .09, .09, { blending: T.AdditiveBlending }); e.userData.ph = k / 6; e.renderOrder = 7; O.embers.push(e); g.add(e); }
+    for (let k = 0; k < 4; k++) { const sm = sprite(smokeTex, .3, .3, { opacity: .5 }); sm.userData.ph = k / 4; sm.renderOrder = 5; O.smoke.push(sm); g.add(sm); }
+  }
+  const loaf = (g, x, y, z, s = 1) => { g.add(mesh(G.sph, M("#c98a3c"), x, y, z, .12 * s, .07 * s, .08 * s, false)); g.add(mesh(G.sph, M("#e0a85a"), x, y + .02 * s, z, .09 * s, .04 * s, .06 * s, false)); };
+  // level 2: a big brick bakery oven on a stone base, iron door, temperature gauge, steel chimney pipe, little striped awning, bread shelf and flour sacks
+  function buildOven2(a, baking, O) {
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, bz = z - .15;
+    blob(g, x, z + .1, 2.7, 2.5);
+    g.add(mesh(G.box, TM("#cdbb9e", "stone", 3, 2), x, .05, z, 1.92, .1, 1.82));
+    g.add(mesh(G.box, TM("#8f8a82", "stone", 3, 1), x, .3, bz, 1.5, .4, 1.15));
+    g.add(mesh(G.box, TM("#b5532f", "brick", 3, 2), x, .5 + .37, bz, 1.32, .74, 1.0));
+    g.add(mesh(G.box, M("#8a7f70"), x, 1.25, bz, 1.38, .05, 1.06)); g.add(mesh(G.box, M("#8a7f70"), x, .52, bz + .02, 1.56, .05, 1.2));
+    gableZ(g, x, bz, 1.32, 1.0, 1.27, .4, "#9a3b26", .1, "#b5532f", "brick");
+    const mz = bz + .51; ovenMouth(g, O, x - .12, .55, mz, .27, "#b8ab96", baking);
+    { const dr = new T.Group(); dr.position.set(x - .51, .55, mz + .04); dr.rotation.y = -1.25; dr.add(mesh(G.box, M("#2b2b2e"), .2, .24, 0, .4, .48, .03)); dr.add(mesh(G.box, MS("#c9a24a", { metalness: .7, roughness: .3 }), .33, .26, .03, .04, .12, .03, false)); g.add(dr); }
+    { const gx = x + .42, gy = 1.02; const gf = mesh(G.cyl, M("#fdfaf2"), gx, gy, mz, .09, .02, .09, false); gf.rotation.x = Math.PI / 2; g.add(gf);
+      const rim = new T.Mesh(new T.TorusGeometry(.09, .015, 6, 18), MS("#c9a24a", { metalness: .7, roughness: .3 })); rim.position.set(gx, gy, mz + .01); g.add(rim);
+      const nd = mesh(G.box, M("#c8302a"), gx + .02, gy + .02, mz + .015, .01, .07, .005, false); nd.rotation.z = -.8; g.add(nd); }
+    { const aw = mesh(G.box, M("#d9483a"), x - .12, 1.36, mz + .12, .78, .03, .3, false); aw.rotation.x = .35; g.add(aw);
+      [-.3, -.1, .1, .3].forEach(dx => { const st = mesh(G.box, M("#fff6e6"), x - .12 + dx, 1.365, mz + .12, .09, .032, .3, false); st.rotation.x = .35; g.add(st); }); }
+    const SS = MS("#3a3a3e", { metalness: .6, roughness: .4 }); g.add(mesh(G.cyl, SS, x + .42, 1.72, bz - .25, .09, .9, .09)); g.add(mesh(G.cone, SS, x + .42, 2.24, bz - .25, .17, .12, .17)); g.add(mesh(G.cyl, SS, x + .42, 2.17, bz - .25, .1, .03, .1, false));
+    { const sx = x - .98; [.3, .62, .94].forEach(y => g.add(mesh(G.box, TM(COL.wood, "planks", 1, 1), sx, y, z + .1, .3, .04, .6))); [-.28, .28].forEach(dz => g.add(mesh(G.box, M(COL.woodD), sx, .5, z + .1 + dz, .04, 1.0, .04)));
+      [[.34, -.15], [.34, .12], [.66, 0], [.98, -.12], [.98, .14]].forEach(([y, dz]) => loaf(g, sx, y + .04, z + .1 + dz, .8)); }
+    [[.82, .55], [1.0, .62]].forEach(([dx, dz]) => { g.add(mesh(G.sph, M("#f4ede0"), x + dx, .22, z + dz, .13, .16, .11)); g.add(mesh(G.box, M("#4f93d8"), x + dx, .24, z + dz + .1, .1, .06, .01, false)); });
+    if (baking) { ovenFire(g, O, x - .12, .57, mz, .9); ovenGlowFx(g, O, x - .12, .75, mz + .2, true); }
+    Object.assign(O, { x, z, cx: x + .42, cy: 2.28, cz: bz - .25 });
+    return g;
+  }
+  // level 3: a modern bakery oven: white tiled floor, stainless body, red enamel front, two lit glass doors (two trays),
+  // control panel with lights and a display, steel hood, chrome bread rack and a FIRIN board; it steams while baking
+  function buildOven3(a, baking, O) {
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, bz = z - .12, CH = MS("#e3e8ec", { metalness: .75, roughness: .22 }), ST = MS("#c9d1d8", { metalness: .65, roughness: .32 });
+    blob(g, x, z + .1, 2.7, 2.5);
+    g.add(mesh(G.box, TM("#eef3f6", "brick", 4, 3), x, .05, z, 1.92, .1, 1.84)); g.add(mesh(G.box, M("#3f7fbf"), x, .101, z + .8, 1.92, .005, .08, false));
+    g.add(mesh(G.box, ST, x, .1 + .58, bz, 1.44, 1.16, .96));
+    const fz = bz + .49;
+    g.add(mesh(G.box, MS("#c8302a", { roughness: .35 }), x, .66, fz, 1.36, 1.0, .02, false));
+    [.44, .86].forEach(y => { g.add(mesh(G.box, CH, x, y, fz + .012, 1.04, .32, .02, false));
+      const gl = mesh(G.box, new T.MeshBasicMaterial({ color: baking ? "#ff9a3a" : "#262b31" }), x, y, fz + .024, .9, .22, .01, false); O.inners.push(gl); g.add(gl);
+      if (baking) [-.25, 0, .25].forEach(dx => g.add(mesh(G.sph, M("#a8642a"), x + dx, y - .06, fz + .03, .09, .035, .005, false)));
+      const hd = mesh(G.cyl, CH, x, y + .2, fz + .05, .018, .78, .018, false); hd.rotation.z = Math.PI / 2; g.add(hd); });
+    g.add(mesh(G.box, M("#1d2126"), x, 1.2, fz + .005, 1.36, .14, .02, false));
+    g.add(mesh(G.box, new T.MeshBasicMaterial({ color: baking ? "#7cf0a0" : "#2f5a40" }), x - .38, 1.2, fz + .018, .3, .07, .005, false));
+    [["#4cd964", .1], ["#ffcc00", .22], ["#ff3b30", .34]].forEach(([col, dx]) => g.add(mesh(G.sph, new T.MeshBasicMaterial({ color: baking || col !== "#4cd964" ? col : "#3a6a4a" }), x + dx, 1.2, fz + .02, .025, .025, .01, false)));
+    [.48, .6].forEach(dx => { const kn = mesh(G.cyl, CH, x + dx, 1.2, fz + .02, .03, .02, .03, false); kn.rotation.x = Math.PI / 2; g.add(kn); });
+    g.add(mesh(G.box, ST, x, 1.29, bz, 1.5, .05, 1.02)); for (let k = 0; k < 6; k++) g.add(mesh(G.box, M("#5d666e"), x - .62 + k * .1, 1.318, bz - .05, .05, .01, .6, false));
+    g.add(mesh(G.box, MS("#c8302a", { roughness: .35 }), x, 1.3, bz + .49, 1.5, .07, .04, false));
+    g.add(mesh(G.box, ST, x + .42, 1.55, bz - .25, .26, .5, .26)); g.add(mesh(G.box, CH, x + .42, 1.83, bz - .25, .34, .05, .34)); g.add(mesh(G.box, M("#5d666e"), x + .42, 1.88, bz - .25, .2, .05, .2, false));
+    { const sb = boardMesh(.7, .2, boardTex("firinSign", "🍞 FIRIN", "#fff7ec", "#c8302a", "#c8302a")); sb.position.set(x - .25, 1.48, bz + .2); sb.rotation.x = -.15; g.add(sb);
+      [-.55, .05].forEach(dx => g.add(mesh(G.box, CH, x + dx, 1.38, bz + .18, .02, .16, .02, false))); }
+    { const rx = x - 1.0; [-.27, .27].forEach(dz => [-.1, .1].forEach(dx => g.add(mesh(G.box, CH, rx + dx, .62, z + .1 + dz, .02, 1.04, .02))));
+      [.32, .62, .92].forEach(y => { g.add(mesh(G.box, CH, rx, y, z + .1, .24, .02, .58)); [-.16, .02, .18].forEach(dz => loaf(g, rx, y + .04, z + .1 + dz, .75)); }); }
+    [[.95, .55]].forEach(([dx, dz]) => { g.add(mesh(G.box, M("#f4ede0"), x + dx, .25, z + dz, .26, .3, .2)); g.add(mesh(G.box, M("#c8302a"), x + dx, .28, z + dz + .101, .2, .08, .005, false)); });
+    if (baking) ovenGlowFx(g, O, x, .65, fz + .25, false);
+    Object.assign(O, { x, z, cx: x + .42, cy: 1.95, cz: bz - .25 });
+    return g;
+  }
+  function buildOven(a, baking, lv) {
+    const O = { baking, flames: [], embers: [], smoke: [], glow: null, inners: [] }; (fx.ovens = fx.ovens || []).push(O);
+    if (lv >= 3) return buildOven3(a, baking, O);
+    if (lv === 2) return buildOven2(a, baking, O);
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1;
     blob(g, x, z + .1, 2.6, 2.4);
     // plinth with a stone top slab
     g.add(mesh(G.box, TM("#a89b88", "stone", 3, 1), x, .22, z, 1.7, .44, 1.5)); g.add(mesh(G.box, TM("#8a7f70", "stone", 3, 1), x, .47, z + .02, 1.82, .07, 1.62));
@@ -5716,7 +6069,7 @@ function setup3D(T) {
       const ho = new T.Path(); ho.moveTo(-.26, 0); ho.lineTo(-.26, .2); ho.absarc(0, .2, .26, Math.PI, 0, true); ho.lineTo(.26, 0); ho.lineTo(-.26, 0); sh.holes.push(ho);
       const fr = new T.Mesh(new T.ExtrudeGeometry(sh, { depth: .12, bevelEnabled: false }), TM("#b8ab96", "stone", 1, 1)); fr.position.set(x, .5, mz - .04); g.add(fr);
       const inS = new T.Shape(); inS.moveTo(-.26, 0); inS.lineTo(-.26, .2); inS.absarc(0, .2, .26, Math.PI, 0, true); inS.lineTo(.26, 0); inS.lineTo(-.26, 0);
-      const inner = new T.Mesh(new T.ShapeGeometry(inS), new T.MeshBasicMaterial({ color: baking ? "#ff7a1a" : "#1e130c" })); inner.position.set(x, .5, mz - .01); O.inner = inner; g.add(inner); }
+      const inner = new T.Mesh(new T.ShapeGeometry(inS), new T.MeshBasicMaterial({ color: baking ? "#ff7a1a" : "#1e130c" })); inner.position.set(x, .5, mz - .01); O.inners.push(inner); g.add(inner); }
     // chimney
     g.add(mesh(G.box, TM("#b5583d", "brick", 1, 2), x + .42, 1.12, z - .32, .2, .6, .2)); g.add(mesh(G.box, M("#5e3226"), x + .42, 1.44, z - .32, .27, .05, .27));
     // bread peel leaning on the side and a loaf on the slab
@@ -5726,24 +6079,24 @@ function setup3D(T) {
     if (baking) {
       // fire inside the mouth
       [["#ff4a12", .14, .34, 0], ["#ff8a1a", .1, .27, .1], ["#ffb52a", .09, .24, -.11], ["#ffe066", .06, .17, .04], ["#ffd23a", .05, .14, -.05]].forEach(([c, w, h, dx], k) => {
-        const fl = mesh(G.cone, new T.MeshBasicMaterial({ color: c, transparent: true, opacity: .95 }), x + dx, .52 + h / 2, mz + .03 + k * .006, w, h, w * .6, false); fl.userData = { flame: 3, h, ph: k * 1.7 }; O.flames.push(fl); g.add(fl); });
+        const fl = mesh(G.cone, new T.MeshBasicMaterial({ color: c, transparent: true, opacity: .95 }), x + dx, .52 + h / 2, mz + .03 + k * .006, w, h, w * .6, false); fl.userData = { flame: 3, h, ph: k * 1.7, y0: .52 }; O.flames.push(fl); g.add(fl); });
       g.add(mesh(G.box, M("#3a1a0a"), x, .52, mz + .01, .34, .04, .08, false));
       const glow = sprite(emberTex, 1.8, 1.4, { blending: T.AdditiveBlending, opacity: .7 }); glow.position.set(x, .7, mz + .2); glow.renderOrder = 7; O.glow = glow; g.add(glow);
       { const gp = new T.Mesh(G.plane, new T.MeshBasicMaterial({ map: emberTex, transparent: true, opacity: .28, depthWrite: false, blending: T.AdditiveBlending })); gp.position.set(x, .51, mz + .3); gp.scale.set(.9, 1, .5); gp.renderOrder = 6; g.add(gp); }
       for (let k = 0; k < 6; k++) { const e = sprite(emberTex, .09, .09, { blending: T.AdditiveBlending }); e.userData.ph = k / 6; e.renderOrder = 7; O.embers.push(e); g.add(e); }
       for (let k = 0; k < 4; k++) { const sm = sprite(smokeTex, .3, .3, { opacity: .5 }); sm.userData.ph = k / 4; sm.renderOrder = 5; O.smoke.push(sm); g.add(sm); }
     }
-    O.x = x; O.z = z; O.mz = mz;
+    Object.assign(O, { x, z, mz, cx: x + .42, cy: 1.48, cz: z - .32 });
     return g;
   }
   function stepOven(sec) { (fx.ovens || []).forEach(O => stepOven1(O, sec)); }
   function stepOven1(O, sec) {
     if (!O || !O.baking || REDUCED) return;
-    O.flames.forEach(f => { const u = f.userData, k = 1 + Math.sin(sec * 13 + u.ph) * .2 + Math.sin(sec * 23 + u.ph * 2) * .1; f.scale.y = u.h * k; f.position.y = .53 + u.h * k / 2; f.rotation.z = Math.sin(sec * 9 + u.ph) * .15; });
+    O.flames.forEach(f => { const u = f.userData, k = 1 + Math.sin(sec * 13 + u.ph) * .2 + Math.sin(sec * 23 + u.ph * 2) * .1; f.scale.y = u.h * k; f.position.y = u.y0 + .01 + u.h * k / 2; f.rotation.z = Math.sin(sec * 9 + u.ph) * .15; });
     if (O.glow) { const v = .62 + Math.sin(sec * 11) * .1 + Math.sin(sec * 17) * .06; O.glow.material.opacity = v; O.glow.scale.set(1.6 + v * .5, 1.25 + v * .4, 1); }
-    if (O.inner) { const v = .75 + Math.sin(sec * 9) * .15; O.inner.material.color.setRGB(1, .42 * v + .1, .08); }
-    O.embers.forEach(e => { const u = (sec * .55 + e.userData.ph) % 1, a = e.userData.ph * 6.28; e.position.set(O.x + .42 + Math.sin(a + u * 4) * .08, 1.48 + u * .9, O.z - .32 + Math.cos(a) * .05); e.material.opacity = 1 - u; });
-    O.smoke.forEach(sm => { const u = (sec / 2.6 + sm.userData.ph) % 1; sm.position.set(O.x + .42 + Math.sin(u * 5) * .06, 1.55 + u * 1.1, O.z - .32 - u * .15); const sz = .22 + u * .55; sm.scale.set(sz, sz, 1); sm.material.opacity = .5 * (1 - u); });
+    O.inners.forEach((inn, i) => { const v = .75 + Math.sin(sec * 9 + i * 2) * .15; inn.material.color.setRGB(1, .42 * v + .1, .08); });
+    O.embers.forEach(e => { const u = (sec * .55 + e.userData.ph) % 1, a = e.userData.ph * 6.28; e.position.set(O.cx + Math.sin(a + u * 4) * .08, O.cy + u * .9, O.cz + Math.cos(a) * .05); e.material.opacity = 1 - u; });
+    O.smoke.forEach(sm => { const u = (sec / 2.6 + sm.userData.ph) % 1; sm.position.set(O.cx + Math.sin(u * 5) * .06, O.cy + .07 + u * 1.1, O.cz - u * .15); const sz = .22 + u * .55; sm.scale.set(sz, sz, 1); sm.material.opacity = .5 * (1 - u); });
   }
   // lumpy leaf clusters (a jittered sphere) look far more natural than smooth balls
   const lumpy = det => { const g = new T.IcosahedronGeometry(1, det), p = g.attributes.position, v = new T.Vector3();
@@ -5881,7 +6234,8 @@ function setup3D(T) {
     else if (t === "stall") { blob(g, x, z, 1.2, .9, .6); g.add(mesh(G.box, TM(COL.wood, "wood"), x, .3, z + .05, .82, .44, .46));
       [-.38, .38].forEach(dx => g.add(mesh(G.box, M(COL.woodD), x + dx, .55, z - .15, .05, 1.1, .05)));
       for (let q = 0; q < 6; q++) g.add(mesh(G.box, M(q % 2 ? "#ffffff" : "#e05a3a"), x - .375 + q * .15, 1.1, z - .02, .15, .04, .6));
-      [["#d9483a", -.22], ["#f2c14e", 0], ["#7bbf4a", .22]].forEach(([c, dx]) => { g.add(mesh(G.sph, M(c), x + dx, .58, z + .1, .07, .07, .07, false)); g.add(mesh(G.sph, M(c), x + dx + .06, .58, z + .18, .06, .06, .06, false)); }); }
+      [["#d9483a", -.22], ["#f2c14e", 0], ["#7bbf4a", .22]].forEach(([c, dx]) => { g.add(mesh(G.sph, M(c), x + dx, .58, z + .1, .07, .07, .07, false)); g.add(mesh(G.sph, M(c), x + dx + .06, .58, z + .18, .06, .06, .06, false)); });
+      { const sb = boardMesh(.66, .19, boardTex("pazarSign", "🛒 PAZAR", "#fff3cf", "#b8322a", "#7b4f27")); sb.position.set(x, 1.27, z - .02); g.add(sb); } }
     else if (t === "fountain") { blob(g, x, z, 1.1, 1.1, .5); g.add(mesh(G.cyl, TM("#d8d2c6", "stone", 3, 1), x, .12, z, .42, .24, .42)); g.add(mesh(G.cyl, MS("#3594c0", { roughness: .05, metalness: .1 }), x, .245, z, .36, .02, .36, false));
       g.add(mesh(G.cyl, M("#c9c2b5"), x, .45, z, .06, .45, .06)); g.add(mesh(G.cyl, M("#c9c2b5"), x, .66, z, .18, .05, .18)); const wm = MS("#e6f7ff", { transparent: true, opacity: .6, roughness: .1 });
       g.add(mesh(G.sph, wm, x, .76, z, .05, .08, .05, false)); for (let q = 0; q < 6; q++) { const a = q / 6 * Math.PI * 2; g.add(mesh(G.sph, wm, x + Math.cos(a) * .19, .6, z + Math.sin(a) * .19, .03, .05, .03, false)); } }
@@ -6045,7 +6399,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     world.add(RO(buildSign(L.sign, String(f.name || "Çiftçi")), "sign")); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
     for (const oid of OVENS) if (L[oid] >= 0) {
       const B = isMe ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
-      const o = buildOven(L[oid], B.q > B.done); world.add(RO(o, oid));
+      const o = buildOven(L[oid], B.q > B.done, ovenLv(f, oid)); world.add(RO(o, oid));
       proxy(colOf(L[oid]) + 1, .7, rowOf(L[oid]) + 1, 2, 1.4, 2, L[oid]);
     }
     // animals and the feed mill
@@ -6317,12 +6671,18 @@ gl_Position = projectionMatrix * mvPosition;`); };
   progFg.center.set(0, .5); progBg.renderOrder = 8; progFg.renderOrder = 9; scene3.add(progBg); scene3.add(progFg);
   const henCache = new Map();
   function buildHen(brown) {
-    const g = new T.Group(), body = brown ? "#c8834a" : "#fbfaf6"; const b = new T.Group(); g.add(b);
-    b.add(mesh(G.sph, M(body), 0, .16, 0, .14, .12, .17)); b.add(mesh(G.sph, M(body), 0, .2, -.15, .07, .1, .06));
-    const hd = new T.Group(); hd.position.set(0, .28, .12); b.add(hd);
-    hd.add(mesh(G.sph, M(body), 0, 0, 0, .07, .07, .07)); hd.add(mesh(G.cone, M("#e39a2b"), 0, -.01, .08, .025, .06, .025, false)); hd.children[1].rotation.x = Math.PI / 2;
-    hd.add(mesh(G.sph, M("#d9483a"), 0, .065, 0, .025, .035, .04, false)); [-.04, .04].forEach(dx => hd.add(mesh(G.sph, M("#1d1a14"), dx, .015, .055, .012, .012, .012, false)));
-    [-.05, .05].forEach(dx => g.add(mesh(G.cyl8, M("#e39a2b"), dx, .03, 0, .012, .07, .012, false)));
+    const g = new T.Group(), body = brown ? "#c8834a" : "#fbfaf6", wing = brown ? "#a35f2c" : "#e9e3d6", tail = brown ? "#5e3218" : "#d8d1c2";
+    const b = new T.Group(); g.add(b);
+    b.add(mesh(G.sph, M(body), 0, .17, -.01, .13, .12, .16)); b.add(mesh(G.sph, M(body), 0, .22, .07, .085, .1, .085));
+    [-1, 1].forEach(s => { const w = mesh(G.sph, M(wing), s * .115, .18, -.03, .035, .075, .12, false); w.rotation.z = s * .15; b.add(w); });
+    [-.4, 0, .4].forEach((ang, k) => { const t = mesh(G.sph, M(k === 1 ? tail : wing), Math.sin(ang) * .03, .27, -.14, .028, .1, .045, false); t.rotation.x = -.6; t.rotation.z = ang; b.add(t); });
+    const hd = new T.Group(); hd.position.set(0, .31, .1); b.add(hd);
+    hd.add(mesh(G.sph, M(body), 0, 0, 0, .065, .068, .065));
+    { const bk = mesh(G.cone, M("#f0a42a"), 0, -.008, .078, .022, .055, .022, false); bk.rotation.x = Math.PI / 2; hd.add(bk); }
+    [[.07, .02, .022], [.076, -.012, .02], [.062, -.04, .017]].forEach(([y, z, s]) => hd.add(mesh(G.sph, M("#e0372a"), 0, y, z, s * .7, s * 1.2, s, false)));
+    hd.add(mesh(G.sph, M("#e0372a"), 0, -.045, .056, .014, .025, .014, false));
+    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#ffffff"), s * .042, .015, .045, .014, .014, .01, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .046, .015, .05, .008, .009, .006, false)); });
+    [-.045, .045].forEach(dx => { g.add(mesh(G.cyl8, M("#e39a2b"), dx, .04, 0, .011, .08, .011, false)); g.add(mesh(G.box, M("#e39a2b"), dx, .005, .02, .03, .01, .05, false)); });
     g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .42, .42);
     return { g, hd };
   }
@@ -6503,7 +6863,7 @@ async function init() {
   } else renderChat();
   if (room) { try { room.onPeers(ch => { syncPeers(ch.peers, true); }); } catch (e) {} }
   listenFriends();
-  if (db && uid && online) { listenJobs(); listenClaims(); loadPay(); listenMail(); listenAdminForMe(); }
+  if (db && uid && online) { listenJobs(); listenClaims(); loadPay(); listenMail(); listenAdminForMe(); try { listenPazarMine(); } catch (e) {} }
 
   if (existing && existing.plots) {
     S = Object.assign(newPlayer(existing.name || "Çiftçi", null), existing);
