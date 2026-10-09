@@ -77,6 +77,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Görev şeridi `stripInfo()`: başlangıç görevi → günlük görev → siparişler; dokununca `qMini` ile max-width animasyonlu küçülür; hazırsa ilgili sekmeyi açar.
 - Meydan tezgahları 1.5 kat büyük (`buildDecor` stall alt grubu).
 
+## v92
+- Fırın 2: büyük tuğla kubbe (`brickDome`), odunluk, ekmek masası; fırın 3: çift kubbeli köy fırını (her tepsi için bir kubbe), ortada baca ve FIRIN tabelası, arkada kiremit sundurma.
+- Tezgahlar `buildStall()` (her tezgah farklı tente rengi ve ürünler), meydan girişinde `buildPazarBanner()` (iki direk, PAZAR YERİ pankartı, bayrak dizileri).
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.
