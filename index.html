@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="theme-color" content="#8fc456"></head><body>
-<title>Lucky Çiftliği</title>
+<title>Lucky Çiftlik</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
@@ -49,6 +49,7 @@ html{background:var(--bg)}
 #gHits_v8 rect{fill:none;pointer-events:all}
 #stage_v8{position:absolute;inset:0;touch-action:none;user-select:none;-webkit-user-select:none}
 #c3d_v8{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:none;outline:none}
+#vig_v8{position:absolute;inset:0;pointer-events:none;display:none;background:radial-gradient(ellipse 75% 70% at 50% 48%,rgba(0,0,0,0) 55%,rgba(20,30,10,.22) 100%)}
 #farm_v8{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
 
 /* HUD */
@@ -462,7 +463,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 .ld-bar{flex:1;height:9px;border-radius:999px;background:rgba(255,255,255,.25);overflow:hidden}
 .ld-bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ffe27a,#f5a524)}
 .ld-ribbon{filter:drop-shadow(0 4px 0 rgba(0,0,0,.18))}
-.ld-logo{font-size:90px}
+.ld-logo{font-size:104px}
 .ld-sub{fill:#fff;stroke:#7d1f12;stroke-width:7;letter-spacing:10px;font-size:29px}
 .ld-blades{transform-box:fill-box;transform-origin:center}
 .loader.on .ld-blades{animation:ldSpin 3.2s linear infinite}
@@ -481,7 +482,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 </style>
 
 <div id="root_v8">
-  <div id="stage_v8"><canvas id="c3d_v8" aria-label="Oyun alanı"></canvas>
+  <div id="stage_v8"><canvas id="c3d_v8" aria-label="Oyun alanı"></canvas><div id="vig_v8" aria-hidden="true"></div>
   <svg id="farm_v8" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Oyun alanı">
     <g id="gStatic_v8"></g><g id="gPlots_v8"></g><g id="gFence_v8"></g><g id="gHits_v8"></g><g id="gChars_v8"></g><g id="gAir_v8" class="air"></g><g id="gPop_v8" class="air"></g>
   </svg></div>
@@ -562,7 +563,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 
   <div class="modal" id="start_v8">
     <div class="box">
-      <h1 id="startTitle_v8">Lucky Çiftliği'ne hoş geldin</h1>
+      <h1 id="startTitle_v8">Lucky Çiftlik'e hoş geldin</h1>
       <p id="startText_v8">Çiftliğe bağlanılıyor</p>
       <div id="startForm_v8" hidden>
         <input id="nameIn_v8" maxlength="16" placeholder="Çiftçi adın" autocomplete="off">
@@ -693,7 +694,7 @@ body{font-family:var(--body);letter-spacing:.1px}
       <g class="ld-mill" transform="translate(120 238)"><path d="M-16 92l8 -92h16l8 92z" fill="#f4e7cf" stroke="#a7825a" stroke-width="3"/><path d="M-20 4l20 -22 20 22z" fill="url(#ldRed)"/><rect x="-6" y="60" width="12" height="32" rx="5" fill="#8a5a32"/>
         <g class="ld-blades"><path d="M0 0l-6 -58h12z M0 0l58 -6v12z M0 0l6 58h-12z M0 0l-58 6v-12z" fill="#fff8ea" stroke="#a7825a" stroke-width="2"/><circle r="6" fill="#8a5a32"/></g></g>
       <g class="ld-ribbon"><path d="M236 198h328l-16 22 16 22h-328l16 -22z" fill="url(#ldRed)" stroke="#7d1f12" stroke-width="4" stroke-linejoin="round"/></g>
-      <text class="ld-logo" x="400" y="184" text-anchor="middle">LuckyTr</text>
+      <text class="ld-logo" x="400" y="184" text-anchor="middle">Lucky</text>
       <text class="ld-sub" x="400" y="231" text-anchor="middle">ÇİFTLİK</text>
       <g class="ld-spark" fill="#fff6c2"><path class="s1" d="M178 92l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5z"/><path class="s2" d="M624 84l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/><path class="s3" d="M600 190l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path class="s4" d="M206 196l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/></g>
       <g transform="translate(480 290) scale(.85)">
@@ -734,7 +735,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 </div>
 
 <script>
-/* ===== Lucky Çiftliği: Firebase sunucu bağlantısı (Netlify gibi kendi sitende çalışırken) =====
+/* ===== Lucky Çiftlik: Firebase sunucu bağlantısı (Netlify gibi kendi sitende çalışırken) =====
    Firebase konsolu > Proje ayarları > Uygulamalarınız > Web uygulaması > "firebaseConfig" bilgilerini
    aşağıdaki FIREBASE_CONFIG içine yapıştır. Claude içinde açıldığında bu kısım kullanılmaz. */
 window.LUCKY_INAPP = /FBAN|FBAV|FB_IAB|Instagram|Line\/|WhatsApp|Snapchat|TikTok|musical_ly|Twitter|; wv\)/i.test(navigator.userAgent || "");
@@ -899,7 +900,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "72";
+const VERSION = "73";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2518,7 +2519,14 @@ document.addEventListener("keydown", e => {
 let fsFails = 0, fsLast = 0;
 const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
 function lockLandscape() { try { const p = screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape"); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+// inside the installed Play Store app the window is already full screen: asking the browser again only
+// brings up Chrome's "swipe down to exit full screen" notice, so we never do it there
+const IN_APP = (() => { try {
+  if (/^android-app:\/\//.test(document.referrer || "")) sessionStorage.setItem("lucky-app", "1");
+  return sessionStorage.getItem("lucky-app") === "1" || ["fullscreen", "standalone", "minimal-ui"].some(m => window.matchMedia && window.matchMedia("(display-mode: " + m + ")").matches);
+} catch (e) { return false; } })();
 function tryLandscape() {
+  if (IN_APP) { lockLandscape(); return; }
   if (isFs() || fsFails >= 3) return;
   if (!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)) return;
   const now = Date.now(); if (now - fsLast < 1500) return; fsLast = now;
@@ -3532,7 +3540,7 @@ async function openProfile(puid) {
   const w = whereIs(puid);
   $("pfInfo").textContent = "Seviye " + d.level + ", " + (d.g === "k" ? "kız" : "erkek") + " çiftçi. " + (w ? (w === "plaza" ? "Şu an meydanda." : "Şu an çevrimiçi.") : "Şu an çevrimdışı.");
   let h = "";
-  if (puid === BOT_UID) { $("pfInfo").textContent = "Lucky Çiftliği'nin resmi çiftliği. Seviye " + MAX_LEVEL + ", her zaman ziyarete açık."; h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button>`; }
+  if (puid === BOT_UID) { $("pfInfo").textContent = "Lucky Çiftlik'in resmi çiftliği. Seviye " + MAX_LEVEL + ", her zaman ziyarete açık."; h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button>`; }
   else if (isFriend(puid)) h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button><button class="big ghost" data-unfriend="${esc(puid)}">Arkadaşlıktan çıkar</button>`;
   else if (outPending(puid)) h = `<button class="big" disabled>İstek gönderildi</button>`;
   else if (inPending(puid)) h = `<button class="big green" data-accept="${esc(puid)}">İsteği kabul et</button>`;
@@ -3601,7 +3609,7 @@ function showCharFields(on) {
 function openCharModal(m) {
   if (m !== "new" && charLocked()) { openAccount(); return; }
   charMode = m;
-  $("startTitle").textContent = m === "new" ? "Lucky Çiftliği'ne hoş geldin" : "Karakterini oluştur";
+  $("startTitle").textContent = m === "new" ? "Lucky Çiftlik'e hoş geldin" : "Karakterini oluştur";
   $("startText").textContent = "Adını yaz ve karakterini seç. Ad ve cinsiyet bir kere seçilir, sonra değiştirilemez.";
   $("nameIn").value = S ? S.name : "";
   setPick(S && S.g ? S.g : null);
@@ -3818,7 +3826,7 @@ function renderSettings() {
   $("gfxNow").textContent = !R3.on ? "3D görünüm bu cihazda kapalı" : GFX.mode === "auto" ? "Şu an: " + ["Düşük", "Orta", "Yüksek"][GFX.level] + (GFX.frameMs > 20 ? ", 30 kare" : ", 60 kare") : "Telefonun zorlanırsa Otomatik'i seç";
   $("musicSw").setAttribute("aria-checked", MUSIC.on); $("musicVol").value = Math.round(MUSIC.vol * 100); $("musicVol").disabled = !MUSIC.on;
   const a = window.LUCKY_AUTH, btns = $("setBtns");
-  $("setVer").textContent = "Lucky Çiftliği, sürüm " + VERSION + (S ? " · " + S.name : "");
+  $("setVer").textContent = "Lucky Çiftlik, sürüm " + VERSION + (S ? " · " + S.name : "");
   if (!a || !online) {
     $("setAcct").textContent = window.claude && window.claude.use ? "Claude hesabınla oynuyorsun." : "Sunucuya bağlı değilsin, ilerlemen bu cihazda saklanıyor.";
     btns.innerHTML = ""; return;
@@ -3835,9 +3843,9 @@ function listenMail() {
   if (!db) return;
   try { db.collection("mail").orderBy("ts", "desc").limit(30).onSnapshot(s => { mailOk = true; mails = s.docs.map(d => Object.assign({ id: d.id }, d.data())).filter(m => m && m.ts).sort((a, b) => b.ts - a.ts); renderMailDot(); if ($("mailbox").classList.contains("on")) renderMail(); }, () => {}); } catch (e) {}
 }
-const WELCOME_MAIL = () => ({ id: "welcome", welcome: true, ts: (S && +S.created) || Date.now(), title: "Lucky Çiftliği'ne hoş geldin!",
+const WELCOME_MAIL = () => ({ id: "welcome", welcome: true, ts: (S && +S.created) || Date.now(), title: "Lucky Çiftlik'e hoş geldin!",
   text: "Merhaba " + (S ? S.name : "çiftçi") + ",\n\nYeni çiftliğin seni bekliyor! Toprağını ekip sula, ürünlerini hasat edip depodan sat, kazandığın altınlarla çiftliğini büyüt ve dilediğin gibi süsle. " +
-    "Meydanda diğer çiftçilerle tanış, arkadaş ol, birbirinizin çiftliğini ziyaret edin. Takıldığın bir şey olursa LuckyTr'nin çiftliğine uğrayıp ilham alabilirsin.\n\nBereketli hasatlar ve çiftliğinde bol şans dileriz!\nLucky Çiftliği ekibi" });
+    "Meydanda diğer çiftçilerle tanış, arkadaş ol, birbirinizin çiftliğini ziyaret edin. Takıldığın bir şey olursa LuckyTr'nin çiftliğine uğrayıp ilham alabilirsin.\n\nBereketli hasatlar ve çiftliğinde bol şans dileriz!\nLucky Çiftlik ekibi" });
 const allMails = () => [...mails, WELCOME_MAIL()];
 const mailNew = m => !(S && S.mailRead && S.mailRead[m.id]);
 const mailGift = m => +m.gold > 0 && !(S && S.mailGot && S.mailGot[m.id]);
@@ -4231,14 +4239,14 @@ function setup3D(T) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = T.SRGBColorSpace;
-  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   const maxTex = Math.min(4096, renderer.capabilities.maxTextureSize || 4096);
   const scene3 = new T.Scene();
   scene3.background = new T.Color("#a9c98a");
   scene3.fog = new T.Fog("#cfe0c4", 36, 82);
   const camera = new T.PerspectiveCamera(30, 1, 1, 200);
-  const hemi = new T.HemisphereLight("#eef5ff", "#6d8442", .55); scene3.add(hemi);
-  const sun = new T.DirectionalLight("#ffeccc", 2.6);
+  const hemi = new T.HemisphereLight("#e6f0ff", "#5b6e3a", .62); scene3.add(hemi);
+  const sun = new T.DirectionalLight("#ffe2b8", 2.75);
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
   const sc = sun.shadow.camera; sc.left = -24; sc.right = 24; sc.top = 20; sc.bottom = -20; sc.near = 1; sc.far = 80;
   sun.shadow.bias = -.0006; sun.shadow.normalBias = .03;
@@ -4313,6 +4321,17 @@ function setup3D(T) {
   const outer = mesh(G.plane, M("#86b552"), COLS / 2, -.02, ROWS / 2, 160, 1, 160, false); scene3.add(outer);
   const groundMat = new T.MeshLambertMaterial({ color: "#ffffff" });
   const ground = mesh(G.plane, groundMat, (RX + RW / 2) / CELL, 0, (RY + RH / 2) / CELL, RW / CELL, 1, RH / CELL, false); scene3.add(ground);
+  const detailTex = canvasTex("gdetail", 256, 256, (x, w, h) => {
+    let sd = 11; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    for (let k = 0; k < 900; k++) { const px = r() * w, py = r() * h, len = 3 + r() * 7, a = (r() - .5) * .9, dark = r() < .62;
+      x.strokeStyle = dark ? `rgba(28,52,12,${(.18 + r() * .3).toFixed(2)})` : `rgba(235,250,190,${(.12 + r() * .22).toFixed(2)})`; x.lineWidth = .8 + r() * 1.1;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.sin(a) * len, py - Math.cos(a) * len); x.stroke(); }
+    for (let k = 0; k < 60; k++) { const px = r() * w, py = r() * h, rr = 6 + r() * 16; const g = x.createRadialGradient(px, py, 0, px, py, rr);
+      g.addColorStop(0, `rgba(${r() < .5 ? "40,60,15" : "150,130,70"},${(.06 + r() * .08).toFixed(2)})`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(px - rr, py - rr, rr * 2, rr * 2); }
+  });
+  detailTex.wrapS = detailTex.wrapT = T.RepeatWrapping; detailTex.repeat.set(RW / CELL / 2.2, RH / CELL / 2.2); detailTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  const detail = new T.Mesh(G.plane, new T.MeshBasicMaterial({ map: detailTex, transparent: true, depthWrite: false, opacity: .55 }));
+  detail.position.set((RX + RW / 2) / CELL, .003, (RY + RH / 2) / CELL); detail.scale.set(RW / CELL, 1, RH / CELL); detail.renderOrder = 0; scene3.add(detail);
   let groundKey = "", groundUrl = "";
   function wantGround() {
     const key = scene.kind === "plaza" ? "plaza3d" : "farm3d";
@@ -4964,7 +4983,7 @@ function setup3D(T) {
     // the shadow map is drawn only when the scene or the (snapped) light position changes, not every frame
     const sb = Math.max(14, 22 * ZOOM) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
     const stx = Math.round(tx / 3) * 3, stz = Math.round(tz / 3) * 3;
-    if (stx !== shX || stz !== shZ) { shX = stx; shZ = stz; sun.position.set(stx - 10, 20, stz - 2); sun.target.position.set(stx, 0, stz); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate = true; }
+    if (stx !== shX || stz !== shZ) { shX = stx; shZ = stz; sun.position.set(stx - 12, 17, stz - 6); sun.target.position.set(stx, 0, stz); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate = true; }
     // characters: bigger on big farms and when zoomed out, so the farmer never looks tiny
     charS = 1;
     const seen = new Set();
@@ -5034,7 +5053,7 @@ function setup3D(T) {
   R3.setRes = k => { k = Math.max(.6, Math.min(1, Math.round(k * 10) / 10)); if (k === (R3.res || 1)) return; R3.res = k; renderer.setPixelRatio(Math.max(1, R3.baseDpr * k)); lastW = 0; };
   R3.quality(GFX.level);
   R3.on = true; R3.dirty = true;
-  $("farm").style.visibility = "hidden"; cv.style.display = "block";
+  $("farm").style.visibility = "hidden"; cv.style.display = "block"; $("vig").style.display = "block";
 }
 
 async function init() {
