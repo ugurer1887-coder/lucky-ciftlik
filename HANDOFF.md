@@ -115,6 +115,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Ekin seviyeleri: buğday 1, patates 5, havuç 6, salata 8, mısır 10, patlıcan 14, kabak 18.
 - Sipariş ve günlük görev ürünleri oyuncunun kendi seviyesine göre (`lvl() >= CROPS[k].lv`; admin kilidi sayılmaz). Açılmamış ürün isteyen açık siparişler girişte yenilenir.
 
+## v100
+- Fırın ekranı (`renderOven`): çizilmiş SVG resimler (`wheatArt`, `breadArt`, `potatoArt`, `friesArt`, `RECIPE_ART`), tarif kartları, kaydırıcı (`data-orng`), 5/10/Hepsi (`data-oset`, `data-omax`), bitiş saati (`hhmm`), tepsi görünümü (`trayView`), "Hepsini depoya al" (`data-otakeall`).
+- Elmalar yaprak kümelerinin dış yüzeyinde (üst/ön taraf), sap+yaprak+parlama; yere düşen elma yok.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

@@ -584,6 +584,32 @@ body{font-family:var(--body);letter-spacing:.1px}
 .pzform{display:flex;flex-direction:column;gap:7px;background:var(--panel2);border-radius:18px;padding:12px}.pzform>b{font-family:Fredoka,Nunito,sans-serif}
 .pzrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pzrow .big.sm{width:auto;min-width:44px;padding:6px 10px}.pzval{min-width:46px;text-align:center;font:700 1.15rem Fredoka,Nunito,sans-serif}
 #pzPrice_v8{width:90px;padding:8px;border-radius:12px;border:2px solid var(--line);font:700 1.05rem Fredoka,Nunito,sans-serif;text-align:center}
+.ovhead{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:var(--ink2);font:600 .85rem Nunito,sans-serif}.ovlv{color:#f6b21a;font-size:1.15rem;letter-spacing:2px}
+.ovall{width:100%!important;margin:0 0 10px}
+.ovcard{background:linear-gradient(170deg,#3a2a1e,#2a1f17);border-radius:20px;padding:12px;margin:0 0 12px;box-shadow:inset 0 0 0 2px rgba(255,190,110,.12),0 6px 18px rgba(0,0,0,.25);color:#fbead2}
+.ovcard.busy{box-shadow:inset 0 0 0 2px rgba(255,140,40,.35),0 0 24px rgba(255,120,30,.18)}.ovcard.done{box-shadow:inset 0 0 0 2px rgba(110,210,90,.45)}
+.ovcard h3{margin:0;font:700 1.05rem Fredoka,Nunito,sans-serif;color:#fff3dc}.ovcard p{margin:3px 0 0;font-size:.84rem;color:#e9d4b4}.ovcard .sub{opacity:.75;font-size:.78rem}.okc{color:#8fe07a}
+.ovtop{display:flex;gap:12px;align-items:center}.ovart{flex:0 0 64px;height:64px;border-radius:16px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#fff3d6,#f2c98a)}
+.upart{font-size:1.8rem;color:#7a4a10}.ovinfo{flex:1;min-width:0}
+.tray{display:grid;grid-template-columns:repeat(var(--tc),1fr);gap:4px;margin:10px 0 6px;padding:8px;border-radius:12px;background:linear-gradient(180deg,#5a5f66,#3a3e44);box-shadow:inset 0 2px 6px rgba(0,0,0,.5)}
+.tray .ti{display:block;aspect-ratio:1.5/1;border-radius:50% 50% 40% 40%/60% 60% 40% 40%}
+.tray .ti.ok{background:radial-gradient(circle at 40% 30%,#f6c47a,#d98a3a 55%,#9a5418);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.tray .ti.raw{background:radial-gradient(circle at 40% 30%,#fff6e4,#f0dcb8 60%,#d9bf90);animation:ovRaw 1.6s ease-in-out infinite}
+.tray.fries .ti{border-radius:4px;aspect-ratio:1/1}.tray.fries .ti.ok{background:linear-gradient(180deg,#ffd040 0 55%,#e8463a 55%)}.tray.fries .ti.raw{background:linear-gradient(180deg,#fff2c0 0 55%,#e8a59a 55%)}
+@keyframes ovRaw{0%,100%{box-shadow:0 0 0 rgba(255,140,40,0)}50%{box-shadow:0 0 8px rgba(255,140,40,.8)}}
+.ovcard .obar{height:8px;border-radius:99px;background:rgba(0,0,0,.35);overflow:hidden;margin:6px 0 10px}.ovcard .obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#ff6a2a)}
+.ovcard .big{width:100%!important}
+.ovt{margin-bottom:8px!important}.recs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.rec{display:grid;grid-template-columns:auto auto auto;align-items:center;justify-content:center;gap:2px 6px;padding:8px 6px;border:0;border-radius:16px;background:rgba(255,255,255,.07);color:#fbead2;box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)}
+.rec.on{background:rgba(255,200,90,.16);box-shadow:inset 0 0 0 2px #f6b21a}.rin{position:relative;display:grid;place-items:center}.rin em{position:absolute;right:-6px;bottom:-4px;font:700 .72rem Fredoka,Nunito,sans-serif;font-style:normal;background:#f6b21a;color:#3a2410;border-radius:99px;padding:0 5px}
+.rarr{color:#f6b21a;font-size:.9rem}.rname{grid-column:1/-1;text-align:center;font:700 .86rem Fredoka,Nunito,sans-serif}.rmeta{grid-column:1/-1;text-align:center;font-size:.72rem;opacity:.75}
+.amt{background:rgba(0,0,0,.22);border-radius:16px;padding:10px 12px;margin-bottom:10px}.amtTop{display:flex;align-items:baseline;justify-content:center;gap:6px;font:600 .9rem Nunito,sans-serif}.amtTop .big1{font:700 2rem Fredoka,Nunito,sans-serif;color:#ffd34d}
+.orange{width:100%;-webkit-appearance:none;appearance:none;height:10px;border-radius:99px;background:linear-gradient(90deg,#ffb52a var(--p),rgba(255,255,255,.18) var(--p));margin:8px 0}
+.orange::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff6d6,#f6b21a);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.orange::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#f6b21a;border:3px solid #fff}
+.qbtns{display:flex;gap:6px;justify-content:center}.qbtns button{flex:1;border:0;border-radius:12px;padding:8px 4px;font:700 .85rem Fredoka,Nunito,sans-serif;background:rgba(255,255,255,.1);color:#fff3dc}
+.need{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px!important;flex-wrap:wrap}.need b{color:#ffd34d}.ni{display:inline-grid}
+.obake{font-size:1.05rem!important}
 .admreset{width:auto!important;min-height:30px!important;padding:4px 12px!important;font-size:.76rem!important;margin-left:auto}
 #notifAsk_v8 .box{max-width:380px;background:linear-gradient(180deg,#fff8e1,#e9f8ff);color:#2a2410}
 #notifAsk_v8 h1{font-size:1.25rem;margin:4px 0 6px}#notifAsk_v8 p{font-size:.88rem;color:#5c5240;margin:0 0 12px}
@@ -1155,7 +1181,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "99";
+const VERSION = "100";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -3715,35 +3741,75 @@ const breadThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rec
 // the oven window: one card per tray, then the upgrade
 let ovenSel = "oven", ovenAmt = { 0: 2, 1: 2 }, ovenRec = { 0: "bread", 1: "bread" };
 function openOven(id) { ovenSel = id; renderOven(); openSheet($("oven")); }
+// hand-drawn ingredient and product pictures for the oven (no emoji): a tied wheat sheaf, a crusty loaf, potatoes, fries in a carton
+let artN = 0;
+function wheatArt(sz = 64) { const u = "wa" + (++artN);
+  const ear = (x, y, r) => { let k = ""; for (let i = 0; i < 6; i++) for (const s of [-1, 1]) k += `<ellipse cx="${s * 3}" cy="${-i * 5}" rx="2.9" ry="4.8" transform="rotate(${s * 20} ${s * 3} ${-i * 5})"/>`;
+    let a = ""; for (let i = 1; i < 6; i++) for (const s of [-1, 1]) a += `<path d="M${s * 3} ${-i * 5 - 2}l${s * 6} -10"/>`;
+    return `<g transform="translate(${x} ${y}) rotate(${r})"><g stroke="#e8c66a" stroke-width=".8">${a}</g><g fill="url(#${u}k)" stroke="#a8741c" stroke-width=".6">${k}<ellipse cx="0" cy="-31" rx="2.6" ry="4.4"/></g></g>`; };
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><linearGradient id="${u}k" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".6" stop-color="#f0c050"/><stop offset="1" stop-color="#c8902a"/></linearGradient></defs>
+    <g stroke="#c9a040" stroke-width="2" stroke-linecap="round"><path d="M32 62L22 30"/><path d="M32 62L32 28"/><path d="M32 62L42 30"/></g>
+    ${ear(22, 30, -16)}${ear(42, 30, 16)}${ear(32, 26, 0)}<path d="M25 47q7 4 14 0" stroke="#8a5a2e" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>`; }
+function breadArt(sz = 64) { const u = "ba" + (++artN);
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><radialGradient id="${u}c" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#f6c47a"/><stop offset=".55" stop-color="#d98a3a"/><stop offset="1" stop-color="#9a5418"/></radialGradient></defs>
+    <ellipse cx="32" cy="52" rx="25" ry="5" fill="rgba(0,0,0,.18)"/><path d="M7 46q-2-24 25-26t25 26q-25 9-50 0z" fill="url(#${u}c)" stroke="#8a4a16" stroke-width="1.5"/>
+    <g stroke="#ffe3ad" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M19 30l5 8M30 26l4 9M41 28l4 8"/></g><path d="M14 34q8-10 20-11" stroke="#fff3d6" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g fill="#fff8ec" opacity=".8"><circle cx="20" cy="27" r=".9"/><circle cx="38" cy="24" r=".8"/><circle cx="47" cy="32" r=".9"/></g></svg>`; }
+function potatoArt(sz = 64) { const u = "pa" + (++artN), p = (cx, cy, rx, ry, r) => `<g transform="rotate(${r} ${cx} ${cy})"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${u}p)" stroke="#8a5a2e" stroke-width="1.2"/><circle cx="${cx - rx * .3}" cy="${cy - ry * .2}" r="1.2" fill="#8a5a2e"/><circle cx="${cx + rx * .35}" cy="${cy + ry * .15}" r="1" fill="#8a5a2e"/><path d="M${cx - rx * .5} ${cy - ry * .5}q${rx * .3} -${ry * .3} ${rx * .7} -${ry * .2}" stroke="#f3d9a8" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/></g>`;
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><radialGradient id="${u}p" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ecc890"/><stop offset=".6" stop-color="#cf9a58"/><stop offset="1" stop-color="#9a6630"/></radialGradient></defs>
+    <ellipse cx="32" cy="54" rx="24" ry="4" fill="rgba(0,0,0,.18)"/>${p(22, 40, 14, 10, -15)}${p(42, 38, 13, 9.5, 18)}${p(32, 48, 12, 8.5, 4)}</svg>`; }
+function friesArt(sz = 64) { const u = "fa" + (++artN);
+  let f = ""; [[22, -10], [27, -4], [32, -12], [37, -3], [42, -9], [29, 3], [35, 2]].forEach(([x, r], i) => { f += `<rect x="${x - 2.4}" y="${8 + (i % 3) * 3}" width="4.8" height="${30 - (i % 2) * 4}" rx="1.4" fill="url(#${u}f)" stroke="#c98a1a" stroke-width=".6" transform="rotate(${r} ${x} 40)"/>`; });
+  return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><linearGradient id="${u}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#ffd040"/><stop offset="1" stop-color="#e8a82a"/></linearGradient>
+    <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8463a"/><stop offset="1" stop-color="#a8261c"/></linearGradient></defs>
+    <ellipse cx="32" cy="58" rx="17" ry="3" fill="rgba(0,0,0,.18)"/>${f}<path d="M17 32h30l-4 25H21z" fill="url(#${u}b)" stroke="#7a1a12" stroke-width="1.2"/><path d="M24 44a8 5 0 0 0 16 0" fill="#ffd34d"/><path d="M19 34h26" stroke="#ff8a7a" stroke-width="1.4" opacity=".6"/></svg>`; }
+const RECIPE_ART = { bread: { out: breadArt, inp: wheatArt }, fries: { out: friesArt, inp: potatoArt } };
+const hhmm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+// the tray: what is on it (done ones golden, the rest still baking)
+function trayView(rk, q, done) {
+  const n = Math.min(q, 20), cols = 10, items = [];
+  for (let i = 0; i < n; i++) items.push(`<i class="ti ${i < done ? "ok" : "raw"}">${rk === "fries" ? "" : ""}</i>`);
+  return `<div class="tray ${rk}" style="--tc:${cols}">${items.join("")}</div>`;
+}
 function renderOven() {
-  const id = ovenSel, body = $("ovenBody"), now = Date.now(), lv = ovenLv(S, id), cap = OVEN_CAP[lv];
-  $("oven").querySelector(".sheet-head h2").textContent = OBJ[id].name + " · " + lv + ". seviye";
-  let h = "";
-  for (let k = 0; k < ovenSlots(S, id); k++) {
-    const t = trayOf(S, id, k), I = trayInfo(t, now), R = RECIPES[I.r || ovenRec[k]] || RECIPES.bread;
+  const id = ovenSel, body = $("ovenBody"), now = Date.now(), lv = ovenLv(S, id), cap = OVEN_CAP[lv], slots = ovenSlots(S, id);
+  $("oven").querySelector(".sheet-head h2").textContent = OBJ[id].name;
+  let h = `<div class="ovhead"><span class="ovlv">${"★".repeat(lv)}${"☆".repeat(OVEN_MAX - lv)}</span><span>${lv}. seviye · tepsi başına ${cap}</span></div>`;
+  const ready = [0, 1].slice(0, slots).reduce((a, k) => a + trayInfo(trayOf(S, id, k), now).done, 0);
+  if (ready && slots > 1) h += `<button class="big green ovall" data-otakeall="1">Hepsini depoya al (${ready})</button>`;
+  for (let k = 0; k < slots; k++) {
+    const t = trayOf(S, id, k), I = trayInfo(t, now);
     if (t) {
-      const left = I.q - I.done;
-      h += `<div class="card"><div class="thumb ovthumb"><span class="rec">${R.emoji}</span></div><div><h3>${ovenSlots(S, id) > 1 ? (k + 1) + ". tepsi: " : ""}${R.name}</h3>
-        <p class="keep">${I.done} hazır${left ? `, ${left} pişiyor · sıradaki ${fmt(I.next)} sonra` : ""}</p>
+      const R = RECIPES[I.r] || RECIPES.bread, left = I.q - I.done, endT = t.t0 + I.q * R.ms;
+      h += `<div class="ovcard ${I.done ? "done" : "busy"}"><div class="ovtop"><div class="ovart">${RECIPE_ART[I.r].out(54)}</div><div class="ovinfo"><h3>${slots > 1 ? (k + 1) + ". tepsi · " : ""}${R.name}</h3>
+          <p>${I.done ? `<b class="okc">${I.done} hazır</b>` : ""}${left ? `${I.done ? " · " : ""}${left} pişiyor · sıradaki <b>${fmt(I.next)}</b>` : ""}</p><p class="sub">${left ? "Hepsi " + hhmm(endT) + "'de biter" : "Hepsi pişti"}</p></div></div>
+        ${trayView(I.r, I.q, I.done)}
         <div class="obar"><u style="width:${(I.done / I.q * 100).toFixed(0)}%"></u></div>
-        <div class="row">${I.done ? `<button class="big green sm" data-otake="${k}">${I.done} ${R.name.toLocaleLowerCase("tr")} depoya al</button>` : `<span class="pill">Pişiyor 🔥</span>`}</div></div></div>`;
+        ${I.done ? `<button class="big green" data-otake="${k}">${I.done} ${R.name.toLocaleLowerCase("tr")} depoya al</button>` : ""}</div>`;
     } else {
-      const rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], have = +S.store[Rr.from] || 0, maxN = Math.min(cap, Math.floor(have / Rr.n)), lockR = rk === "fries" && !cropOpen("potato");
-      ovenAmt[k] = Math.max(1, Math.min(maxN || 1, ovenAmt[k] || 1));
-      h += `<div class="card"><div class="thumb ovthumb"><span class="rec">${Rr.emoji}</span></div><div><h3>${ovenSlots(S, id) > 1 ? (k + 1) + ". tepsi boş" : "Fırın boş"}</h3>
-        <div class="seg oseg">${Object.keys(RECIPES).map(r => `<button data-orec="${k}:${r}" aria-pressed="${r === rk}">${RECIPES[r].emoji} ${RECIPES[r].name}</button>`).join("")}</div>
-        <p class="keep">${Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} = 1 ${Rr.name.toLocaleLowerCase("tr")}, tanesi ${fmtDurS(Rr.ms)}. Depoda ${have} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} var. Tepsiye en fazla ${cap} sığar.</p>
-        ${lockR ? `<p class="keep">Patates ${CROPS.potato.lv}. seviyede açılır.</p>` : maxN ? `<div class="row"><div class="stepper"><button data-ominus="${k}" aria-label="Azalt">−</button><b>${ovenAmt[k]} ${Rr.name.toLocaleLowerCase("tr")}</b><button data-oplus="${k}" aria-label="Artır">+</button></div><button class="big ghost sm" data-omax="${k}">En fazla</button></div>
-        <p class="keep"><b>${ovenAmt[k] * Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")}</b> kullanılır, ${fmtDurS(ovenAmt[k] * Rr.ms)} sürer.</p>
-        <div class="row"><button class="big green sm" data-obake="${k}">Pişir 🔥</button></div>` : `<p class="keep">Pişirmek için en az ${Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} gerekir.</p>`}</div></div>`;
+      const rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], have = +S.store[Rr.from] || 0, maxN = Math.min(cap, Math.floor(have / Rr.n)), lockR = rk === "fries" && S.level < CROPS.potato.lv && !isAdmin();
+      ovenAmt[k] = Math.max(1, Math.min(maxN || 1, ovenAmt[k] || maxN || 1));
+      const amt = ovenAmt[k], A = RECIPE_ART[rk], inName = CROPS[Rr.from].name.toLocaleLowerCase("tr");
+      h += `<div class="ovcard"><h3 class="ovt">${slots > 1 ? (k + 1) + ". tepsi boş" : "Fırın boş"}</h3>
+        <div class="recs">${Object.keys(RECIPES).map(r => { const RR = RECIPES[r], hv = +S.store[RR.from] || 0; return `<button class="rec ${r === rk ? "on" : ""}" data-orec="${k}:${r}">
+          <span class="rin">${RECIPE_ART[r].inp(34)}<em>×${RR.n}</em></span><span class="rarr">➜</span><span class="rout">${RECIPE_ART[r].out(40)}</span>
+          <span class="rname">${RR.name}</span><span class="rmeta">${fmtDurS(RR.ms)} · depoda ${hv}</span></button>`; }).join("")}</div>
+        ${lockR ? `<p class="keep">Patates ${CROPS.potato.lv}. seviyede açılır.</p>` : maxN ? `
+        <div class="amt"><div class="amtTop"><span class="big1" id="oAmtL${k}">${amt}</span><span>${Rr.name.toLocaleLowerCase("tr")}</span></div>
+          <input type="range" class="orange" data-orng="${k}" min="1" max="${maxN}" value="${amt}" style="--p:${maxN > 1 ? ((amt - 1) / (maxN - 1) * 100).toFixed(0) : 100}%">
+          <div class="qbtns"><button data-ominus="${k}">−</button>${[5, 10].filter(n => n < maxN).map(n => `<button data-oset="${k}:${n}">${n}</button>`).join("")}<button data-omax="${k}">Hepsi (${maxN})</button><button data-oplus="${k}">+</button></div>
+          <p class="need" id="oNeed${k}"><span class="ni">${A.inp(22)}</span><b>${amt * Rr.n}</b> ${inName} · <b>${fmtDurS(amt * Rr.ms)}</b> · bitiş <b>${hhmm(now + amt * Rr.ms)}</b></p></div>
+        <button class="big green obake" data-obake="${k}">Pişir</button>` : `<p class="keep">Pişirmek için en az ${Rr.n} ${inName} gerekir. Depoda ${have} var.</p>`}</div>`;
     }
   }
-  h += lv >= OVEN_MAX ? `<p class="note">Fırının en üst seviyede: iki tepside aynı anda ${OVEN_CAP[OVEN_MAX]}'şer ürün.</p>`
-    : `<div class="card"><div class="thumb ovthumb"><span class="rec">⬆️</span></div><div><h3>Fırını geliştir</h3><p><span class="price">${fmtG(OVEN_UP[lv])} altın</span></p>
-      <p class="keep">${lv + 1}. seviye: ${lv + 1 >= 3 ? "ikinci tepsi açılır, iki tepside aynı anda " + OVEN_CAP[lv + 1] + "'şer ürün" : "tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar"}.</p>
-      <div class="row"><button class="big green sm" data-oup="1" ${S.gold >= OVEN_UP[lv] ? "" : "disabled"}>${S.gold >= OVEN_UP[lv] ? "Geliştir" : "Altının yetmiyor"}</button></div></div></div>`;
+  if (lv < OVEN_MAX) h += `<div class="ovcard up"><div class="ovtop"><div class="ovart upart">⬆</div><div class="ovinfo"><h3>Fırını geliştir</h3>
+      <p>${lv + 1 >= 3 ? "İkinci tepsi açılır, her tepsiye " + OVEN_CAP[lv + 1] : "Tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar"}</p></div></div>
+      <button class="big green" data-oup="1" ${S.gold >= OVEN_UP[lv] ? "" : "disabled"}>${fmtG(OVEN_UP[lv])} altın · Geliştir</button></div>`;
   body.innerHTML = h;
 }
+$("ovenBody").addEventListener("input", e => { const r = e.target.closest("[data-orng]"); if (!r) return; const k = +r.getAttribute("data-orng"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], v = +r.value;
+  ovenAmt[k] = v; const L = $("oAmtL" + k + "") || document.getElementById("oAmtL" + k); if (L) L.textContent = v; r.style.setProperty("--p", (r.max > 1 ? (v - 1) / (r.max - 1) * 100 : 100).toFixed(0) + "%");
+  const N = document.getElementById("oNeed" + k); if (N) N.innerHTML = `<span class="ni">${RECIPE_ART[rk].inp(22)}</span><b>${v * Rr.n}</b> ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} · <b>${fmtDurS(v * Rr.ms)}</b> · bitiş <b>${hhmm(Date.now() + v * Rr.ms)}</b>`; });
 const fmtDurS = ms => ms >= 60000 ? (ms % 60000 ? (ms / 60000).toFixed(1).replace(".", ",") : ms / 60000) + " dk" : Math.round(ms / 1000) + " sn";
 $("ovenBody").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || !S) return;
@@ -3753,6 +3819,10 @@ $("ovenBody").addEventListener("click", e => {
   if (A("data-ominus") !== null) { const k = +A("data-ominus"); ovenAmt[k] = Math.max(1, ovenAmt[k] - 1); renderOven(); return; }
   if (A("data-oplus") !== null) { const k = +A("data-oplus"); ovenAmt[k]++; renderOven(); return; }
   if (A("data-omax") !== null) { const k = +A("data-omax"); ovenAmt[k] = 999; renderOven(); return; }
+  if (A("data-oset")) { const [k, n] = A("data-oset").split(":").map(Number); ovenAmt[k] = n; renderOven(); return; }
+  if (A("data-otakeall")) { let got = 0; [0, 1].forEach(k => { const t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return; const key = I.r; S.store[key] = (+S.store[key] || 0) + I.done; t.q -= I.done; t.t0 += I.done * RECIPES[key].ms;
+      if (t.q <= 0) S.bakes[id][k] = null; gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done); dailyEv("bake:" + key, I.done); got += I.done; });
+    if (got) { popAt(me.x, me.y - .3, "+" + got + " depoya", "#ffe27a"); saveNow(); renderHud(); renderPlots(); } renderOven(); return; }
   if (A("data-obake") !== null) {
     const k = +A("data-obake"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", R = RECIPES[rk]; if (trayOf(S, id, k)) return;
     if (rk === "fries" && !cropOpen("potato")) return;
@@ -5326,6 +5396,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 100, d: "10 Ekim 2026", e: "🍞", t: "Yeni fırın ekranı", c: "#c8702a", b: "#fff0dc", items: [
+    "Fırın ekranı yenilendi: buğday başağı, ekmek, patates ve kızartma resimleri, tepside pişen ekmekler tek tek görünüyor.",
+    "Kaydırarak miktar seç, 5 / 10 / Hepsi düğmeleri, bitiş saati ve iki tepsiyi birden depoya alma.",
+    "Elmalar artık ağacın üstünde, saplı ve yapraklı; olgunlaşınca parlak kırmızı.",
+  ] },
   { v: 99, d: "10 Ekim 2026", e: "🌽", t: "Ekinler daha erken", c: "#e0a01a", b: "#fff4d6", items: [
     "Yeni açılış seviyeleri: havuç 6, salata 8, <b>mısır 10</b>, patlıcan 14, kabak 18.",
     "Siparişler artık sadece senin seviyende açık olan ürünleri istiyor.",
@@ -6317,15 +6392,16 @@ function setup3D(T) {
     cl.forEach(([dx, y, dz, r], i) => { const l = mesh(leafGeo, LEAFM(greens[(i + k) % greens.length]), x + dx, y, z + dz, r, r * .88, r); l.rotation.set(i * .7, i * 2.1, k * .3); g.add(l); });
     // sunlit highlight clusters on top
     [[.1, 1.72, .08, .2], [-.18, 1.6, .2, .16]].forEach(([dx, y, dz, r]) => g.add(mesh(leafGeo, LEAFM("#86c955"), x + dx, y, z + dz, r, r * .8, r)));
-    // apples sit just outside the canopy surface
-    const p = ripe ? 1 : Math.max(0, Math.min(1, grow || 0)), n = 11, col = new T.Color("#8cc040").lerp(new T.Color("#d9342a"), Math.max(0, (p - .45) / .55));
-    const AM = MS("#" + col.getHexString(), { roughness: .35 }), sz = .028 + p * .042;
-    if (p > .08) for (let q = 0; q < n; q++) { const c = cl[q % cl.length], a = r1() * 6.28, el = -.2 + r1() * .9, rr = c[3] * .92;
-      const ax = x + c[0] + Math.cos(a) * Math.cos(el) * rr, ay = c[1] + Math.sin(el) * rr * .88, az = z + c[2] + Math.sin(a) * Math.cos(el) * rr;
-      if (az < z - .2 && q % 2) continue;
-      g.add(mesh(G.sph, AM, ax, ay, az, sz, sz * .95, sz, false)); if (p > .6) g.add(mesh(G.cyl8, M("#5a3a1c"), ax, ay + sz * .95, az, .006, .03, .006, false)); }
-    if (ripe) [[.42, .3], [-.35, .38], [.15, .55]].forEach(([dx, dz]) => g.add(mesh(G.sph, AM, x + dx, .06, z + dz, .065, .06, .065, false)));
-    else if (p <= .08) [[-.15, 1.4, .42], [.3, 1.2, .3], [-.38, 1.05, .2], [.1, 1.62, .25]].forEach(([dx, y, dz]) => g.add(mesh(G.sph, M("#fff4f6"), x + dx, y, z + dz, .045, .03, .045, false)));
+    // apples hang on the outside of the leaf clusters, mostly on the top and the side facing the viewer (none on the ground):
+    // small and green while growing, big, shiny and red when ripe, each with a stem and a little leaf
+    const p = ripe ? 1 : Math.max(0, Math.min(1, grow || 0)), col = new T.Color("#8cc040").lerp(new T.Color("#d4281f"), Math.max(0, (p - .4) / .6));
+    const AM = MS("#" + col.getHexString(), { roughness: .3 }), HL = MS("#ffffff", { roughness: .2, transparent: true, opacity: .35 }), sz = .03 + p * .045;
+    if (p > .08) { const spots = [[0, .55, .5], [.6, .35, .55], [-.6, .4, .5], [.3, .75, .35], [-.35, .7, .4], [.85, .1, .5], [-.85, .15, .45], [.15, .2, .8], [-.2, .3, .75], [.45, .55, .65], [-.5, .1, .7], [0, .95, .1]];
+      spots.forEach(([ax, ay, az], q) => { const c = cl[q % 6], len = Math.hypot(ax, ay, az), rr = c[3] * .95;
+        const px = x + c[0] + ax / len * rr, py = c[1] + ay / len * rr * .88, pz = z + c[2] + az / len * rr;
+        g.add(mesh(G.sphHi, AM, px, py, pz, sz, sz * .92, sz, false)); g.add(mesh(G.sph, HL, px - sz * .35, py + sz * .35, pz + sz * .45, sz * .3, sz * .22, sz * .2, false));
+        if (p > .5) { g.add(mesh(G.cyl8, M("#5a3a1c"), px, py + sz * .95, pz, .006, sz * .7, .006, false)); const lf = mesh(G.sph, M("#4f9a2f"), px + sz * .3, py + sz * 1.05, pz, sz * .35, sz * .08, sz * .18, false); lf.rotation.z = -.5; g.add(lf); } }); }
+    else [[-.15, 1.4, .42], [.3, 1.2, .3], [-.38, 1.05, .2], [.1, 1.62, .25]].forEach(([dx, y, dz]) => g.add(mesh(G.sph, M("#fff4f6"), x + dx, y, z + dz, .045, .03, .045, false)));
     return g;
   }
   function buildCottage(r, c, roof) {
