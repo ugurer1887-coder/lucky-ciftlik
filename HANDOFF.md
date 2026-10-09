@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 82). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 83). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -30,9 +30,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Fıskiye: 5 seviye (`SPR_CAPS` 50/75/100/150/200, `SPR_NS` 4/6/8/10/12, `SPR_UP` 400/800/1500/2500).
 - Görevler (öğretici): `QUESTS` dizisi (8 görev, ödüller 3–12 altın). İlerleme `S.tut = { i: alınan ödül sayısı, c: { görevId: sayaç }, o: pencere bir kez açıldı }`. Sayaçlar `questEv(id, n)` ile artar (ekim, sulama, hasat, satış, ekmek, dilek, iş ilanı); fırın görevi `S.oven` durumuna bakar. Ödüller üstteki Görevler düğmesinden alınır, sol üstte görev kartı ve sağdaki ilgili düğmede işaret parmağı gösterilir. Yeni oyuncu `START_GOLD = 18` ile başlar (6 buğday tohumu).
 - Dilek çarkı: `WISH_LEVEL = 5` (5. seviyeden önce açılmaz), kazanınca `winShow()` kutlaması. Meydandaki 3D çeşme `buildFountain()` + `stepFountain()` ile canlandırılıyor (altınlar, balıklar, nilüferler, su damlaları, halkalar).
-- Dilek çarkı: `WISH_ODDS` (%1 100x, %25 2x, %34 geri, %40 boş), `WISH_MAX = 20000` (Firebase kuralı tek yazımda en fazla 2.000.000 altın değişimine izin veriyor), günde 3 hak.
+- Dilek çarkı: `WISH_ODDS` (%1 100x, %20 2x, %34 tekrar/geri, %45 boş), `WISH_MAX = 20000` (Firebase kuralı tek yazımda en fazla 2.000.000 altın değişimine izin veriyor), günde 3 hak.
 - Araçlar: tırpan, elektrikli tırpan (x2), traktör (x4, 30. seviye), ekim aleti (x2).
 - LuckyTr: her oyuncuda arkadaş olarak görünen bot (`BOT_UID`), canlı güncellenen vitrin çiftliği.
+- Admin paneli (sarı kalkan): "Bütün oyuncuları sıfırla" düğmesi her oyuncuya `admin/{id}/reset = {ts}` yazar; oyuncu bağlanınca `resetMe()` çiftliğini sıfırlar (ad, karakter, arkadaşlar, alınmış mektup ödülleri kalır; `S.resetAt`).
 - Admin paneli (sarı kalkan): ban/kick (süreli), altın verme/alma, toplu mektup/ödül, istatistik.
 - Diğer: mektup kutusu, sıralama (haftalık/aylık/genel), iş ilanları (20 dk), küfür filtresi, benzersiz isimler, dekor marketi, fırın.
 
