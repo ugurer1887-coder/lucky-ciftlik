@@ -922,7 +922,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "79";
+const VERSION = "80";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2548,7 +2548,7 @@ const IN_APP = (() => { try {
   return sessionStorage.getItem("lucky-app") === "1" || ["fullscreen", "standalone", "minimal-ui"].some(m => window.matchMedia && window.matchMedia("(display-mode: " + m + ")").matches);
 } catch (e) { return false; } })();
 function tryLandscape() {
-  if (isFs() || fsFails >= 3) return;
+  if (IN_APP || isFs() || fsFails >= 3) return;
   if (!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)) return;
   const now = Date.now(); if (now - fsLast < 1500) return; fsLast = now;
   const el = document.documentElement;
@@ -4136,6 +4136,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 80, d: "9 Ekim 2026", e: "📱", t: "Uygulama doğrudan tam ekran", c: "#2f6fb0", b: "#dcebf8", items: [
+    "Play Store uygulaması artık açılır açılmaz tam ekran başlıyor, ekrana dokunmana gerek yok.",
+    "\"Tam ekrandan çıkmak için...\" uyarısı artık çıkmıyor.",
+    "Açılıştaki simge kaldırıldı, oyun doğrudan yükleme ekranıyla açılıyor.",
+  ] },
   { v: 79, d: "9 Ekim 2026", e: "⚡", t: "Daha hızlı açılış", c: "#3f7a26", b: "#e3f0c8", items: [
     "Oyun açılırken ortada beliren ilk görüntü artık çok daha kısa sürüyor, yükleme ekranı hemen geliyor.",
   ] },
