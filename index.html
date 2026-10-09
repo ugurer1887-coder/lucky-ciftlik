@@ -901,7 +901,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "76";
+const VERSION = "77";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2527,7 +2527,6 @@ const IN_APP = (() => { try {
   return sessionStorage.getItem("lucky-app") === "1" || ["fullscreen", "standalone", "minimal-ui"].some(m => window.matchMedia && window.matchMedia("(display-mode: " + m + ")").matches);
 } catch (e) { return false; } })();
 function tryLandscape() {
-  if (IN_APP) { lockLandscape(); return; }
   if (isFs() || fsFails >= 3) return;
   if (!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)) return;
   const now = Date.now(); if (now - fsLast < 1500) return; fsLast = now;
@@ -4253,7 +4252,7 @@ function setup3D(T) {
   scene3.background = new T.Color("#b9cfb4");
   scene3.fog = new T.Fog("#c4d6c6", 30, 80);
   const camera = new T.PerspectiveCamera(30, 1, 1, 200);
-  const hemi = new T.HemisphereLight("#e6f0ff", "#5b6e3a", .62); scene3.add(hemi);
+  const hemi = new T.HemisphereLight("#e6f0ff", "#5b6e3a", 1.25); scene3.add(hemi);
   const sun = new T.DirectionalLight("#ffe2b8", 2.75);
   sun.castShadow = false; sun.shadow.mapSize.set(1024, 1024);
   const sc = sun.shadow.camera; sc.left = -24; sc.right = 24; sc.top = 20; sc.bottom = -20; sc.near = 1; sc.far = 80;
@@ -4262,7 +4261,9 @@ function setup3D(T) {
 
   // ---------- shared materials and geometries ----------
   const mats = {};
-  const M = (color, o) => { const k = color + JSON.stringify(o || {}); return mats[k] || (mats[k] = new T.MeshStandardMaterial(Object.assign({ color, roughness: .86, metalness: 0 }, o || {}))); };
+  // most surfaces use the cheaper Lambert lighting (far less work per pixel on phones than the physically based material)
+  const LAM = o => { const c = Object.assign({}, o); delete c.roughness; delete c.metalness; delete c.envMapIntensity; return new T.MeshLambertMaterial(c); };
+  const M = (color, o) => { const k = color + JSON.stringify(o || {}); return mats[k] || (mats[k] = LAM(Object.assign({ color }, o || {}))); };
   // sky light: a soft gradient sky baked into an environment map
   (() => { const es = new T.Scene(), geo = new T.SphereGeometry(50, 32, 16), cols = [], pos = geo.attributes.position, top = new T.Color("#8fc4ff"), hor = new T.Color("#f4f1e6"), bot = new T.Color("#5f7a3c"), c = new T.Color();
     for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 50; if (y > 0) c.copy(hor).lerp(top, Math.pow(y, .6)); else c.copy(hor).lerp(bot, Math.min(1, -y * 3)); cols.push(c.r, c.g, c.b); }
@@ -4394,7 +4395,7 @@ function setup3D(T) {
   Object.values(TEX).forEach(t => { t.wrapS = t.wrapT = T.RepeatWrapping; });
   // textured material with its own repeat, cached
   const TM = (color, tex, rx = 1, ry = 1, o) => { const k = "t" + color + tex + rx + "x" + ry + JSON.stringify(o || {}); if (!mats[k]) { const t = TEX[tex].clone(); t.needsUpdate = true; t.repeat.set(rx, ry);
-    mats[k] = new T.MeshStandardMaterial(Object.assign({ color, map: t, roughness: .9, metalness: 0 }, o || {})); } return mats[k]; };
+    mats[k] = LAM(Object.assign({ color, map: t }, o || {})); } return mats[k]; };
   const roofMat = c => TM(c, "shingle", 3, 1.6, { roughness: .75 });
   function gableRoof(g, cx, cz, w, d, y0, rise, color, over = .18) {
     const half = d / 2 + over, len = Math.hypot(half, rise), ang = Math.atan2(rise, half);
@@ -4567,7 +4568,7 @@ function setup3D(T) {
       gg.add(mesh(G.cone, M("#ffffff"), 0, .28, .05, .07, -.16, .05, false)); gg.add(mesh(G.cone, M("#d9483a"), 0, .52, 0, .09, .26, .09)); gg.add(mesh(G.sph, M("#f08a8a"), 0, .36, .08, .022, .022, .022, false)); }
     else if (t === "flag") { g.add(mesh(G.cyl8, MS("#9aa3ab", { metalness: .6, roughness: .3 }), x - .25, .9, z, .03, 1.8, .03)); g.add(mesh(G.sph, M("#ffd34d"), x - .25, 1.82, z, .05, .05, .05, false));
       const tx = canvasTex("flagL", 256, 160, (c, w, h) => { c.fillStyle = "#38a84a"; c.fillRect(0, 0, w, h); c.fillStyle = "#2f8a3c"; c.fillRect(0, h - 26, w, 26); c.fillStyle = "#ffe27a"; c.font = "700 74px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("Lucky", w / 2, h / 2 - 8); });
-      const fl = new T.Mesh(new T.PlaneGeometry(.62, .4), new T.MeshStandardMaterial({ map: tx, side: T.DoubleSide, roughness: .8 })); fl.position.set(x + .07, 1.56, z); g.add(fl); fx.flags.push(fl); }
+      const fl = new T.Mesh(new T.PlaneGeometry(.62, .4), LAM({ map: tx, side: T.DoubleSide })); fl.position.set(x + .07, 1.56, z); g.add(fl); fx.flags.push(fl); }
     else if (t === "stall") { blob(g, x, z, 1.2, .9, .6); g.add(mesh(G.box, TM(COL.wood, "wood"), x, .3, z + .05, .82, .44, .46));
       [-.38, .38].forEach(dx => g.add(mesh(G.box, M(COL.woodD), x + dx, .55, z - .15, .05, 1.1, .05)));
       for (let q = 0; q < 6; q++) g.add(mesh(G.box, M(q % 2 ? "#ffffff" : "#e05a3a"), x - .375 + q * .15, 1.1, z - .02, .15, .04, .6));
@@ -4599,23 +4600,23 @@ function setup3D(T) {
     return { m, n: 0, add(x, y, z, sx, sy, sz, color, ry = 0, rx = 0, rz = 0) { if (this.n >= cap) return; dummy.position.set(x, y, z); dummy.rotation.set(rx, ry, rz); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
       this.m.setMatrixAt(this.n, dummy.matrix); this.m.setColorAt(this.n, typeof color === "string" ? colOf3(color) : tmpC.set(color)); this.n++; }, done() { this.m.count = this.n; this.m.instanceMatrix.needsUpdate = true; if (this.m.instanceColor) this.m.instanceColor.needsUpdate = true; this.n = 0; } }; }
   const P = {
-    soil: pool(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial({ map: TEX.soil, roughness: 1 }), 520),
-    furrow: pool(new T.CylinderGeometry(1, 1, 1, 8).rotateZ(Math.PI / 2), new T.MeshStandardMaterial({ map: TEX.soil, roughness: 1 }), 2100, false),
-    stalk: pool(new T.CylinderGeometry(.5, 1, 1, 5), new T.MeshStandardMaterial({ roughness: .8 }), 3150),
-    ear: pool(new T.SphereGeometry(1, 6, 4), new T.MeshStandardMaterial({ roughness: .7 }), 3150),
-    leaf: pool(new T.IcosahedronGeometry(1, 0), new T.MeshStandardMaterial({ roughness: .9 }), 6300),
-    tuber: pool(new T.SphereGeometry(1, 6, 4), new T.MeshStandardMaterial({ roughness: .95 }), 4200),
-    post: pool(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial({ map: TEX.wood, roughness: .9 }), 240),
-    rail: pool(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial({ map: TEX.wood, roughness: .9 }), 520),
+    soil: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.soil, roughness: 1 }), 520),
+    furrow: pool(new T.CylinderGeometry(1, 1, 1, 8).rotateZ(Math.PI / 2), LAM({ map: TEX.soil, roughness: 1 }), 2100, false),
+    stalk: pool(new T.CylinderGeometry(.5, 1, 1, 5), LAM({ roughness: .8 }), 3150),
+    ear: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .7 }), 3150),
+    leaf: pool(new T.IcosahedronGeometry(1, 0), LAM({ roughness: .9 }), 6300),
+    tuber: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .95 }), 4200),
+    post: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.wood, roughness: .9 }), 240),
+    rail: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.wood, roughness: .9 }), 520),
     hl: pool(G.plane, new T.MeshBasicMaterial({ transparent: true, opacity: .42, depthWrite: false }), 1000, false),
     // grass tufts and the forest around the map
     tuft: pool((() => { const g = new T.BufferGeometry(), v = [];
       for (let b = 0; b < 5; b++) { const a = b / 5 * Math.PI, ca = Math.cos(a) * .5, sa = Math.sin(a) * .5, lean = (b % 2 ? .25 : -.2);
         v.push(-ca * .12, 0, -sa * .12, ca * .12, 0, sa * .12, lean * ca, 1, lean * sa); }
       g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.computeVertexNormals(); return g; })(),
-      new T.MeshStandardMaterial({ side: T.DoubleSide, roughness: 1 }), 7600, false),
-    ftrunk: pool(new T.CylinderGeometry(.55, 1, 1, 7), new T.MeshStandardMaterial({ map: TEX.wood, roughness: .95 }), 320),
-    fleaf: pool(farLeafGeo, new T.MeshStandardMaterial({ roughness: .95, flatShading: false }), 1200, false)
+      LAM({ side: T.DoubleSide, roughness: 1 }), 7600, false),
+    ftrunk: pool(new T.CylinderGeometry(.55, 1, 1, 7), LAM({ map: TEX.wood, roughness: .95 }), 320),
+    fleaf: pool(farLeafGeo, LAM({ roughness: .95, flatShading: false }), 1200, false)
   };
   P.hl.m.receiveShadow = false; P.hl.m.renderOrder = 2; P.tuft.m.receiveShadow = true;
 
@@ -5057,7 +5058,7 @@ function setup3D(T) {
   }
   R3.quality = lvl => {
     const dpr = window.devicePixelRatio || 1;
-    R3.baseDpr = [1, Math.min(dpr, 1.6), Math.min(dpr, 2)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
+    R3.baseDpr = [1, Math.min(dpr, 1.4), Math.min(dpr, 1.75)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
     sun.castShadow = false;
     const ms = 1024; if (false && sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
     tuftCount = [1500, 4500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
