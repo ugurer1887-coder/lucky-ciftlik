@@ -98,6 +98,15 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Yeni `buildCow(v)` (benekli deri dokusu `cowHide`, eklemli bacaklar, kuyruk) ve `buildHen`; ortak `animWalk(m, moving, sec, dt)` hem ağıllarda (`stepPens`) hem avludaki tavuklarda (`syncHens`).
 - Kelebekler `stepButterflies` (7 adet, çiftlikte sahip olunan alanda, meydanda meydan çevresinde).
 
+## v97
+- Görev ödülleri: günlük görev altını işin satış değerinin %10-20'si (`dailyValue`, `dailyGold`), XP = altın/3; sipariş = değerin 1.1-1.2 katı, XP değer/12. Eski günlük/siparişler girişte yeni ölçeğe çekilir (`D.v=2`). Görev penceresindeki açıklama yazıları kaldırıldı.
+- Çimen tutamları: 7 sivri, kıvrık yaprak, köke doğru koyu (vertexColors) ve rüzgârda sallanan özel malzeme (`grasswind`).
+- İnek yeniden (`buildCow`: uzun gövde, ince eklemli bacaklar, uzun burun, MS deri). Ağaç (`buildTree(x,z,ripe,seed,grow)`): pürüzsüz yaprak kümeleri (`lumpySmooth`, `leafTex`, `LEAFM`), elmalar büyüme dörtte birlerine göre büyür ve kızarır; imzada büyüme kademesi var.
+- Traktör (`buildTractor`) 1.4x, camlı kabin; sürücü koltuğu `userData.seat`.
+- Kuyu 1-5 seviyeye göre (`buildWell`), fıskiye 1-6 (`buildSprinkler(i, lv)`); `cleanFarm` artık `ovenLv` ve `sprLv` taşır (ziyarette doğru görünür).
+- Çözünürlük: kalite seviyeleri dpr 1.3/1.7/2.25; otomatik modda önce 30 fps'e iner, sonra kaliteyi düşürür.
+- LuckyTr çiftliği: kümes, ahır, ambar, iki 3. seviye fırın, 5. seviye kuyu, tüm ekin türleri.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

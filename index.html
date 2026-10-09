@@ -570,7 +570,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 .qtabs button{position:relative;border:0;border-radius:99px;padding:7px 13px;font:700 .84rem Fredoka,Nunito,sans-serif;color:#6b4a14;background:#fff;box-shadow:0 2px 8px rgba(60,50,20,.12)}
 .qtabs button[aria-pressed=true]{background:linear-gradient(160deg,#ffd34d,#f6a623);color:#4a2c00}
 .qtabs button i{position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#e0473a;border:2px solid #fff}
-.qinfo{text-align:center;font-size:.8rem;color:#6a6040;margin:0 0 8px}
+#questLead_v8:empty{display:none}.qinfo{text-align:center;font-size:.8rem;color:#6a6040;margin:0 0 8px}
 .qcard .qcoin.xp{background:#bfe6ff;color:#1d4f7a}
 .qcard.chest .qe{background:linear-gradient(160deg,#ffd9a0,#e9a24a)}
 .qcard.wait{opacity:.75}.qcard.wait .qe{background:#eee6d2}
@@ -873,7 +873,7 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div class="box set">
       <h1><span class="h1e">📜</span> <span class="h1g">Görevler</span></h1>
       <div class="qtabs" id="qtabs_v8"></div>
-      <p class="lead" id="questLead_v8">Görevleri bitir, ödül altınlarını buradan topla.</p>
+      <p class="lead" id="questLead_v8"></p>
       <div id="questList_v8"></div>
       <p class="qmore" id="questMore_v8"></p>
       <button class="big ghost" id="questClose_v8">Kapat</button>
@@ -1149,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "96";
+const VERSION = "97";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2537,7 +2537,8 @@ function cleanFarm(d) {
     plots: cleanPlots(d.plots, d.mapv), fences: [], size: farmSize(d), landBought: Math.max(0, Math.floor(+d.landBought || 0)),
     layout: cleanLayout(d.layout, d.mapv), kicks: cleanKicks(d.kicks),
     chickens: animalsOf(d, "coop").slice(0, COOP_CAP).map(() => ({ f: 0 })), cows: animalsOf(d, "cowbarn").slice(0, COW_CAP).map(() => ({ f: 0 })),
-    rot: d.rot && typeof d.rot === "object" ? Object.fromEntries(Object.entries(d.rot).slice(0, 300).map(([k, v]) => [k, (+v || 0) % 4])) : {}
+    rot: d.rot && typeof d.rot === "object" ? Object.fromEntries(Object.entries(d.rot).slice(0, 300).map(([k, v]) => [k, (+v || 0) % 4])) : {},
+    ovenLv: Object.fromEntries(OVENS.map(id => [id, ovenLv(d, id)])), sprLv: sprLv(d)
   };
   f.trees = cleanTrees(d.trees, d.mapv, f.layout);
   f.fences = cleanFences(d.fences, d.mapv, f);
@@ -3221,9 +3222,9 @@ function perfTick(ts) {
   if (!GFX.t0) GFX.t0 = ts;
   if (ts - GFX.t0 < 2000 || GFX.win.length < 20) return;
   const avg = GFX.win.reduce((a, b) => a + b, 0) / GFX.win.length; GFX.win = []; GFX.t0 = ts;
-  if (avg > 27) {                         // under ~37 fps: lighter graphics first, then 30 fps
+  if (avg > (GFX.frameMs ? 44 : 27)) {     // too slow: first 30 fps (keeps the picture sharp), then lighter graphics
     GFX.good = 0;
-    if (GFX.level > 0) { GFX.level--; R3.quality(GFX.level); } else GFX.frameMs = 32;
+    if (!GFX.frameMs) GFX.frameMs = 32; else if (GFX.level > 0) { GFX.level--; R3.quality(GFX.level); }
     try { localStorage.setItem("lucky-gfx2", JSON.stringify({ mode: "auto", level: GFX.level })); } catch (e) {}
   } else if (avg < 18.5) {
     if (++GFX.good >= 4) { GFX.good = 0; if (GFX.frameMs > 20) GFX.frameMs = 0; else if (GFX.level < 2) { GFX.level++; R3.quality(GFX.level); } }
@@ -4009,7 +4010,8 @@ function botFarm() {
 }
 function designBotFarm() {
   const now = Date.now(), taken = new Set(), plots = [], trees = [], fences = [], decor = [], spr = [];
-  const layout = Object.assign({}, DEFAULT_LAYOUT, { oven: at(6, 12) });
+  // the welcome farm shows everything a farmer can build: both ovens at the top level, the coop, the cow barn and the feed mill
+  const layout = Object.assign({}, DEFAULT_LAYOUT, { oven: at(6, 12), oven2: idx(25, 28), coop: idx(19, 15), cowbarn: idx(18, 35), mill: idx(23, 17) });
   for (const k in OBJ) fpCells(k, layout[k]).forEach(c => taken.add(c));
   taken.add(doorOf({ layout })); barnDoors({ layout }).forEach(c => taken.add(c));
   const free = i => canBase(i) && !taken.has(i), take = i => taken.add(i);
@@ -4027,8 +4029,8 @@ function designBotFarm() {
   [[5, 7], [5, 14], [5, 41], [5, 48], [14, 8], [14, 46]].forEach(([r, c]) => sprk(r, c));
   ring(1, 9, 2, 19, 10); ring(1, 9, 36, 53, 45);
   for (const c of [10, 11, 45, 46]) take(idx(9, c));
-  field(2, 8, 3, 18, "wheat"); field(2, 8, 37, 52, "potato");
-  field(12, 17, 3, 14, (r, c) => (r + c) % 3 ? "wheat" : "potato"); field(12, 16, 41, 52, (r, c) => (r + c) % 2 ? "potato" : "wheat");
+  field(2, 8, 3, 18, (r, c) => c < 9 ? "wheat" : c < 14 ? "corn" : "carrot"); field(2, 8, 37, 52, (r, c) => c < 43 ? "potato" : c < 48 ? "pumpkin" : "lettuce");
+  field(12, 17, 3, 14, (r, c) => ["wheat", "eggplant", "carrot"][Math.floor((c - 3) / 4) % 3]); field(12, 16, 41, 52, (r, c) => ["corn", "potato", "pumpkin"][Math.floor((c - 41) / 4) % 3]);
   const tree = (r, c, n) => { const i = idx(r, c); if (free(i)) { take(i); trees.push({ cell: i, t: now - ((now + n * 1237) % (TREE_MS * 1.5)) }); } };
   let tn = 0;
   for (let c = 1; c <= 54; c += 3) tree(0, c, tn++);
@@ -4049,7 +4051,9 @@ function designBotFarm() {
   for (let r = 23; r <= 27; r++) for (let c = 40; c <= 53; c += 2) dec((r * 3 + c) % 4 ? "bed" : "sunflower", r, c);
   for (let c = 17; c <= 38; c += 3) dec("sunflower", 28, c);
   designBotFarm.decor = decor; designBotFarm.spr = spr;
-  return { name: BOT_NAME, level: MAX_LEVEL, g: "e", well: 3, size: EXPAND_MAX, mapv: MAPV, store: { wheat: 999, potato: 999, apple: 999, bread: 999 },
+  const hens = Array.from({ length: COOP_CAP }, () => ({ f: now })), cows = Array.from({ length: COW_CAP }, () => ({ f: now }));
+  return { name: BOT_NAME, level: MAX_LEVEL, g: "e", well: WELL_MAX, sprLv: SPR_MAX, ovenLv: { oven: OVEN_MAX, oven2: OVEN_MAX }, oven: true, oven2: true, coop: true, cowbarn: true, mill: true,
+    chickens: hens, cows, rot: {}, size: EXPAND_MAX, mapv: MAPV, store: { wheat: 999, potato: 999, apple: 999, bread: 999 },
     plots, trees, fences, decor, spr, layout, landBought: 0 };
 }
 // a fully grown, decorated farm; empty = fields are freshly tilled and ready to plant
@@ -4971,19 +4975,29 @@ const DAILY = [
   { k: "order", e: "📋", t: n => n + " sipariş teslim et", ok: () => lvl() >= ORDER_LEVEL, n: L => 2 + Math.floor(L / 15) },
   { k: "wish", e: "⛲", t: () => "Dilek çeşmesinde dilek tut", ok: () => lvl() >= WISH_LEVEL, n: () => 1 },
 ];
-const dailyGold = L => 15 + L * 5, dailyXp = L => 8 + L * 2, dailyBonus = L => 40 + L * 12;
+// rewards follow what the work is worth: about 10-20% on top of its sale value, modest XP
+function dailyValue(k, n) {
+  if (k.startsWith("harv:")) { const c = k.slice(5); return n * (c === "apple" ? APPLE_PRICE : (CROPS[c] ? CROPS[c].sell : 5)); }
+  if (k === "sellg") return n; if (k === "plant" || k === "water") return n * 2;
+  if (k === "bake:bread") return n * BREAD_PRICE; if (k === "bake:fries") return n * FRIES_PRICE;
+  if (k === "prod:egg") return n * EGG_PRICE; if (k === "prod:milk") return n * MILK_PRICE; if (k === "feed") return n * 8; if (k === "order") return n * 40; return 40;
+}
+const dailyGold = (k, n, f) => Math.max(3, Math.round(dailyValue(k, n) * (.1 + f * .1))), dailyXp = g => Math.max(2, Math.round(g / 3));
 function seededRng(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; }; }
 function dailyEnsure() {
   if (!S || lvl() < DAILY_LEVEL) return null;
   const d = today();
-  if (S.daily && S.daily.d === d && toArr(S.daily.list).length) { const D = S.daily; D.list = toArr(D.list); D.c = D.list.map((_, j) => +toArr(D.c)[j] || 0); D.got = D.list.map((_, j) => +toArr(D.got)[j] || 0); return D; }
+  if (S.daily && S.daily.d === d && toArr(S.daily.list).length) { const D = S.daily; D.list = toArr(D.list); D.c = D.list.map((_, j) => +toArr(D.c)[j] || 0); D.got = D.list.map((_, j) => +toArr(D.got)[j] || 0);
+    if (D.v !== 2) { D.list.forEach(t => { if (!D.got[D.list.indexOf(t)]) { t.g = dailyGold(t.k, t.n, .5); t.x = dailyXp(t.g); } }); D.bg = Math.max(5, Math.round(D.list.reduce((a, t) => a + t.g, 0) * .5)); D.v = 2; }
+    return D; }
   const L = lvl(), rnd2 = seededRng(d + "|" + (uid || S.name || "")), pool = DAILY.filter(t => t.ok()), pick = [];
   while (pick.length < 3 && pool.length) {
     const t = pool.splice(Math.floor(rnd2() * pool.length), 1)[0];
     if (t.k.startsWith("harv:") && pick.filter(x => x.k.startsWith("harv:")).length >= 2) continue;
     pick.push(t);
   }
-  S.daily = { d, list: pick.map(t => ({ k: t.k, n: t.n(L), g: dailyGold(L), x: dailyXp(L) })), c: pick.map(() => 0), got: pick.map(() => 0), b: 0, bg: dailyBonus(L) };
+  const list = pick.map(t => { const n = t.n(L), g = dailyGold(t.k, n, rnd2()); return { k: t.k, n, g, x: dailyXp(g) }; });
+  S.daily = { v: 2, d, list, c: pick.map(() => 0), got: pick.map(() => 0), b: 0, bg: Math.max(5, Math.round(list.reduce((a, t) => a + t.g, 0) * .5)) };
   return S.daily;
 }
 const dailyTpl = k => DAILY.find(t => t.k === k);
@@ -5005,7 +5019,7 @@ function dailyClaim(j) {
 }
 function dailyBonusClaim() {
   const D = dailyEnsure(); if (!D || D.b || !D.got.every(Boolean)) return;
-  D.b = 1; S.gold = round1(S.gold + D.bg); gainXp(dailyXp(lvl()));
+  D.b = 1; S.gold = round1(S.gold + D.bg); gainXp(dailyXp(D.bg));
   coinBurst($("questList").querySelector("[data-dbonus]"), 14); saveNow(); renderHud(); renderQuest(); renderQuestList();
   toast("Günün sandığı açıldı: +" + D.bg + " altın 🎁");
 }
@@ -5029,7 +5043,7 @@ function newOrder() {
     it[k] = Math.max(1, Math.round(base * (.7 + Math.random() * .6)));
   }
   const val = Object.entries(it).reduce((a, [k, q]) => a + q * itemPrice(k), 0);
-  return { p: Math.floor(Math.random() * ORDER_NPC.length), it, g: Math.max(5, Math.round(val * 1.4)), x: Math.round(val / 5) + 3 };
+  return { p: Math.floor(Math.random() * ORDER_NPC.length), it, g: Math.max(5, Math.round(val * (1.1 + Math.random() * .1))), x: Math.max(2, Math.round(val / 12)) };
 }
 function ordersEnsure() {
   if (!S || lvl() < ORDER_LEVEL) return null;
@@ -5040,6 +5054,7 @@ function ordersEnsure() {
     if (!o || typeof o !== "object" || (o.it && !Object.entries(o.it).every(([k, q]) => STORE_KEYS.includes(k) && +q > 0)) || (!o.it && !(+o.w > 0)) || (!o.it && +o.w <= now)) { S.orders[j] = newOrder(); changed = true; }
   }
   S.orders.length = ORDER_SLOTS;
+  S.orders.forEach(o => { if (!o || !o.it) return; const val = Object.entries(o.it).reduce((a, [k, q]) => a + q * itemPrice(k), 0); if (o.g > val * 1.25) { o.g = Math.max(5, Math.round(val * 1.15)); o.x = Math.max(2, Math.round(val / 12)); changed = true; } });
   if (changed) save();
   return S.orders;
 }
@@ -5065,7 +5080,7 @@ function untilMidnight() { const d = new Date(); d.setHours(24, 0, 0, 0); return
 function renderDailyList() {
   if (lvl() < DAILY_LEVEL) return `<div class="qdone-all">📅 Günlük görevler ${DAILY_LEVEL}. seviyede açılır.<br>Şu an ${lvl()}. seviyedesin.</div>`;
   const D = dailyEnsure();
-  let h = `<p class="qinfo">Her gün 3 yeni görev. Yenileri <b data-until="${untilMidnight()}"></b> sonra gelir.</p>`;
+  let h = `<p class="qinfo">⏳ <b data-until="${untilMidnight()}"></b></p>`;
   h += D.list.map((t, j) => { const T = dailyTpl(t.k), c = Math.min(t.n, +D.c[j] || 0), got = !!D.got[j], rd = dailyReady(D, j);
     return `<div class="qcard ${got ? "claimed" : rd ? "cur ready" : "cur"}"><span class="qe">${got ? "✅" : T ? T.e : "⭐"}</span><div class="qbody">
       <h3>${T ? T.t(t.n) : t.k}<span class="qcoin">+${t.g} altın</span><span class="qcoin xp">+${t.x} XP</span></h3>
@@ -5074,7 +5089,7 @@ function renderDailyList() {
   const all = D.got.every(Boolean);
   h += `<div class="qcard chest ${D.b ? "claimed" : all ? "cur ready" : ""}"><span class="qe">${D.b ? "✅" : "🎁"}</span><div class="qbody">
     <h3>Günün sandığı<span class="qcoin">+${D.bg} altın</span></h3>
-    <p>${D.b ? "Bugünün sandığını açtın. Yarın yine gel!" : all ? "Bütün görevleri bitirdin, sandığını aç!" : "3 görevin hepsini bitirince açılır (" + D.got.filter(Boolean).length + "/3)."}</p>
+    <p>${D.b ? "Açıldı" : D.got.filter(Boolean).length + "/3"}</p>
     ${all && !D.b ? `<button class="big green" data-dbonus="1">Sandığı aç</button>` : ""}</div></div>`;
   return h;
 }
@@ -5097,8 +5112,7 @@ function renderQuestTabs() {
   const dot = { tut: tutLeft && questReady(questCur()), daily: dailyAny(), orders: orderAny() };
   $("qtabs").innerHTML = [["tut", "📜 Görevler"], ["daily", "📅 Günlük"], ["orders", "📋 Siparişler"]].filter(([k]) => k !== "tut" || tutLeft)
     .map(([k, t]) => `<button data-qtab="${k}" aria-pressed="${k === qtab}">${t}${dot[k] ? "<i></i>" : ""}</button>`).join("");
-  $("questLead").textContent = qtab === "tut" ? "Görevleri bitir, ödül altınlarını buradan topla. Görevler seni adım adım çiftçiliğe hazırlar."
-    : qtab === "daily" ? "Günlük görevleri bitir, altın ve XP topla. Üçünü de bitirirsen günün sandığı açılır." : "Köylüler ürün istiyor. Depodan teslim et, normal satıştan daha çok altın ve XP kazan. Çiftliğindeki tabeladan da bakabilirsin.";
+  $("questLead").textContent = "";
 }
 function tickUntil() {
   let due = false;
@@ -5305,6 +5319,14 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 97, d: "9 Ekim 2026", e: "✨", t: "Daha güzel Lucky Farm", c: "#2f9a43", b: "#e3f7dc", items: [
+    "Görüntü daha keskin ve canlı; çimenler rüzgârda sallanıyor.",
+    "Yeni gerçekçi inekler, dolgun yapraklı elma ağaçları: elmalar dalda büyüyüp kızarıyor.",
+    "Traktör büyüdü: camlı kabin, krom ızgara, farlar ve tepe lambası.",
+    "Su kuyusu ve fıskiyeler geliştirdikçe büyüyüp güzelleşiyor.",
+    "LuckyTr'nin çiftliği yeni binalarla süslendi.",
+    "Görev ve sipariş ödülleri yeniden dengelendi.",
+  ] },
   { v: 96, d: "9 Ekim 2026", e: "🦋", t: "Lucky Farm canlanıyor", c: "#e0702a", b: "#fff0dc", items: [
     "Oyunumuzun adı artık <b>Lucky Farm</b>!",
     "Yeni inekler ve tavuklar: yürürken bacakları oynuyor, ineklerin kuyruğu sallanıyor, tavuklar başını sallayarak yürüyor.",
@@ -5577,7 +5599,7 @@ function setup3D(T) {
   renderer.shadowMap.enabled = false; renderer.shadowMap.type = T.PCFSoftShadowMap;   // real-time shadows off: every object has a soft ground shadow instead (much lighter for phones)
   renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = T.SRGBColorSpace;
-  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.06;
   const maxTex = Math.min(4096, renderer.capabilities.maxTextureSize || 4096);
   const scene3 = new T.Scene();
   scene3.background = new T.Color("#b9cfb4");
@@ -5604,7 +5626,7 @@ function setup3D(T) {
     const pm = new T.PMREMGenerator(renderer); scene3.environment = pm.fromScene(es, .03).texture; scene3.environmentIntensity = .9; pm.dispose(); })();
   const MS = (color, o) => { const k = "s" + color + JSON.stringify(o || {}); return mats[k] || (mats[k] = new T.MeshStandardMaterial(Object.assign({ color, roughness: .8, metalness: 0 }, o || {}))); };
   const G = {
-    box: new T.BoxGeometry(1, 1, 1), sph: new T.SphereGeometry(1, 16, 12), ico: new T.IcosahedronGeometry(1, 1),
+    box: new T.BoxGeometry(1, 1, 1), sph: new T.SphereGeometry(1, 16, 12), sphHi: new T.SphereGeometry(1, 26, 18), ico: new T.IcosahedronGeometry(1, 1),
     cyl: new T.CylinderGeometry(1, 1, 1, 16), cyl8: new T.CylinderGeometry(1, 1, 1, 8), cone: new T.ConeGeometry(1, 1, 12),
     plane: new T.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), half: new T.SphereGeometry(1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2)
   };
@@ -5755,7 +5777,7 @@ function setup3D(T) {
   const blobTex = canvasTex("blob", 128, 128, (x) => { const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.6, "rgba(0,0,0,.22)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 128, 128); });
   const blobMat = new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .8 });
   function blob(g, x, z, sx, sz, o = .8) { const b = new T.Mesh(G.plane, o === .8 ? blobMat : new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: o })); b.position.set(x, .012, z); b.scale.set(sx, 1, sz); b.renderOrder = 1; g.add(b); return b; }
-  function bush(g, x, z, s = 1) { [[0, 0, .22], [.17, .03, .18], [-.16, .02, .17]].forEach(([dx, dz, r], i) => g.add(mesh(leafGeo, M(LEAF[i + 1], { roughness: .95 }), x + dx * s, r * s * .8, z + dz * s, r * s, r * s * .85, r * s))); }
+  function bush(g, x, z, s = 1) { [[0, 0, .22], [.17, .03, .18], [-.16, .02, .17]].forEach(([dx, dz, r], i) => g.add(mesh(leafGeo, LEAFM(LEAF[i + 1]), x + dx * s, r * s * .8, z + dz * s, r * s, r * s * .85, r * s))); }
   function buildHouse(a) {
     const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + 2.5, cz = r + 1.55, w = 4.3, d = 1.9, h = 1.45;
     blob(g, cx, cz + .1, w + 1.6, d + 1.6);
@@ -5816,23 +5838,43 @@ function setup3D(T) {
       [-.11, .11].forEach(dx => { const wh = mesh(G.cyl, M("#222"), dx, .06, -.02, .06, .03, .06, false); wh.rotation.z = Math.PI / 2; ht.add(wh); }); g.add(ht); }
     return g;
   }
+  // the well grows with its level: 1 small stone well, 2 a roofed stone well with a bucket, 3 a bigger well with a shingled roof and crank wheel,
+  // 4 a brick well with a tiled roof, lantern and water trough, 5 a grand white-stone well with a copper dome, golden trim and flowers all around
   function buildWell(a, lv) {
-    const g = new T.Group(), x = colOf(a) + .5, z = rowOf(a) + .5;
-    blob(g, x, z, 1.3, 1.2, .55);
-    if (lv >= 2) {
-      g.add(mesh(G.cyl, TM("#d8d2c6", "stone", 3, 1), x, .22, z, .36, .44, .36)); g.add(mesh(G.cyl, MS("#2f7fa8", { roughness: .05, metalness: .1 }), x, .43, z, .3, .04, .3, false));
-      g.add(mesh(G.box, M(COL.woodD), x - .32, .7, z, .06, .9, .06)); g.add(mesh(G.box, M(COL.woodD), x + .32, .7, z, .06, .9, .06));
-      g.add(mesh(G.box, M(COL.woodD), x, 1.0, z, .7, .05, .05)); g.add(mesh(prism, M("#b84a2e"), x, 1.12, z, .82, .32, .62));
-      g.add(mesh(G.cyl8, M("#9aa5ad"), x, .72, z, .07, .12, .07));
-    } else {
-      g.add(mesh(G.cyl, TM("#c9c0ae", "stone", 3, 1), x, .2, z, .34, .4, .34)); g.add(mesh(G.cyl, M("#b3a891"), x, .41, z, .37, .04, .37));
-      g.add(mesh(G.cyl, MS("#24688c", { roughness: .05, metalness: .1 }), x, .38, z, .27, .02, .27, false));
+    const g = new T.Group(), x = colOf(a) + .5, z = rowOf(a) + .5, s = [0, .92, 1, 1.1, 1.2, 1.3][lv] || 1;
+    blob(g, x, z, (1.1 + lv * .12), (1.0 + lv * .12), .55);
+    const WOOD = TM(COL.woodD, "wood"), water = MS(lv >= 5 ? "#3fb0d8" : "#2f7fa8", { roughness: .05, metalness: .1 });
+    if (lv === 1) {
+      g.add(mesh(G.cyl, TM("#c9c0ae", "stone", 3, 1), x, .2, z, .34, .4, .34)); { const rim = new T.Mesh(new T.TorusGeometry(1, .09, 6, 28), M("#b3a891")); rim.rotation.x = Math.PI / 2; rim.position.set(x, .41, z); rim.scale.set(.34, .34, .5); g.add(rim); }
+      g.add(mesh(G.cyl, water, x, .405, z, .29, .01, .29, false));
       g.add(mesh(G.box, M(COL.wood), x - .3, .62, z, .06, .5, .06)); g.add(mesh(G.box, M(COL.wood), x + .3, .62, z, .06, .5, .06));
       const ax = mesh(G.cyl8, M(COL.woodD), x, .82, z, .04, .7, .04); ax.rotation.z = Math.PI / 2; g.add(ax);
-      g.add(mesh(G.box, M(COL.woodD), x + .38, .76, z, .03, .14, .03));
-      g.add(mesh(G.box, M("#d9c79a"), x, .66, z, .012, .3, .012, false));
-      g.add(mesh(G.cyl8, M("#8a5a32"), x, .48, z, .07, .1, .07));
+      g.add(mesh(G.box, M(COL.woodD), x + .38, .76, z, .03, .14, .03)); g.add(mesh(G.box, M("#d9c79a"), x, .66, z, .012, .3, .012, false)); g.add(mesh(G.cyl8, M("#8a5a32"), x, .48, z, .07, .1, .07));
+      return g;
     }
+    const baseTex = lv === 4 ? TM("#c46a45", "brick", 4, 1) : lv >= 5 ? TM("#dedbd4", "stone", 4, 1) : TM("#c9c0ae", "stone", 3, 1);
+    if (lv >= 3) g.add(mesh(G.cyl, lv >= 5 ? TM("#d9d2c4", "stone", 4, 1) : TM("#a89b88", "stone", 4, 1), x, .04, z, .46 * s, .08, .46 * s));
+    g.add(mesh(G.cyl, baseTex, x, .24 * s, z, .34 * s, .44 * s, .34 * s)); { const rim = new T.Mesh(new T.TorusGeometry(1, .09, 6, 28), lv >= 5 ? MS("#e2b33c", { metalness: .7, roughness: .3 }) : M(lv === 4 ? "#8a7f70" : "#b3a891")); rim.rotation.x = Math.PI / 2; rim.position.set(x, .46 * s, z); rim.scale.set(.34 * s, .34 * s, .5); g.add(rim); }
+    g.add(mesh(G.cyl, water, x, .48 * s, z, .3 * s, .01, .3 * s, false)); g.add(mesh(G.cyl, M("#1d3f52"), x, .465 * s, z, .31 * s, .01, .31 * s, false));
+    const ph = .95 * s, pw = .32 * s, POST = lv >= 5 ? TM("#efe9de", "stone", 1, 2) : WOOD;
+    [-1, 1].forEach(q => g.add(mesh(G.box, POST, x + q * pw, .46 * s + ph / 2 - .05, z, .07 * s, ph, .07 * s)));
+    g.add(mesh(G.box, WOOD, x, .46 * s + ph - .1, z, pw * 2 + .1, .05, .05));
+    const ry = .46 * s + ph - .05;
+    if (lv === 2) g.add(mesh(prism, M("#b84a2e"), x, ry, z, .86, .34, .66));
+    else if (lv === 3 || lv === 4) { gableRoof(g, x, z, pw * 2 + .14, .62 * s, ry, .32 * s, lv === 4 ? "#a33a26" : "#6b4423", .08); }
+    else { const dome = mesh(G.half, MS("#4f9e8c", { metalness: .15, roughness: .55 }), x, ry, z, .46 * s, .4 * s, .46 * s); g.add(dome);
+      { const gr = new T.Mesh(new T.TorusGeometry(1, .06, 6, 28), MS("#e2b33c", { metalness: .8, roughness: .25 })); gr.rotation.x = Math.PI / 2; gr.position.set(x, ry, z); gr.scale.set(.46 * s, .46 * s, .5); g.add(gr); } g.add(mesh(G.sph, MS("#e2b33c", { metalness: .8, roughness: .25 }), x, ry + .45 * s, z, .05, .05, .05, false));
+      g.add(mesh(G.cone, MS("#e2b33c", { metalness: .8, roughness: .25 }), x, ry + .54 * s, z, .025, .1, .025, false)); }
+    // rope and bucket
+    g.add(mesh(G.box, M("#d9c79a"), x, .46 * s + ph * .55, z, .012, ph * .5, .012, false));
+    g.add(mesh(G.cyl, MS(lv >= 5 ? "#e2b33c" : "#8a5a32", { metalness: lv >= 5 ? .7 : 0, roughness: .4 }), x, .46 * s + ph * .28, z, .07, .11, .07));
+    if (lv >= 3) { const wh = new T.Mesh(new T.TorusGeometry(.13 * s, .015, 6, 18), lv >= 5 ? MS("#e2b33c", { metalness: .8, roughness: .25 }) : WOOD); wh.rotation.y = Math.PI / 2; wh.position.set(x + pw + .07, .46 * s + ph - .12, z); g.add(wh);
+      for (let k = 0; k < 4; k++) { const sp = mesh(G.box, WOOD, x + pw + .07, .46 * s + ph - .12, z, .01, .26 * s, .012, false); sp.rotation.x = k * Math.PI / 4; g.add(sp); } }
+    if (lv === 3) { g.add(mesh(G.cyl, TM("#c8693a", "stone", 1, 1), x - .42, .1, z + .32, .09, .18, .09)); g.add(mesh(G.sph, M("#4f9a2f"), x - .42, .24, z + .32, .1, .08, .1, false)); [[0, 0, "#e05a7a"], [.04, .03, "#f2c14e"]].forEach(([dx, dz, c]) => g.add(mesh(G.sph, M(c), x - .42 + dx, .3, z + .32 + dz, .03, .03, .03, false))); }
+    if (lv >= 4) { g.add(mesh(G.box, lv >= 5 ? TM("#efe9de", "stone", 2, 1) : TM("#a89b88", "stone", 2, 1), x + .05, .1, z + .52, .7, .2, .2)); g.add(mesh(G.box, water, x + .05, .2, z + .52, .62, .01, .13, false));
+      g.add(mesh(G.box, M("#2a2a2a"), x - pw, .46 * s + ph - .25, z + .08, .02, .02, .1, false)); g.add(mesh(G.box, M("#2a2a2a"), x - pw, .46 * s + ph - .32, z + .13, .07, .1, .07, false)); g.add(mesh(G.sph, new T.MeshBasicMaterial({ color: "#ffd27a" }), x - pw, .46 * s + ph - .32, z + .13, .028, .04, .028, false)); }
+    if (lv >= 5) for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2, fx2 = x + Math.cos(a) * .58, fz2 = z + Math.sin(a) * .58; if (Math.sin(a) > .6) continue;
+      g.add(mesh(G.sph, M("#4f9a2f"), fx2, .08, fz2, .1, .07, .1, false)); g.add(mesh(G.sph, M(["#e05a7a", "#f2c14e", "#ffffff", "#c9a6ff"][k % 4]), fx2, .15, fz2, .035, .03, .035, false)); }
     return g;
   }
   // turn a building around its centre (n quarter turns)
@@ -5917,23 +5959,31 @@ function setup3D(T) {
     const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(.85, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(230,220,210,.6)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
   function buildCow(v = 0) {
     const g = new T.Group(), b = new T.Group(); g.add(b);
-    const W = "#fbfaf6", K = "#26221f", P = "#f2a3ab", HIDE = new T.MeshLambertMaterial({ map: cowHide(v % 3) });
-    b.add(mesh(G.sph, HIDE, 0, .5, -.03, .19, .18, .33)); b.add(mesh(G.sph, HIDE, 0, .53, .16, .17, .17, .17)); b.add(mesh(G.sph, HIDE, 0, .52, -.24, .17, .165, .15));
-    { const nk = mesh(G.cyl, M(W), 0, .6, .3, .09, .2, .1); nk.rotation.x = -1.0; b.add(nk); }
-    b.add(mesh(G.sph, M(P), 0, .33, -.17, .08, .06, .08, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .28, -.17 + dz, .012, .045, .012, false)));
-    { const col = mesh(G.cyl, M("#c8453a"), 0, .6, .33, .1, .03, .1, false); col.rotation.x = -1.0; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .7, roughness: .3 }), 0, .5, .38, .035, .042, .035, false)); }
-    const tail = new T.Group(); tail.position.set(0, .64, -.36); b.add(tail);
-    { const t1 = mesh(G.cyl8, M(W), 0, -.14, -.02, .013, .28, .013, false); t1.rotation.x = .15; tail.add(t1); tail.add(mesh(G.sph, M(K), 0, -.3, -.04, .03, .055, .03, false)); }
-    const hd = new T.Group(); hd.position.set(0, .7, .4); b.add(hd);
-    hd.add(mesh(G.sph, M(W), 0, 0, 0, .1, .105, .12)); hd.add(mesh(G.sph, M(K), .04, .04, .0, .07, .065, .085, false)); hd.add(mesh(G.sph, M(K), 0, .1, -.01, .04, .02, .04, false));
-    hd.add(mesh(G.sph, M(P), 0, -.055, .11, .085, .068, .07, false)); [-.03, .03].forEach(dx => hd.add(mesh(G.sph, M("#8a3a42"), dx, -.045, .175, .013, .016, .008, false)));
-    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#ffffff"), s * .07, .025, .08, .024, .026, .016, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .074, .025, .092, .015, .017, .008, false)); hd.add(mesh(G.sph, M("#ffffff"), s * .07, .033, .099, .005, .005, .003, false));
-      const ear = new T.Group(); ear.position.set(s * .1, .05, -.02); ear.rotation.z = s * -.35; hd.add(ear); ear.add(mesh(G.sph, M(s > 0 ? K : W), s * .05, 0, 0, .06, .02, .035, false)); ear.add(mesh(G.sph, M(P), s * .055, -.005, .006, .04, .012, .022, false));
-      const hn = mesh(G.cone, M("#efe2c0"), s * .065, .12, -.02, .018, .08, .018, false); hn.rotation.z = -s * .55; hd.add(hn); });
+    const W = "#f7f5f0", K = "#24201d", P = "#e9a6a8", NOSE = "#d99595", HIDE = MS("#ffffff", { map: cowHide(v % 3), roughness: .85 }), SK = G.sphHi;
+    // long, deep body: chest, barrel and hips, with a slightly dropped belly and visible hip bones
+    b.add(mesh(SK, HIDE, 0, .58, -.02, .2, .2, .36)); b.add(mesh(SK, HIDE, 0, .6, .2, .19, .2, .19)); b.add(mesh(SK, HIDE, 0, .6, -.27, .19, .19, .17));
+    b.add(mesh(SK, HIDE, 0, .5, 0, .17, .14, .3)); [-1, 1].forEach(s => b.add(mesh(SK, HIDE, s * .12, .74, -.28, .05, .04, .05, false)));
+    { const nk = mesh(SK, M(W), 0, .7, .37, .1, .13, .14); nk.rotation.x = .6; b.add(nk); b.add(mesh(SK, M(W), 0, .58, .32, .06, .1, .08, false)); }
+    b.add(mesh(SK, M(P), 0, .4, -.2, .085, .065, .085, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .34, -.2 + dz, .011, .05, .011, false)));
+    { const col = mesh(G.cyl, M("#b8402c"), 0, .68, .4, .095, .03, .11, false); col.rotation.x = .9; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .75, roughness: .25 }), 0, .58, .46, .032, .04, .032, false)); }
+    const tail = new T.Group(); tail.position.set(0, .72, -.42); b.add(tail);
+    { const t1 = mesh(G.cyl8, M(W), 0, -.17, -.02, .012, .34, .012, false); t1.rotation.x = .1; tail.add(t1); tail.add(mesh(G.sph, M(K), 0, -.36, -.04, .028, .06, .028, false)); }
+    // head: skull, long muzzle, nostrils, eyes on the sides, ears and short horns, a dark patch
+    const hd = new T.Group(); hd.position.set(0, .8, .48); hd.rotation.x = .25; b.add(hd);
+    hd.add(mesh(SK, M(W), 0, 0, 0, .095, .1, .12)); hd.add(mesh(SK, M(K), .045, .03, -.01, .065, .07, .08, false));
+    hd.add(mesh(SK, M(W), 0, -.04, .11, .078, .075, .1)); hd.add(mesh(SK, M(NOSE), 0, -.06, .19, .07, .055, .045, false));
+    [-.028, .028].forEach(dx => hd.add(mesh(G.sph, M("#5a2a2e"), dx, -.05, .232, .012, .015, .006, false)));
+    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#1a1714"), s * .085, .03, .05, .016, .019, .014, false)); hd.add(mesh(G.sph, M("#ffffff"), s * .095, .038, .056, .004, .004, .003, false));
+      const ear = new T.Group(); ear.position.set(s * .09, .04, -.05); ear.rotation.z = s * -.15; ear.rotation.y = s * .3; hd.add(ear);
+      ear.add(mesh(SK, M(s > 0 ? K : W), s * .06, 0, 0, .065, .018, .035, false)); ear.add(mesh(SK, M(P), s * .065, -.004, .008, .045, .01, .022, false));
+      const hn = mesh(G.cone, M("#e9dcbc"), s * .06, .1, -.04, .016, .06, .016, false); hn.rotation.z = -s * .9; hd.add(hn); });
+    hd.add(mesh(SK, M(W), 0, .085, .02, .05, .025, .05, false));
+    // slim jointed legs with knees and dark hooves
     const legs = [];
-    [[-.1, .2, 0], [.1, .2, Math.PI], [-.1, -.22, Math.PI], [.1, -.22, 0]].forEach(([dx, dz, ph]) => { const L = new T.Group(); L.position.set(dx, .38, dz); L.userData.ph = ph; g.add(L); legs.push(L);
-      L.add(mesh(G.cyl, M(W), 0, -.1, 0, .048, .2, .048)); L.add(mesh(G.sph, M(W), 0, -.2, 0, .042, .03, .042, false)); L.add(mesh(G.cyl, M(W), 0, -.29, 0, .036, .16, .036)); L.add(mesh(G.cyl, M(K), 0, -.36, 0, .042, .05, .042, false)); });
-    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .75, .95);
+    [[-.11, .24, 0], [.11, .24, Math.PI], [-.11, -.27, Math.PI], [.11, -.27, 0]].forEach(([dx, dz, ph]) => { const L = new T.Group(); L.position.set(dx, .46, dz); L.userData.ph = ph; g.add(L); legs.push(L);
+      L.add(mesh(SK, M(W), 0, -.08, 0, .05, .12, .055)); L.add(mesh(G.cyl, M(W), 0, -.2, 0, .033, .14, .033)); L.add(mesh(SK, M(W), 0, -.28, 0, .036, .03, .036, false));
+      L.add(mesh(G.cyl, M(W), 0, -.36, 0, .028, .14, .028)); L.add(mesh(G.cyl, M(K), 0, -.44, .005, .034, .04, .036, false)); });
+    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .75, 1.05);
     return { g, hd, legs, tail, body: b, kind: "cow" };
   }
   function buildCowbarn(a, nCows) {
@@ -5968,7 +6018,7 @@ function setup3D(T) {
     g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), c + 1.7, .12, r + 1.88, 1.7, .18, .26)); g.add(mesh(G.box, M("#d9c26a"), c + 1.7, .22, r + 1.88, 1.6, .05, .2, false));
     g.add(mesh(G.box, TM("#9a9286", "stone", 1, 2), c + 3.4, .11, r + 2.75, .32, .2, .9)); g.add(mesh(G.box, MS("#4fa8d6", { roughness: .1 }), c + 3.4, .21, r + 2.75, .24, .01, .8, false));
     const pen = { items: [], x0: c + .55, x1: c + 3.0, z0: r + 2.2, z1: r + 3.45 };
-    for (let k = 0; k < nCows; k++) { const m = buildCow(k); m.g.scale.setScalar(.95); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+    for (let k = 0; k < nCows; k++) { const m = buildCow(k); m.g.scale.setScalar(.82); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: 1 + Math.random() * 4, sp: .22, cow: 1 }); }
     fx.pens.push(pen);
     return g;
@@ -6187,20 +6237,43 @@ function setup3D(T) {
   const lumpy = det => { const g = new T.IcosahedronGeometry(1, det), p = g.attributes.position, v = new T.Vector3();
     for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const n = 1 + Math.sin(v.x * 5.1 + v.y * 3.3) * .06 + Math.sin(v.z * 6.7 - v.y * 4.1) * .05 + Math.sin(v.x * 11 + v.z * 9) * .03; v.multiplyScalar(n); p.setXYZ(i, v.x, v.y, v.z); }
     g.computeVertexNormals(); return g; };
-  const leafGeo = lumpy(3), farLeafGeo = lumpy(1);   // the forest ring is far away: a much lighter shape is enough
+  // smooth, lumpy leaf mass (indexed sphere, so the light falls softly instead of in flat facets)
+  const lumpySmooth = () => { const g = new T.SphereGeometry(1, 22, 16), p = g.attributes.position, v = new T.Vector3();
+    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const n = 1 + Math.sin(v.x * 5.1 + v.y * 3.3) * .07 + Math.sin(v.z * 6.7 - v.y * 4.1) * .06 + Math.sin(v.x * 13 + v.z * 11) * .025; v.multiplyScalar(n); p.setXYZ(i, v.x, v.y, v.z); }
+    g.computeVertexNormals(); return g; };
+  const leafGeo = lumpySmooth(), farLeafGeo = lumpy(1);
+  // a leafy texture: many small overlapping leaves in light and dark greens, tinted by the material colour
+  const leafTex = canvasTex("leafy", 256, 256, (x, w, h) => { x.fillStyle = "#c9c9c9"; x.fillRect(0, 0, w, h);
+    let sd = 5; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    for (let k = 0; k < 1300; k++) { const px = r() * w, py = r() * h, v = 120 + r() * 135 | 0; x.fillStyle = `rgb(${v},${v},${v})`; x.beginPath(); x.ellipse(px, py, 5 + r() * 5, 2.5 + r() * 2.5, r() * 3.14, 0, 6.3); x.fill(); }
+    for (let k = 0; k < 160; k++) { x.fillStyle = "rgba(255,255,255,.55)"; x.beginPath(); x.ellipse(r() * w, r() * h, 3 + r() * 3, 1.5 + r() * 1.5, r() * 3.14, 0, 6.3); x.fill(); } });
+  leafTex.wrapS = leafTex.wrapT = T.RepeatWrapping; leafTex.repeat.set(3, 2);
+  const LEAFM = c => { const k = "lf" + c; return mats[k] || (mats[k] = new T.MeshStandardMaterial({ color: c, map: leafTex, roughness: .88, metalness: 0 })); };   // the forest ring is far away: a much lighter shape is enough
   sharedGeoExtra.push(leafGeo, farLeafGeo);
   const trunkGeo = new T.CylinderGeometry(.55, 1, 1, 9); sharedGeoExtra.push(trunkGeo);
   const LEAF = ["#2f6a22", "#41802c", "#4f8b36", "#2a5c1f"];
-  function buildTree(x, z, ripe, seed) {
-    const g = new T.Group(), k = seed || 0;
-    blob(g, x + .12, z + .05, 1.7, 1.5, .6);
-    g.add(mesh(trunkGeo, TM("#6e4a2c", "wood", 1, 2), x, .45, z, .09, .9, .09));
-    [[-.18, .75, .5], [.2, .82, -.6]].forEach(([dx, y, rz]) => { const b = mesh(trunkGeo, TM("#6e4a2c", "wood", 1, 2), x + dx * .6, y, z, .04, .4, .04); b.rotation.z = rz; g.add(b); });
-    const s = [[0, 1.15, 0, .46], [-.3, .92, .06, .34], [.3, .95, -.06, .36], [.04, .88, .3, .32], [-.08, 1.42, -.1, .3], [.22, 1.25, .2, .27], [-.24, 1.2, -.22, .28]];
-    s.forEach(([dx, y, dz, r], i) => { const l = mesh(leafGeo, M(LEAF[(i + k) % 4], { roughness: .95 }), x + dx, y, z + dz, r, r * .9, r); l.rotation.set(i, i * 2, k); g.add(l); });
-    const dots = ripe ? [[-.2, .98, .3, "#d9483a"], [.28, .82, .25, "#d9483a"], [.1, 1.25, .25, "#e0503f"], [-.32, .72, .1, "#d9483a"], [.3, 1.08, .1, "#c93c30"]]
-      : [[-.15, 1.1, .32, "#fff6f0"], [.25, .9, .3, "#f6c6d6"], [-.3, .82, .18, "#fff6f0"]];
-    dots.forEach(([dx, y, dz, col]) => g.add(mesh(G.sph, M(col), x + dx, y, z + dz, ripe ? .065 : .04, ripe ? .065 : .04, ripe ? .065 : .04, false)));
+  // apple tree: a textured trunk with a root flare and branches, a full canopy of lumpy leaf clusters in several greens,
+  // and apples that grow on the branches: small and green at first, turning red and big when ripe (a few fall to the grass)
+  function buildTree(x, z, ripe, seed, grow) {
+    const g = new T.Group(), k = seed || 0, TR = TM("#6b4529", "wood", 1, 3);
+    let sd = 101 + k * 37; const r1 = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    blob(g, x + .12, z + .05, 1.9, 1.7, .62);
+    g.add(mesh(trunkGeo, TR, x, .5, z, .11, 1.0, .11)); g.add(mesh(G.cone, TR, x, .1, z, .2, .22, .2));
+    [[-.2, .82, .55, .05], [.22, .9, -.6, .045], [.02, .95, .1, .04]].forEach(([dx, y, rz, w], i) => { const b = mesh(trunkGeo, TR, x + dx * .55, y, z + (i === 2 ? -.12 : 0), w, .5, w); b.rotation.z = rz; if (i === 2) b.rotation.x = -.5; g.add(b); });
+    const greens = ["#2f6a22", "#3d7d2a", "#4a8c32", "#5a9a3a", "#2a5c1f", "#6aa842"];
+    const cl = [[0, 1.3, 0, .5], [-.36, 1.08, .06, .38], [.36, 1.1, -.06, .4], [.05, 1.02, .36, .36], [-.1, 1.58, -.1, .36], [.26, 1.42, .24, .32], [-.3, 1.36, -.26, .32], [.18, 1.08, -.34, .32], [-.22, 1.2, .3, .3]];
+    cl.forEach(([dx, y, dz, r], i) => { const l = mesh(leafGeo, LEAFM(greens[(i + k) % greens.length]), x + dx, y, z + dz, r, r * .88, r); l.rotation.set(i * .7, i * 2.1, k * .3); g.add(l); });
+    // sunlit highlight clusters on top
+    [[.1, 1.72, .08, .2], [-.18, 1.6, .2, .16]].forEach(([dx, y, dz, r]) => g.add(mesh(leafGeo, LEAFM("#86c955"), x + dx, y, z + dz, r, r * .8, r)));
+    // apples sit just outside the canopy surface
+    const p = ripe ? 1 : Math.max(0, Math.min(1, grow || 0)), n = 11, col = new T.Color("#8cc040").lerp(new T.Color("#d9342a"), Math.max(0, (p - .45) / .55));
+    const AM = MS("#" + col.getHexString(), { roughness: .35 }), sz = .028 + p * .042;
+    if (p > .08) for (let q = 0; q < n; q++) { const c = cl[q % cl.length], a = r1() * 6.28, el = -.2 + r1() * .9, rr = c[3] * .92;
+      const ax = x + c[0] + Math.cos(a) * Math.cos(el) * rr, ay = c[1] + Math.sin(el) * rr * .88, az = z + c[2] + Math.sin(a) * Math.cos(el) * rr;
+      if (az < z - .2 && q % 2) continue;
+      g.add(mesh(G.sph, AM, ax, ay, az, sz, sz * .95, sz, false)); if (p > .6) g.add(mesh(G.cyl8, M("#5a3a1c"), ax, ay + sz * .95, az, .006, .03, .006, false)); }
+    if (ripe) [[.42, .3], [-.35, .38], [.15, .55]].forEach(([dx, dz]) => g.add(mesh(G.sph, AM, x + dx, .06, z + dz, .065, .06, .065, false)));
+    else if (p <= .08) [[-.15, 1.4, .42], [.3, 1.2, .3], [-.38, 1.05, .2], [.1, 1.62, .25]].forEach(([dx, y, dz]) => g.add(mesh(G.sph, M("#fff4f6"), x + dx, y, z + dz, .045, .03, .045, false)));
     return g;
   }
   function buildCottage(r, c, roof) {
@@ -6286,12 +6359,18 @@ function setup3D(T) {
     const b = boardMesh(1.1, .27, t); b.position.set(x, .45, z + .06); g.add(b); return g; }
   function buildFlowerBed(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.box, M("#8b5a33"), x, .06, z, .86, .12, .66));
     for (let k = 0; k < 7; k++) g.add(mesh(G.sph, M(k % 2 ? "#f6a6c1" : "#fff6d6"), x - .3 + (k % 4) * .2, .17, z - .15 + Math.floor(k / 4) * .3, .07, .07, .07, false)); return g; }
-  function buildSprinkler(i) {
-    const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; blob(g, x, z, .8, .8, .5);
+  // sprinklers change with their level: taller, more nozzles, from grey steel to blue, brass, copper and gold, with a small tank from level 4
+  function buildSprinkler(i, lv = 1) {
+    const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5, s = .9 + lv * .06; blob(g, x, z, .8 + lv * .04, .8 + lv * .04, .5);
+    const METAL = [null, "#9aa5ad", "#9aa5ad", "#3f8fd0", "#c9a23a", "#c47a3a", "#e2b33c"][lv] || "#9aa5ad", HEAD = [null, "#3f8fb5", "#3f8fb5", "#2f6fb0", "#d6a43a", "#b8682e", "#f2c230"][lv] || "#3f8fb5";
+    const mm = MS(METAL, { metalness: lv >= 4 ? .75 : .5, roughness: .3 });
     g.add(mesh(G.cyl8, MS("#6f7a84", { metalness: .4, roughness: .5 }), x, .12, z, .2, .24, .2));
-    g.add(mesh(G.cyl8, MS("#9aa5ad", { metalness: .6, roughness: .35 }), x, .45, z, .04, .5, .04));
-    g.add(mesh(G.cyl, MS("#3f8fb5", { roughness: .3 }), x, .72, z, .14, .06, .14));
-    [0, 1, 2, 3].forEach(q => { const a = q * Math.PI / 2, n = mesh(G.cyl8, M("#56606a"), x + Math.cos(a) * .12, .74, z + Math.sin(a) * .12, .02, .14, .02, false); n.rotation.z = Math.cos(a) * 1.2; n.rotation.x = -Math.sin(a) * 1.2; g.add(n); });
+    if (lv >= 4) { g.add(mesh(G.cyl, mm, x + .2, .2, z - .12, .1, .3, .1)); g.add(mesh(G.half, mm, x + .2, .35, z - .12, .1, .06, .1, false)); }
+    g.add(mesh(G.cyl8, mm, x, .45 * s, z, .04, .5 * s, .04));
+    g.add(mesh(G.cyl, MS(HEAD, { metalness: lv >= 4 ? .7 : .1, roughness: .3 }), x, .72 * s, z, .14 + lv * .01, .06, .14 + lv * .01));
+    const nN = lv >= 5 ? 8 : lv >= 3 ? 6 : 4;
+    for (let q = 0; q < nN; q++) { const a = q / nN * Math.PI * 2, n = mesh(G.cyl8, M("#56606a"), x + Math.cos(a) * .12, .74 * s, z + Math.sin(a) * .12, .02, .14, .02, false); n.rotation.z = Math.cos(a) * 1.2; n.rotation.x = -Math.sin(a) * 1.2; g.add(n); }
+    if (lv >= 6) g.add(mesh(G.sph, MS("#f2c230", { metalness: .85, roughness: .2 }), x, .8 * s, z, .05, .05, .05, false));
     return g;
   }
   const alertTex = canvasTex("alert", 128, 128, (x) => { x.fillStyle = "#e23b2e"; x.beginPath(); x.arc(64, 64, 54, 0, Math.PI * 2); x.fill(); x.lineWidth = 10; x.strokeStyle = "#fff"; x.stroke();
@@ -6441,11 +6520,24 @@ gl_Position = projectionMatrix * mvPosition;`); };
     rail: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.wood, roughness: .9 }), 520),
     hl: pool(G.plane, new T.MeshBasicMaterial({ transparent: true, opacity: .42, depthWrite: false }), 1000, false),
     // grass tufts and the forest around the map
-    tuft: pool((() => { const g = new T.BufferGeometry(), v = [];
-      for (let b = 0; b < 5; b++) { const a = b / 5 * Math.PI, ca = Math.cos(a) * .5, sa = Math.sin(a) * .5, lean = (b % 2 ? .25 : -.2);
-        v.push(-ca * .12, 0, -sa * .12, ca * .12, 0, sa * .12, lean * ca, 1, lean * sa); }
-      g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.computeVertexNormals(); return g; })(),
-      LAM({ side: T.DoubleSide, roughness: 1 }), 7600, false),
+    // grass tufts: 7 tapered, curved blades (two segments each), dark at the root and light at the tip, swaying in the wind
+    tuft: pool((() => { const g = new T.BufferGeometry(), v = [], c = [];
+      for (let b = 0; b < 7; b++) { const a = b / 7 * Math.PI * 2 + (b % 2) * .4, ca = Math.cos(a), sa = Math.sin(a), lean = .25 + (b % 3) * .12, h = .75 + (b % 4) * .1, w = .05;
+        const px = -sa * w, pz = ca * w, bx = ca * .04, bz = sa * .04, mx = ca * lean * .45, mz = sa * lean * .45, tx = ca * lean, tz = sa * lean;
+        const P0 = [bx - px, 0, bz - pz], P1 = [bx + px, 0, bz + pz], M0 = [mx - px * .6, h * .55, mz - pz * .6], M1 = [mx + px * .6, h * .55, mz + pz * .6], TP = [tx, h, tz];
+        const C0 = [.42, .5, .36], CM = [.78, .84, .72], CT = [1, 1, .9];
+        [[P0, P1, M1], [P0, M1, M0], [M0, M1, TP]].forEach((tri, ti) => tri.forEach((pt, k) => { v.push(...pt); c.push(...(pt === TP ? CT : pt === M0 || pt === M1 ? CM : C0)); })); }
+      g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.setAttribute("color", new T.Float32BufferAttribute(c, 3)); g.computeVertexNormals(); return g; })(),
+      (() => { const m = LAM({ side: T.DoubleSide, vertexColors: true }); m.onBeforeCompile = sh => { sh.uniforms.uWind = WIND;
+        sh.vertexShader = "uniform float uWind;\n" + sh.vertexShader.replace("#include <project_vertex>", `vec4 mvPosition = vec4( transformed, 1.0 );
+#ifdef USE_INSTANCING
+mvPosition = instanceMatrix * mvPosition;
+#endif
+float gh = max(0.0, mvPosition.y), gp = mvPosition.x * 1.3 + mvPosition.z * 0.9;
+mvPosition.x += (sin(uWind * 1.6 + gp) * 0.6 + sin(uWind * 3.1 + gp * 2.3) * 0.25) * gh;
+mvPosition.z += cos(uWind * 1.1 + gp * .7) * 0.3 * gh;
+mvPosition = modelViewMatrix * mvPosition;
+gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () => "grasswind"; return m; })(), 7600, false),
     ftrunk: pool(new T.CylinderGeometry(.55, 1, 1, 7), LAM({ map: TEX.wood, roughness: .95 }), 320),
     fleaf: pool(farLeafGeo, LAM({ roughness: .95, flatShading: false }), 1200, false)
   };
@@ -6467,8 +6559,8 @@ gl_Position = projectionMatrix * mvPosition;`); };
     if (!f) return "none|" + tuftCount;
     const B = { q: 0, done: 0 }; const oSig = (f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") + (millInfo(S, now).q > millInfo(S, now).done ? "m" : "") : "")
       + "|" + animalsOf(f, "coop").length + "." + animalsOf(f, "cowbarn").length + "|" + JSON.stringify(f.rot || {});
-    return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : "")).join(","),
-      f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
+    return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : ":" + Math.floor((now - t.t) / TREE_MS * 4))).join(","),
+      f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, sprLv(f), B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
   }
   function rebuild() {
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
@@ -6497,15 +6589,15 @@ gl_Position = projectionMatrix * mvPosition;`); };
     if (scene.kind === "plaza") { for (let r = PSQ.r0; r <= PSQ.r1; r++) for (let c = PSQ.c0; c <= PSQ.c1; c++) busy.add(idx(r, c)); P_BLOCK.forEach(i => busy.add(i)); }
     else if (f) { occMap(f).forEach((v, k) => busy.add(k)); }
     // soft grass in natural clumps: colours close to the meadow, short and leaning, a few taller wild tufts
-    const greens = ["#679f3c", "#74aa44", "#7fb34b", "#8cbd55", "#9ac760", "#86b24c"];
+    const greens = ["#6ea83e", "#7cb547", "#89c050", "#97ca5a", "#a6d266", "#82b347", "#b4d86e"];
     let cx0 = 0, cz0 = 0;
     for (let k = 0; k < tuftCount * .7; k++) {
       if (k % 5 === 0) { cx0 = -1 + r1() * (COLS + 2); cz0 = -1 + r1() * (ROWS + 1.2); }
       const x = cx0 + (r1() - .5) * .9, z = cz0 + (r1() - .5) * .7, c = Math.floor(x), r = Math.floor(z);
       if (r === ROWS - 1) continue; if (c >= 0 && r >= 0 && c < COLS && r < ROWS && busy.has(idx(r, c))) continue;
       if (f && scene.kind !== "plaza" && !(c >= 0 && r >= 0 && c < COLS && r < ROWS && inOwned(f, idx(r, c)))) continue;   // none under the fog
-      const tall = r1() < .08, s = (tall ? .13 : .07) + r1() * (tall ? .08 : .06);
-      P.tuft.add(x, 0, z, s * (1.4 + r1() * .6), s * (.7 + r1() * .7) * (tall ? 1.6 : 1), s * 1.4, greens[Math.floor(r1() * greens.length)], r1() * 6.28);
+      const tall = r1() < .1, s = (tall ? .16 : .09) + r1() * (tall ? .08 : .07);
+      P.tuft.add(x, 0, z, s * (1.1 + r1() * .5), s * (.8 + r1() * .7) * (tall ? 1.5 : 1), s * 1.1, greens[Math.floor(r1() * greens.length)], r1() * 6.28);
     }
     // a forest ring frames the map
     for (let k = 0; k < 290; k++) {
@@ -6551,12 +6643,12 @@ gl_Position = projectionMatrix * mvPosition;`); };
     if (L.cowbarn >= 0) { world.add(RO(buildCowbarn(L.cowbarn, animalsOf(f, "cowbarn").length), "cowbarn")); proxy(colOf(L.cowbarn) + 2, .6, rowOf(L.cowbarn) + 2, 4, 1.2, 4, L.cowbarn); }
     if (L.mill >= 0) { const M0 = isMe ? millInfo(S, now) : { q: 0, done: 0 }; world.add(RO(buildMill(L.mill, M0.q > M0.done), "mill")); proxy(colOf(L.mill) + 1, .7, rowOf(L.mill) + 1, 2, 1.4, 2, L.mill); }
     // sprinklers
-    (f.spr || []).forEach(s => { world.add(R1(buildSprinkler(s.cell), "spr", s.cell)); proxy(colOf(s.cell) + .5, .5, rowOf(s.cell) + .5, 1, 1, 1, s.cell); });
+    (f.spr || []).forEach(s => { world.add(R1(buildSprinkler(s.cell, sprLv(f)), "spr", s.cell)); proxy(colOf(s.cell) + .5, .5, rowOf(s.cell) + .5, 1, 1, 1, s.cell); });
     // decorations
     (f.decor || []).forEach((d, k) => { const o = buildDecor(d.t, d.cell, k); if (o) { world.add(R1(o, "decor", d.cell)); proxy(colOf(d.cell) + .5, .5, rowOf(d.cell) + .5, 1, 1, 1, d.cell); } });
     // trees
     (f.trees || []).forEach((tr, k) => { const rp = now - tr.t >= TREE_MS, x = colOf(tr.cell) + .5, z = rowOf(tr.cell) + .5;
-      world.add(R1(buildTree(x, z, rp, k), "tree", tr.cell)); proxy(x, .7, z, 1, 1.4, 1, tr.cell);
+      world.add(R1(buildTree(x, z, rp, k, Math.floor((now - tr.t) / TREE_MS * 4) / 4), "tree", tr.cell)); proxy(x, .7, z, 1, 1.4, 1, tr.cell);
       if (rp) { const s = sprite(starTex, .42, .42); s.position.set(x + .38, 1.45, z); s.userData.bob = Math.random() * 6; fx.stars.push(s); world.add(s); } });
     // fences
     const F = new Set(f.fences || []);
@@ -6715,27 +6807,39 @@ gl_Position = projectionMatrix * mvPosition;`); };
   // the tool in the right hand: a classic scythe, or the orange electric brush cutter
   const bladeGeo = new T.TorusGeometry(1, .07, 5, 18, Math.PI * .85); sharedGeoExtra.push(bladeGeo);
   const ringGeo = new T.TorusGeometry(1, .12, 5, 20); sharedGeoExtra.push(ringGeo);
+  // a big, glossy, luxury tractor: rounded hood with a chrome grille and headlights, a glass cab with a roof and an amber beacon,
+  // chrome exhaust, large treaded rear tyres on yellow rims, fenders, steps and mirrors
   function buildTractor() {
-    const g = new T.Group(), red = MS("#d9402c", { roughness: .45, metalness: .15 }), dark = M("#2b2b2b"), hub = MS("#f2c14e", { roughness: .4 }), wheels = [];
-    blob(g, 0, 0, 1.3, 1.7, .6);
-    g.add(mesh(G.box, red, 0, .42, .02, .5, .22, 1.0));
-    g.add(mesh(G.box, red, 0, .55, .3, .42, .22, .46));
-    g.add(mesh(G.box, M("#3a3f45"), 0, .52, .54, .36, .16, .03, false));
-    [-.06, .06].forEach(dx => g.add(mesh(G.box, M("#cfd6db"), dx * 2.2, .58, .545, .06, .03, .02, false)));
-    g.add(mesh(G.cyl8, M("#3b3b3b"), .14, .82, .42, .03, .36, .03));
-    g.add(mesh(G.cyl8, M("#3b3b3b"), .14, 1.0, .42, .04, .02, .04, false));
-    g.add(mesh(G.box, M("#3a2a20"), 0, .62, -.28, .26, .05, .24));
-    g.add(mesh(G.box, M("#3a2a20"), 0, .76, -.4, .26, .26, .05));
-    const sw = mesh(ringGeo, M("#2b2b2b"), 0, .8, -.02, .09, .09, .09, false); sw.rotation.x = -1.0; g.add(sw);
-    g.add(mesh(G.cyl8, M("#2b2b2b"), 0, .7, .04, .015, .2, .015, false)); g.children[g.children.length - 1].rotation.x = -.6;
+    const g = new T.Group(), body = new T.Group(); body.scale.setScalar(1.4); g.add(body);
+    const red = MS("#c9271c", { roughness: .28, metalness: .25 }), redD = MS("#8e1810", { roughness: .4, metalness: .2 }), tyre = M("#1f1f1f"), rim = MS("#f2c230", { roughness: .3, metalness: .4 }),
+      chrome = MS("#e7ecf0", { roughness: .15, metalness: .9 }), glass = MS("#bfe3f2", { roughness: .05, metalness: .1, transparent: true, opacity: .28 }), blk = M("#2a2a2c"), wheels = [];
+    blob(g, 0, 0, 1.9, 2.5, .6);
+    body.add(mesh(G.box, redD, 0, .36, .02, .44, .12, 1.04));
+    { const hood = mesh(G.cyl, red, 0, .52, .33, .2, .52, .2); hood.rotation.x = Math.PI / 2; hood.scale.set(.2, .52, .17); body.add(hood); }
+    body.add(mesh(G.box, red, 0, .45, .33, .4, .14, .52));
+    body.add(mesh(G.box, chrome, 0, .5, .6, .3, .2, .02, false)); for (let q = 0; q < 5; q++) body.add(mesh(G.box, blk, 0, .42 + q * .04, .612, .26, .012, .01, false));
+    [-1, 1].forEach(s => { const hl = mesh(G.cyl, new T.MeshBasicMaterial({ color: "#fff8d6" }), s * .14, .56, .6, .035, .02, .035, false); hl.rotation.x = Math.PI / 2; body.add(hl);
+      const hr = new T.Mesh(new T.TorusGeometry(.037, .008, 6, 16), chrome); hr.position.set(s * .14, .56, .61); body.add(hr); });
+    body.add(mesh(G.box, MS("#f2c230", { roughness: .3 }), 0, .68, .45, .06, .015, .3, false));
+    { const ex = mesh(G.cyl8, chrome, .13, .86, .44, .025, .5, .025); body.add(ex); body.add(mesh(G.cyl8, chrome, .13, 1.12, .44, .032, .04, .032, false)); }
+    // cab
+    body.add(mesh(G.box, red, 0, .55, -.22, .5, .3, .5)); body.add(mesh(G.box, M("#3a2a20"), 0, .72, -.3, .28, .05, .24)); body.add(mesh(G.box, M("#3a2a20"), 0, .86, -.42, .28, .26, .05));
+    [[-.24, .02], [.24, .02], [-.24, -.46], [.24, -.46]].forEach(([dx, dz]) => body.add(mesh(G.box, blk, dx, 1.0, -.22 + dz + .22, .035, .62, .035)));
+    body.add(mesh(G.box, red, 0, 1.33, -.22, .58, .05, .6)); body.add(mesh(G.box, M("#f4f1ea"), 0, 1.365, -.22, .5, .02, .52, false));
+    body.add(mesh(G.box, glass, 0, 1.0, .02, .46, .58, .01, false)); [-1, 1].forEach(s => body.add(mesh(G.box, glass, s * .245, 1.0, -.22, .01, .58, .44, false)));
+    body.add(mesh(G.sph, new T.MeshBasicMaterial({ color: "#ffa21a" }), .18, 1.4, -.4, .04, .035, .04, false));
+    [-1, 1].forEach(s => { const mr = mesh(G.box, chrome, s * .33, 1.05, .02, .03, .07, .05, false); body.add(mr); body.add(mesh(G.box, blk, s * .29, 1.05, .02, .08, .012, .012, false)); });
+    const sw = mesh(ringGeo, blk, 0, .84, -.08, .08, .08, .08, false); sw.rotation.x = -1.0; body.add(sw);
     const wheel = (x, y, z, r, w) => { const wg = new T.Group(); wg.position.set(x, y, z);
-      const t = mesh(G.cyl, dark, 0, 0, 0, r, w, r); t.rotation.z = Math.PI / 2; wg.add(t);
-      const h = mesh(G.cyl, hub, (x > 0 ? 1 : -1) * (w / 2 + .005), 0, 0, r * .45, .02, r * .45, false); h.rotation.z = Math.PI / 2; wg.add(h);
-      for (let k = 0; k < 6; k++) { const tr = mesh(G.box, M("#1c1c1c"), 0, 0, 0, w * 1.02, .04, .07, false); const a = k / 6 * Math.PI * 2; tr.position.set(0, Math.sin(a) * r, Math.cos(a) * r); tr.rotation.x = a; wg.add(tr); }
-      wheels.push({ wg, r }); g.add(wg); };
-    wheel(-.36, .32, -.24, .32, .16); wheel(.36, .32, -.24, .32, .16); wheel(-.29, .18, .4, .18, .1); wheel(.29, .18, .4, .18, .1);
-    [-.36, .36].forEach(x => { g.add(mesh(G.box, red, x, .67, -.26, .19, .035, .5)); g.add(mesh(G.box, red, x, .55, .0, .19, .2, .035)); });
-    g.userData.wheels = wheels; return g;
+      const t = mesh(G.cyl, tyre, 0, 0, 0, r, w, r); t.rotation.z = Math.PI / 2; wg.add(t);
+      const h = mesh(G.cyl, rim, (x > 0 ? 1 : -1) * (w / 2 + .004), 0, 0, r * .58, .02, r * .58, false); h.rotation.z = Math.PI / 2; wg.add(h);
+      const hc = mesh(G.cyl, chrome, (x > 0 ? 1 : -1) * (w / 2 + .012), 0, 0, r * .16, .02, r * .16, false); hc.rotation.z = Math.PI / 2; wg.add(hc);
+      for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2; [-1, 1].forEach(sd => { const tr = mesh(G.box, M("#161616"), sd * w * .25, Math.sin(a) * r, Math.cos(a) * r, w * .5, .035, .06, false); tr.rotation.x = a; tr.rotation.y = sd * .5; wg.add(tr); }); }
+      wheels.push({ wg, r }); body.add(wg); };
+    wheel(-.37, .38, -.25, .38, .2); wheel(.37, .38, -.25, .38, .2); wheel(-.29, .2, .4, .2, .12); wheel(.29, .2, .4, .2, .12);
+    { const half = new T.CylinderGeometry(1, 1, 1, 18, 1, false, 0, Math.PI); [-.37, .37].forEach(x => { const fd = new T.Mesh(half, red); fd.rotation.z = Math.PI / 2; fd.position.set(x, .38, -.25); fd.scale.set(.43, .23, .43); body.add(fd); }); }
+    [-1, 1].forEach(s => body.add(mesh(G.box, blk, s * .27, .3, .02, .1, .02, .12, false)));
+    g.userData.wheels = wheels; g.userData.seat = { y: .74 * 1.4 - .29, z: -.3 * 1.4 }; return g;
   }
   function buildTool(k) {
     if (k === "tractor") return new T.Group();
@@ -6792,7 +6896,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     if (m.tractor) m.tractor.visible = riding;
     if (riding) {
       const vib = Math.sin(t / 1000 * 40) * .006;
-      m.body.position.set(0, .33 + vib, -.26);
+      const seat = m.tractor.userData.seat || { y: .33, z: -.26 }; m.body.position.set(0, seat.y + vib, seat.z);
       m.legL.rotation.x = m.legR.rotation.x = -1.35;
       m.armL.rotation.x = m.armR.rotation.x = working ? -1.1 + Math.sin(t / 1000 * 18) * .25 : -1.0;
       const spin = walking ? .22 : working ? .08 : 0; m.tractor.userData.wheels.forEach(w => { w.wg.rotation.x += spin * .32 / w.r; });
@@ -6866,6 +6970,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     ndc.set(lx / w * 2 - 1, -(ly / h * 2 - 1)); ray.setFromCamera(ndc, camera);
   }
   const scrV = new T.Vector3();
+  R3._scene = scene3;
   R3.toScreen = (x, y, z) => { scrV.set(x, y, z).project(camera); return { x: (scrV.x + 1) / 2 * (cv.clientWidth || 1), y: (1 - scrV.y) / 2 * (cv.clientHeight || 1) }; };
   R3.pick = (cx, cy, groundOnly) => {
     toNdc(cx, cy);
@@ -7005,12 +7110,12 @@ gl_Position = projectionMatrix * mvPosition;`); };
   }
   R3.quality = lvl => {
     const dpr = window.devicePixelRatio || 1;
-    R3.baseDpr = [1, Math.min(dpr, 1.4), Math.min(dpr, 1.75)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
+    R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.7), Math.min(dpr, 2.25)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
     sun.castShadow = false;
     const ms = 1024; if (false && sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-    tuftCount = [1500, 4500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
+    tuftCount = [2500, 5500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
   };
-  R3.setRes = k => { k = Math.max(.6, Math.min(1, Math.round(k * 10) / 10)); if (k === (R3.res || 1)) return; R3.res = k; renderer.setPixelRatio(Math.max(1, R3.baseDpr * k)); lastW = 0; };
+  R3.setRes = k => { k = Math.max(.75, Math.min(1, Math.round(k * 10) / 10)); if (k === (R3.res || 1)) return; R3.res = k; renderer.setPixelRatio(Math.max(1, R3.baseDpr * k)); lastW = 0; };
   R3.quality(GFX.level);
   R3.on = true; R3.dirty = true;
   $("farm").style.visibility = "hidden"; cv.style.display = "block"; $("vig").style.display = "block";
