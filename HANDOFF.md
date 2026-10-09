@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 85). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 86). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -42,6 +42,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `netlify/functions/harvest-push.mjs` 5 dakikada bir çalışır (bağımlılıksız, VAPID imzası Node crypto ile), içeriksiz push yollar; yazıyı `sw.js` gösterir. Oyun açık ve odaktaysa bildirim gösterilmez.
 - Netlify ortam değişkenleri (9 Ekim 2026'da eklendi): `FIREBASE_DB_SECRET` ve `VAPID_PRIVATE_D` gizli, `VAPID_PUBLIC` (oyundaki `VAPID_PUBLIC` ile aynı). Değerler depoda YOK. Fonksiyon Netlify > Logs > Functions > harvest-push altında izlenir, oradan "Run now" ile elle de çalıştırılabilir.
 - Firebase kuralı: `"push": { ".indexOn": ["due"], "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }`.
+
+- 3D buğday: `wheat3()` tarla başına 10 sap, `whead` (taneli/kılçıklı başak) ve `blade` (yaprak) havuzları; `windy()` ile rüzgârda sallanır (`WIND` uniform). Fırın: `buildOven()` tuğla kubbe, taş kemer, baca, odun; pişerken alev/kor/duman `stepOven()`.
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.

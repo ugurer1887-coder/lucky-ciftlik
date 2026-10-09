@@ -1100,7 +1100,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "85";
+const VERSION = "86";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -4608,6 +4608,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 86, d: "9 Ekim 2026", e: "🌾", t: "Altın başaklar ve yanan fırın", c: "#d9961a", b: "#fff3d0", items: [
+    "Buğday yeniden tasarlandı: her tarlada daha gür sap, gerçek yaprak ve taneli, kılçıklı başaklar var. Olgunlaşınca altın sarısına dönüyor ve rüzgârda hafifçe sallanıyor.",
+    "Taş fırın yenilendi: tuğla kubbe, taş kemerli ağız, tuğla baca, odun yığını ve ekmek küreği.",
+    "Ekmek pişerken fırının içinde <b>ateş yanıyor</b>: alevler dans ediyor, ağzı parlıyor, bacadan kıvılcım ve duman çıkıyor.",
+  ] },
   { v: 84, d: "9 Ekim 2026", e: "🔔", t: "Hasat bildirimleri", c: "#e0762a", b: "#fff0d9", items: [
     "Ekinlerin, elma ağaçların ya da ekmeklerin hazır olunca oyun kapalıyken bile telefonuna <b>bildirim</b> gelir.",
     "Oyuna ilk girişinde bir kez sorulur. İstediğin zaman <b>Ayarlar &gt; Hasat bildirimleri</b>'nden açıp kapatabilirsin.",
@@ -4946,6 +4951,8 @@ function setup3D(T) {
   let tseed = 7; const trand = () => { tseed = (tseed * 16807) % 2147483647; return tseed / 2147483647; };
   const speck = (x, w, h, n, a) => { for (let k = 0; k < n; k++) { const v = trand() < .5 ? 0 : 255; x.fillStyle = `rgba(${v},${v},${v},${(trand() * a).toFixed(3)})`; x.fillRect(trand() * w, trand() * h, 1 + trand() * 3, 1 + trand() * 3); } };
   const TEX = {
+    brick: canvasTex("brick", 256, 256, (x, w, h) => { x.fillStyle = "#d9cbb8"; x.fillRect(0, 0, w, h);
+      for (let r = 0; r < 8; r++) for (let k = -1; k < 5; k++) { const v = 200 + trand() * 55 | 0; x.fillStyle = `rgb(${v},${v * .93 | 0},${v * .86 | 0})`; rr(x, k * 64 + (r % 2) * 32 + 3, r * 32 + 3, 58, 26, 4); x.fill(); } }),
     shingle: canvasTex("shingle", 256, 256, (x, w, h) => { x.fillStyle = "#fff"; x.fillRect(0, 0, w, h);
       for (let r = 0; r < 10; r++) for (let k = 0; k < 9; k++) { const s = 200 + trand() * 55 | 0; x.fillStyle = `rgb(${s},${s},${s})`; const tw = 30, ox = (r % 2) * 15;
         rr(x, k * tw - ox + 1, r * 26 + 1, tw - 2, 25, 5); x.fill(); }
@@ -5051,16 +5058,54 @@ function setup3D(T) {
     g.children[1].rotation.x = -.3; const f = new T.Mesh(new T.PlaneGeometry(.86, .4), new T.MeshLambertMaterial({ map: tex })); f.position.set(x, .62, z + .045); f.rotation.x = -.3; g.add(f);
     return g;
   }
+  // the stone bread oven: stone plinth, brick dome with an arched mouth, brick chimney, firewood and a bread peel.
+  // While bread is baking the mouth glows, flames dance inside, embers rise and the chimney smokes (fx.oven, stepOven).
+  const emberTex = canvasTex("ember", 64, 64, (x) => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 30); g.addColorStop(0, "rgba(255,240,180,1)"); g.addColorStop(.3, "rgba(255,150,40,.85)"); g.addColorStop(1, "rgba(255,80,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); });
   function buildOven(a, baking) {
-    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1;
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, O = fx.oven = { baking, flames: [], embers: [], smoke: [], glow: null, inner: null };
     blob(g, x, z + .1, 2.6, 2.4);
-    g.add(mesh(G.box, TM("#d8d2c6", "stone", 3, 1), x, .25, z, 1.7, .5, 1.5));
-    g.add(mesh(G.half, TM("#b4624a", "stone", 3, 2), x, .5, z - .05, .78, .78, .7));
-    g.add(mesh(G.box, M("#2a1a10"), x, .72, z + .62, .62, .44, .06, false));
-    g.add(mesh(G.cyl, M("#9a4a36"), x + .38, 1.25, z - .3, .1, .55, .1)); g.add(mesh(G.cyl, M("#5e3226"), x + .38, 1.54, z - .3, .13, .05, .13));
-    if (baking) { const fl = mesh(G.cone, new T.MeshBasicMaterial({ color: "#ffb02e" }), x, .68, z + .55, .16, .32, .08, false); fl.userData.flame = 1; g.add(fl);
-      const fl2 = mesh(G.cone, new T.MeshBasicMaterial({ color: "#ffe27a" }), x, .64, z + .58, .09, .2, .05, false); fl2.userData.flame = 2; g.add(fl2); }
+    // plinth with a stone top slab
+    g.add(mesh(G.box, TM("#a89b88", "stone", 3, 1), x, .22, z, 1.7, .44, 1.5)); g.add(mesh(G.box, TM("#8a7f70", "stone", 3, 1), x, .47, z + .02, 1.82, .07, 1.62));
+    // wood store under the plinth front
+    g.add(mesh(G.box, M("#3a2a1e"), x - .48, .2, z + .72, .52, .3, .1, false));
+    [[-.62, .12], [-.48, .12], [-.34, .12], [-.55, .24], [-.41, .24]].forEach(([dx, y]) => { const l = mesh(G.cyl8, TM("#8a5a32", "wood"), x + dx, y, z + .74, .06, .1, .06, false); l.rotation.x = Math.PI / 2; g.add(l);
+      g.add(mesh(G.cyl8, M("#e0c28a"), x + dx, y, z + .79, .045, .005, .045, false)); });
+    // brick dome
+    g.add(mesh(G.half, TM("#c8704f", "brick", 4, 2), x, .5, z - .05, .8, .82, .72));
+    { const ring = new T.Mesh(new T.TorusGeometry(1, .09, 6, 32), TM("#9a8f80", "stone", 3, 1)); ring.rotation.x = Math.PI / 2; ring.position.set(x, .52, z - .05); ring.scale.set(.8, .72, 1); g.add(ring); }
+    // arched mouth with a stone frame
+    const mz = z + .7;
+    { const sh = new T.Shape(); sh.moveTo(-.36, 0); sh.lineTo(-.36, .2); sh.absarc(0, .2, .36, Math.PI, 0, true); sh.lineTo(.36, 0); sh.lineTo(-.36, 0);
+      const ho = new T.Path(); ho.moveTo(-.26, 0); ho.lineTo(-.26, .2); ho.absarc(0, .2, .26, Math.PI, 0, true); ho.lineTo(.26, 0); ho.lineTo(-.26, 0); sh.holes.push(ho);
+      const fr = new T.Mesh(new T.ExtrudeGeometry(sh, { depth: .12, bevelEnabled: false }), TM("#b8ab96", "stone", 1, 1)); fr.position.set(x, .5, mz - .04); g.add(fr);
+      const inS = new T.Shape(); inS.moveTo(-.26, 0); inS.lineTo(-.26, .2); inS.absarc(0, .2, .26, Math.PI, 0, true); inS.lineTo(.26, 0); inS.lineTo(-.26, 0);
+      const inner = new T.Mesh(new T.ShapeGeometry(inS), new T.MeshBasicMaterial({ color: baking ? "#ff7a1a" : "#1e130c" })); inner.position.set(x, .5, mz - .01); O.inner = inner; g.add(inner); }
+    // chimney
+    g.add(mesh(G.box, TM("#b5583d", "brick", 1, 2), x + .42, 1.12, z - .32, .2, .6, .2)); g.add(mesh(G.box, M("#5e3226"), x + .42, 1.44, z - .32, .27, .05, .27));
+    // bread peel leaning on the side and a loaf on the slab
+    { const peel = new T.Group(); peel.add(mesh(G.box, TM("#c99a5a", "wood"), 0, .55, 0, .04, 1.1, .04)); peel.add(mesh(G.box, TM("#d9ae6c", "wood"), 0, .05, 0, .26, .26, .02));
+      peel.position.set(x + .95, .1, z + .25); peel.rotation.z = .28; g.add(peel); }
+    g.add(mesh(G.sph, M("#c98a3c"), x + .62, .56, z + .55, .14, .08, .09)); g.add(mesh(G.sph, M("#e0a85a"), x + .62, .585, z + .55, .1, .045, .065, false));
+    if (baking) {
+      // fire inside the mouth
+      [["#ff4a12", .14, .34, 0], ["#ff8a1a", .1, .27, .1], ["#ffb52a", .09, .24, -.11], ["#ffe066", .06, .17, .04], ["#ffd23a", .05, .14, -.05]].forEach(([c, w, h, dx], k) => {
+        const fl = mesh(G.cone, new T.MeshBasicMaterial({ color: c, transparent: true, opacity: .95 }), x + dx, .52 + h / 2, mz + .03 + k * .006, w, h, w * .6, false); fl.userData = { flame: 3, h, ph: k * 1.7 }; O.flames.push(fl); g.add(fl); });
+      g.add(mesh(G.box, M("#3a1a0a"), x, .52, mz + .01, .34, .04, .08, false));
+      const glow = sprite(emberTex, 1.8, 1.4, { blending: T.AdditiveBlending, opacity: .7 }); glow.position.set(x, .7, mz + .2); glow.renderOrder = 7; O.glow = glow; g.add(glow);
+      { const gp = new T.Mesh(G.plane, new T.MeshBasicMaterial({ map: emberTex, transparent: true, opacity: .28, depthWrite: false, blending: T.AdditiveBlending })); gp.position.set(x, .51, mz + .3); gp.scale.set(.9, 1, .5); gp.renderOrder = 6; g.add(gp); }
+      for (let k = 0; k < 6; k++) { const e = sprite(emberTex, .09, .09, { blending: T.AdditiveBlending }); e.userData.ph = k / 6; e.renderOrder = 7; O.embers.push(e); g.add(e); }
+      for (let k = 0; k < 4; k++) { const sm = sprite(smokeTex, .3, .3, { opacity: .5 }); sm.userData.ph = k / 4; sm.renderOrder = 5; O.smoke.push(sm); g.add(sm); }
+    }
+    O.x = x; O.z = z; O.mz = mz;
     return g;
+  }
+  function stepOven(sec) {
+    const O = fx.oven; if (!O || !O.baking || REDUCED) return;
+    O.flames.forEach(f => { const u = f.userData, k = 1 + Math.sin(sec * 13 + u.ph) * .2 + Math.sin(sec * 23 + u.ph * 2) * .1; f.scale.y = u.h * k; f.position.y = .53 + u.h * k / 2; f.rotation.z = Math.sin(sec * 9 + u.ph) * .15; });
+    if (O.glow) { const v = .62 + Math.sin(sec * 11) * .1 + Math.sin(sec * 17) * .06; O.glow.material.opacity = v; O.glow.scale.set(1.6 + v * .5, 1.25 + v * .4, 1); }
+    if (O.inner) { const v = .75 + Math.sin(sec * 9) * .15; O.inner.material.color.setRGB(1, .42 * v + .1, .08); }
+    O.embers.forEach(e => { const u = (sec * .55 + e.userData.ph) % 1, a = e.userData.ph * 6.28; e.position.set(O.x + .42 + Math.sin(a + u * 4) * .08, 1.48 + u * .9, O.z - .32 + Math.cos(a) * .05); e.material.opacity = 1 - u; });
+    O.smoke.forEach(sm => { const u = (sec / 2.6 + sm.userData.ph) % 1; sm.position.set(O.x + .42 + Math.sin(u * 5) * .06, 1.55 + u * 1.1, O.z - .32 - u * .15); const sz = .22 + u * .55; sm.scale.set(sz, sz, 1); sm.material.opacity = .5 * (1 - u); });
   }
   // lumpy leaf clusters (a jittered sphere) look far more natural than smooth balls
   const lumpy = det => { const g = new T.IcosahedronGeometry(1, det), p = g.attributes.position, v = new T.Vector3();
@@ -5225,10 +5270,38 @@ function setup3D(T) {
   function pool(geo, mat, cap, cast = true) { const m = new T.InstancedMesh(geo, mat, cap); m.castShadow = cast; m.receiveShadow = true; m.count = 0; m.frustumCulled = false; scene3.add(m);
     return { m, n: 0, add(x, y, z, sx, sy, sz, color, ry = 0, rx = 0, rz = 0) { if (this.n >= cap) return; dummy.position.set(x, y, z); dummy.rotation.set(rx, ry, rz); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
       this.m.setMatrixAt(this.n, dummy.matrix); this.m.setColorAt(this.n, typeof color === "string" ? colOf3(color) : tmpC.set(color)); this.n++; }, done() { this.m.count = this.n; this.m.instanceMatrix.needsUpdate = true; if (this.m.instanceColor) this.m.instanceColor.needsUpdate = true; this.n = 0; } }; }
+  // gentle wind for the crops: the instanced stalks, heads and blades bend a little, higher parts more
+  const WIND = { value: 0 };
+  const windy = mat => { mat.onBeforeCompile = sh => { sh.uniforms.uWind = WIND;
+      sh.vertexShader = "uniform float uWind;\n" + sh.vertexShader.replace("#include <project_vertex>", `vec4 mvPosition = vec4( transformed, 1.0 );
+#ifdef USE_INSTANCING
+mvPosition = instanceMatrix * mvPosition;
+#endif
+float wh = max(0.0, mvPosition.y - 0.13), wp = mvPosition.x * 1.7 + mvPosition.z * 1.3;
+mvPosition.x += sin(uWind * 1.7 + wp) * 0.16 * wh; mvPosition.z += cos(uWind * 1.2 + wp * .8) * 0.07 * wh;
+mvPosition = modelViewMatrix * mvPosition;
+gl_Position = projectionMatrix * mvPosition;`); };
+    mat.customProgramCacheKey = () => "wind"; return mat; };
+  // a wheat head: two rows of plump kernels around a short axis plus thin awns, merged into one geometry (unit height)
+  const wheatHeadGeo = (() => {
+    const parts = [], k0 = new T.SphereGeometry(1, 6, 5);
+    for (let k = 0; k < 12; k++) { const t = k / 11, a = k * 2.4, r = .34 * (1 - t * .35), g = k0.clone();
+      g.scale(.32, .5, .32); g.rotateZ(Math.cos(a) * .5); g.rotateX(Math.sin(a) * .5); g.translate(Math.cos(a) * r, .1 + t * .82, Math.sin(a) * r); parts.push(g.toNonIndexed()); }
+    const aw = new T.ConeGeometry(.045, 1, 3);
+    for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2, g = aw.clone(); g.translate(0, .5, 0); g.scale(1, .75, 1); g.rotateZ(Math.cos(a) * .35); g.rotateX(Math.sin(a) * .35); g.translate(Math.cos(a) * .12, .78, Math.sin(a) * .12); parts.push(g.toNonIndexed()); }
+    const pos = [], nor = []; parts.forEach(g => { pos.push(...g.attributes.position.array); nor.push(...g.attributes.normal.array); g.dispose(); }); k0.dispose(); aw.dispose();
+    const out = new T.BufferGeometry(); out.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); out.setAttribute("normal", new T.Float32BufferAttribute(nor, 3)); return out; })();
+  // a grass-like curved leaf blade (unit height, base at 0)
+  const leafBladeGeo = (() => { const g = new T.BufferGeometry(), v = [], n = 5;
+    for (let k = 0; k < n; k++) { const t0 = k / n, t1 = (k + 1) / n, w0 = .5 * (1 - t0), w1 = .5 * (1 - t1), b0 = t0 * t0 * .55, b1 = t1 * t1 * .55;
+      v.push(-w0, t0, b0, w0, t0, b0, -w1, t1, b1, w0, t0, b0, w1, t1, b1, -w1, t1, b1); }
+    g.setAttribute("position", new T.Float32BufferAttribute(v, 3)); g.computeVertexNormals(); return g; })();
   const P = {
     soil: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.soil, roughness: 1 }), 520),
     furrow: pool(new T.CylinderGeometry(1, 1, 1, 8).rotateZ(Math.PI / 2), LAM({ map: TEX.soil, roughness: 1 }), 2100, false),
-    stalk: pool(new T.CylinderGeometry(.5, 1, 1, 5), LAM({ roughness: .8 }), 3150),
+    stalk: pool(new T.CylinderGeometry(.5, 1, 1, 5), windy(LAM({ roughness: .8 })), 5200),
+    whead: pool(wheatHeadGeo, windy(LAM({ roughness: .7 })), 5200),
+    blade: pool(leafBladeGeo, windy(LAM({ side: T.DoubleSide, roughness: .9 })), 10400, false),
     ear: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .7 }), 3150),
     leaf: pool(new T.IcosahedronGeometry(1, 0), LAM({ roughness: .9 }), 6300),
     tuber: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .95 }), 4200),
@@ -5256,7 +5329,7 @@ function setup3D(T) {
     if (n.isPoints) { n.geometry.dispose(); n.material.dispose(); return; } if ((n.isMesh || n.isSprite) && n.material && !Object.values(mats).includes(n.material)) n.material.dispose();
     if (n.isMesh && n.geometry && !sharedGeo.has(n.geometry)) n.geometry.dispose(); }); }
   let dyn = new T.Group(); scene3.add(dyn); let staticSig = "";
-  const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "ear", "leaf", "tuber", "hl"];
+  const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "whead", "blade", "ear", "leaf", "tuber", "hl"];
   function staticSigOf(f, now) {
     if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length;
     if (!f) return "none|" + tuftCount;
@@ -5268,7 +5341,7 @@ function setup3D(T) {
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
     if (sig !== staticSig) {
       staticSig = sig;
-      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null;
+      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.oven = null;
       if (scene.kind === "plaza") buildPlaza(); else if (f) buildFarm(f, now, "s");
       const scs = sceneryKey(f);
       if (scs !== scenSig) { scenSig = scs; scenery(f); ["tuft", "ftrunk", "fleaf"].forEach(k => P[k].done()); }
@@ -5329,7 +5402,7 @@ function setup3D(T) {
     world.add(buildSign(L.sign, String(f.name || "Çiftçi"))); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
     if (L.oven >= 0) {
       const B = isMe ? bakeInfo(S, now) : { q: 0, done: 0 };
-      const o = buildOven(L.oven, B.q > B.done); o.children.forEach(m => { if (m.userData.flame) fx.flames.push(m); }); world.add(o);
+      const o = buildOven(L.oven, B.q > B.done); world.add(o);
       proxy(colOf(L.oven) + 1, .7, rowOf(L.oven) + 1, 2, 1.4, 2, L.oven);
     }
     // sprinklers
@@ -5379,13 +5452,21 @@ function setup3D(T) {
     // highlights for the current mode
     if (home) highlights(f, now);
   }
+  // wheat: 8 stems per field in a loose patch; sprouts -> leafy -> green heads -> golden heads with awns
+  const WSPOTS = [[-.28, -.2], [-.08, -.25], [.14, -.22], [.3, -.12], [-.3, .06], [-.1, .02], [.12, .08], [.28, .18], [-.2, .26], [.04, .27]];
+  const WGOLD = ["#f0b92e", "#ffcc3d", "#e8a524", "#ffd75a"], WGREEN = ["#6db744", "#5ea83a", "#7cc24e"], WTURN = ["#b9c24a", "#c8c656", "#a8b63e"];
   function wheat3(x, z, stage) {
-    const spots = [[-.26, -.16], [0, -.22], [.26, -.16], [-.26, .2], [0, .14], [.26, .2]];
-    if (stage === 0) { spots.forEach(([a, b]) => P.tuber.add(x + a, .15, z + b, .04, .03, .04, "#e9d29a")); return; }
-    const h = [0, .14, .26, .36, .42][stage], col = stage <= 2 ? "#5da33a" : stage === 3 ? "#a9b83c" : "#d9a628";
-    spots.forEach(([a, b], k) => { const lean = (k % 2 ? .1 : -.1); P.stalk.add(x + a, .12 + h / 2, z + b, .025, h, .025, col, 0, 0, lean);
-      if (stage <= 2) P.leaf.add(x + a, .14 + h * .5, z + b, .06, .03, .03, col, k);
-      if (stage >= 3) P.ear.add(x + a - lean * h * .5, .12 + h + .05, z + b, .045, .1, .045, stage === 4 ? "#f2c14e" : "#c9cf6a", 0, 0, lean); });
+    const seed = Math.round(x * 7 + z * 13);
+    if (stage === 0) { WSPOTS.forEach(([a, b]) => P.tuber.add(x + a, .15, z + b, .035, .025, .035, "#e9d29a")); return; }
+    WSPOTS.forEach(([a, b], k) => {
+      const r = ((seed + k * 37) % 97) / 97, hv = .85 + r * .3, lean = (r - .5) * .22, rot = r * 6.28, px = x + a + (r - .5) * .04, pz = z + b;
+      if (stage === 1) { for (let q = 0; q < 2; q++) P.blade.add(px, .13, pz, .045, .1 * hv, .045, WGREEN[(k + q) % 3], rot + q * 2.6, 0, (q ? .3 : -.3)); return; }
+      const h = [0, 0, .24, .38, .44][stage] * hv, col = stage === 2 ? WGREEN[k % 3] : stage === 3 ? WTURN[k % 3] : WGOLD[k % 4];
+      P.stalk.add(px, .12 + h / 2, pz, .024, h, .024, stage === 4 ? "#d4a640" : col, 0, 0, lean);
+      const leafCol = stage === 4 ? "#c9a24a" : stage === 3 ? "#9fb043" : WGREEN[(k + 1) % 3];
+      P.blade.add(px, .13, pz, .05, h * .62, .05, leafCol, rot, 0, .25); P.blade.add(px, .13 + h * .2, pz, .045, h * .5, .045, leafCol, rot + 2.9, 0, .3);
+      if (stage >= 3) { const hy = .12 + h - .01, tx = px - Math.sin(lean) * h; P.whead.add(tx, hy, pz, .1, stage === 4 ? .22 : .17, .1, stage === 4 ? WGOLD[(k + 2) % 4] : WTURN[(k + 1) % 3], rot, 0, lean * 1.6); }
+    });
   }
   function potato3(x, z, stage) {
     const spots = [[-.22, -.18], [.22, -.18], [-.22, .22], [.22, .22]];
@@ -5641,7 +5722,8 @@ function setup3D(T) {
     fx.stars.concat(fx.dstars || []).forEach(s => { s.position.y += Math.sin(sec * 3 + s.userData.bob) * .002; s.material.rotation = Math.sin(sec * 2 + s.userData.bob) * .3; });
     fx.mills.forEach(h => { h.rotation.z -= .016 * h.userData.spin; });
     fx.flags.forEach((f, i) => { f.rotation.y = Math.sin(sec * 2.2 + i) * .18; });
-    if (scene.kind === "plaza") stepFountain(sec);
+    if (scene.kind === "plaza") stepFountain(sec); else stepOven(sec);
+    WIND.value = REDUCED ? 0 : sec;
     (fx.ddrops || []).forEach(sp => { const b = Math.abs(Math.sin(sec * 2.8 + sp.userData.ph)); sp.position.y = sp.userData.y0 + b * .14; const sc = .6 + b * .08; sp.scale.set(sc, sc, 1); });
     fx.flames.forEach((f, i) => { f.scale.y = (f.userData.flame === 1 ? .32 : .2) * (1 + Math.sin(sec * 17 + i * 2) * .18); });
     fx.clouds.forEach(s => { const bp = s.userData.base; s.position.x = bp.x + Math.sin(sec * .15 + s.userData.ph) * .5; s.position.y = bp.y + Math.sin(sec * .3 + s.userData.ph) * .08; });
