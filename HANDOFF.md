@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 81). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 82). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -47,6 +47,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## Bilinen konular / sonraki adımlar
 - Play uygulamasında Chrome'un "Chrome'da çalışıyor" bilgisi ilk açılışta çıkabilir (TWA kuralı). Kaldırmak için Capacitor gibi yerel WebView uygulamasına geçip yerel Google girişi eklemek gerekir.
 - Uygulama içinde (`IN_APP`) oyun tarayıcıdan tam ekran istemez; aksi halde Chrome "Tam ekrandan çıkmak için..." uyarısı gösterir.
+- Sis/bulut: `fogImage()` yalnızca bir sonraki genişletme halkasını (`OWN[size+1]`) bulutla kaplar, ötesi hafif gölgeli. Fiyat etiketi bulutun üstünde (`expandSpots`, `expandLabel`); eski ahşap `buildForSale` tabelası kullanılmıyor.
+- Sulanmamış ekinlerde 3D'de zıplayan su damlası sprite'ı (`fx.ddrops`). Admin için dilek hakkı sınırsız. Görev penceresi kendiliğinden açılmaz, listede sadece biten ve sıradaki görev görünür.
 - Sağdaki menü düğmeleri ahşap tabela görünümünde, simgeler `ICON` içinde renkli SVG çizimler (`fico`).
 - Uzun pencereler (`.modal`) üstten başlar ve kayar; ortalama yüzünden üst kısmın ekran dışında kalması düzeltildi.
 - Google yazı tipleri engellemeden yüklenir (`media="print" onload`), sayfa ilk anda çizilir.

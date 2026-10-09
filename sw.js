@@ -3,7 +3,7 @@
 // - Libraries with a fixed version in their address (3D engine, Firebase, fonts) are kept on the phone,
 //   so from the second launch on they load instantly instead of being downloaded again.
 // - Live game data (Firebase database / sign-in) is never touched.
-const CACHE = "lucky-v16", LIBS = "lucky-libs-v1";
+const CACHE = "lucky-v17", LIBS = "lucky-libs-v1";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"])).catch(() => {}).then(() => self.skipWaiting()));
 });
