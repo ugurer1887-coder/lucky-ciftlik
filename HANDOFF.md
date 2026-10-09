@@ -8,10 +8,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - **Kaynak:** bu depo (`ugurer1887-coder/lucky-ciftlik`). Oyunun tamamı tek dosya: `index.html`.
 - **Yayın:** `main` dalına yapılan her push'u Netlify otomatik yayına alır (Netlify Personal plan, ayda 1.000 kredi, her yayın 15 kredi). Değişiklikleri toplu push edin.
 - **Sunucu:** Firebase (proje: `luckytr-ciftlik`), Realtime Database + Google girişi. Admin hesabı: `ugur_er_1@hotmail.com`.
-- **Google Play:** paket adı `com.luckytr.ciftlik`, TWA. Artık PWABuilder değil, depodaki `android/` projesi kullanılıyor (bkz. `android/README.md`). Dahili test kanalında son yüklenen: sürüm kodu 4 (1.0.3). Hazır bekleyen: sürüm kodu 5 (1.0.4, açılıştan itibaren tam ekran).
+- **Google Play:** paket adı `com.luckytr.ciftlik`, TWA. Artık PWABuilder değil, depodaki `android/` projesi kullanılıyor (bkz. `android/README.md`). Dahili test kanalında son yüklenen: sürüm kodu 6 (1.0.5). Bir sonraki paket sürüm kodu 7 olmalı.
   - Paketi GitHub Actions ("Android paketi") derleyip imzalar; `android/` değişince çalışır, `.aab` çalıştırmanın Artifacts bölümünden indirilir.
   - İmza: depo gizli değerleri `KEYSTORE_BASE64` ve `KEYSTORE_PASSWORD` (alias `my-key-alias`). Şifre depoya yazılmaz.
-  - minSdk 24, targetSdk 36 (Play şartı). Açılışta simge yok (sistem açılış ekranı yükleme ekranının mavisi #BFE6F7), immersive tam ekran.
+  - minSdk 24, targetSdk 36 (Play şartı). Açılışta simge yok (sistem açılış ekranı yükleme ekranının mavisi #BFE6F7), sticky-immersive tam ekran, çentikli kenar da kullanılır (`android/app/src/main/java/com/luckytr/ciftlik/LauncherActivity.java`).
   - İmza anahtarı (`signing.keystore`, alias `my-key-alias`) sahibinde saklı. Yeni paket yaparken **mutlaka aynı anahtar** kullanılmalı ve version code bir artırılmalı.
   - `assetlinks.json` (kök ve `.well-known/`) iki SHA-256 içerir: yükleme anahtarı ve Google Play imzalama anahtarı. Silinmemeli.
 
@@ -22,12 +22,14 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 80). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 81). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
 - Su kuyusu: 5 seviye (`WELL_COST`, `WELL_BUCKET` = 3/10/20/35/50 kova); 3. seviyeden 2'şer, 5. seviyede 4'er sulama.
 - Fıskiye: 5 seviye (`SPR_CAPS` 50/75/100/150/200, `SPR_NS` 4/6/8/10/12, `SPR_UP` 400/800/1500/2500).
+- Görevler (öğretici): `QUESTS` dizisi (8 görev, ödüller 3–12 altın). İlerleme `S.tut = { i: alınan ödül sayısı, c: { görevId: sayaç }, o: pencere bir kez açıldı }`. Sayaçlar `questEv(id, n)` ile artar (ekim, sulama, hasat, satış, ekmek, dilek, iş ilanı); fırın görevi `S.oven` durumuna bakar. Ödüller üstteki Görevler düğmesinden alınır, sol üstte görev kartı ve sağdaki ilgili düğmede işaret parmağı gösterilir. Yeni oyuncu `START_GOLD = 18` ile başlar (6 buğday tohumu).
+- Dilek çarkı: `WISH_LEVEL = 5` (5. seviyeden önce açılmaz), kazanınca `winShow()` kutlaması. Meydandaki 3D çeşme `buildFountain()` + `stepFountain()` ile canlandırılıyor (altınlar, balıklar, nilüferler, su damlaları, halkalar).
 - Dilek çarkı: `WISH_ODDS` (%1 100x, %25 2x, %34 geri, %40 boş), `WISH_MAX = 20000` (Firebase kuralı tek yazımda en fazla 2.000.000 altın değişimine izin veriyor), günde 3 hak.
 - Araçlar: tırpan, elektrikli tırpan (x2), traktör (x4, 30. seviye), ekim aleti (x2).
 - LuckyTr: her oyuncuda arkadaş olarak görünen bot (`BOT_UID`), canlı güncellenen vitrin çiftliği.
@@ -45,6 +47,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## Bilinen konular / sonraki adımlar
 - Play uygulamasında Chrome'un "Chrome'da çalışıyor" bilgisi ilk açılışta çıkabilir (TWA kuralı). Kaldırmak için Capacitor gibi yerel WebView uygulamasına geçip yerel Google girişi eklemek gerekir.
 - Uygulama içinde (`IN_APP`) oyun tarayıcıdan tam ekran istemez; aksi halde Chrome "Tam ekrandan çıkmak için..." uyarısı gösterir.
+- Sağdaki menü düğmeleri ahşap tabela görünümünde, simgeler `ICON` içinde renkli SVG çizimler (`fico`).
+- Uzun pencereler (`.modal`) üstten başlar ve kayar; ortalama yüzünden üst kısmın ekran dışında kalması düzeltildi.
 - Google yazı tipleri engellemeden yüklenir (`media="print" onload`), sayfa ilk anda çizilir.
 - Herkese açık yayın için Play Console'da kapalı test, gizlilik politikası, veri güvenliği formu ve mağaza görselleri (1024x500 kapak, ekran görüntüleri) gerekiyor.
 - Firebase ücretsiz planı aynı anda ~100 bağlantı sınırı – oyuncu artarsa Blaze plana geçilmeli.
