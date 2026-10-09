@@ -87,6 +87,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v94
 - Pazar etiketleri (`stallLbl{n}`, `pazarCount{n}`) `sizeAttenuation: false` sprite: ekranda hep aynı boyda (kamera fov 30°, ölçek ≈ ekran yüksekliği oranı × 0.54).
 
+## v95
+- Kullanıcı isteğiyle pazar yerindeki bütün yazılar kaldırıldı (tente numarası/PAZAR, sabit boyutlu etiketler, sayaç, pankart yazısı). Pankartta sadece ürün emojileri var. Pazarda yazı eklemeyin.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

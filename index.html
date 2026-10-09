@@ -1149,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "94";
+const VERSION = "95";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -5298,6 +5298,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 95, d: "9 Ekim 2026", e: "🧺", t: "Sade pazar yeri", c: "#2f9a43", b: "#e3f7dc", items: [
+    "Pazar yerindeki yazılar kaldırıldı; tezgahlar renkli tenteleri ve halılarıyla, pankart da meyve resimleriyle sade bir görünümde.",
+  ] },
   { v: 94, d: "9 Ekim 2026", e: "🔎", t: "Uzaktan okunan pazar yazıları", c: "#2f9a43", b: "#e3f7dc", items: [
     "Pazar tezgahlarının üstündeki numaralar ve PAZAR YERİ yazısı artık uzaklaşınca küçülmüyor, kuş bakışında da okunuyor.",
   ] },
@@ -6297,17 +6300,6 @@ function setup3D(T) {
     [[-.78, .35], [-.82, .12]].forEach(([dx, dz], q) => { g.add(mesh(G.sph, M(q ? "#e2cc95" : "#ead7a6"), x + dx, .14, z + dz, .1, .14, .09)); g.add(mesh(G.cyl, M(set[q]), x + dx, .27, z + dz, .07, .02, .07, false)); });
     // striped awning, sloping to the front, with a scalloped edge
     for (let q = 0; q < 8; q++) { const st = mesh(G.box, M(q % 2 ? a2 : a1), x - .6 + .075 + q * .15, 1.18, z + .02, .15, .03, .82); st.rotation.x = .28; g.add(st); }
-    // painted roof seen from above: big stall number and PAZAR, so players can count and find the stalls easily
-    { const tx = canvasTex("stallTop" + k, 512, 352, (c, w, h) => { for (let q = 0; q < 8; q++) { c.fillStyle = q % 2 ? a2 : a1; c.fillRect(q * w / 8, 0, w / 8 + 1, h); }
-        c.fillStyle = "rgba(255,250,236,.97)"; rr(c, 22, 40, w - 44, h - 80, 56); c.fill(); c.lineWidth = 14; c.strokeStyle = a1; rr(c, 22, 40, w - 44, h - 80, 56); c.stroke();
-        c.fillStyle = a1; c.beginPath(); c.arc(118, h / 2, 82, 0, 6.3); c.fill(); c.fillStyle = "#fff"; c.font = "700 128px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(String(k + 1), 118, h / 2 + 8);
-        c.fillStyle = "#4a2410"; c.font = "700 96px Fredoka, Nunito, sans-serif"; c.fillText("PAZAR", 336, h / 2 + 6); });
-      const top = new T.Mesh(G.plane, new T.MeshLambertMaterial({ map: tx, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); top.position.set(x, 1.2, z + .02); top.rotation.x = .28; top.scale.set(1.2, 1, .84); g.add(top); }
-    // a label that keeps the same size on screen, so it can be read even from far away
-    { const lt = canvasTex("stallLbl" + k, 256, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.28)"; rr(c, 10, 14, w - 14, h - 18, 54); c.fill(); c.fillStyle = a1; rr(c, 4, 6, w - 14, h - 18, 54); c.fill();
-        c.lineWidth = 9; c.strokeStyle = "#ffffff"; rr(c, 4, 6, w - 14, h - 18, 54); c.stroke();
-        c.fillStyle = "#fff"; c.textAlign = "center"; c.textBaseline = "middle"; c.font = "700 84px Fredoka, Nunito, sans-serif"; c.fillText(String(k + 1), w / 2 + 34, h / 2 - 2); c.font = "64px serif"; c.fillText("🛒", w / 2 - 42, h / 2); });
-      const sp = sprite(lt, .036 * 256 / 160, .036, { sizeAttenuation: false, depthTest: false }); sp.position.set(x, 1.7, z); sp.renderOrder = 9; g.add(sp); }
     // a coloured rug under the stall so the market place stands out on the ground
     { const rg = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: a1, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 })); rg.position.set(x, .02, z + .1); rg.scale.set(1.62, 1, 1.28); g.add(rg);
       const rin = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: "#f3e3c0", polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); rin.position.set(x, .022, z + .1); rin.scale.set(1.46, 1, 1.12); g.add(rin); }
@@ -6318,15 +6310,11 @@ function setup3D(T) {
     const g = new T.Group(), z = SY + 18.62, xa = SX + 18.75, xb = SX + 21.25, cx = (xa + xb) / 2, top = 1.95;
     [xa, xb].forEach(px => { blob(g, px, z, .5, .5, .5); g.add(mesh(G.cyl, TM("#c8453a", "wood"), px, top / 2, z, .07, top, .07)); g.add(mesh(G.cyl, M("#fff6e6"), px, .5, z, .075, .08, .075, false)); g.add(mesh(G.cyl, M("#fff6e6"), px, 1.1, z, .075, .08, .075, false));
       g.add(mesh(G.cone, M("#f2c14e"), px, top + .1, z, .1, .2, .1)); g.add(mesh(G.cyl, TM("#a89b88", "stone", 1, 1), px, .06, z, .14, .12, .14)); });
-    const tx = canvasTex("pazarBanner", 1024, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#e8463a"); gr.addColorStop(1, "#b8322a"); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+    const tx = canvasTex("pazarBanner2", 1024, 256, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#e8463a"); gr.addColorStop(1, "#b8322a"); c.fillStyle = gr; c.fillRect(0, 0, w, h);
       c.fillStyle = "#f6c445"; c.fillRect(0, 0, w, 18); c.fillRect(0, h - 18, w, 18); for (let k = 0; k < 32; k++) { c.fillStyle = k % 2 ? "#fff6e6" : "#f6c445"; c.beginPath(); c.arc(16 + k * 32, h - 9, 6, 0, 6.3); c.fill(); }
-      c.font = "700 140px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.lineWidth = 14; c.strokeStyle = "#7a1d14"; c.strokeText("🛒 PAZAR YERİ", w / 2, h / 2 + 6); c.fillStyle = "#fff6e6"; c.fillText("🛒 PAZAR YERİ", w / 2, h / 2 + 6); });
+      c.font = "120px serif"; c.textAlign = "center"; c.textBaseline = "middle"; ["🍎", "🥕", "🌽", "🛒", "🍞", "🥚", "🧀"].forEach((e, k) => c.fillText(e, w / 2 + (k - 3) * 140, h / 2 + 4)); });
     { const ban = new T.Mesh(new T.PlaneGeometry(xb - xa - .14, .58), LAM({ map: tx, side: T.DoubleSide })); ban.position.set(cx, top - .36, z); g.add(ban); }
     { const rod = mesh(G.cyl8, M(COL.woodD), cx, top - .05, z, .025, xb - xa, .025); rod.rotation.z = Math.PI / 2; g.add(rod); }
-    { const n = pzAll.filter(l => !l.buyer).length, st = STALL_SETS.length;
-      const tx2 = canvasTex("pazarCount" + n, 640, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.25)"; rr(c, 10, 16, w - 16, h - 22, 60); c.fill(); c.fillStyle = "#fffaf0"; rr(c, 4, 6, w - 16, h - 22, 60); c.fill(); c.lineWidth = 10; c.strokeStyle = "#e8463a"; rr(c, 4, 6, w - 16, h - 22, 60); c.stroke();
-        c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#b8322a"; c.font = "700 52px Fredoka, Nunito, sans-serif"; c.fillText("PAZAR YERİ · " + st + " tezgah", w / 2 - 6, 52); c.fillStyle = "#3a2410"; c.font = "700 44px Fredoka, Nunito, sans-serif"; c.fillText(n ? "🛒 " + n + " ürün satışta" : "🛒 Satış yap, kazan!", w / 2 - 6, 108); });
-      const sp = sprite(tx2, .058 * 640 / 160, .058, { sizeAttenuation: false, depthTest: false }); sp.position.set(cx, top + 1.1, z - 1.2); sp.renderOrder = 9; g.add(sp); }
     // little flag strings from each post to the nearest stall roof
     const tri = new T.ShapeGeometry((() => { const s = new T.Shape(); s.moveTo(-.07, 0); s.lineTo(.07, 0); s.lineTo(0, -.13); s.closePath(); return s; })());
     const FLAGC = ["#e8463a", "#f6c445", "#3f8fd0", "#2f9a43", "#ffffff"];
@@ -6447,7 +6435,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
   let dyn = new T.Group(); scene3.add(dyn); let staticSig = "";
   const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "whead", "blade", "ear", "leaf", "tuber", "fruit", "cone", "hl"];
   function staticSigOf(f, now) {
-    if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length + "|" + pzAll.filter(l => !l.buyer).length;
+    if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length;
     if (!f) return "none|" + tuftCount;
     const B = { q: 0, done: 0 }; const oSig = (f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") + (millInfo(S, now).q > millInfo(S, now).done ? "m" : "") : "")
       + "|" + animalsOf(f, "coop").length + "." + animalsOf(f, "cowbarn").length + "|" + JSON.stringify(f.rot || {});
