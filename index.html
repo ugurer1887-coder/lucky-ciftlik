@@ -560,7 +560,7 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div id="chatFoot_v8"></div>
   </section>
 
-  <div class="modal on" id="start_v8">
+  <div class="modal" id="start_v8">
     <div class="box">
       <h1 id="startTitle_v8">Lucky Çiftliği'ne hoş geldin</h1>
       <p id="startText_v8">Çiftliğe bağlanılıyor</p>
@@ -670,7 +670,7 @@ body{font-family:var(--body);letter-spacing:.1px}
       <button class="big ghost" id="setClose_v8">Kapat</button>
     </div>
   </div>
-  <div id="loader_v8" class="loader" aria-live="polite">
+  <div id="loader_v8" class="loader on" aria-live="polite">
     <svg class="ld-art" viewBox="0 0 800 450" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <defs>
         <linearGradient id="ldSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0f5"/><stop offset=".7" stop-color="#d9f1fb"/><stop offset="1" stop-color="#fff6dc"/></linearGradient>
@@ -728,7 +728,7 @@ body{font-family:var(--body);letter-spacing:.1px}
       </g>
     </svg>
     <div class="ld-tip" id="ldTip_v8"></div>
-    <div class="ld-foot"><b id="ldText_v8">Harita yükleniyor</b><div class="ld-bar"><i id="ldFill_v8"></i></div><span class="ld-pct" id="ldPct_v8">0%</span></div>
+    <div class="ld-foot"><b id="ldText_v8">Oyun yükleniyor</b><div class="ld-bar"><i id="ldFill_v8"></i></div><span class="ld-pct" id="ldPct_v8">0%</span></div>
   </div>
   <div class="toast" id="toast_v8"></div>
 </div>
@@ -899,7 +899,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "71";
+const VERSION = "72";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2104,14 +2104,19 @@ let ldTimer = null, firstScene = true, ldTipN = Math.floor(Math.random() * 20);
 const LD_TIPS = ["Fıskiyeler yakınlarındaki ekinleri tek dokunuşla sular.", "Su kuyusunu geliştirdikçe kovan büyür.", "Meydandaki dilek çarkında günde 3 hakkın var.",
   "İşçi ilanı vererek arkadaşlarından yardım alabilirsin.", "Ekim aleti ile tohumları ikişer ikişer ekebilirsin.", "Traktör 30. seviyede açılır ve dörder dörder hasat eder.",
   "LuckyTr'nin çiftliğini ziyaret etmeyi unutma.", "Dekorları taşıma modunda satabilirsin.", "Sıralamada haftalık, aylık ve genel listeler var.", "Fırında ekmek pişirip daha çok kazanabilirsin."];
-function showLoader(text, ms) {
+let bootLd = true, ldTok = 0;
+function endBootLoader() { if (!bootLd) return; bootLd = false; clearTimeout(ldTimer); $("ldPct").textContent = "100%"; setTimeout(() => { if (!bootLd && !entered) $("loader").classList.remove("on"); }, 150); }
+function showLoader(text, ms, hold) {
   const L = $("loader"), f = $("ldFill"); ms = ms || 3200;
+  const cont = bootLd && !hold && L.classList.contains("on"); if (!hold) bootLd = false;   // the first map continues the start-up bar instead of restarting it
   $("ldText").textContent = text; L.classList.add("on");
-  $("ldTip").textContent = "İpucu: " + LD_TIPS[ldTipN++ % LD_TIPS.length];
-  { const pc = $("ldPct"), t1 = Date.now(), up = () => { if (!L.classList.contains("on")) return; const k = Math.min(.99, (Date.now() - t1) / Math.max(1, ms - 250)); pc.textContent = Math.round(k * k * (3 - 2 * k) * 100) + "%"; requestAnimationFrame(up); }; pc.textContent = "0%"; requestAnimationFrame(up); }
-  f.style.transition = "none"; f.style.width = "0"; void f.offsetWidth;
-  f.style.transition = `width ${ms - 250}ms cubic-bezier(.35,.1,.3,1)`; f.style.width = "100%";
+  if (!cont) $("ldTip").textContent = "İpucu: " + LD_TIPS[ldTipN++ % LD_TIPS.length];
+  const tok = ++ldTok, p0 = cont ? Math.min(.9, parseFloat($("ldPct").textContent) / 100 || 0) : 0;
+  { const pc = $("ldPct"), t1 = Date.now(), up = () => { if (!L.classList.contains("on") || tok !== ldTok) return; const k = Math.min(hold ? .9 : .99, (Date.now() - t1) / Math.max(1, ms - 250)); pc.textContent = Math.round((p0 + (1 - p0) * k * k * (3 - 2 * k)) * 100) + "%"; requestAnimationFrame(up); }; pc.textContent = "0%"; requestAnimationFrame(up); }
+  if (!cont) { f.style.transition = "none"; f.style.width = "0"; void f.offsetWidth; }
+  f.style.transition = `width ${ms - 250}ms cubic-bezier(.35,.1,.3,1)`; f.style.width = hold ? "90%" : "100%";
   clearTimeout(ldTimer); const t0 = Date.now();
+  if (hold) return;
   // stays until the new map's ground is drawn (at most 5 extra seconds)
   const done = () => { if (R3.on && R3.groundReady && !R3.groundReady() && Date.now() - t0 < ms + 5000) { ldTimer = setTimeout(done, 200); return; } $("ldPct").textContent = "100%"; setTimeout(() => L.classList.remove("on"), 120); };
   ldTimer = setTimeout(done, ms);
@@ -2718,9 +2723,11 @@ function perfTick(ts) {
   } else GFX.good = 0;
 }
 document.addEventListener("visibilitychange", () => { GFX.win = []; GFX.last = 0; GFX.t0 = 0; });
+let fpsNow = 0, fpsN = 0, fpsT = 0;
 function frame(ts) {
   if (!alive()) return;
   requestAnimationFrame(frame);
+  { const n = performance.now(); fpsN++; if (!fpsT) fpsT = n; if (n - fpsT >= 1000) { fpsNow = Math.round(fpsN * 1000 / (n - fpsT)); fpsN = 0; fpsT = n; if (entered && isAdmin()) renderOnline(); } }
   if (GFX.frameMs && ts && ts - lastFrame < GFX.frameMs - 2) return;
   perfTick(ts || performance.now());
   lastFrame = ts || performance.now();
@@ -2890,7 +2897,7 @@ let onlineCount = 1;
 let onlineHtml = "";
 function renderOnline() {
   const shown = saveState === "Kaydedilemedi" ? "" : saveState;
-  const h = `<i class="dot ${online ? "on" : ""}"></i>Sunucu 1${isAdmin() ? ", " + onlineCount + " çevrimiçi" : ""}<br><small>Sürüm ${VERSION}${shown ? ", " + shown : ""}</small>`;
+  const h = `<i class="dot ${online ? "on" : ""}"></i>Sunucu 1${isAdmin() ? ", " + onlineCount + " çevrimiçi" : ""}<br><small>Sürüm ${VERSION}${shown ? ", " + shown : ""}${isAdmin() && fpsNow ? ", " + fpsNow + " FPS" : ""}</small>`;
   if (h !== onlineHtml) { onlineHtml = h; $("online").innerHTML = h; }
 }
 function whereIs(fuid) {
@@ -3602,7 +3609,7 @@ function openCharModal(m) {
   $("startBtn").textContent = "Çiftliğe gir";
   $("startCancel").hidden = true;
   $("startForm").hidden = false;
-  $("start").classList.add("on");
+  $("start").classList.add("on"); endBootLoader();
   renderAccount();
   if (m === "new") $("nameIn").focus();
 }
@@ -4222,7 +4229,7 @@ function setup3D(T) {
   const cv = $("c3d");
   const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = T.SRGBColorSpace;
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
   const maxTex = Math.min(4096, renderer.capabilities.maxTextureSize || 4096);
@@ -4557,10 +4564,11 @@ function setup3D(T) {
   }
 
   // ---------- instanced pools for many small things (plots, crops, fences, highlights) ----------
-  const dummy = new T.Object3D(), tmpC = new T.Color();
+  const dummy = new T.Object3D(), tmpC = new T.Color(), colCache = new Map();
+  const colOf3 = c => { let v = colCache.get(c); if (!v) { v = new T.Color(c); colCache.set(c, v); } return v; };
   function pool(geo, mat, cap, cast = true) { const m = new T.InstancedMesh(geo, mat, cap); m.castShadow = cast; m.receiveShadow = true; m.count = 0; m.frustumCulled = false; scene3.add(m);
     return { m, n: 0, add(x, y, z, sx, sy, sz, color, ry = 0, rx = 0, rz = 0) { if (this.n >= cap) return; dummy.position.set(x, y, z); dummy.rotation.set(rx, ry, rz); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
-      this.m.setMatrixAt(this.n, dummy.matrix); this.m.setColorAt(this.n, tmpC.set(color)); this.n++; }, done() { this.m.count = this.n; this.m.instanceMatrix.needsUpdate = true; if (this.m.instanceColor) this.m.instanceColor.needsUpdate = true; this.n = 0; } }; }
+      this.m.setMatrixAt(this.n, dummy.matrix); this.m.setColorAt(this.n, typeof color === "string" ? colOf3(color) : tmpC.set(color)); this.n++; }, done() { this.m.count = this.n; this.m.instanceMatrix.needsUpdate = true; if (this.m.instanceColor) this.m.instanceColor.needsUpdate = true; this.n = 0; } }; }
   const P = {
     soil: pool(new T.BoxGeometry(1, 1, 1), new T.MeshStandardMaterial({ map: TEX.soil, roughness: 1 }), 520),
     furrow: pool(new T.CylinderGeometry(1, 1, 1, 8).rotateZ(Math.PI / 2), new T.MeshStandardMaterial({ map: TEX.soil, roughness: 1 }), 2100, false),
@@ -4613,6 +4621,7 @@ function setup3D(T) {
     disposeTree(dyn); scene3.remove(dyn); dyn = new T.Group(); scene3.add(dyn); fx.dstars = [];
     if (scene.kind !== "plaza" && f) buildFarm(f, now, "d");
     DYN_POOLS.forEach(k => P[k].done());
+    fx.mills.concat(fx.flags, fx.flames).forEach(o => o.traverse(n => { n.castShadow = false; }));
   }
   let scenSig = "";
   function sceneryKey(f) {
@@ -4854,7 +4863,7 @@ function setup3D(T) {
   }
   function syncChar(c, isMe, t) {
     if (!c.el && !isMe) return;
-    if (!c.m3 || c.m3.g !== c.g) { if (c.m3) scene3.remove(c.m3.root); c.m3 = buildChar(c.g); c.m3.g = c.g; scene3.add(c.m3.root); c.m3.root.traverse(o => { if (o.isMesh && !o.userData.peerProxy) o.userData.peer = isMe ? null : c.uid; }); }
+    if (!c.m3 || c.m3.g !== c.g) { if (c.m3) scene3.remove(c.m3.root); c.m3 = buildChar(c.g); c.m3.g = c.g; c.m3.root.traverse(n => { n.castShadow = false; }); scene3.add(c.m3.root); c.m3.root.traverse(o => { if (o.isMesh && !o.userData.peerProxy) o.userData.peer = isMe ? null : c.uid; }); }
     const m = c.m3; charLabel(c, isMe);
     const x = c.x + .5, z = c.y + .5, px = m.px == null ? x : m.px, pz = m.pz == null ? z : m.pz, dx = x - px, dz = z - pz;
     if (Math.hypot(dx, dz) > .002) m.heading = Math.atan2(dx, dz);
@@ -4863,7 +4872,7 @@ function setup3D(T) {
     m.px = x; m.pz = z; m.root.position.set(x, 0, z); if (m.cs !== charS) { m.cs = charS; m.root.scale.setScalar(charS); }
     const walking = !!c.walking, working = isMe && me.busy, ph = t / 1000 * 11;
     const riding = (isMe ? heldTool() : c.tool) === "tractor";
-    if (riding && !m.tractor) { m.tractor = buildTractor(); m.root.add(m.tractor); }
+    if (riding && !m.tractor) { m.tractor = buildTractor(); m.tractor.traverse(n => { n.castShadow = false; }); m.root.add(m.tractor); }
     if (m.tractor) m.tractor.visible = riding;
     if (riding) {
       const vib = Math.sin(t / 1000 * 40) * .006;
@@ -4896,6 +4905,7 @@ function setup3D(T) {
     hd.add(mesh(G.sph, M(body), 0, 0, 0, .07, .07, .07)); hd.add(mesh(G.cone, M("#e39a2b"), 0, -.01, .08, .025, .06, .025, false)); hd.children[1].rotation.x = Math.PI / 2;
     hd.add(mesh(G.sph, M("#d9483a"), 0, .065, 0, .025, .035, .04, false)); [-.04, .04].forEach(dx => hd.add(mesh(G.sph, M("#1d1a14"), dx, .015, .055, .012, .012, .012, false)));
     [-.05, .05].forEach(dx => g.add(mesh(G.cyl8, M("#e39a2b"), dx, .03, 0, .012, .07, .012, false)));
+    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .42, .42);
     return { g, hd };
   }
   function syncHens(t) {
@@ -4937,7 +4947,7 @@ function setup3D(T) {
 
   // ---------- per frame ----------
   let lastW = 0, lastH = 0, sceneSig = "";
-  let charS = 1.2;
+  let charS = 1.2, shX = NaN, shZ = NaN;
   const D0 = 27, TILT = 1.12;   // camera distance (at zoom 1) and pitch (radians above the ground)
   R3.frame = t => {
     const w = cv.clientWidth, h = cv.clientHeight;
@@ -4945,14 +4955,16 @@ function setup3D(T) {
     const sig = scene.kind + (scene.owner || "");
     if (sig !== sceneSig) { sceneSig = sig; R3.dirty = true; }
     wantGround();
-    if (R3.dirty) { R3.dirty = false; rebuild(); }
+    if (R3.dirty) { R3.dirty = false; rebuild(); renderer.shadowMap.needsUpdate = true; }
     // camera follows the same camera box the 2D view uses
     const tx = (cam.x + cam.w / 2) / CELL, tz = (cam.y + cam.h / 2) / CELL;
     const D = D0 * ZOOM;
     camera.position.set(tx, Math.sin(TILT) * D, tz + Math.cos(TILT) * D); camera.lookAt(tx, 0, tz - .3);
     scene3.fog.near = D * 1.5; scene3.fog.far = D * 3.4;
-    const sb = Math.max(14, 22 * ZOOM); if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); }
-    sun.position.set(tx - 10, 20, tz - 2); sun.target.position.set(tx, 0, tz); sun.target.updateMatrixWorld();
+    // the shadow map is drawn only when the scene or the (snapped) light position changes, not every frame
+    const sb = Math.max(14, 22 * ZOOM) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
+    const stx = Math.round(tx / 3) * 3, stz = Math.round(tz / 3) * 3;
+    if (stx !== shX || stz !== shZ) { shX = stx; shZ = stz; sun.position.set(stx - 10, 20, stz - 2); sun.target.position.set(stx, 0, stz); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate = true; }
     // characters: bigger on big farms and when zoomed out, so the farmer never looks tiny
     charS = 1;
     const seen = new Set();
@@ -5017,7 +5029,7 @@ function setup3D(T) {
     R3.baseDpr = [1, Math.min(dpr, 1.6), Math.min(dpr, 2)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
     sun.castShadow = lvl > 0;
     const ms = lvl === 2 ? 2048 : 1024; if (sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-    tuftCount = [1500, 4500, 7500][lvl]; R3.dirty = true;
+    tuftCount = [1500, 4500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
   };
   R3.setRes = k => { k = Math.max(.6, Math.min(1, Math.round(k * 10) / 10)); if (k === (R3.res || 1)) return; R3.res = k; renderer.setPixelRatio(Math.max(1, R3.baseDpr * k)); lastW = 0; };
   R3.quality(GFX.level);
@@ -5026,6 +5038,8 @@ function setup3D(T) {
 }
 
 async function init() {
+  showLoader("Oyun yükleniyor", 7000, true);
+  setTimeout(() => { if (bootLd && !entered) { endBootLoader(); $("start").classList.add("on"); } }, 30000);
   start3D();
   const claude = await getClaude();
   if (claude) [db, user, room] = await Promise.all(["db", "user", "room"].map(n => claude.use(n).catch(() => null)));
