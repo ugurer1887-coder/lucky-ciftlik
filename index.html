@@ -707,6 +707,7 @@ body{font-family:var(--body);letter-spacing:.1px}
       <button class="tab" role="tab" aria-selected="false" data-mtab="tools">Araçlar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="ovens">Ocaklar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="land">Toprak</button>
+      <button class="tab" role="tab" aria-selected="false" data-mtab="animals">Hayvanlar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="decor">Dekor</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="up">Geliştir</button>
     </div>
@@ -720,8 +721,13 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div class="sheet-head"><h2>Fırın</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
     <div class="sheet-body" id="ovenBody_v8"></div>
   </section>
+  <section class="sheet" id="farmb_v8" aria-label="Bina">
+    <div class="sheet-head"><h2 id="farmbTitle_v8">Kümes</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="sheet-body" id="farmbBody_v8"></div>
+  </section>
   <section class="sheet" id="depot_v8" aria-label="Depo">
-    <div class="sheet-head"><h2>Depo</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="sheet-head"><h2>📦 Depo</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="seg dtabs" id="depotTabs_v8"><button data-dtab="crops" aria-pressed="true">🌾 Ekinler</button><button data-dtab="feeds" aria-pressed="false">🐔 Yemler</button><button data-dtab="goods" aria-pressed="false">🥚 Malzemeler</button></div>
     <div class="sheet-body" id="depotBody_v8"></div>
   </section>
   <section class="sheet" id="jobs_v8" aria-label="İş ilanları">
@@ -1115,7 +1121,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "87";
+const VERSION = "88";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1154,7 +1160,7 @@ const g4 = (r, c) => idx(r + SY, c + SX);           // a cell given in the previ
 const area = (r0, r1, c0, c1) => { const s = new Set(); for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) s.add(idx(r, c)); return s; };
 const coreArea = (r0, r1, c0, c1) => area(r0 + OY, r1 + OY, c0 + OX, c1 + OX);
 // Farm yard: flat land. Buildings belong to each player and can be moved; these are only the starting spots.
-const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Tabela" } };
+const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, coop: { w: 3, h: 3, name: "Tavuk kümesi" }, cowbarn: { w: 4, h: 4, name: "İnek ahırı" }, mill: { w: 2, h: 2, name: "Ambar" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Tabela" } };
 const DEFAULT_LAYOUT = { house: at(0,0), barn: at(0,11), well: at(4,9), scare: at(3,8), sign: at(3,0) };
 const DEFAULT_SOIL = [at(4,5), at(4,6), at(4,7), at(5,5), at(5,6), at(5,7)];
 const ROAD = area(ROWS - 1, ROWS - 1, 0, COLS - 1);
@@ -1185,7 +1191,7 @@ const SPAWN_PLAZA = g4(15, 20);
 const fencePrice = bought => FENCE_BASE + Math.floor(bought / 5);
 const MAX_LEVEL = 100;
 // XP for each job: wheat harvest is the base, potato and apples 10% more, watering same as wheat
-const XP = { fries: 5, wheat: 2, potato: 3, carrot: 4, lettuce: 5, corn: 6, eggplant: 7, pumpkin: 9, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
+const XP = { egg: 2, milk: 4, feed: 1, fries: 5, wheat: 2, potato: 3, carrot: 4, lettuce: 5, corn: 6, eggplant: 7, pumpkin: 9, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
 // every level needs 15% more than the one before; overall 30% slower than before (old need x 6 for the bigger XP numbers x 1.3)
 const XP_BASE = 15.6;
 // +15% every level, and from level 5 on an extra +10% that stacks again every 5 levels (5, 10, 15, ...)
@@ -1297,7 +1303,7 @@ function layoutOk(farm, from) {
   const seen = flood(from, bl), any = s => [...s].some(c => seen.has(c));
   return farm.plots.every(p => seen.has(p.cell)) && (farm.trees || []).every(t => any(sidesOf([t.cell], bl)))
     && any(sidesOf([farm.layout.well], bl)) && barnDoors(farm).some(c => seen.has(c)) && seen.has(doorOf(farm))
-    && OVENS.every(id => !(farm.layout[id] >= 0 && !any(sidesOf(fpCells(id, farm.layout[id]), bl))));
+    && [...OVENS, "coop", "cowbarn", "mill"].every(id => !(farm.layout[id] >= 0 && !any(sidesOf(fpCells(id, farm.layout[id]), bl))));
 }
 function cleanLayout(raw, mapv) {
   const L = {};
@@ -1352,7 +1358,21 @@ const CROPS = {
   eggplant: { name: "Patlıcan", seed: 45, sell: 100, ms: 45 * MIN, lv: 15, xp: 7 },
   pumpkin: { name: "Kabak", seed: 70, sell: 160, ms: 60 * MIN, lv: 20, xp: 9 },
 };
-const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries"];
+// ---------- Animals and the feed mill (ambar) ----------
+const COOP_LEVEL = 10, COOP_PRICE = 500, COOP_CAP = 10, HEN_PRICE = 100, EGG_MS = 5 * MIN, EGG_PRICE = 10;
+const COWBARN_LEVEL = 13, COWBARN_PRICE = 750, COW_CAP = 4, COW_PRICE = 200, MILK_MS = 8 * MIN, MILK_PRICE = 25;
+const MILL_LEVEL = 10, MILL_PRICE = 300, MILL_CAP = 10;
+// feed recipes: what one batch uses, how many feeds it gives, how long one batch takes
+const FEEDS = {
+  chickfeed: { name: "Tavuk yemi", need: { wheat: 2 }, out: 1, ms: 2 * MIN, emoji: "🐔" },
+  cowfeed: { name: "İnek yemi", need: { corn: 1, wheat: 1 }, out: 3, ms: 3 * MIN, emoji: "🐄" },
+};
+const ANIMALS = {
+  coop: { list: "chickens", one: "Tavuk", feed: "chickfeed", prod: "egg", prodName: "Yumurta", ms: EGG_MS, cap: COOP_CAP, price: HEN_PRICE, lv: COOP_LEVEL, cost: COOP_PRICE, emoji: "🐔", pe: "🥚" },
+  cowbarn: { list: "cows", one: "İnek", feed: "cowfeed", prod: "milk", prodName: "Süt", ms: MILK_MS, cap: COW_CAP, price: COW_PRICE, lv: COWBARN_LEVEL, cost: COWBARN_PRICE, emoji: "🐄", pe: "🥛" },
+};
+const BUILDINGS = ["coop", "cowbarn", "mill"];
+const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "chickfeed", "cowfeed"];
 const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
 const growMs = p => cropOf(p).ms;
@@ -2144,6 +2164,9 @@ function objectsLayer(farm, now, queued) {
     if (B.done > 0) o += `<g transform="translate(${ox + 158} ${oy + 26})"><circle r="24" fill="#fffdf6" stroke="#e3a72f" stroke-width="3"/><path d="M-15 6q0-17 15-17t15 17z" fill="#d48a3a" stroke="#8a4f1c" stroke-width="2"/><path d="M-6 -4l3 5M3 -6l2 6" stroke="#f3c27a" stroke-width="2.4" stroke-linecap="round"/><text y="20" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3e2a17">${B.done}</text></g>`;
     items.push([rowOf(L[oid]) + 2, o]);
   }
+  if (L.coop >= 0) items.push([rowOf(L.coop) + 3, `<g transform="translate(${X(L.coop)} ${Y(L.coop)})"><rect x="6" y="6" width="288" height="288" rx="10" fill="#d9c79a" stroke="#8a5a32" stroke-width="6" stroke-dasharray="14 8"/><path d="M20 120l60-60 60 60v80H20z" fill="#c8453a" stroke="#6b2018" stroke-width="5"/><rect x="62" y="150" width="36" height="50" fill="#3a2a1c"/>${[0, 1, 2].map(k => `<text x="${170 + k * 40}" y="${200 + (k % 2) * 40}" font-size="34">🐔</text>`).join("")}${farm === S && animalInfo(S, "coop", now).ready ? `<text x="230" y="70" font-size="44">🥚</text>` : ""}</g>`]);
+  if (L.cowbarn >= 0) items.push([rowOf(L.cowbarn) + 4, `<g transform="translate(${X(L.cowbarn)} ${Y(L.cowbarn)})"><rect x="6" y="6" width="388" height="388" rx="10" fill="#c9d98a" stroke="#8a5a32" stroke-width="6" stroke-dasharray="16 8"/><path d="M20 30h200v110H20z" fill="#9c6a3a" stroke="#5a3a1e" stroke-width="5"/><path d="M10 34l120-30 120 30" fill="#7b2f22" stroke="#4a1a12" stroke-width="5"/>${[0, 1].map(k => `<text x="${200 + k * 90}" y="${260 + k * 60}" font-size="54">🐄</text>`).join("")}${farm === S && animalInfo(S, "cowbarn", now).ready ? `<text x="300" y="90" font-size="50">🥛</text>` : ""}</g>`]);
+  if (L.mill >= 0) items.push([rowOf(L.mill) + 2, `<g transform="translate(${X(L.mill)} ${Y(L.mill)})"><rect x="20" y="70" width="160" height="120" rx="8" fill="#b9864f" stroke="#6b4423" stroke-width="5"/><path d="M10 74l90-58 90 58z" fill="#6b4423"/><rect x="70" y="120" width="60" height="70" fill="#3a2a1c"/><text x="100" y="108" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="24" fill="#fff6d6">AMBAR</text></g>`]);
   items.push([rowOf(L.scare) + 1, `<g transform="translate(${X(L.scare)} ${Y(L.scare)})">${scareInner()}</g>`]);
   const nm = String(farm.name || "Çiftçi"), fs = Math.min(17, Math.max(10, 150 / Math.max(4, nm.length)));
   items.push([rowOf(L.sign) + 1, `<g transform="translate(${X(L.sign) + 50} ${Y(L.sign) + 50})"><rect x="-4" y="-2" width="8" height="46" fill="#6b4423"/><ellipse cy="44" rx="18" ry="5" fill="rgba(0,0,0,.18)"/>
@@ -2478,7 +2501,9 @@ function cleanFarm(d) {
     name: censor(String(d.name || "Çiftçi")).slice(0, 16), level: Math.min(MAX_LEVEL, +d.level || 1), g: d.g === "k" ? "k" : "e",
     well: wellLv(d), store: Object.fromEntries(STORE_KEYS.map(k => [k, Math.max(0, Math.floor(+(d.store && d.store[k]) || 0))])),
     plots: cleanPlots(d.plots, d.mapv), fences: [], size: farmSize(d), landBought: Math.max(0, Math.floor(+d.landBought || 0)),
-    layout: cleanLayout(d.layout, d.mapv), kicks: cleanKicks(d.kicks)
+    layout: cleanLayout(d.layout, d.mapv), kicks: cleanKicks(d.kicks),
+    chickens: animalsOf(d, "coop").slice(0, COOP_CAP).map(() => ({ f: 0 })), cows: animalsOf(d, "cowbarn").slice(0, COW_CAP).map(() => ({ f: 0 })),
+    rot: d.rot && typeof d.rot === "object" ? Object.fromEntries(Object.entries(d.rot).slice(0, 300).map(([k, v]) => [k, (+v || 0) % 4])) : {}
   };
   f.trees = cleanTrees(d.trees, d.mapv, f.layout);
   f.fences = cleanFences(d.fences, d.mapv, f);
@@ -2562,6 +2587,87 @@ function tapHome(i) {
   walkPlain(i);
 }
 
+
+// ---------- Chicken coop, cow barn and the feed mill (ambar) ----------
+// each animal is { f: time it was fed } (0 = hungry). A fed animal gives its product after EGG_MS / MILK_MS;
+// collecting it makes the animal hungry again, so it needs one feed (made in the ambar) for every egg / milk.
+const animalsOf = (farm, kind) => toArr(farm && farm[ANIMALS[kind].list]).filter(a => a && typeof a === "object");
+function animalInfo(farm, kind, now) {
+  const A = ANIMALS[kind], list = animalsOf(farm, kind); let ready = 0, hungry = 0, next = 0;
+  list.forEach(a => { if (!a.f) { hungry++; return; } const left = a.f + A.ms - now; if (left <= 0) ready++; else if (!next || left < next) next = left; });
+  return { n: list.length, ready, hungry, next };
+}
+function millInfo(farm, now) {
+  const t = farm && farm.millQ; if (!t || !(+t.q > 0) || !FEEDS[t.r]) return { q: 0, done: 0, next: 0, r: null };
+  const ms = FEEDS[t.r].ms, done = Math.min(+t.q, Math.max(0, Math.floor((now - t.t0) / ms)));
+  return { q: +t.q, done, next: done < t.q ? t.t0 + (done + 1) * ms - now : 0, r: t.r };
+}
+const ownedB = (farm, kind) => !!(farm && farm[kind]);
+const bLevel = kind => kind === "mill" ? MILL_LEVEL : ANIMALS[kind].lv, bPrice = kind => kind === "mill" ? MILL_PRICE : ANIMALS[kind].cost;
+function collectAnimals(kind) {
+  const A = ANIMALS[kind], now = Date.now(); let n = 0;
+  animalsOf(S, kind).forEach(a => { if (a.f && now - a.f >= A.ms) { a.f = 0; n++; } });
+  if (!n) { const I = animalInfo(S, kind, now); hint(I.n ? (I.hungry === I.n ? "Hayvanların aç, önce yem ver." : A.prodName + " henüz hazır değil, " + fmt(I.next) + " kaldı.") : "Önce " + A.one.toLocaleLowerCase("tr") + " almalısın."); return 0; }
+  S.store[A.prod] = (+S.store[A.prod] || 0) + n; gainXp(n * XP[A.prod]);
+  popAt(colOf(S.layout[kind]) + 1, rowOf(S.layout[kind]), "+" + n + " " + A.prodName.toLocaleLowerCase("tr"), "#fff6c9");
+  saveNow(); renderHud(); renderPlots(); return n;
+}
+function feedAnimals(kind) {
+  const A = ANIMALS[kind], now = Date.now(), have = +S.store[A.feed] || 0, hungry = animalsOf(S, kind).filter(a => !a.f);
+  if (!hungry.length) { hint(animalsOf(S, kind).length ? "Bütün " + (kind === "coop" ? "tavukların" : "ineklerin") + " tok." : "Önce " + A.one.toLocaleLowerCase("tr") + " almalısın."); return 0; }
+  if (!have) { hint("Depoda " + FEEDS[A.feed].name.toLocaleLowerCase("tr") + " yok. Ambar'da yem yap."); return 0; }
+  const n = Math.min(have, hungry.length); hungry.slice(0, n).forEach(a => a.f = now); S.store[A.feed] = have - n;
+  popAt(colOf(S.layout[kind]) + 1, rowOf(S.layout[kind]), n + " " + (kind === "coop" ? "tavuk" : "inek") + " doydu", "#d9f7b0");
+  saveNow(); renderPlots(); return n;
+}
+let farmbKind = "coop";
+function openFarmB(kind) { farmbKind = kind; renderFarmB(); openSheet($("farmb")); }
+function renderFarmB() {
+  const kind = farmbKind, body = $("farmbBody"), now = Date.now();
+  $("farmbTitle").textContent = OBJ[kind].name;
+  if (kind === "mill") {
+    const I = millInfo(S, now);
+    if (I.q) { const F = FEEDS[I.r], left = I.q - I.done;
+      body.innerHTML = `<div class="card"><div class="thumb">${feedThumb(I.r)}</div><div><h3>${F.name} yapılıyor</h3><p class="keep">${I.done * F.out} yem hazır${left ? `, ${left * F.out} yem yapılıyor · sıradaki ${fmt(I.next)} sonra` : ""}</p>
+        <div class="obar"><u style="width:${(I.done / I.q * 100).toFixed(0)}%"></u></div>
+        <div class="row">${I.done ? `<button class="big green sm" data-mtake="1">${I.done * F.out} yemi depoya al</button>` : `<span class="pill">Öğütülüyor ⚙️</span>`}</div></div></div>`; }
+    else body.innerHTML = Object.keys(FEEDS).map(k => { const F = FEEDS[k], max = Math.min(MILL_CAP, ...Object.entries(F.need).map(([c, n]) => Math.floor((+S.store[c] || 0) / n))), lock = k === "cowfeed" && !cropOpen("corn");
+      millAmt[k] = Math.max(1, Math.min(max || 1, millAmt[k] || 1));
+      const needTxt = Object.entries(F.need).map(([c, n]) => n + " " + CROPS[c].name.toLocaleLowerCase("tr")).join(" + ");
+      return `<div class="card"><div class="thumb">${feedThumb(k)}</div><div><h3>${F.name}</h3><p class="keep">${needTxt} = ${F.out} yem · ${fmtDurS(F.ms)}</p>
+        <p class="keep">Depoda ${Object.keys(F.need).map(c => (+S.store[c] || 0) + " " + CROPS[c].name.toLocaleLowerCase("tr")).join(", ")}</p>
+        ${lock ? `<p class="keep">Mısır ${CROPS.corn.lv}. seviyede açılır.</p>` : max ? `<div class="row"><div class="stepper"><button data-mminus="${k}">−</button><b>${millAmt[k] * F.out} yem</b><button data-mplus="${k}">+</button></div><button class="big ghost sm" data-mmax="${k}">En fazla</button></div>
+        <div class="row"><button class="big green sm" data-mmake="${k}">Üret ⚙️ ${fmtDurS(millAmt[k] * F.ms)}</button></div>` : `<p class="keep">Malzeme yetmiyor.</p>`}</div></div>`; }).join("")
+      + `<p class="note">Ambar aynı anda tek çeşit yem yapar, bir seferde en fazla ${MILL_CAP} parti.</p>`;
+    return;
+  }
+  const A = ANIMALS[kind], I = animalInfo(S, kind, now), feed = +S.store[A.feed] || 0;
+  body.innerHTML = `<div class="card"><div class="thumb ovthumb"><span class="rec">${A.emoji}</span></div><div><h3>${I.n}/${A.cap} ${A.one.toLocaleLowerCase("tr")}</h3>
+      <p class="keep">${A.pe} ${I.ready} ${A.prodName.toLocaleLowerCase("tr")} hazır · 😋 ${I.n - I.ready - I.hungry} yemde${I.next ? " (" + fmt(I.next) + ")" : ""} · 🍽️ ${I.hungry} aç</p>
+      <div class="animals">${animalsOf(S, kind).map(a => `<span class="${!a.f ? "hun" : now - a.f >= A.ms ? "rdy" : "eat"}">${A.emoji}<i>${!a.f ? "🍽️" : now - a.f >= A.ms ? A.pe : "⏳"}</i></span>`).join("")}</div>
+      <div class="row"><button class="big green sm" data-acollect="1" ${I.ready ? "" : "disabled"}>${A.pe} Topla (${I.ready})</button><button class="big sm" data-afeed="1" ${I.hungry && feed ? "" : "disabled"}>🌾 Yem ver (${Math.min(I.hungry, feed)})</button></div>
+      <p class="keep">Depoda ${feed} ${FEEDS[A.feed].name.toLocaleLowerCase("tr")} var. Her ${A.prodName.toLocaleLowerCase("tr")} için 1 yem, ${fmtDurS(A.ms)}.</p></div></div>
+    <div class="card"><div class="thumb ovthumb"><span class="rec">${A.emoji}</span></div><div><h3>${A.one} al</h3><p><span class="price">${fmtG(A.price)} altın</span></p>
+      <div class="row"><button class="big green sm" data-abuy="1" ${I.n < A.cap && S.gold >= A.price ? "" : "disabled"}>${I.n >= A.cap ? "Yer kalmadı" : S.gold >= A.price ? "Satın al" : "Altının yetmiyor"}</button></div></div></div>`;
+}
+const millAmt = { chickfeed: 1, cowfeed: 1 };
+$("farmbBody").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !S) return; const kind = farmbKind, A = n => b.getAttribute(n);
+  if (A("data-acollect")) collectAnimals(kind);
+  else if (A("data-afeed")) feedAnimals(kind);
+  else if (A("data-abuy")) { const An = ANIMALS[kind]; adminTopUp(); if (animalsOf(S, kind).length >= An.cap || S.gold < An.price) return;
+    S.gold = round1(S.gold - An.price); S[An.list] = animalsOf(S, kind).concat([{ f: 0 }]); saveNow(); renderHud(); renderPlots(); R3.dirty = true; toast(An.one + " alındı, onu doyurmayı unutma"); }
+  else if (A("data-mminus")) { const k = A("data-mminus"); millAmt[k] = Math.max(1, millAmt[k] - 1); }
+  else if (A("data-mplus")) { const k = A("data-mplus"); millAmt[k]++; }
+  else if (A("data-mmax")) { millAmt[A("data-mmax")] = 999; }
+  else if (A("data-mmake")) { const k = A("data-mmake"), F = FEEDS[k]; if (millInfo(S, Date.now()).q) return; if (k === "cowfeed" && !cropOpen("corn")) return;
+    const n = Math.min(MILL_CAP, millAmt[k], ...Object.entries(F.need).map(([c, q]) => Math.floor((+S.store[c] || 0) / q))); if (n < 1) return;
+    Object.entries(F.need).forEach(([c, q]) => S.store[c] -= n * q); S.millQ = { r: k, q: n, t0: Date.now() }; saveNow(); renderPlots(); toast(F.name + " yapılıyor ⚙️"); }
+  else if (A("data-mtake")) { const I = millInfo(S, Date.now()); if (!I.done) return; const F = FEEDS[I.r];
+    S.store[I.r] = (+S.store[I.r] || 0) + I.done * F.out; S.millQ.q -= I.done; S.millQ.t0 += I.done * F.ms; if (S.millQ.q <= 0) S.millQ = null;
+    gainXp(I.done * XP.feed); popAt(me.x, me.y - .3, "+" + I.done * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
+  renderFarmB();
+});
 // ---------- Tap on a building / tree / decoration: a small action bar appears under it ----------
 // (the first button is what a tap used to do; "Taşı" picks it up to move it, like the move mode)
 function objAct(kind, i) {
@@ -2578,6 +2684,7 @@ function objAct(kind, i) {
     return;
   }
   if (kind === "house") { cancelAll(); walkTo(new Set([doorOf(S)]), null); return; }
+  if (kind === "coop" || kind === "cowbarn" || kind === "mill") { cancelAll(); if (!walkTo(sidesOf(fpCells(kind, S.layout[kind]), curBlocked()), () => openFarmB(kind))) openFarmB(kind); return; }
   if (OVENS.includes(kind)) { const id = kind; cancelAll(); if (!walkTo(sidesOf(fpCells(id, S.layout[id]), curBlocked()), () => openOven(id))) openOven(id); return; }
   if (kind === "barn") { cancelAll(); if (!walkTo(new Set(barnDoors(S)), () => { renderDepot(); openSheet($("depot")); })) hint("Depoya giden bir yol yok."); return; }
   if (kind === "tree") {
@@ -2595,7 +2702,14 @@ const OBJ_ACTS = {
   spr: [["💦", "Sula", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
   tree: [["🍎", "Topla", "use"], ["✋", "Taşı", "move"]],
   decor: [["✋", "Taşı", "move"]], scare: [["✋", "Taşı", "move"]], sign: [["✋", "Taşı", "move"]],
+  coop: [["🥚", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐔", "Kümes", "use"], ["✋", "Taşı", "move"]],
+  cowbarn: [["🥛", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐄", "Ahır", "use"], ["✋", "Taşı", "move"]],
+  mill: [["⚙️", "Yem yap", "use"], ["✋", "Taşı", "move"]],
 };
+// buildings and decorations that can be turned (house and depot keep their door towards the yard)
+const ROTATABLE = new Set(["oven", "oven2", "well", "scare", "sign", "decor", "tree", "spr", "coop", "cowbarn", "mill"]);
+const rotKey = (kind, i) => kind in OBJ ? kind : "c" + i;
+const rotOf = (farm, kind, i) => ((farm && farm.rot && +farm.rot[rotKey(kind, i)]) || 0) % 4;
 let objMenu = null;   // { i, kind, x, z }
 function objMenuShow(i, kind) {
   const acts = OBJ_ACTS[kind]; if (!acts) return objAct(kind, i);
@@ -2605,7 +2719,8 @@ function objMenuShow(i, kind) {
   objMenu = { i, kind, x, z };
   const name = kind === "decor" ? ((DECOR[(occMap(S).get(i) || {}).k] || {}).name || "Süs") : OBJ_NAME(kind);
   const tr = kind === "tree" ? treeAt(S, i) : null;
-  $("objMenu").innerHTML = `<b>${esc(name)}${kind === "tree" && !treeRipe(tr) ? ` · ${fmt(tr.t + TREE_MS - Date.now())}` : ""}</b><div>${acts.filter(a => !(kind === "tree" && a[2] === "use" && !treeRipe(tr)))
+  const all = ROTATABLE.has(kind) ? acts.concat([["🔄", "Döndür", "rot"]]) : acts;
+  $("objMenu").innerHTML = `<b>${esc(name)}${kind === "tree" && !treeRipe(tr) ? ` · ${fmt(tr.t + TREE_MS - Date.now())}` : ""}</b><div>${all.filter(a => !(kind === "tree" && a[2] === "use" && !treeRipe(tr)))
     .map(([e, t, a]) => `<button data-oa="${a}" data-ot="${t}"><span>${e}</span>${t}</button>`).join("")}</div>`;
   $("objMenu").classList.add("on"); objMenuPlace();
 }
@@ -2623,6 +2738,9 @@ $("objMenu").addEventListener("click", e => {
   const { i, kind } = objMenu, a = b.getAttribute("data-oa"); objMenuHide();
   if (a === "move") { setMode("move"); moveSel = { t: kind, from: kind in OBJ ? S.layout[kind] : i }; setMode("move"); return; }
   if (a === "up") { mtab = "up"; renderMarket(); openSheet($("market")); return; }
+  if (a === "rot") { S.rot = S.rot && typeof S.rot === "object" ? S.rot : {}; const k = rotKey(kind, i); S.rot[k] = ((+S.rot[k] || 0) + 1) % 4; save(); R3.dirty = true; renderPlots(); objMenuShow(i, kind); return; }
+  if (a === "collect") { collectAnimals(kind); return; }
+  if (a === "feed") { feedAnimals(kind); return; }
   if (b.getAttribute("data-ot") === "Geliştir" && OVENS.includes(kind)) { openOven(kind); setTimeout(() => { const u = $("ovenBody").querySelector("[data-oup]"); if (u) scrollInSheet(u.closest(".card")); }, 80); return; }
   objAct(kind, i);
 });
@@ -3339,7 +3457,7 @@ $("dock").addEventListener("click", e => {
   else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; renderBadges(); scrollChat(); }
 });
 function openSheet(el) { closeAll(); $("scrim").classList.add("on"); el.classList.add("on"); }
-function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "jobs", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
+function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "farmb", "jobs", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
 $("scrim").onclick = closeAll;
 document.querySelectorAll("#root_v8 [data-close]").forEach(b => b.onclick = closeAll);
 
@@ -3394,6 +3512,9 @@ const MARKET_INDEX = () => [
   { n: "Traktör", tab: "tools", k: "arac hasat traktor motorlu dort arac binmek", price: TOOLS.tractor.price, th: () => TOOLS.tractor.icon },
   { n: "Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma", price: OVEN_PRICE, th: () => ovenIcon() },
   { n: "2. Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma ikinci", price: OVEN_PRICE, th: () => ovenIcon() },
+  { n: "Tavuk kümesi", tab: "animals", k: "hayvan tavuk kumes yumurta", price: COOP_PRICE },
+  { n: "İnek ahırı", tab: "animals", k: "hayvan inek ahir sut", price: COWBARN_PRICE },
+  { n: "Ambar", tab: "animals", k: "yem tavuk inek degirmen ambar", price: MILL_PRICE },
   { n: "Tarla toprağı", tab: "land", k: "toprak tarla arazi", price: landPrice(S.landBought) },
   { n: "Alan genişletme", tab: "land", k: "arazi sis bolge genislet buyut", price: expandPrice(S) },
   { n: "Ahşap çit", tab: "decor", k: "cit dekor sus", price: fencePrice(S.fencesBought), th: fenceThumb },
@@ -3402,7 +3523,7 @@ const MARKET_INDEX = () => [
   { n: "Su kuyusu", tab: "up", k: "kuyu su kova gelistir depo", price: wellCost(Math.min(wellLv(S), WELL_MAX - 1)) },
   { n: "Fıskiye geliştir", tab: "up", k: "fiskiye gelistir seviye yukselt", price: SPR_UP[Math.min(sprLv(S), SPR_MAX - 1)], th: () => sprThumb() }
 ];
-const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", land: "Toprak", decor: "Dekor", up: "Geliştir" };
+const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", animals: "Hayvanlar", land: "Toprak", decor: "Dekor", up: "Geliştir" };
 const fold = s => String(s).toLocaleLowerCase("tr").replace(/[çğıöşüâî]/g, c => ({ "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "â": "a", "î": "i" }[c]));
 let mq = "";
 function renderSearch() {
@@ -3453,6 +3574,16 @@ function renderMarket0() {
     body.querySelectorAll("[data-obuy]").forEach(b => b.onclick = () => { const id = b.getAttribute("data-obuy"); if (ovenOwned(S, id) || S.gold < OVEN_PRICE || (id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin())) return;
       S.gold = round1(S.gold - OVEN_PRICE); S[id] = true; renderHud(); saveNow(); go(id); });
     body.querySelectorAll("[data-oplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-oplace")));
+  } else if (mtab === "animals") {
+    const info = { coop: `${COOP_CAP} tavuk sığar. Tavuklar yem yiyince ${EGG_MS / MIN} dakikada yumurtlar.`, cowbarn: `${COW_CAP} inek sığar. İnekler yem yiyince ${MILK_MS / MIN} dakikada süt verir.`, mill: "Buğdaydan tavuk yemi, mısır ve buğdaydan inek yemi yapar." };
+    body.innerHTML = ["mill", "coop", "cowbarn"].map(k => { const own = ownedB(S, k), placed = S.layout[k] >= 0, lock = S.level < bLevel(k) && !isAdmin(), icon = { coop: "🐔", cowbarn: "🐄", mill: "⚙️" }[k];
+      return `<div class="card${lock ? " locked" : ""}"><div class="thumb ovthumb"><span class="rec">${icon}</span></div><div><h3>${OBJ[k].name}</h3><p>${own ? "Sende var." : `<span class="price">${fmtG(bPrice(k))} altın</span>`}</p><p class="keep">${info[k]}</p>
+        <div class="row">${lock ? `<button class="big sm" disabled>🔒 ${bLevel(k)}. seviyede açılır</button>` : !own ? `<button class="big green sm" data-bbuy="${k}" ${S.gold >= bPrice(k) ? "" : "disabled"}>${S.gold >= bPrice(k) ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
+          : !placed ? `<button class="big green sm" data-bplace="${k}">Yerleştir</button>` : `<span class="pill">Çiftliğinde</span>`}</div></div></div>`; }).join("");
+    const go = k => { closeAll(); placeKind = k; setMode("place"); };
+    body.querySelectorAll("[data-bbuy]").forEach(b => b.onclick = () => { const k = b.getAttribute("data-bbuy"); adminTopUp(); if (ownedB(S, k) || S.gold < bPrice(k) || (S.level < bLevel(k) && !isAdmin())) return;
+      S.gold = round1(S.gold - bPrice(k)); S[k] = true; renderHud(); saveNow(); go(k); });
+    body.querySelectorAll("[data-bplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-bplace")));
   } else if (mtab === "tools") {
     body.innerHTML = Object.keys(TOOLS).map(k => { const T = TOOLS[k], own = S.tools.includes(k), sel = S.slot === k;
       return `<div class="card"><div class="thumb" style="background:#e9d9b4">${T.icon.replace('width="34" height="34"', 'width="58" height="58"')}</div><div>
@@ -3599,16 +3730,32 @@ const ovenIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-h
   <rect x="64" y="14" width="10" height="20" fill="#b5583d" stroke="#7d2f1c" stroke-width="2"/><rect x="62" y="11" width="14" height="5" rx="1.5" fill="#5e3226"/>
   <path d="M36 64v-12a14 14 0 0 1 28 0v12z" fill="#2a1a10" stroke="#e2dccf" stroke-width="4"/><path d="M42 64q2-10 6-12q-1 6 3 7q1-8 5-10q2 9 2 15z" fill="#ff8a1a"/><path d="M46 64q2-6 4-7q0 4 2 4q1-4 3-5q0 5 0 8z" fill="#ffe066"/>
   <circle cx="72" cy="6" r="4" fill="#e9e6e0" opacity=".7"/></svg>`;
-const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }];
+const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }];
+let dtab = "crops";
+const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "egg", "milk"] };
 function renderDepot() {
-  const body = $("depotBody"), items = PRODUCTS.filter(pr => (+S.store[pr.key] || 0) > 0);
-  if (!items.length) { body.innerHTML = `<p class="empty">Depon boş.<br>Hasat ettiğin ürünler burada görünür, buradan satarsın.</p>`; return; }
+  document.querySelectorAll("#depotTabs_v8 [data-dtab]").forEach(b => { const k = b.getAttribute("data-dtab"), n = DEPOT_TABS[k].reduce((a, x) => a + (+S.store[x] || 0), 0);
+    b.setAttribute("aria-pressed", k === dtab); b.dataset.n = n; });
+  const body = $("depotBody");
+  if (dtab === "feeds") {
+    const items = DEPOT_TABS.feeds.filter(k => (+S.store[k] || 0) > 0);
+    body.innerHTML = items.length ? items.map(k => `<div class="card"><div class="thumb">${feedThumb(k)}</div><div><h3>${FEEDS[k].name}</h3><p><span class="stock">${+S.store[k] || 0}</span> adet depoda</p>
+      <p class="keep">Satılmaz, ${k === "chickfeed" ? "tavuklara" : "ineklere"} verilir. Bir yem bir hayvanı bir kez doyurur.</p></div></div>`).join("")
+      : `<p class="empty">Hiç yemin yok.<br>Yemi <b>Ambar</b>'da buğday ve mısırdan yaparsın, yapılan yemler buraya gelir.</p>`;
+    return;
+  }
+  const items = PRODUCTS.filter(pr => DEPOT_TABS[dtab].includes(pr.key) && (+S.store[pr.key] || 0) > 0);
+  if (!items.length) { body.innerHTML = `<p class="empty">${dtab === "goods" ? "Burada ekmek, kızartma, yumurta ve süt gibi ürünler durur." : "Hasat ettiğin ekinler burada görünür, buradan satarsın."}</p>`; return; }
   body.innerHTML = items.map(pr => { const n = +S.store[pr.key] || 0; return `<div class="card"><div class="thumb">${pr.thumb()}</div><div>
     <h3>${pr.name}</h3>
     <p><span class="stock">${n}</span> adet depoda</p>
     <p>Tanesi <span class="price">${fmtG(pr.price)} altın</span>, hepsi ${fmtG(n * pr.price)} altın eder.</p>
     <div class="row"><button class="big ghost sm" data-sell="${pr.key}" data-n="1">1 tane sat</button><button class="big green sm" data-sell="${pr.key}" data-n="all">Hepsini sat</button></div></div></div>`; }).join("");
 }
+$("depotTabs").addEventListener("click", e => { const b = e.target.closest("[data-dtab]"); if (!b) return; dtab = b.getAttribute("data-dtab"); renderDepot(); });
+const eggThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M14 70q36 22 72 0l-6 18H20z" fill="#c8964a" stroke="#7b5128" stroke-width="3"/><ellipse cx="36" cy="60" rx="13" ry="17" fill="#fff6e8" stroke="#c8a77a" stroke-width="2.5"/><ellipse cx="62" cy="58" rx="13" ry="17" fill="#f3dcbc" stroke="#b98d5a" stroke-width="2.5"/><ellipse cx="49" cy="66" rx="12" ry="15" fill="#fffaf0" stroke="#c8a77a" stroke-width="2.5"/></svg>`;
+const milkThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M34 18h32v10l8 12v44a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V40l8-12z" fill="#fff" stroke="#5a7a9a" stroke-width="3" stroke-linejoin="round"/><path d="M26 54h48v16H26z" fill="#4f93d8"/><text x="50" y="66" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="12" fill="#fff">SÜT</text><rect x="32" y="12" width="36" height="8" rx="3" fill="#e0473a"/></svg>`;
+const feedThumb = k => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M28 30q22-10 44 0l6 52a6 6 0 0 1-6 6H28a6 6 0 0 1-6-6z" fill="${k === "cowfeed" ? "#e9d29a" : "#f3e2b4"}" stroke="#8a6a3a" stroke-width="3"/><path d="M30 30q20 8 40 0" fill="none" stroke="#8a6a3a" stroke-width="3"/><text x="50" y="68" text-anchor="middle" font-size="26">${FEEDS[k].emoji}</text></svg>`;
 $("depotBody").addEventListener("click", e => {
   const b = e.target.closest("[data-sell]"); if (!b || !S) return;
   const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr) return;
@@ -4116,6 +4263,9 @@ function enterGame() {
   delete S.bake;
   { const B = S.bakes && typeof S.bakes === "object" ? S.bakes : {}; S.bakes = {}; OVENS.forEach(id => { const a = toArr(B[id]); S.bakes[id] = [0, 1].map(k => a[k] && +a[k].q > 0 && RECIPES[a[k].r || "bread"] ? { q: Math.floor(+a[k].q), t0: +a[k].t0 || Date.now(), r: a[k].r || "bread" } : null); }); }
   S.ovenLv = Object.fromEntries(OVENS.map(id => [id, ovenLv(S, id)]));
+  Object.keys(ANIMALS).forEach(k => { const A = ANIMALS[k]; S[A.list] = animalsOf(S, k).slice(0, A.cap).map(a => ({ f: Math.max(0, +a.f || 0) })); });
+  if (!S.millQ || !(+S.millQ.q > 0) || !FEEDS[S.millQ.r]) S.millQ = null;
+  if (!S.rot || typeof S.rot !== "object") S.rot = {};
   S.tools = toArr(S.tools).filter(t => TOOLS[t]); if (!S.tools.includes("scythe")) S.tools.unshift("scythe");
   if (!S.tools.includes(S.slot)) S.slot = "scythe";
   S.plots = cleanPlots(S.plots, mv);
@@ -4434,6 +4584,8 @@ function nextReadyAt() {
   (S.plots || []).forEach(p => { if (p.c && p.w) { const r = +p.w + growMs(p); if (r > now) t = Math.min(t, r); } });
   (S.trees || []).forEach(tr => { const r = +tr.t + TREE_MS; if (r > now) t = Math.min(t, r); });
   const B = bakeInfo(S, now); if (B.next > 0) t = Math.min(t, now + B.next);
+  Object.keys(ANIMALS).forEach(k => { const I = animalInfo(S, k, now); if (I.next > 0) t = Math.min(t, now + I.next); });
+  { const M = millInfo(S, now); if (M.next > 0) t = Math.min(t, now + M.next); }
   return isFinite(t) ? Math.round(t) : 0;
 }
 function pushDue() {
@@ -4780,6 +4932,14 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 88, d: "9 Ekim 2026", e: "🐔", t: "Tavuklar, inekler ve ambar", c: "#c8453a", b: "#ffe3dc", items: [
+    "<b>Tavuk kümesi</b> (10. sv, 500 altın): 10 tavuk sığar, tavuğu 100 altın. Yem yiyen tavuk 5 dakikada yumurtlar, yumurta 10 altın.",
+    "<b>İnek ahırı</b> (13. sv, 750 altın): 4 inek sığar, ineği 200 altın. Yem yiyen inek 8 dakikada süt verir, süt 25 altın.",
+    "<b>Ambar</b> (10. sv, 300 altın): 2 buğdaydan 1 tavuk yemi (2 dk), 1 mısır + 1 buğdaydan 3 inek yemi (3 dk). Yemler depoya gelir.",
+    "Hayvanlar açık kümeste ve ahırda dolaşıyor. Yumurta, süt ya da yem hazır olunca binanın üstünde işaret çıkıyor.",
+    "Depo artık <b>Ekinler, Yemler ve Malzemeler</b> diye ayrılıyor. Depo binasında DEPO tabelası, kasalar ve çuvallar var.",
+    "Binaları ve süsleri <b>döndürebilirsin</b>: dokun, altındaki menüden Döndür'e bas.",
+  ] },
   { v: 87, d: "9 Ekim 2026", e: "🥕", t: "Yeni ekinler ve iki fırın", c: "#e0762a", b: "#ffe9cf", items: [
     "Yeni ekinler: <b>havuç</b> (7. sv), <b>salata</b> (9), <b>mısır</b> (12), <b>patlıcan</b> (15) ve <b>kabak</b> (20). Patates artık 5. seviyede açılıyor ve 4 dakikada yetişiyor.",
     "Taş fırın artık 40 altın. <b>İkinci fırın</b> 20. seviyede açılıyor. Fırınlar 3 seviyeye geliştirilebiliyor: 7, 15 ve iki tepside 20+20 ürün.",
@@ -5062,6 +5222,10 @@ function setup3D(T) {
       x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 80);
     });
   }
+  function emojiBadge(e, n) { return canvasTex("emo" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.22)"; x.beginPath(); x.arc(82, 86, 64, 0, 6.283); x.fill();
+    x.fillStyle = "#fffdf4"; x.beginPath(); x.arc(78, 78, 64, 0, 6.283); x.fill(); x.lineWidth = 8; x.strokeStyle = "#e3a72f"; x.stroke();
+    x.font = "84px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(e, 78, 84);
+    if (n > 1) { x.fillStyle = "#e0473a"; x.beginPath(); x.arc(128, 30, 28, 0, 6.283); x.fill(); x.fillStyle = "#fff"; x.font = "700 36px Fredoka, Nunito, sans-serif"; x.fillText(n > 99 ? "99" : String(n), 128, 32); } }); }
   function badgeTex(n, kind) {
     return canvasTex("bdg" + kind + n, 256, 128, (x, w, h) => {
       x.fillStyle = "rgba(0,0,0,.2)"; rr(x, 10, 18, w - 20, h - 26, 50); x.fill();
@@ -5200,6 +5364,12 @@ function setup3D(T) {
     g.add(mesh(G.box, M(COL.trim), cx - .58, .7, fz + .04, .07, 1.05, .04, false)); g.add(mesh(G.box, M(COL.trim), cx + .58, .7, fz + .04, .07, 1.05, .04, false));
     g.add(mesh(G.box, M("#3a2a1c"), cx, 1.75, fz - .2, .5, .38, .06)); g.add(mesh(G.box, M(COL.hay), cx, 1.62, fz - .17, .44, .12, .06, false));
     [[-1.55, .25], [1.55, .3]].forEach(([dx, dz]) => { const b = mesh(G.cyl, M(COL.hay), cx + dx, .22, fz + dz, .24, .44, .24); b.rotation.z = Math.PI / 2; g.add(b); });
+    // it is the depot: a big DEPO board over the door, crates and sacks around it
+    const dt = canvasTex("depoSign", 512, 160, (x, w, h) => { x.fillStyle = "#6b4423"; rr(x, 4, 4, w - 8, h - 8, 26); x.fill(); x.fillStyle = "#c08a4f"; rr(x, 16, 16, w - 32, h - 32, 18); x.fill();
+      x.fillStyle = "#fff6d6"; x.font = "700 92px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.lineWidth = 12; x.strokeStyle = "#5a3315"; x.strokeText("📦 DEPO", w / 2, h / 2 + 4); x.fillText("📦 DEPO", w / 2, h / 2 + 4); });
+    const sb = boardMesh(1.25, .4, dt); sb.position.set(cx, 1.42, fz + .07); g.add(sb);
+    [[-1.05, .55, "#b07a42"], [-1.32, .55, "#c08a4f"], [-1.18, .55, "#a8743f"]].forEach(([dx, dz, c], k) => { const y = k === 2 ? .45 : .15; g.add(mesh(G.box, TM(c, "planks", 1, 1), cx + dx, y, fz + dz - (k === 2 ? .03 : 0), .28, .28, .28)); });
+    [[1.05, .55], [1.3, .6], [1.17, .78]].forEach(([dx, dz]) => { g.add(mesh(G.sph, M("#e9d6a8"), cx + dx, .17, fz + dz, .14, .17, .12)); g.add(mesh(G.cyl8, M("#8a6a3a"), cx + dx, .33, fz + dz, .04, .04, .04, false)); });
     return g;
   }
   function buildWell(a, lv) {
@@ -5220,6 +5390,90 @@ function setup3D(T) {
       g.add(mesh(G.cyl8, M("#8a5a32"), x, .48, z, .07, .1, .07));
     }
     return g;
+  }
+  // turn a building around its centre (n quarter turns)
+  function spin(g, cx, cz, n) { if (!n) return g; const p = new T.Group(); p.position.set(cx, 0, cz); g.position.set(-cx, 0, -cz); p.add(g); p.rotation.y = -n * Math.PI / 2; return p; }
+  function fenceRun(g, x0, z0, x1, z1, gap) {   // a low wooden fence from (x0,z0) to (x1,z1) with an optional opening in the middle
+    const len = Math.hypot(x1 - x0, z1 - z0), n = Math.max(2, Math.round(len / .5)), dx = (x1 - x0) / n, dz = (z1 - z0) / n;
+    for (let k = 0; k <= n; k++) { const t = k / n; if (gap && Math.abs(t - .5) < gap / 2) continue; g.add(mesh(G.box, TM(COL.wood, "wood"), x0 + dx * k, .2, z0 + dz * k, .06, .4, .06)); }
+    for (let k = 0; k < n; k++) { const t = (k + .5) / n; if (gap && Math.abs(t - .5) < gap / 2) continue; const r = mesh(G.box, M("#c08a4f"), x0 + dx * (k + .5), .3, z0 + dz * (k + .5), Math.abs(dx) + .02 || .04, .05, Math.abs(dz) + .02 || .04); g.add(r); const r2 = r.clone(); r2.position.y = .16; g.add(r2); }
+  }
+  function buildCoop(a, nHens) {
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .1, x1 = c + 2.9, z0 = r + .1, z1 = r + 2.9;
+    blob(g, c + 1.5, r + 1.5, 3.4, 3.4, .45);
+    { const fl = new T.Mesh(G.plane, M("#e3cf8f")); fl.position.set(c + 1.5, .012, r + 1.5); fl.scale.set(2.8, 1, 2.8); g.add(fl); }
+    fenceRun(g, x0, z0, x1, z0); fenceRun(g, x0, z0, x0, z1); fenceRun(g, x1, z0, x1, z1); fenceRun(g, x0, z1, x1, z1, .3);
+    // little henhouse on stilts in the back corner, nest boxes and a ramp
+    const hx = c + .85, hz = r + .75;
+    [[-.4, -.3], [.4, -.3], [-.4, .3], [.4, .3]].forEach(([dx, dz]) => g.add(mesh(G.box, M(COL.woodD), hx + dx, .15, hz + dz, .06, .3, .06)));
+    g.add(mesh(G.box, TM("#c8453a", "planks", 2, 1), hx, .55, hz, 1.0, .5, .8)); gableRoof(g, hx, hz, 1.0, .8, .78, .38, "#6b4423", .1);
+    g.add(mesh(G.box, M("#3a2a1c"), hx + .2, .48, hz + .41, .22, .26, .02, false)); g.add(mesh(G.box, M(COL.trim), hx - .22, .6, hz + .41, .24, .18, .02, false));
+    { const rp = mesh(G.box, TM(COL.wood, "planks", 1, 2), hx + .2, .17, hz + .66, .2, .03, .5); rp.rotation.x = .62; g.add(rp); }
+    // feeder and water dish
+    g.add(mesh(G.box, TM(COL.wood, "wood"), c + 2.2, .1, r + .7, .7, .12, .18)); g.add(mesh(G.box, M("#e9d29a"), c + 2.2, .17, r + .7, .62, .03, .12, false));
+    g.add(mesh(G.cyl, M("#9aa5ad"), c + 2.4, .05, r + 1.5, .18, .08, .18)); g.add(mesh(G.cyl, MS("#5ab0d6", { roughness: .1 }), c + 2.4, .09, r + 1.5, .15, .01, .15, false));
+    // hens walking around inside the pen
+    const pen = { items: [], x0: c + .4, x1: c + 2.6, z0: r + 1.35, z1: r + 2.6 };
+    for (let k = 0; k < nHens; k++) { const m = buildHen(k % 3 === 1); m.g.scale.setScalar(.9); const px = pen.x0 + Math.random() * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+      m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: Math.random() * 3, sp: .45 }); }
+    fx.pens.push(pen);
+    return g;
+  }
+  function buildCow() {
+    const g = new T.Group(), b = new T.Group(); g.add(b);
+    b.add(mesh(G.box, M("#fbfaf6"), 0, .42, 0, .34, .3, .62)); b.add(mesh(G.box, M("#2f2a26"), .1, .5, .1, .2, .16, .22, false)); b.add(mesh(G.box, M("#2f2a26"), -.11, .43, -.16, .14, .14, .18, false));
+    const hd = new T.Group(); hd.position.set(0, .56, .36); b.add(hd);
+    hd.add(mesh(G.box, M("#fbfaf6"), 0, 0, 0, .24, .24, .24)); hd.add(mesh(G.box, M("#f2a9b0"), 0, -.06, .13, .2, .12, .06, false));
+    [-.07, .07].forEach(dx => { hd.add(mesh(G.sph, M("#1d1a14"), dx, .05, .125, .02, .02, .02, false)); hd.add(mesh(G.cone, M("#f3e0b0"), dx * 1.6, .16, -.02, .03, .1, .03, false)); hd.add(mesh(G.box, M("#2f2a26"), dx * 2.2, .06, -.02, .1, .05, .06, false)); });
+    [[-.12, -.22], [.12, -.22], [-.12, .22], [.12, .22]].forEach(([dx, dz]) => g.add(mesh(G.box, M("#efe9e0"), dx, .14, dz, .08, .28, .08)));
+    g.add(mesh(G.sph, M("#f2a9b0"), 0, .26, -.08, .07, .05, .07, false));
+    { const tl = mesh(G.cyl8, M("#2f2a26"), 0, .4, -.33, .015, .25, .015, false); tl.rotation.x = .3; g.add(tl); }
+    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .7, .9);
+    return { g, hd };
+  }
+  function buildCowbarn(a, nCows) {
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .1, x1 = c + 3.9, z0 = r + .1, z1 = r + 3.9;
+    blob(g, c + 2, r + 2, 4.4, 4.4, .45);
+    { const fl = new T.Mesh(G.plane, M("#b9c97a")); fl.position.set(c + 2, .012, r + 2); fl.scale.set(3.8, 1, 3.8); g.add(fl); }
+    fenceRun(g, x0, z0, x1, z0); fenceRun(g, x0, z0, x0, z1); fenceRun(g, x1, z0, x1, z1); fenceRun(g, x0, z1, x1, z1, .22);
+    // open shelter along the back: posts, slanted roof, hay rack and a trough
+    [[.5, .3], [2, .3], [3.5, .3], [.5, 1.05], [2, 1.05], [3.5, 1.05]].forEach(([dx, dz]) => g.add(mesh(G.box, TM(COL.wood, "wood"), c + dx, .5, r + dz, .09, 1.0 - (dz > 1 ? .14 : 0), .09)));
+    { const rf = mesh(G.box, TM("#7b2f22", "shingle", 3, 1), c + 2, 1.0, r + .68, 3.3, .05, .95); rf.rotation.x = -.2; g.add(rf); }
+    g.add(mesh(G.box, TM("#9c6a3a", "planks", 3, 1), c + 2, .42, r + .22, 3.1, .84, .06));
+    g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), c + 2, .12, r + 1.55, 2.2, .18, .26)); g.add(mesh(G.box, M("#d9c26a"), c + 2, .22, r + 1.55, 2.1, .04, .2, false));
+    [[.7, .7], [3.2, .7]].forEach(([dx, dz]) => { const b = mesh(G.cyl, M(COL.hay), c + dx, .2, r + dz, .22, .4, .22); b.rotation.z = Math.PI / 2; g.add(b); });
+    const pen = { items: [], x0: c + .6, x1: c + 3.4, z0: r + 2.1, z1: r + 3.4 };
+    for (let k = 0; k < nCows; k++) { const m = buildCow(), px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+      m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: 1 + Math.random() * 4, sp: .22, cow: 1 }); }
+    fx.pens.push(pen);
+    return g;
+  }
+  function buildMill(a, busy) {
+    const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + .8, cz = r + 1.05, w = 1.3, d = 1.2, h = .95;
+    blob(g, c + 1, r + 1, 2.4, 2.4);
+    g.add(mesh(G.box, TM("#d8d2c6", "stone", 2, 1), cx, .06, cz, w + .1, .12, d + .1));
+    g.add(mesh(G.box, TM("#b9864f", "planks", 3, 1.2), cx, .12 + h / 2, cz, w, h, d)); gableWalls(g, cx, cz, w, d, .12 + h, .55, "#b9864f", "planks"); gableRoof(g, cx, cz, w, d, .12 + h - .02, .6, "#6b4423", .12);
+    const fz = cz + d / 2 + .02; g.add(mesh(G.box, M("#3a2a1c"), cx, .5, fz, .5, .7, .04, false));
+    const st = canvasTex("ambarSign", 512, 140, (x, w2, h2) => { x.fillStyle = "#5a3315"; rr(x, 4, 4, w2 - 8, h2 - 8, 24); x.fill(); x.fillStyle = "#e3a72f"; rr(x, 14, 14, w2 - 28, h2 - 28, 16); x.fill();
+      x.fillStyle = "#3e2a17"; x.font = "700 84px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("AMBAR", w2 / 2, h2 / 2 + 4); });
+    const sb = boardMesh(.95, .26, st); sb.position.set(cx, 1.0, fz + .03); g.add(sb);
+    // a silo beside it and grain sacks
+    g.add(mesh(G.cyl, TM("#c9c2b5", "siding", 2, 2), c + 1.65, .7, r + .55, .3, 1.4, .3)); g.add(mesh(G.cone, M("#8e3322"), c + 1.65, 1.58, r + .55, .36, .36, .36));
+    [[1.55, 1.6], [1.75, 1.45], [1.65, 1.75]].forEach(([dx, dz]) => g.add(mesh(G.sph, M("#ead7a6"), c + dx, .16, r + dz, .13, .16, .11)));
+    // a small grinding wheel on the front that turns while feed is being made
+    const hub = new T.Group(); hub.position.set(cx + .45, .75, fz + .05); g.add(hub);
+    hub.add(mesh(G.cyl8, M("#5e3a1c"), 0, 0, 0, .05, .06, .05)); for (let q = 0; q < 6; q++) { const arm = new T.Group(); arm.rotation.z = q * Math.PI / 3; arm.add(mesh(G.box, TM(COL.wood, "wood"), 0, .14, 0, .04, .28, .025)); hub.add(arm); }
+    hub.rotation.x = Math.PI / 2 * 0; hub.userData.spin = busy ? 3 : 0; if (busy) fx.mills.push(hub);
+    return g;
+  }
+  function stepPens(dt, sec) {
+    (fx.pens || []).forEach(pen => pen.items.forEach(it => {
+      const dx = it.tx - it.x, dz = it.tz - it.z, d = Math.hypot(dx, dz);
+      if (d < .03) { it.wait -= dt; if (it.wait <= 0) { it.tx = pen.x0 + Math.random() * (pen.x1 - pen.x0); it.tz = pen.z0 + Math.random() * (pen.z1 - pen.z0); it.wait = (it.cow ? 3 : 1) + Math.random() * (it.cow ? 6 : 3); } }
+      else { const st = Math.min(d, it.sp * dt); it.x += dx / d * st; it.z += dz / d * st; it.m.g.rotation.y = Math.atan2(dx, dz); }
+      it.m.g.position.set(it.x, 0, it.z);
+      if (it.m.hd) it.m.hd.rotation.x = d < .03 ? (it.cow ? .5 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : 0;
+    }));
   }
   function buildScare(a) {
     const g = new T.Group(), x = colOf(a) + .5, z = rowOf(a) + .55;
@@ -5505,7 +5759,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
 
   // ---------- rebuilding the world from the game state ----------
   let world = new T.Group(); scene3.add(world);
-  const fx = { stars: [], dstars: [], flames: [], clouds: [], sprites: [], mills: [], flags: [], fount: null };
+  const fx = { stars: [], dstars: [], flames: [], clouds: [], sprites: [], mills: [], flags: [], fount: null, ovens: [], pens: [] };
   let proxies = [], lastFarmSig = "";
   function proxy(x, y, z, sx, sy, sz, cell) { const p = new T.Mesh(G.box, M("#000")); p.visible = false; p.position.set(x, y, z); p.scale.set(sx, sy, sz); p.userData.cell = cell; proxies.push(p); world.add(p); }
   const sharedGeo = new Set([...Object.values(G), prism, ...sharedGeoExtra]);
@@ -5517,7 +5771,8 @@ gl_Position = projectionMatrix * mvPosition;`); };
   function staticSigOf(f, now) {
     if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length;
     if (!f) return "none|" + tuftCount;
-    const B = { q: 0, done: 0 }; const oSig = f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") : "";
+    const B = { q: 0, done: 0 }; const oSig = (f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") + (millInfo(S, now).q > millInfo(S, now).done ? "m" : "") : "")
+      + "|" + animalsOf(f, "coop").length + "." + animalsOf(f, "cowbarn").length + "|" + JSON.stringify(f.rot || {});
     return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : "")).join(","),
       f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
   }
@@ -5525,7 +5780,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
     if (sig !== staticSig) {
       staticSig = sig;
-      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = [];
+      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = []; fx.pens = [];
       if (scene.kind === "plaza") buildPlaza(); else if (f) buildFarm(f, now, "s");
       const scs = sceneryKey(f);
       if (scs !== scenSig) { scenSig = scs; scenery(f); ["tuft", "ftrunk", "fleaf"].forEach(k => P[k].done()); }
@@ -5581,21 +5836,27 @@ gl_Position = projectionMatrix * mvPosition;`); };
     // buildings
     world.add(buildHouse(L.house)); proxy(colOf(L.house) + 2.5, 1.2, rowOf(L.house) + 1.5, 5, 2.4, 3, L.house);
     world.add(buildBarn(L.barn)); proxy(colOf(L.barn) + 1.5, 1, rowOf(L.barn) + 1, 3, 2, 2, L.barn);
-    world.add(buildWell(L.well, f.well || 1)); proxy(colOf(L.well) + .5, .5, rowOf(L.well) + .5, 1, 1, 1, L.well);
-    world.add(buildScare(L.scare)); proxy(colOf(L.scare) + .5, .6, rowOf(L.scare) + .5, 1, 1.2, 1, L.scare);
-    world.add(buildSign(L.sign, String(f.name || "Çiftçi"))); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
+    const R1 = (g, kind, i) => spin(g, colOf(i) + .5, rowOf(i) + .5, rotOf(f, kind, i));
+    const RO = (g, kind) => { const o = OBJ[kind], a = L[kind]; return spin(g, colOf(a) + o.w / 2, rowOf(a) + o.h / 2, rotOf(f, kind, a)); };
+    world.add(RO(buildWell(L.well, f.well || 1), "well")); proxy(colOf(L.well) + .5, .5, rowOf(L.well) + .5, 1, 1, 1, L.well);
+    world.add(RO(buildScare(L.scare), "scare")); proxy(colOf(L.scare) + .5, .6, rowOf(L.scare) + .5, 1, 1.2, 1, L.scare);
+    world.add(RO(buildSign(L.sign, String(f.name || "Çiftçi")), "sign")); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
     for (const oid of OVENS) if (L[oid] >= 0) {
       const B = isMe ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
-      const o = buildOven(L[oid], B.q > B.done); world.add(o);
+      const o = buildOven(L[oid], B.q > B.done); world.add(RO(o, oid));
       proxy(colOf(L[oid]) + 1, .7, rowOf(L[oid]) + 1, 2, 1.4, 2, L[oid]);
     }
+    // animals and the feed mill
+    if (L.coop >= 0) { world.add(RO(buildCoop(L.coop, animalsOf(f, "coop").length), "coop")); proxy(colOf(L.coop) + 1.5, .5, rowOf(L.coop) + 1.5, 3, 1, 3, L.coop); }
+    if (L.cowbarn >= 0) { world.add(RO(buildCowbarn(L.cowbarn, animalsOf(f, "cowbarn").length), "cowbarn")); proxy(colOf(L.cowbarn) + 2, .6, rowOf(L.cowbarn) + 2, 4, 1.2, 4, L.cowbarn); }
+    if (L.mill >= 0) { const M0 = isMe ? millInfo(S, now) : { q: 0, done: 0 }; world.add(RO(buildMill(L.mill, M0.q > M0.done), "mill")); proxy(colOf(L.mill) + 1, .7, rowOf(L.mill) + 1, 2, 1.4, 2, L.mill); }
     // sprinklers
-    (f.spr || []).forEach(s => { world.add(buildSprinkler(s.cell)); proxy(colOf(s.cell) + .5, .5, rowOf(s.cell) + .5, 1, 1, 1, s.cell); });
+    (f.spr || []).forEach(s => { world.add(R1(buildSprinkler(s.cell), "spr", s.cell)); proxy(colOf(s.cell) + .5, .5, rowOf(s.cell) + .5, 1, 1, 1, s.cell); });
     // decorations
-    (f.decor || []).forEach((d, k) => { const o = buildDecor(d.t, d.cell, k); if (o) { world.add(o); proxy(colOf(d.cell) + .5, .5, rowOf(d.cell) + .5, 1, 1, 1, d.cell); } });
+    (f.decor || []).forEach((d, k) => { const o = buildDecor(d.t, d.cell, k); if (o) { world.add(R1(o, "decor", d.cell)); proxy(colOf(d.cell) + .5, .5, rowOf(d.cell) + .5, 1, 1, 1, d.cell); } });
     // trees
     (f.trees || []).forEach((tr, k) => { const rp = now - tr.t >= TREE_MS, x = colOf(tr.cell) + .5, z = rowOf(tr.cell) + .5;
-      world.add(buildTree(x, z, rp, k)); proxy(x, .7, z, 1, 1.4, 1, tr.cell);
+      world.add(R1(buildTree(x, z, rp, k), "tree", tr.cell)); proxy(x, .7, z, 1, 1.4, 1, tr.cell);
       if (rp) { const s = sprite(starTex, .42, .42); s.position.set(x + .38, 1.45, z); s.userData.bob = Math.random() * 6; fx.stars.push(s); world.add(s); } });
     // fences
     const F = new Set(f.fences || []);
@@ -5610,6 +5871,12 @@ gl_Position = projectionMatrix * mvPosition;`); };
   }
   function farmDyn(f, now, L, home, isMe) {
     if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), .7, .35); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
+    if (isMe) {
+      [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
+        const em = I.ready ? e : I.hungry && I.hungry === I.n ? "🍽️" : null; if (!em) return;
+        const sp = sprite(emojiBadge(em, I.ready || 0), .8, .8); sp.position.set(colOf(L[k]) + o.w / 2, 1.9 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
+      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), .8, .8); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
+    }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });
     // plots and crops
@@ -5934,7 +6201,8 @@ gl_Position = projectionMatrix * mvPosition;`); };
     fx.stars.concat(fx.dstars || []).forEach(s => { s.position.y += Math.sin(sec * 3 + s.userData.bob) * .002; s.material.rotation = Math.sin(sec * 2 + s.userData.bob) * .3; });
     fx.mills.forEach(h => { h.rotation.z -= .016 * h.userData.spin; });
     fx.flags.forEach((f, i) => { f.rotation.y = Math.sin(sec * 2.2 + i) * .18; });
-    if (scene.kind === "plaza") stepFountain(sec); else stepOven(sec);
+    if (scene.kind === "plaza") stepFountain(sec); else { stepOven(sec); stepPens(Math.min(.1, Math.max(0, sec - (R3.lastSec || sec))), sec); }
+    R3.lastSec = sec;
     WIND.value = REDUCED ? 0 : sec;
     (fx.ddrops || []).forEach(sp => { const b = Math.abs(Math.sin(sec * 2.8 + sp.userData.ph)); sp.position.y = sp.userData.y0 + b * .14; const sc = .6 + b * .08; sp.scale.set(sc, sc, 1); });
     fx.flames.forEach((f, i) => { f.scale.y = (f.userData.flame === 1 ? .32 : .2) * (1 + Math.sin(sec * 17 + i * 2) * .18); });
@@ -6048,7 +6316,9 @@ setInterval(() => {
     const now = Date.now();
     let key = f.plots.map(p => p.c && p.w ? (now - p.w >= growMs(p) ? 4 : Math.floor((now - p.w) / growMs(p) * 3)) : "-").join("") + "|" + (f.trees || []).map(t => now - t.t >= TREE_MS ? 1 : 0).join("");
     key += "|" + bakeInfo(f, now).done;
+    if (f === S) { key += "|" + Object.keys(ANIMALS).map(k => { const I = animalInfo(S, k, now); return I.ready + "." + I.hungry; }).join(",") + "|" + millInfo(S, now).done; }
     if ($("oven").classList.contains("on") && f === S) renderOven();
+    if ($("farmb").classList.contains("on") && f === S) renderFarmB();
     if (key !== stageKey) { stageKey = key; renderPlots(); }
     else document.querySelectorAll("#gPlots_v8 text.cd").forEach(t => { const v = fmt(+t.getAttribute("data-end") - now); if (t.textContent !== v) t.textContent = v; });
   }

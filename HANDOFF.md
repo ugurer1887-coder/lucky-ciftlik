@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 87). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 88). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -51,6 +51,14 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Nesne menüsü: binaya dokununca `objMenuShow()` (Pişir/Geliştir/Taşı vb.), `objAct()` eski doğrudan işlem.
 - Fiyatlar: ekim aleti 500 sv10, elektrikli tırpan 1000 sv15, fıskiye 400, fıskiye 6 seviye (`SPR_UP` 600/850/1500/2250/3500), başlangıç 50 altın, kuyu `at(4,9)`.
 - Admin paneli: oyuncuya +1/+5/+10 seviye (`admin/{id}/ops/{op} = {lv}`; sunucu kuralı kayıt başına +5 seviyeye izin verdiği için 5'erli uygulanır).
+
+## v88 hayvanlar ve ambar
+- `OBJ.coop` 3x3 (sv10, 500), `OBJ.cowbarn` 4x4 (sv13, 750), `OBJ.mill` 2x2 Ambar (sv10, 300). Satın alma bayrakları `S.coop/S.cowbarn/S.mill`.
+- `ANIMALS` tablosu: `S.chickens`/`S.cows` = `[{f: yem yediği zaman}]` (0 = aç). Yem yiyen tavuk 5 dk'da yumurta (10 altın), inek 8 dk'da süt (25 altın); toplayınca aç kalır. Kapasite 10 tavuk / 4 inek, tavuk 100 / inek 200 altın.
+- `FEEDS`: tavuk yemi 2 buğday → 1 (2 dk), inek yemi 1 mısır + 1 buğday → 3 (3 dk). Ambar kuyruğu `S.millQ = {r,q,t0}`, en fazla 10 parti.
+- Depo sekmeleri `DEPOT_TABS` (Ekinler/Yemler/Malzemeler); yemler satılmaz.
+- Döndürme: `S.rot[anahtar]` (0-3), anahtar bina adı ya da `"c"+hücre`. Ev ve depo dönmez (kapı yönü). 3D'de `spin()` ile.
+- Ekonomi notu: yumurta (10) 2 buğdaydan (10) yapılan yemle üretildiği için kârı XP; süt 25 olduğu için inek yemi tarifi 3 adet veriyor.
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
