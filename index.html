@@ -900,7 +900,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "74";
+const VERSION = "75";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1984,9 +1984,9 @@ function paintGrass(ctx, W, H, kind) {
   const lw = Math.ceil(W / 8), lh = Math.ceil(H / 8), lc = document.createElement("canvas"); lc.width = lw; lc.height = lh;
   const lx = lc.getContext("2d"), im = lx.createImageData(lw, lh), d = im.data;
   for (let j = 0; j < lh; j++) for (let i = 0; i < lw; i++) {
-    const n = fbm(i / 26, j / 26), dry = fbm(i / 60 + 9, j / 60 + 3), k = (j * lw + i) * 4;
-    const t = Math.max(0, Math.min(1, (n - .25) / .5)), y = Math.max(0, (dry - .58) * 2.2);
-    d[k] = 92 + 52 * t + 46 * y; d[k + 1] = 152 + 48 * t + 12 * y; d[k + 2] = 48 + 22 * t - 10 * y; d[k + 3] = 255;
+    const n = fbm(i / 26, j / 26), dry = fbm(i / 60 + 9, j / 60 + 3), wet = fbm(i / 14 + 31, j / 14 + 17), k = (j * lw + i) * 4;
+    const t = Math.max(0, Math.min(1, (n - .25) / .5)), y = Math.max(0, (dry - .56) * 2.4), m = 1 - .16 * Math.max(0, (wet - .5) * 2.4);
+    d[k] = (80 + 40 * t + 74 * y) * m; d[k + 1] = (132 + 36 * t + 30 * y) * m; d[k + 2] = (46 + 14 * t + 2 * y) * m; d[k + 3] = 255;
   }
   lx.putImageData(im, 0, 0);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(lc, 0, 0, W, H);
@@ -2548,7 +2548,8 @@ function fitScreen() {
   r.setProperty("--vw", (w || window.innerWidth) + "px"); r.setProperty("--vh", (h || window.innerHeight) + "px");
   try { fitCam(); applyCam(); } catch (e) {}   // camera not set up yet on the very first call
 }
-const refit = () => { if (!alive()) return; fitScreen(); setTimeout(fitScreen, 250); setTimeout(fitScreen, 700); };
+let refitT = 0;
+const refit = () => { if (!alive()) return; clearTimeout(refitT); refitT = setTimeout(() => { fitW = window.innerWidth; fitH = window.innerHeight; fitScreen(); }, 450); };
 ["resize", "orientationchange"].forEach(ev => window.addEventListener(ev, refit));
 if (window.visualViewport) window.visualViewport.addEventListener("resize", refit);
 document.addEventListener("fullscreenchange", refit); document.addEventListener("webkitfullscreenchange", refit);
@@ -2556,12 +2557,16 @@ const unscroll = () => { const r = $("root"); if (r && (r.scrollLeft || r.scroll
 $("root").addEventListener("scroll", unscroll); window.addEventListener("scroll", unscroll);
 document.addEventListener("focusout", () => setTimeout(() => { unscroll(); fitScreen(); }, 350));
 let fitW = 0, fitH = 0;
-setInterval(() => { if (!alive()) return; unscroll(); const w = window.innerWidth, h = window.innerHeight; if (w !== fitW || h !== fitH) { fitW = w; fitH = h; fitScreen(); } }, 700);
+let pendW = 0, pendH = 0, pendT = 0;
+setInterval(() => { if (!alive()) return; unscroll(); const w = window.innerWidth, h = window.innerHeight;
+  if (w === fitW && h === fitH) return;
+  if (w !== pendW || h !== pendH) { pendW = w; pendH = h; pendT = Date.now(); return; }   // wait until the size stays the same
+  if (Date.now() - pendT > 500) { fitW = w; fitH = h; fitScreen(); } }, 300);
 (function addAppMeta() {
   const m = [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"], ["theme-color", "#8fc456"]];
   m.forEach(([n, c]) => { if (!document.querySelector(`meta[name="${n}"]`)) { const e = document.createElement("meta"); e.name = n; e.content = c; document.head.appendChild(e); } });
 })();
-fitScreen();
+fitScreen(); fitW = window.innerWidth; fitH = window.innerHeight;
 
 // ---------- Camera: drag to look around ----------
 // zoom: pinch with two fingers (or ctrl + mouse wheel); remembered on this device
@@ -4243,8 +4248,8 @@ function setup3D(T) {
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   const maxTex = Math.min(4096, renderer.capabilities.maxTextureSize || 4096);
   const scene3 = new T.Scene();
-  scene3.background = new T.Color("#a9c98a");
-  scene3.fog = new T.Fog("#cfe0c4", 36, 82);
+  scene3.background = new T.Color("#b9cfb4");
+  scene3.fog = new T.Fog("#c4d6c6", 30, 80);
   const camera = new T.PerspectiveCamera(30, 1, 1, 200);
   const hemi = new T.HemisphereLight("#e6f0ff", "#5b6e3a", .62); scene3.add(hemi);
   const sun = new T.DirectionalLight("#ffe2b8", 2.75);
@@ -4319,7 +4324,7 @@ function setup3D(T) {
   const sprite = (tex, w, h, o) => { const s = new T.Sprite(new T.SpriteMaterial(Object.assign({ map: tex, depthWrite: false, transparent: true }, o || {}))); s.scale.set(w, h, 1); return s; };
 
   // ---------- ground ----------
-  const outer = mesh(G.plane, M("#86b552"), COLS / 2, -.02, ROWS / 2, 160, 1, 160, false); scene3.add(outer);
+  const outer = mesh(G.plane, M("#6f9a44"), COLS / 2, -.02, ROWS / 2, 160, 1, 160, false); scene3.add(outer);
   const groundMat = new T.MeshLambertMaterial({ color: "#ffffff" });
   const ground = mesh(G.plane, groundMat, (RX + RW / 2) / CELL, 0, (RY + RH / 2) / CELL, RW / CELL, 1, RH / CELL, false); scene3.add(ground);
   const detailTex = canvasTex("gdetail", 256, 256, (x, w, h) => {
@@ -4333,6 +4338,8 @@ function setup3D(T) {
   detailTex.wrapS = detailTex.wrapT = T.RepeatWrapping; detailTex.repeat.set(RW / CELL / 2.2, RH / CELL / 2.2); detailTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const detail = new T.Mesh(G.plane, new T.MeshBasicMaterial({ map: detailTex, transparent: true, depthWrite: false, opacity: .55 }));
   detail.position.set((RX + RW / 2) / CELL, .003, (RY + RH / 2) / CELL); detail.scale.set(RW / CELL, 1, RH / CELL); detail.renderOrder = 0; scene3.add(detail);
+  { const t2 = detailTex.clone(); t2.needsUpdate = true; t2.repeat.set(160 / 2.2, 160 / 2.2); const od = new T.Mesh(G.plane, new T.MeshBasicMaterial({ map: t2, transparent: true, depthWrite: false, opacity: .5 }));
+    od.position.set(COLS / 2, -.015, ROWS / 2); od.scale.set(160, 1, 160); scene3.add(od); }
   let groundKey = "", groundUrl = "";
   function wantGround() {
     const key = scene.kind === "plaza" ? "plaza3d" : "farm3d";
@@ -4481,7 +4488,7 @@ function setup3D(T) {
   const leafGeo = lumpy(3), farLeafGeo = lumpy(1);   // the forest ring is far away: a much lighter shape is enough
   sharedGeoExtra.push(leafGeo, farLeafGeo);
   const trunkGeo = new T.CylinderGeometry(.55, 1, 1, 9); sharedGeoExtra.push(trunkGeo);
-  const LEAF = ["#3c7a27", "#4a8a2f", "#57993a", "#33702a"];
+  const LEAF = ["#2f6a22", "#41802c", "#4f8b36", "#2a5c1f"];
   function buildTree(x, z, ripe, seed) {
     const g = new T.Group(), k = seed || 0;
     blob(g, x + .12, z + .05, 1.7, 1.5, .6);
@@ -4966,12 +4973,14 @@ function setup3D(T) {
   };
 
   // ---------- per frame ----------
-  let lastW = 0, lastH = 0, sceneSig = "";
+  let lastW = 0, lastH = 0, sceneSig = "", rsW = 0, rsH = 0, rsT = 0;
   let charS = 1.2, shX = NaN, shZ = NaN;
   const D0 = 27, TILT = 1.12;   // camera distance (at zoom 1) and pitch (radians above the ground)
   R3.frame = t => {
     const w = cv.clientWidth, h = cv.clientHeight;
-    if (w !== lastW || h !== lastH) { lastW = w; lastH = h; renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); }
+    if (w !== lastW || h !== lastH) {   // resize the drawing buffer only once the size has settled
+      const nw = performance.now(); if (w !== rsW || h !== rsH) { rsW = w; rsH = h; rsT = nw; }
+      if (!lastW || nw - rsT > 300) { lastW = w; lastH = h; renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); } }
     const sig = scene.kind + (scene.owner || "");
     if (sig !== sceneSig) { sceneSig = sig; R3.dirty = true; }
     wantGround();
@@ -4980,7 +4989,7 @@ function setup3D(T) {
     const tx = (cam.x + cam.w / 2) / CELL, tz = (cam.y + cam.h / 2) / CELL;
     const D = D0 * ZOOM;
     camera.position.set(tx, Math.sin(TILT) * D, tz + Math.cos(TILT) * D); camera.lookAt(tx, 0, tz - .3);
-    scene3.fog.near = D * 1.5; scene3.fog.far = D * 3.4;
+    scene3.fog.near = D * 1.05; scene3.fog.far = D * 2.9;
     // the shadow map is drawn only when the scene or the (snapped) light position changes, not every frame
     const sb = Math.max(14, 22 * ZOOM) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
     const stx = Math.round(tx / 3) * 3, stz = Math.round(tz / 3) * 3;
