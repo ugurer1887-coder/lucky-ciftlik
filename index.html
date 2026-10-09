@@ -49,6 +49,7 @@ html{background:var(--bg)}
 #gHits_v8 rect{fill:none;pointer-events:all}
 #stage_v8{position:absolute;inset:0;touch-action:none;user-select:none;-webkit-user-select:none}
 #c3d_v8{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:none;outline:none}
+html,body{background:#000!important}
 #vig_v8{position:absolute;inset:0;pointer-events:none;display:none;background:radial-gradient(ellipse 75% 70% at 50% 48%,rgba(0,0,0,0) 55%,rgba(20,30,10,.22) 100%)}
 #farm_v8{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
 
@@ -300,16 +301,16 @@ html{background:var(--bg)}
 .mailrow .big{width:auto!important;min-height:34px;padding:5px 12px;font-size:.82rem}
 .modal .compose input,.modal .compose textarea{width:100%;margin:0 0 8px;text-align:left;border:2px solid transparent;border-radius:12px;padding:9px 12px;font:inherit;font-weight:700;background:var(--panel);color:var(--fieldInk)}
 .modal .compose textarea{min-height:70px;resize:vertical}
-#marketBody_v8{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
-#marketBody_v8>.card{grid-template-columns:1fr;gap:6px;margin:0;padding:8px;text-align:center;align-content:start}
-#marketBody_v8>.card .thumb{width:100%;height:72px;margin:0 auto}
+#marketBody_v8{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px;align-content:start}
+#marketBody_v8>.card{grid-template-columns:1fr;gap:4px;margin:0;padding:6px;text-align:center;align-content:start}
+#marketBody_v8>.card .thumb{width:100%;height:46px;margin:0 auto}
 #marketBody_v8>.card .thumb svg{height:100%;width:auto}
-#marketBody_v8>.card h3{font-size:.95rem;margin:0}
-#marketBody_v8>.card p{margin:0;font-size:.8rem}
+#marketBody_v8>.card h3{font-size:.82rem;margin:0}
+#marketBody_v8>.card p{margin:0;font-size:.72rem}
 #marketBody_v8>.card .row{justify-content:center;margin-top:4px;gap:6px}
-#marketBody_v8>.card .row .big{padding:6px 10px;font-size:.78rem;min-height:34px}
-#marketBody_v8>.card .stepper b{min-width:44px;font-size:.8rem}
-#marketBody_v8>.card .stepper button{width:30px;height:30px}
+#marketBody_v8>.card .row .big{padding:4px 8px;font-size:.72rem;min-height:30px}
+#marketBody_v8>.card .stepper b{min-width:36px;font-size:.74rem}
+#marketBody_v8>.card .stepper button{width:26px;height:26px}
 #marketBody_v8>.note,#marketBody_v8>.empty,#marketBody_v8>.sub{grid-column:1/-1}
 #marketBody_v8>.sres{margin:0;flex-direction:column;text-align:center;gap:4px}
 /* ---- modern buttons (v47) ---- */
@@ -900,7 +901,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "75";
+const VERSION = "76";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2570,7 +2571,8 @@ fitScreen(); fitW = window.innerWidth; fitH = window.innerHeight;
 
 // ---------- Camera: drag to look around ----------
 // zoom: pinch with two fingers (or ctrl + mouse wheel); remembered on this device
-let ZOOM = 1; try { ZOOM = Math.max(.45, Math.min(2.2, +localStorage.getItem("lucky-zoom") || 1)); } catch (e) {}
+const ZOOM_MAX = 1.55;
+let ZOOM = 1; try { ZOOM = Math.max(.45, Math.min(ZOOM_MAX, +localStorage.getItem("lucky-zoom") || 1)); } catch (e) {}
 const cam = { x: 0, y: 0, w: 1600, h: 900, follow: true, lastDrag: 0, vx: 0, vy: 0 };
 const DRAG_GAIN = 1.6;
 const svgEl = $("stage"), svgReal = $("farm");
@@ -2666,7 +2668,7 @@ svgEl.addEventListener("pointerup", endDrag);
 svgEl.addEventListener("pointercancel", endDrag);
 function setZoom(z, keep) {
   const cx = cam.x + cam.w / 2, cy = cam.y + cam.h / 2;
-  ZOOM = Math.max(.45, Math.min(2.2, z)); fitCam(); cam.x = cx - cam.w / 2; cam.y = cy - cam.h / 2; clampCam(); applyCam();
+  ZOOM = Math.max(.45, Math.min(ZOOM_MAX, z)); fitCam(); cam.x = cx - cam.w / 2; cam.y = cy - cam.h / 2; clampCam(); applyCam();
   if (!keep) try { localStorage.setItem("lucky-zoom", ZOOM.toFixed(2)); } catch (e) {}
 }
 const touchPts = new Map(); let pinch = null;
