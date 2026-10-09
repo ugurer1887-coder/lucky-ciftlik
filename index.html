@@ -2,7 +2,7 @@
 <title>Lucky Çiftlik</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Layout: the farm board fills the whole landscape screen; HUD floats top-left, dock floats right, sheets slide in from the right.
    In portrait the whole game is rotated 90° so it is always played sideways. */
@@ -922,7 +922,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "78";
+const VERSION = "79";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -4136,6 +4136,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 79, d: "9 Ekim 2026", e: "⚡", t: "Daha hızlı açılış", c: "#3f7a26", b: "#e3f0c8", items: [
+    "Oyun açılırken ortada beliren ilk görüntü artık çok daha kısa sürüyor, yükleme ekranı hemen geliyor.",
+  ] },
   { v: 78, d: "9 Ekim 2026", e: "🎡", t: "Şans çarkı yenilendi!", c: "#e0473a", b: "#ffe1d9", items: [
     "Meydandaki dilek çeşmesinde artık <b>%1 ihtimalle 100 kat</b> kazanma şansı var!",
     "%25 ihtimalle attığın altının 2 katı, %34 ihtimalle altının geri geliyor.",
