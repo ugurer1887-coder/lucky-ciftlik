@@ -8,7 +8,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - **Kaynak:** bu depo (`ugurer1887-coder/lucky-ciftlik`). Oyunun tamamı tek dosya: `index.html`.
 - **Yayın:** `main` dalına yapılan her push'u Netlify otomatik yayına alır (Netlify Personal plan, ayda 1.000 kredi, her yayın 15 kredi). Değişiklikleri toplu push edin.
 - **Sunucu:** Firebase (proje: `luckytr-ciftlik`), Realtime Database + Google girişi. Admin hesabı: `ugur_er_1@hotmail.com`.
-- **Google Play:** paket adı `com.luckytr.ciftlik`, TWA. Artık PWABuilder değil, depodaki `android/` projesi kullanılıyor (bkz. `android/README.md`). Dahili test kanalında son yüklenen: sürüm kodu 6 (1.0.5). Bir sonraki paket sürüm kodu 7 olmalı.
+- **Google Play:** paket adı `com.luckytr.ciftlik`, TWA. Artık PWABuilder değil, depodaki `android/` projesi kullanılıyor (bkz. `android/README.md`). Dahili test kanalında son yüklenen: sürüm kodu 6 (1.0.5). Hazır bekleyen: sürüm kodu 7 (1.0.6, bildirim izni ve DelegationService). Bir sonraki paket 8 olmalı.
   - Paketi GitHub Actions ("Android paketi") derleyip imzalar; `android/` değişince çalışır, `.aab` çalıştırmanın Artifacts bölümünden indirilir.
   - İmza: depo gizli değerleri `KEYSTORE_BASE64` ve `KEYSTORE_PASSWORD` (alias `my-key-alias`). Şifre depoya yazılmaz.
   - minSdk 24, targetSdk 36 (Play şartı). Açılışta simge yok (sistem açılış ekranı yükleme ekranının mavisi #BFE6F7), sticky-immersive tam ekran, çentikli kenar da kullanılır (`android/app/src/main/java/com/luckytr/ciftlik/LauncherActivity.java`).
@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 83). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 84). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -36,6 +36,12 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Admin paneli (sarı kalkan): "Bütün oyuncuları sıfırla" düğmesi her oyuncuya `admin/{id}/reset = {ts}` yazar; oyuncu bağlanınca `resetMe()` çiftliğini sıfırlar (ad, karakter, arkadaşlar, alınmış mektup ödülleri kalır; `S.resetAt`).
 - Admin paneli (sarı kalkan): ban/kick (süreli), altın verme/alma, toplu mektup/ödül, istatistik.
 - Diğer: mektup kutusu, sıralama (haftalık/aylık/genel), iş ilanları (20 dk), küfür filtresi, benzersiz isimler, dekor marketi, fırın.
+
+## Hasat bildirimleri (Web Push)
+- Oyun `push/{uid} = { sub, due, sent, on }` yazar; `due` sıradaki ekin/ağaç/ekmek hazır olma zamanı (`nextReadyAt`, `pushDue`). Ayarlar'da aç/kapa, ilk sulamada bir kez sorulur (`notifAsk`).
+- `netlify/functions/harvest-push.mjs` 5 dakikada bir çalışır (bağımlılıksız, VAPID imzası Node crypto ile), içeriksiz push yollar; yazıyı `sw.js` gösterir. Oyun açık ve odaktaysa bildirim gösterilmez.
+- Netlify ortam değişkenleri: `FIREBASE_DB_SECRET`, `VAPID_PUBLIC` (oyundaki `VAPID_PUBLIC` ile aynı), `VAPID_PRIVATE_D` (özel anahtar, depoda YOK, sahibinde).
+- Firebase kuralı: `"push": { ".indexOn": ["due"], "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }`.
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.

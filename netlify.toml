@@ -1,0 +1,5 @@
+# Lucky Çiftlik: site depo kökünden yayınlanır (derleme yok); netlify/functions içindeki
+# zamanlanmış fonksiyon "hasadın hazır" bildirimlerini gönderir.
+[build]
+  publish = "."
+  functions = "netlify/functions"

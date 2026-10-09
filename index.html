@@ -563,6 +563,10 @@ body{font-family:var(--body);letter-spacing:.1px}
 .qcard.next .qe{filter:grayscale(.5)}
 .qcard .qwait{font-weight:800;color:#2f9a43}
 .admreset{width:auto!important;min-height:30px!important;padding:4px 12px!important;font-size:.76rem!important;margin-left:auto}
+#notifAsk_v8 .box{max-width:380px;background:linear-gradient(180deg,#fff8e1,#e9f8ff);color:#2a2410}
+#notifAsk_v8 h1{font-size:1.25rem;margin:4px 0 6px}#notifAsk_v8 p{font-size:.88rem;color:#5c5240;margin:0 0 12px}
+.nbell{font-size:2.6rem;line-height:1;animation:nBell 1.4s ease-in-out infinite;display:inline-block;transform-origin:50% 10%}
+@keyframes nBell{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-14deg)}}
 .qmore{text-align:center;font-weight:800;color:#8a6a3a;font-size:.84rem;margin:2px 0 10px}
 .qdone-all{border-radius:18px;padding:14px;margin:0 0 10px;text-align:center;font:700 1rem Fredoka,Nunito,sans-serif;color:#fff;background:linear-gradient(120deg,#2f9a43,#f0a01a)}
 .coinfly{position:absolute;z-index:300;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;pointer-events:none;
@@ -808,6 +812,15 @@ body{font-family:var(--body);letter-spacing:.1px}
       <button class="big ghost" id="rankClose_v8">Kapat</button>
     </div>
   </div>
+  <div class="modal" id="notifAsk_v8">
+    <div class="box">
+      <div class="nbell">🔔</div>
+      <h1>Hasadın hazır olunca haber verelim mi?</h1>
+      <p>Oyun kapalıyken bile ekinlerin toplanmaya hazır olduğunda telefonuna bildirim gelir. İstediğin zaman Ayarlar'dan kapatabilirsin.</p>
+      <button class="big green" id="notifYes_v8">Evet, haber ver</button>
+      <button class="linkbtn" id="notifNo_v8">Şimdi değil</button>
+    </div>
+  </div>
   <div class="modal" id="quests_v8">
     <div class="box set">
       <h1><span class="h1e">📜</span> <span class="h1g">Görevler</span></h1>
@@ -838,6 +851,9 @@ body{font-family:var(--body);letter-spacing:.1px}
       <div class="sgroup">
         <div class="srow"><div><b>Müzik</b><span>Çiftlik müziği</span></div><button class="switch" id="musicSw_v8" role="switch" aria-checked="true"><i></i></button></div>
         <div class="srow"><div><b>Ses seviyesi</b></div><input type="range" id="musicVol_v8" min="0" max="100" value="50" aria-label="Müzik ses seviyesi"></div>
+      </div>
+      <div class="sgroup">
+        <div class="srow"><div><b>Hasat bildirimleri</b><span id="notifNow_v8">Ekinlerin hazır olunca telefonuna haber gelir</span></div><button class="switch" id="notifSw_v8" role="switch" aria-checked="false"><i></i></button></div>
       </div>
       <div class="sgroup">
         <div class="srow"><div><b>Grafik kalitesi</b><span id="gfxNow_v8"></span></div></div>
@@ -1084,7 +1100,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "83";
+const VERSION = "84";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1383,6 +1399,7 @@ async function flush() {
       await Promise.race([db.doc("players/" + uid).set(body), new Promise((_, no) => setTimeout(() => no({ code: "timeout" }), 8000))]);
       lastSentStr = str;
       setSaveState("Kaydedildi");
+      try { pushDue(); } catch (e) {}
     } catch (e) {
       console.error("save failed", e);
       setSaveState("Kaydedilemedi");
@@ -1400,6 +1417,7 @@ function saveOnExit() {
   S.savedAt = body.savedAt = Date.now();
   try { localStorage.setItem("ciftlik-save", JSON.stringify(Object.assign({ owner: uid || "local" }, body))); } catch (e) {}
   if (online && db && uid && str !== lastSentStr) { lastSentStr = str; try { db.doc("players/" + uid).set(body).catch(() => { lastSentStr = ""; }); } catch (e) {} }
+  try { pushDue(); } catch (e) {}
 }
 setInterval(() => { if (alive() && entered && S) { dirty = true; flush(); } }, 8000);
 document.addEventListener("visibilitychange", () => { if (document.hidden && alive()) saveOnExit(); });
@@ -1694,7 +1712,7 @@ function doAction(t) {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || !q2.c || q2.w) continue;
         if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); break; }
-        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); pop(c, "Sulandı", "#bfe9ff");
+        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); notifAsk(); pop(c, "Sulandı", "#bfe9ff");
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
@@ -3969,6 +3987,7 @@ function enterGame() {
   $("start").classList.remove("on");
   if (mv !== MAPV) save();
   renderHotbar(); renderQuest();
+  renderNotif(); if (NOTIF.on && online) notifEnable(true);   // keep the subscription fresh on this device
   try { if (localStorage.getItem("lucky-was-reset")) { localStorage.removeItem("lucky-was-reset"); setTimeout(() => toast("Çiftliğin sıfırlandı. Görevleri takip ederek yeniden başla!"), 1200); } } catch (e) {}
 
   if (online) { Object.keys(S.earned).slice(-20).forEach(listenPay); processClaims(); if (S.hire.open) writeJobAd(); }
@@ -4078,6 +4097,7 @@ const MUSIC = (() => {
 })();
 // ---------- Settings ----------
 function renderSettings() {
+  try { renderNotif(); } catch (e) {}
   document.querySelectorAll("#gfxSeg_v8 [data-gfx]").forEach(b => b.setAttribute("aria-pressed", String(b.getAttribute("data-gfx")) === String(GFX.mode)));
   $("gfxNow").textContent = !R3.on ? "3D görünüm bu cihazda kapalı" : GFX.mode === "auto" ? "Şu an: " + ["Düşük", "Orta", "Yüksek"][GFX.level] + (GFX.frameMs > 20 ? ", 30 kare" : ", 60 kare") : "Telefonun zorlanırsa Otomatik'i seç";
   $("musicSw").setAttribute("aria-checked", MUSIC.on); $("musicVol").value = Math.round(MUSIC.vol * 100); $("musicVol").disabled = !MUSIC.on;
@@ -4241,6 +4261,63 @@ function winShow(jackpot, total) {
 }
 function winHide() { clearTimeout(winT); $("winfx").classList.remove("on"); }
 $("winfx").onclick = winHide;
+
+// ---------- Harvest notifications (Web Push) ----------
+// The game writes push/{uid} = { sub, due, sent, on }: "due" is when the next crop, apple tree or bread is ready.
+// A Netlify scheduled function (netlify/functions/harvest-push.mjs) checks every 5 minutes and sends the push;
+// sw.js shows it. Players turn it on/off in Ayarlar; it is offered once after the first watering.
+const VAPID_PUBLIC = "BOMfPIzsxMXe52yFHemHZxpiq2dMyWjgmNpsGpG3JJCNqJScHpv2dIKl1_-TscRBDKMQfsea4AqRpCdbhpMgMzo";
+const NOTIF = { on: (() => { try { return localStorage.getItem("lucky-notif") === "1"; } catch (e) { return false; } })(), due: -1 };
+const notifSupported = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && location.protocol === "https:";
+const b64uBytes = s => { const b = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)); return Uint8Array.from(b, c => c.charCodeAt(0)); };
+function nextReadyAt() {
+  if (!S) return 0; const now = Date.now(); let t = Infinity;
+  (S.plots || []).forEach(p => { if (p.c && p.w) { const r = +p.w + growMs(p); if (r > now) t = Math.min(t, r); } });
+  (S.trees || []).forEach(tr => { const r = +tr.t + TREE_MS; if (r > now) t = Math.min(t, r); });
+  const B = bakeInfo(S, now); if (B.q > B.done && B.next > 0) t = Math.min(t, now + B.next);
+  return isFinite(t) ? Math.round(t) : 0;
+}
+function pushDue() {
+  if (!NOTIF.on || !db || !uid || !online || !S) return;
+  const d = nextReadyAt(); if (d === NOTIF.due) return; NOTIF.due = d;
+  try { db.doc("push/" + uid).update({ due: d }).catch(() => { NOTIF.due = -1; }); } catch (e) { NOTIF.due = -1; }
+}
+function setNotif(v) { NOTIF.on = !!v; try { localStorage.setItem("lucky-notif", v ? "1" : "0"); } catch (e) {} renderNotif(); }
+function renderNotif() {
+  const sw = $("notifSw"); if (!sw) return;
+  const ok = notifSupported(), denied = ok && Notification.permission === "denied";
+  sw.setAttribute("aria-checked", NOTIF.on && ok && !denied); sw.disabled = !ok;
+  $("notifNow").textContent = !ok ? "Bu cihaz bildirimleri desteklemiyor" : denied ? "İzin kapalı: telefon ayarlarından Lucky Çiftlik bildirimlerine izin ver" : NOTIF.on ? "Açık: ekinlerin hazır olunca haber gelir" : "Kapalı";
+}
+async function notifEnable(quiet) {
+  if (!notifSupported()) { if (!quiet) toast("Bu cihaz bildirimleri desteklemiyor"); return false; }
+  let perm = Notification.permission;
+  if (perm === "default" && !quiet) perm = await Notification.requestPermission();
+  if (perm !== "granted") { if (!quiet) { toast("Bildirim izni verilmedi. Telefon ayarlarından açabilirsin."); setNotif(false); } return false; }
+  try {
+    const reg = await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uBytes(VAPID_PUBLIC) });
+    const j = sub.toJSON();
+    if (db && uid) await db.doc("push/" + uid).set({ sub: { endpoint: j.endpoint, keys: j.keys || null }, due: nextReadyAt(), sent: 0, on: true, ts: Date.now() });
+    NOTIF.due = -1; setNotif(true); if (!quiet) toast("Hasat bildirimleri açıldı 🔔");
+    return true;
+  } catch (e) { console.error("push", e); if (!quiet) { toast("Bildirimler şu an açılamadı"); setNotif(false); } return false; }
+}
+async function notifDisable() {
+  setNotif(false);
+  try { if (db && uid) await db.doc("push/" + uid).delete(); } catch (e) {}
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (e) {}
+  toast("Hasat bildirimleri kapatıldı");
+}
+// asked once, right after the first watering (a moment where waiting for the harvest makes sense)
+function notifAsk() {
+  if (NOTIF.on || !notifSupported() || Notification.permission === "denied" || !db || !online) return;
+  try { if (localStorage.getItem("lucky-notif-asked")) return; localStorage.setItem("lucky-notif-asked", "1"); } catch (e) { return; }
+  setTimeout(() => { if (alive() && entered && !document.querySelector("#root_v8 .modal.on")) $("notifAsk").classList.add("on"); }, 900);
+}
+$("notifSw").onclick = () => { if (NOTIF.on) notifDisable(); else notifEnable(false); };
+$("notifYes").onclick = () => { $("notifAsk").classList.remove("on"); notifEnable(false); };
+$("notifNo").onclick = () => $("notifAsk").classList.remove("on");
 // ---------- Tutorial quests ----------
 // S.tut = { i: quests already claimed, c: { questId: progress }, o: window shown once }
 // progress counts for every quest that is not claimed yet, so nothing done early is lost
@@ -4524,6 +4601,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 84, d: "9 Ekim 2026", e: "🔔", t: "Hasat bildirimleri", c: "#e0762a", b: "#fff0d9", items: [
+    "Ekinlerin, elma ağaçların ya da ekmeklerin hazır olunca oyun kapalıyken bile telefonuna <b>bildirim</b> gelir.",
+    "İlk sulamandan sonra sana sorulur. İstediğin zaman <b>Ayarlar &gt; Hasat bildirimleri</b>'nden açıp kapatabilirsin.",
+  ] },
   { v: 83, d: "9 Ekim 2026", e: "🔄", t: "Yeni bir başlangıç", c: "#7650dc", b: "#ece4ff", items: [
     "Bütün çiftlikler sıfırlandı. Herkes görevlerle birlikte yeniden başlıyor, iyi şanslar!",
     "Görevler penceresinde sadece sıradaki görev görünüyor. Ödülü alınan görev listeden kalkıyor.",
