@@ -111,6 +111,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Yükleme ekranı yeniden: gün batımı gökyüzü, dönen güneş ışınları, bulanık bulutlar, kuşlar, ahır+silo+yel değirmeni silüeti, buğday tarlası şeritleri, sallanan başaklar (SVG içinde üretilmiş başak taneleri), ışık zerreleri, parlak "Lucky" logosu (parlama şeridi) + yeşil "FARM" rozeti, camsı ilerleme kartı. ID'ler aynı (`ldTip`, `ldText`, `ldFill`, `ldPct`).
 - İnek: `sculpt()` ile yontulmuş tek parça gövde/baş/burun/kulak (`COWG`), `cowHide2` yumuşak kenarlı benek dokusu, MS malzemeler, eklemli bacaklar; otlarken baş aşağıda.
 
+## v99
+- Ekin seviyeleri: buğday 1, patates 5, havuç 6, salata 8, mısır 10, patlıcan 14, kabak 18.
+- Sipariş ve günlük görev ürünleri oyuncunun kendi seviyesine göre (`lvl() >= CROPS[k].lv`; admin kilidi sayılmaz). Açılmamış ürün isteyen açık siparişler girişte yenilenir.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

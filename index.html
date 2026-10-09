@@ -1155,7 +1155,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "98";
+const VERSION = "99";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1386,11 +1386,11 @@ const MIN = 60 * 1000;
 const CROPS = {
   wheat: { name: "Buğday", seed: SEED_PRICE, sell: SELL_PRICE, ms: GROW_MS, lv: 1, xp: 2 },
   potato: { name: "Patates", seed: 10, sell: 20, ms: 4 * MIN, lv: 5, xp: 3 },
-  carrot: { name: "Havuç", seed: 15, sell: 32, ms: 15 * MIN, lv: 7, xp: 4 },
-  lettuce: { name: "Salata", seed: 20, sell: 42, ms: 20 * MIN, lv: 9, xp: 5 },
-  corn: { name: "Mısır", seed: 30, sell: 65, ms: 30 * MIN, lv: 12, xp: 6 },
-  eggplant: { name: "Patlıcan", seed: 45, sell: 100, ms: 45 * MIN, lv: 15, xp: 7 },
-  pumpkin: { name: "Kabak", seed: 70, sell: 160, ms: 60 * MIN, lv: 20, xp: 9 },
+  carrot: { name: "Havuç", seed: 15, sell: 32, ms: 15 * MIN, lv: 6, xp: 4 },
+  lettuce: { name: "Salata", seed: 20, sell: 42, ms: 20 * MIN, lv: 8, xp: 5 },
+  corn: { name: "Mısır", seed: 30, sell: 65, ms: 30 * MIN, lv: 10, xp: 6 },
+  eggplant: { name: "Patlıcan", seed: 45, sell: 100, ms: 45 * MIN, lv: 14, xp: 7 },
+  pumpkin: { name: "Kabak", seed: 70, sell: 160, ms: 60 * MIN, lv: 18, xp: 9 },
 };
 // ---------- Animals and the feed mill (ambar) ----------
 const COOP_LEVEL = 10, COOP_PRICE = 500, COOP_CAP = 10, HEN_PRICE = 100, EGG_MS = 5 * MIN, EGG_PRICE = 15;
@@ -4968,12 +4968,12 @@ const lvl = () => S.level || 1;
 const DAILY = [
   { k: "harv:wheat", e: "🌾", t: n => n + " buğday topla", ok: () => true, n: L => Math.min(120, 20 + L * 2) },
   ...["potato", "carrot", "lettuce", "corn", "eggplant", "pumpkin"].map(c => ({ k: "harv:" + c, e: ITEM_EMO[c], t: n => n + " " + CROPS[c].name.toLocaleLowerCase("tr") + " topla",
-    ok: () => cropOpen(c), n: L => Math.min(60, Math.round((c === "potato" ? 8 : 5) + L / (c === "potato" ? 1.5 : 3))) })),
+    ok: () => lvl() >= CROPS[c].lv, n: L => Math.min(60, Math.round((c === "potato" ? 8 : 5) + L / (c === "potato" ? 1.5 : 3))) })),
   { k: "plant", e: "🌱", t: n => n + " tohum ek", ok: () => true, n: L => Math.min(150, 20 + L * 2) },
   { k: "water", e: "💧", t: n => n + " ekin sula", ok: () => true, n: L => Math.min(150, 20 + L * 2) },
   { k: "sellg", e: "💰", t: n => "Depoda " + fmtBig(n) + " altınlık satış yap", ok: () => true, n: L => Math.min(20000, 60 + L * L * 6) },
   { k: "bake:bread", e: "🍞", t: n => n + " ekmek pişir", ok: hasOven, n: L => Math.min(40, 5 + Math.floor(L / 2)) },
-  { k: "bake:fries", e: "🍟", t: n => n + " patates kızartması yap", ok: () => hasOven() && cropOpen("potato"), n: L => Math.min(30, 3 + Math.floor(L / 4)) },
+  { k: "bake:fries", e: "🍟", t: n => n + " patates kızartması yap", ok: () => hasOven() && lvl() >= CROPS.potato.lv, n: L => Math.min(30, 3 + Math.floor(L / 4)) },
   { k: "harv:apple", e: "🍎", t: n => n + " elma topla", ok: () => (S.trees || []).length > 0, n: L => Math.max(1, Math.min((S.trees || []).length * 2, 3 + Math.floor(L / 5))) },
   { k: "prod:egg", e: "🥚", t: n => n + " yumurta topla", ok: () => (S.chickens || []).length > 0, n: L => Math.min(60, 5 + Math.floor(L / 2)) },
   { k: "prod:milk", e: "🥛", t: n => n + " süt topla", ok: () => (S.cows || []).length > 0, n: L => Math.min(30, 3 + Math.floor(L / 4)) },
@@ -5033,10 +5033,10 @@ function dailyBonusClaim() {
 const ORDER_NPC = [["👵", "Ayşe teyze"], ["👴", "Hasan amca"], ["👨‍🍳", "Aşçı Mehmet"], ["👩‍🌾", "Zeynep"], ["🧔", "Bakkal Ali"], ["👩‍🏫", "Elif öğretmen"], ["🧑‍💼", "Muhtar"], ["👧", "Küçük Defne"], ["👨‍🌾", "Çoban Yusuf"], ["👩‍🍳", "Pastacı Selin"]];
 function orderItems() {
   const L = lvl(), out = [];
-  CROP_KEYS.forEach(k => { if (!cropOpen(k)) return; const base = k === "wheat" ? 6 + L * .8 : k === "potato" ? 3 + L / 3 : 2 + L / 6; out.push([k, base]); });
+  CROP_KEYS.forEach(k => { if (lvl() < CROPS[k].lv) return; const base = k === "wheat" ? 6 + L * .8 : k === "potato" ? 3 + L / 3 : 2 + L / 6; out.push([k, base]); });
   if ((S.trees || []).length) out.push(["apple", 2 + L / 6]);
   if (hasOven()) out.push(["bread", 2 + L / 4]);
-  if (hasOven() && cropOpen("potato")) out.push(["fries", 2 + L / 6]);
+  if (hasOven() && lvl() >= CROPS.potato.lv) out.push(["fries", 2 + L / 6]);
   if ((S.chickens || []).length) out.push(["egg", 2 + L / 4], ["egg", 2 + L / 4]);
   if ((S.cows || []).length) out.push(["milk", 1 + L / 6], ["milk", 1 + L / 6]);
   return out;
@@ -5060,6 +5060,7 @@ function ordersEnsure() {
     if (!o || typeof o !== "object" || (o.it && !Object.entries(o.it).every(([k, q]) => STORE_KEYS.includes(k) && +q > 0)) || (!o.it && !(+o.w > 0)) || (!o.it && +o.w <= now)) { S.orders[j] = newOrder(); changed = true; }
   }
   S.orders.length = ORDER_SLOTS;
+  { const can = new Set(orderItems().map(([k]) => k)); S.orders.forEach((o, j) => { if (o && o.it && Object.keys(o.it).some(k => !can.has(k))) { S.orders[j] = newOrder(); changed = true; } }); }
   S.orders.forEach(o => { if (!o || !o.it) return; const val = Object.entries(o.it).reduce((a, [k, q]) => a + q * itemPrice(k), 0); if (o.g > val * 1.25) { o.g = Math.max(5, Math.round(val * 1.15)); o.x = Math.max(2, Math.round(val / 12)); changed = true; } });
   if (changed) save();
   return S.orders;
@@ -5325,6 +5326,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 99, d: "10 Ekim 2026", e: "🌽", t: "Ekinler daha erken", c: "#e0a01a", b: "#fff4d6", items: [
+    "Yeni açılış seviyeleri: havuç 6, salata 8, <b>mısır 10</b>, patlıcan 14, kabak 18.",
+    "Siparişler artık sadece senin seviyende açık olan ürünleri istiyor.",
+  ] },
   { v: 98, d: "9 Ekim 2026", e: "🐄", t: "Yeni yükleme ekranı ve inekler", c: "#2f6fc4", b: "#e2f0ff", items: [
     "Yepyeni yükleme ekranı: gün batımında çiftlik, sallanan başaklar ve parlayan Lucky Farm logosu.",
     "İnekler baştan yapıldı: tek parça yumuşak gövde, gerçek benekler, gerçekçi baş ve bacaklar.",
