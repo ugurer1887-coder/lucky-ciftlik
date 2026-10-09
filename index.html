@@ -816,9 +816,9 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div class="box">
       <div class="nbell">🔔</div>
       <h1>Hasadın hazır olunca haber verelim mi?</h1>
-      <p>Oyun kapalıyken bile ekinlerin toplanmaya hazır olduğunda telefonuna bildirim gelir. İstediğin zaman Ayarlar'dan kapatabilirsin.</p>
+      <p>Oyun kapalıyken bile ekinlerin, elmaların ve ekmeklerin hazır olduğunda telefonuna bildirim gelir. İstediğin zaman Ayarlar'dan kapatabilirsin.</p>
       <button class="big green" id="notifYes_v8">Evet, haber ver</button>
-      <button class="linkbtn" id="notifNo_v8">Şimdi değil</button>
+      <button class="linkbtn" id="notifNo_v8">Hayır, istemiyorum</button>
     </div>
   </div>
   <div class="modal" id="quests_v8">
@@ -1100,7 +1100,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "84";
+const VERSION = "85";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1712,7 +1712,7 @@ function doAction(t) {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || !q2.c || q2.w) continue;
         if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); break; }
-        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); notifAsk(); pop(c, "Sulandı", "#bfe9ff");
+        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); pop(c, "Sulandı", "#bfe9ff");
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
@@ -3987,7 +3987,7 @@ function enterGame() {
   $("start").classList.remove("on");
   if (mv !== MAPV) save();
   renderHotbar(); renderQuest();
-  renderNotif(); if (NOTIF.on && online) notifEnable(true);   // keep the subscription fresh on this device
+  renderNotif(); if (NOTIF.on && online) notifEnable(true); else notifAsk();   // keep the subscription fresh, or ask once on the first entry
   try { if (localStorage.getItem("lucky-was-reset")) { localStorage.removeItem("lucky-was-reset"); setTimeout(() => toast("Çiftliğin sıfırlandı. Görevleri takip ederek yeniden başla!"), 1200); } } catch (e) {}
 
   if (online) { Object.keys(S.earned).slice(-20).forEach(listenPay); processClaims(); if (S.hire.open) writeJobAd(); }
@@ -4309,11 +4309,18 @@ async function notifDisable() {
   try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (e) {}
   toast("Hasat bildirimleri kapatıldı");
 }
-// asked once, right after the first watering (a moment where waiting for the harvest makes sense)
+// asked once per device, on the first entry into the game (waits until no other window is open)
 function notifAsk() {
   if (NOTIF.on || !notifSupported() || Notification.permission === "denied" || !db || !online) return;
-  try { if (localStorage.getItem("lucky-notif-asked")) return; localStorage.setItem("lucky-notif-asked", "1"); } catch (e) { return; }
-  setTimeout(() => { if (alive() && entered && !document.querySelector("#root_v8 .modal.on")) $("notifAsk").classList.add("on"); }, 900);
+  try { if (localStorage.getItem("lucky-notif-asked")) return; } catch (e) { return; }
+  let tries = 0;
+  const show = () => {
+    if (!alive() || !entered || NOTIF.on) return;
+    if (document.querySelector("#root_v8 .modal.on") || $("loader").classList.contains("on")) { if (++tries < 40) setTimeout(show, 1500); return; }
+    try { localStorage.setItem("lucky-notif-asked", "1"); } catch (e) {}
+    $("notifAsk").classList.add("on");
+  };
+  setTimeout(show, 2500);
 }
 $("notifSw").onclick = () => { if (NOTIF.on) notifDisable(); else notifEnable(false); };
 $("notifYes").onclick = () => { $("notifAsk").classList.remove("on"); notifEnable(false); };
@@ -4603,7 +4610,7 @@ $("rankBtn").onclick = openRank;
 const UPDATES = [
   { v: 84, d: "9 Ekim 2026", e: "🔔", t: "Hasat bildirimleri", c: "#e0762a", b: "#fff0d9", items: [
     "Ekinlerin, elma ağaçların ya da ekmeklerin hazır olunca oyun kapalıyken bile telefonuna <b>bildirim</b> gelir.",
-    "İlk sulamandan sonra sana sorulur. İstediğin zaman <b>Ayarlar &gt; Hasat bildirimleri</b>'nden açıp kapatabilirsin.",
+    "Oyuna ilk girişinde bir kez sorulur. İstediğin zaman <b>Ayarlar &gt; Hasat bildirimleri</b>'nden açıp kapatabilirsin.",
   ] },
   { v: 83, d: "9 Ekim 2026", e: "🔄", t: "Yeni bir başlangıç", c: "#7650dc", b: "#ece4ff", items: [
     "Bütün çiftlikler sıfırlandı. Herkes görevlerle birlikte yeniden başlıyor, iyi şanslar!",
