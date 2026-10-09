@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.luckytr.ciftlik",
+        "sha256_cert_fingerprints": ["34:0F:13:02:FB:0B:EE:9D:34:58:79:D5:64:FB:0F:DE:8C:6B:45:52:5A:9C:72:BB:F1:59:A0:61:19:0B:39:36"]
+      }
+    }]

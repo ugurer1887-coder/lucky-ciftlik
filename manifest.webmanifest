@@ -1,0 +1,18 @@
+{
+  "name": "Lucky Çiftlik",
+  "short_name": "Lucky Çiftlik",
+  "description": "Arkadaşlarınla birlikte ek, sula, hasat et ve çiftliğini büyüt. Çevrim içi çok oyunculu çiftlik oyunu.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#8fc456",
+  "theme_color": "#8fc456",
+  "lang": "tr",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
