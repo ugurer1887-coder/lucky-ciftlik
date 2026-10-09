@@ -567,6 +567,20 @@ body{font-family:var(--body);letter-spacing:.1px}
 #notifAsk_v8 h1{font-size:1.25rem;margin:4px 0 6px}#notifAsk_v8 p{font-size:.88rem;color:#5c5240;margin:0 0 12px}
 .nbell{font-size:2.6rem;line-height:1;animation:nBell 1.4s ease-in-out infinite;display:inline-block;transform-origin:50% 10%}
 @keyframes nBell{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-14deg)}}
+#marketBody_v8>.card.locked{opacity:.62}#marketBody_v8>.card.locked .thumb{filter:grayscale(.6)}
+.ovthumb{background:linear-gradient(160deg,#ffe2a8,#f6b25a)!important;display:grid;place-items:center}.ovthumb .rec{font-size:2.2rem}
+.obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
+.oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
+.objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
+  background:rgba(30,24,16,.86);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:omIn .16s ease}
+.objmenu.on{display:flex}.objmenu::before{content:"";position:absolute;top:-7px;left:50%;margin-left:-7px;border:7px solid transparent;border-top:0;border-bottom-color:rgba(30,24,16,.86)}
+.objmenu b{color:#ffe9b8;font:700 .78rem Fredoka,Nunito,sans-serif}.objmenu div{display:flex;gap:6px}
+.objmenu button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px;padding:5px 8px;border:0;border-radius:12px;color:#3a2410;font:700 .72rem Fredoka,Nunito,sans-serif;
+  background:linear-gradient(180deg,#fff6dc,#f3d79a);box-shadow:inset 0 -3px 0 rgba(120,70,10,.25)}.objmenu button span{font-size:1.15rem;line-height:1.1}.objmenu button:active{transform:scale(.94)}
+@keyframes omIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+#root_v8,#root_v8 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+#root_v8 input,#root_v8 textarea,#root_v8 [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+#root_v8 img,#root_v8 svg{-webkit-user-drag:none}
 .qmore{text-align:center;font-weight:800;color:#8a6a3a;font-size:.84rem;margin:2px 0 10px}
 .qdone-all{border-radius:18px;padding:14px;margin:0 0 10px;text-align:center;font:700 1rem Fredoka,Nunito,sans-serif;color:#fff;background:linear-gradient(120deg,#2f9a43,#f0a01a)}
 .coinfly{position:absolute;z-index:300;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;pointer-events:none;
@@ -683,6 +697,7 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div class="hint" id="hint_v8" aria-live="polite"></div>
   </div>
 
+  <div class="objmenu" id="objMenu_v8" role="menu"></div>
   <div class="scrim" id="scrim_v8"></div>
   <section class="sheet" id="market_v8" aria-label="Market">
     <div class="sheet-head"><h2>Market</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
@@ -1100,13 +1115,13 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "86";
+const VERSION = "87";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
 const DX = 6 + SX, DY = 8 + SY;   // where the very old 28 x 14 map sits
 const OX = 6 + DX, OY = 3 + DY; // the 16x9 core (farm yard / plaza) sits in the middle of the bigger map
-const START_GOLD = 18, SEED_PRICE = 3, GROW_MS = 1 * 60 * 1000; // test süresi: 1 dakika
+const START_GOLD = 50, SEED_PRICE = 3, GROW_MS = 1 * 60 * 1000; // test süresi: 1 dakika
 const FENCE_BASE = 5, CHAT_LEVEL = 5;
 const SELL_PRICE = 5, HARVEST_MS = 500, ACT_MS = 300, WELL_UPGRADE = 300;
 const LAND_PRICE = 10, LAND_LEVEL = 5, PLOT_CAP = 500, LAND_TOTAL = PLOT_CAP - 6;   // never more than 500 fields on a farm, the 6 starting ones included
@@ -1129,7 +1144,7 @@ const QUESTS = [
   { id: "wish", e: "⛲", t: "Dilek tut", s: "Dilek tut", d: "5. seviyeye ulaş, <b>Meydan</b>'a git ve dilek çeşmesine dokunup altın atarak dilek tut.", need: 1, gold: 11, lv: 5, go: "plaza" },
   { id: "jobs", e: "📋", t: "İş ilanları", s: "İlanlara bak", d: "Meydandaki <b>İş ilanı</b> tabelasına bak. Başka çiftçilerin tarlasında çalışıp altın kazanabilirsin.", need: 1, gold: 12, go: "jobs" },
 ];
-const OVEN_PRICE = 200, BREAD_MS = 2 * 60 * 1000, WHEAT_PER_BREAD = 2, BREAD_PRICE = 20, JOB_LEVEL = 5;
+const FRIES_PRICE = 60, OVEN_PRICE = 40, BREAD_MS = 150 * 1000, WHEAT_PER_BREAD = 2, BREAD_PRICE = 20, JOB_LEVEL = 5;
 const TREE_PRICE = 20, APPLE_PRICE = 45, TREE_MS = 30 * 60 * 1000;   // apple trees grow on their own, no watering
 const WAGE_MIN = 1, WAGE_MAX = 20;
 const idx = (r, c) => r * COLS + c, colOf = i => i % COLS, rowOf = i => Math.floor(i / COLS);
@@ -1139,8 +1154,8 @@ const g4 = (r, c) => idx(r + SY, c + SX);           // a cell given in the previ
 const area = (r0, r1, c0, c1) => { const s = new Set(); for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) s.add(idx(r, c)); return s; };
 const coreArea = (r0, r1, c0, c1) => area(r0 + OY, r1 + OY, c0 + OX, c1 + OX);
 // Farm yard: flat land. Buildings belong to each player and can be moved; these are only the starting spots.
-const OBJ = { oven: { w: 2, h: 2, name: "Fırın" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Tabela" } };
-const DEFAULT_LAYOUT = { house: at(0,0), barn: at(0,11), well: at(0,15), scare: at(3,8), sign: at(3,0) };
+const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Tabela" } };
+const DEFAULT_LAYOUT = { house: at(0,0), barn: at(0,11), well: at(4,9), scare: at(3,8), sign: at(3,0) };
 const DEFAULT_SOIL = [at(4,5), at(4,6), at(4,7), at(5,5), at(5,6), at(5,7)];
 const ROAD = area(ROWS - 1, ROWS - 1, 0, COLS - 1);
 // the part of the map a farmer owns: starting yard, then 3 bigger steps bought with "Alan genişletme"
@@ -1170,15 +1185,15 @@ const SPAWN_PLAZA = g4(15, 20);
 const fencePrice = bought => FENCE_BASE + Math.floor(bought / 5);
 const MAX_LEVEL = 100;
 // XP for each job: wheat harvest is the base, potato and apples 10% more, watering same as wheat
-const XP = { wheat: 2, potato: 3, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
+const XP = { fries: 5, wheat: 2, potato: 3, carrot: 4, lettuce: 5, corn: 6, eggplant: 7, pumpkin: 9, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
 // every level needs 15% more than the one before; overall 30% slower than before (old need x 6 for the bigger XP numbers x 1.3)
 const XP_BASE = 15.6;
 // +15% every level, and from level 5 on an extra +10% that stacks again every 5 levels (5, 10, 15, ...)
 // after level 60 each level grows only 5% instead of 15%, and everything from 60 on is 30% easier
 const lvGrow = lv => lv < 60 ? Math.pow(1.15, Math.max(0, lv - 1)) : Math.pow(1.15, 58) * Math.pow(1.05, lv - 59);
 const xpNeed = lv => Math.round(XP_BASE * lvGrow(lv) * Math.pow(1.1, Math.floor(Math.max(0, lv) / 5)) * (lv >= 60 ? .7 : 1) * (lv >= 90 ? .85 : 1) * (lv >= 5 && lv < 20 ? 1.1 : 1) * (lv >= 5 && lv < 10 ? 1.15 : 1));
-const WELL3_PRICE = 500, SPR_PRICE = 100, SPR_CAP = 50, SPR_R = 3, SPR_N = 4;   // waters the 4 nearest crops (within 3 squares)
-const SPR_MAX = 5, SPR_CAPS = [0, 50, 75, 100, 150, 200], SPR_NS = [0, 4, 6, 8, 10, 12], SPR_UP = [0, 400, 800, 1500, 2500];
+const WELL3_PRICE = 500, SPR_PRICE = 400, SPR_CAP = 50, SPR_R = 3, SPR_N = 4;   // waters the 4 nearest crops (within 3 squares)
+const SPR_MAX = 6, SPR_CAPS = [0, 50, 75, 100, 150, 200, 250], SPR_NS = [0, 4, 6, 8, 10, 12, 14], SPR_UP = [0, 600, 850, 1500, 2250, 3500];
 const sprLv = f => Math.max(1, Math.min(SPR_MAX, Math.floor(+(f && f.sprLv) || 1)));
 const sprCap = () => SPR_CAPS[sprLv(S)], sprN = () => SPR_NS[sprLv(S)];
 const sprAt = (farm, i) => (farm.spr || []).find(s => s.cell === i);
@@ -1282,7 +1297,7 @@ function layoutOk(farm, from) {
   const seen = flood(from, bl), any = s => [...s].some(c => seen.has(c));
   return farm.plots.every(p => seen.has(p.cell)) && (farm.trees || []).every(t => any(sidesOf([t.cell], bl)))
     && any(sidesOf([farm.layout.well], bl)) && barnDoors(farm).some(c => seen.has(c)) && seen.has(doorOf(farm))
-    && !(farm.layout.oven >= 0 && !any(sidesOf(fpCells("oven", farm.layout.oven), bl)));
+    && OVENS.every(id => !(farm.layout[id] >= 0 && !any(sidesOf(fpCells(id, farm.layout[id]), bl))));
 }
 function cleanLayout(raw, mapv) {
   const L = {};
@@ -1326,15 +1341,27 @@ function cleanDecor(raw, mapv, taken) {
   return out.slice(0, 160);
 }
 // crops: seed price, sell price in the depot, growing time after watering
-const CROPS = { wheat: { name: "Buğday", seed: SEED_PRICE, sell: SELL_PRICE, ms: GROW_MS }, potato: { name: "Patates", seed: 10, sell: 20, ms: 10 * 60 * 1000 } };
+// lv: level the seed unlocks at; xp: given on planting and again on harvest
+const MIN = 60 * 1000;
+const CROPS = {
+  wheat: { name: "Buğday", seed: SEED_PRICE, sell: SELL_PRICE, ms: GROW_MS, lv: 1, xp: 2 },
+  potato: { name: "Patates", seed: 10, sell: 20, ms: 4 * MIN, lv: 5, xp: 3 },
+  carrot: { name: "Havuç", seed: 15, sell: 32, ms: 15 * MIN, lv: 7, xp: 4 },
+  lettuce: { name: "Salata", seed: 20, sell: 42, ms: 20 * MIN, lv: 9, xp: 5 },
+  corn: { name: "Mısır", seed: 30, sell: 65, ms: 30 * MIN, lv: 12, xp: 6 },
+  eggplant: { name: "Patlıcan", seed: 45, sell: 100, ms: 45 * MIN, lv: 15, xp: 7 },
+  pumpkin: { name: "Kabak", seed: 70, sell: 160, ms: 60 * MIN, lv: 20, xp: 9 },
+};
+const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries"];
+const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
 const growMs = p => cropOf(p).ms;
 const ripe = p => !!(p && p.c && p.w && Date.now() - p.w >= growMs(p));
 // tools in the bottom bar: how many ripe crops one swing gathers
-const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 500, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
+const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 1000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
   tractor: { name: "Traktör", n: 4, price: 10000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M6 25V17h8l3-8h10v16z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6" stroke-linejoin="round"/><path d="M18.5 11h7v7h-9z" fill="#bfe6f7" stroke="#7a1f14" stroke-width="1.3"/><path d="M27 17h8v8h-8z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6"/><path d="M31 17V9" stroke="#3b3b3b" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="28" r="8.5" fill="#2b2b2b"/><circle cx="12" cy="28" r="3.6" fill="#f2c14e"/><circle cx="32" cy="31" r="5" fill="#2b2b2b"/><circle cx="32" cy="31" r="2" fill="#f2c14e"/></svg>' },
-  seeder: { name: "Ekim aleti", n: 2, price: 300, kind: "plant", icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M33 4L22 19" stroke="#8a5a32" stroke-width="3.2" stroke-linecap="round"/><path d="M29 6.5h7" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M9 13h15l-3 12H12z" fill="#3fa34d" stroke="#1f5a28" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 17h11" stroke="#bfe9a8" stroke-width="1.6"/><circle cx="16.5" cy="30" r="6.5" fill="#3b3b3b"/><circle cx="16.5" cy="30" r="2.5" fill="#f2c14e"/><g fill="#e9d29a" stroke="#a8843f" stroke-width=".8"><ellipse cx="6" cy="36" rx="1.8" ry="1.2"/><ellipse cx="27" cy="36.5" rx="1.8" ry="1.2"/><ellipse cx="32" cy="34" rx="1.8" ry="1.2"/></g></svg>' } };
-const TOOL_LEVEL = { tractor: 30 };   // tools that unlock later
+  seeder: { name: "Ekim aleti", n: 2, price: 500, kind: "plant", icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M33 4L22 19" stroke="#8a5a32" stroke-width="3.2" stroke-linecap="round"/><path d="M29 6.5h7" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M9 13h15l-3 12H12z" fill="#3fa34d" stroke="#1f5a28" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 17h11" stroke="#bfe9a8" stroke-width="1.6"/><circle cx="16.5" cy="30" r="6.5" fill="#3b3b3b"/><circle cx="16.5" cy="30" r="2.5" fill="#f2c14e"/><g fill="#e9d29a" stroke="#a8843f" stroke-width=".8"><ellipse cx="6" cy="36" rx="1.8" ry="1.2"/><ellipse cx="27" cy="36.5" rx="1.8" ry="1.2"/><ellipse cx="32" cy="34" rx="1.8" ry="1.2"/></g></svg>' } };
+const TOOL_LEVEL = { seeder: 10, escythe: 15, tractor: 30 };   // tools that unlock later
 const HARVEST_TOOLS = k => TOOLS[k] && TOOLS[k].kind !== "plant";
 const seederOn = () => !!(S && scene.kind !== "plaza" && S.slot === "seeder" && S.tools.includes("seeder"));
 let plantCrop = "wheat";
@@ -1369,7 +1396,7 @@ const $ = id => document.getElementById(id + "_v8");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 function newPlayer(name, g) {
-  return { name, g, gold: START_GOLD, xp: 0, level: 1, bucket: 0, fences: [], fencesBought: 0, friends: [], well: 1, store: { wheat: 0, apple: 0, potato: 0, bread: 0 }, tools: ["scythe"], slot: "scythe",
+  return { name, g, gold: START_GOLD, xp: 0, level: 1, bucket: 0, fences: [], fencesBought: 0, friends: [], well: 1, store: Object.fromEntries(STORE_KEYS.map(k => [k, 0])), tools: ["scythe"], slot: "scythe",
            plots: DEFAULT_SOIL.map(cell => ({ cell, c: null, p: 0, w: 0 })), landBought: 0, mapv: MAPV,
            layout: Object.assign({}, DEFAULT_LAYOUT), trees: [], size: 0,
            hire: { open: false, wage: 2 }, paidOut: 0, earned: {}, created: Date.now() };
@@ -1470,7 +1497,7 @@ function gainXp(n) {
   if (S.level >= MAX_LEVEL) { S.level = MAX_LEVEL; S.xp = 0; }
 }
 function checkBroke() {
-  if (S.gold < SEED_PRICE && S.plots.every(p => !p.c) && !(S.store && (S.store.wheat || S.store.apple || S.store.potato)) && !(S.trees && S.trees.length)) { S.gold += 18; hint("Köy muhtarı sana 18 altın bıraktı."); }
+  if (S.gold < SEED_PRICE && S.plots.every(p => !p.c) && !(S.store && STORE_KEYS.some(k => k !== "bread" && +S.store[k] > 0)) && !(S.trees && S.trees.length)) { S.gold += 18; hint("Köy muhtarı sana 18 altın bıraktı."); }
 }
 
 // ---------- Characters ----------
@@ -2037,7 +2064,7 @@ function fogImage(sz) {
       const edge = sm(0, 1, (d + (wisp - .5) * 60) / 55);
       const dn = Math.hypot(Math.max(nx0 - mx, 0, mx - nx1), Math.max(ny0 - my, 0, my - ny1)), outer = 1 - sm(0, 1, (dn + (wisp - .5) * 50) / 45);
       const bottom = Math.min(1, (CELL * (ROWS - 1) - my) / 50 + .15);
-      const aC = edge * outer * (.82 + .18 * sm(.28, .72, n)) * bottom;          // white clouds over the next expansion
+      const aC = edge * (.82 + .18 * sm(.28, .72, n)) * bottom;                  // white clouds over all land that is not open yet
       const aT = .34 * (1 - outer) * sm(0, 1, d / 40) * bottom;                    // land further out: only a soft shade, no clouds
       const a = aC + (1 - aC) * aT, wc = a > 0 ? aC / a : 0;
       const c = Math.max(200, Math.min(255, 226 + 26 * n + 120 * lit));
@@ -2081,10 +2108,27 @@ const ovenInner = () => `<ellipse cx="100" cy="186" rx="94" ry="12" fill="rgba(0
   <rect x="128" y="12" width="22" height="40" fill="url(#brick_v8)" stroke="#5a2a1e" stroke-width="3"/><rect x="124" y="6" width="30" height="9" rx="2" fill="#5e3226"/>
   <path d="M64 122v-26a36 36 0 0 1 72 0v26z" fill="#2a1a10" stroke="#3e2a17" stroke-width="4"/>
   <path d="M58 124h84" stroke="#8f877b" stroke-width="6" stroke-linecap="round"/>`;
-function bakeInfo(farm, now) {
-  const b = farm && farm.bake; if (!b || !(+b.q > 0)) return { q: 0, done: 0, next: 0 };
-  const done = Math.min(+b.q, Math.max(0, Math.floor((now - b.t0) / BREAD_MS)));
-  return { q: +b.q, done, next: done < b.q ? b.t0 + (done + 1) * BREAD_MS - now : 0 };
+// ---------- Ovens: up to two (the 2nd opens at level 20), 3 levels each ----------
+// Lv1: one tray of up to 7, Lv2: 15, Lv3: two trays of 20 baking side by side. Each tray bakes one recipe, item by item.
+const OVENS = ["oven", "oven2"], OVEN2_LEVEL = 20, OVEN_CAP = [0, 7, 15, 20], OVEN_UP = [0, 1000, 3000], OVEN_MAX = 3;
+const RECIPES = {
+  bread: { name: "Ekmek", from: "wheat", n: WHEAT_PER_BREAD, ms: BREAD_MS, emoji: "🍞" },
+  fries: { name: "Patates kızartması", from: "potato", n: 2, ms: 5 * 60 * 1000, emoji: "🍟" },
+};
+const ovenLv = (farm, id) => Math.max(1, Math.min(OVEN_MAX, Math.floor(+(farm && farm.ovenLv && farm.ovenLv[id]) || 1)));
+const ovenSlots = (farm, id) => ovenLv(farm, id) >= 3 ? 2 : 1;
+const ovenOwned = (farm, id) => !!(farm && (id === "oven" ? farm.oven : farm.oven2));
+function trayOf(farm, id, k) { const b = farm && farm.bakes && farm.bakes[id]; return b && b[k] && +b[k].q > 0 ? b[k] : null; }
+function trayInfo(t, now) {
+  if (!t) return { q: 0, done: 0, next: 0, r: null };
+  const ms = (RECIPES[t.r] || RECIPES.bread).ms, done = Math.min(+t.q, Math.max(0, Math.floor((now - t.t0) / ms)));
+  return { q: +t.q, done, next: done < t.q ? t.t0 + (done + 1) * ms - now : 0, r: t.r || "bread" };
+}
+// one oven (id) or every oven together
+function bakeInfo(farm, now, id) {
+  const out = { q: 0, done: 0, next: 0 };
+  (id ? [id] : OVENS).forEach(o => [0, 1].forEach(k => { const I = trayInfo(trayOf(farm, o, k), now); out.q += I.q; out.done += I.done; if (I.next > 0 && (!out.next || I.next < out.next)) out.next = I.next; }));
+  return out;
 }
 function objectsLayer(farm, now, queued) {
   const L = farm.layout, X = a => colOf(a) * CELL, Y = a => rowOf(a) * CELL, items = [];
@@ -2092,13 +2136,13 @@ function objectsLayer(farm, now, queued) {
   let b = sprite("barn", barnInner(), -40, -4, 372, 220, X(L.barn), Y(L.barn));
   items.push([rowOf(L.barn) + 2, b]);
   items.push([rowOf(L.well) + 1, `<g transform="translate(${X(L.well) - 800} ${Y(L.well)})">${wellSvg(farm.well || 1)}</g>`]);
-  if (L.oven >= 0) {
-    const ox = X(L.oven), oy = Y(L.oven), B = farm === S ? bakeInfo(S, now) : { q: 0, done: 0 };
+  for (const oid of OVENS) if (L[oid] >= 0) {
+    const ox = X(L[oid]), oy = Y(L[oid]), B = farm === S ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
     let o = sprite("oven", ovenInner(), 0, 0, 200, 200, ox, oy);
     if (B.q > B.done) o += `<g transform="translate(${ox + 100} ${oy + 118})"><path d="M-22 0q4-26 14-30q-2 14 8 18q2-20 12-28q4 22 10 40z" fill="#f2a12e"/><path d="M-12 0q4-14 10-16q0 10 6 10q4-10 8-12q0 12 0 18z" fill="#ffe27a"/></g>
       <circle cx="${ox + 139}" cy="${oy - 2}" r="9" fill="#e9e6e0" opacity=".7"/><circle cx="${ox + 146}" cy="${oy - 20}" r="12" fill="#e9e6e0" opacity=".5"/>`;
     if (B.done > 0) o += `<g transform="translate(${ox + 158} ${oy + 26})"><circle r="24" fill="#fffdf6" stroke="#e3a72f" stroke-width="3"/><path d="M-15 6q0-17 15-17t15 17z" fill="#d48a3a" stroke="#8a4f1c" stroke-width="2"/><path d="M-6 -4l3 5M3 -6l2 6" stroke="#f3c27a" stroke-width="2.4" stroke-linecap="round"/><text y="20" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3e2a17">${B.done}</text></g>`;
-    items.push([rowOf(L.oven) + 2, o]);
+    items.push([rowOf(L[oid]) + 2, o]);
   }
   items.push([rowOf(L.scare) + 1, `<g transform="translate(${X(L.scare)} ${Y(L.scare)})">${scareInner()}</g>`]);
   const nm = String(farm.name || "Çiftçi"), fs = Math.min(17, Math.max(10, 150 / Math.max(4, nm.length)));
@@ -2281,7 +2325,28 @@ function setMode(m) {
   renderPlots(); renderFences(); renderHotbar();
 }
 const OBJ_NAME = t => OBJ[t] ? OBJ[t].name : t === "tree" ? "Elma ağacı" : t === "plot" ? "Toprak" : t === "decor" ? "Süs" : t === "spr" ? "Fıskiye" : "Çit";
-const cropSvg = (c, x, y, stage) => c === "potato" ? potatoSvg(x, y, stage) : wheatSvg(x, y, stage);
+const cropSvg = (c, x, y, stage) => c === "potato" ? potatoSvg(x, y, stage) : c === "wheat" || !CROPS[c] ? wheatSvg(x, y, stage) : vegSvg(c, x, y, stage);
+// produce pictures (used on fields when ripe, in the market and in the depot)
+const PRODUCE = {
+  carrot: (cx, cy, k) => `<path d="M${cx-6*k} ${cy-8*k}l${6*k} ${26*k}l${6*k} ${-26*k}z" fill="#f07a1e" stroke="#a84b0c" stroke-width="${1.6*k}" stroke-linejoin="round"/><path d="M${cx-3*k} ${cy-2*k}h${4*k}M${cx-2*k} ${cy+5*k}h${3*k}" stroke="#a84b0c" stroke-width="${1.2*k}"/><path d="M${cx} ${cy-8*k}l${-6*k} ${-12*k}M${cx} ${cy-8*k}l0 ${-14*k}M${cx} ${cy-8*k}l${6*k} ${-12*k}" stroke="#3f9a2f" stroke-width="${3*k}" stroke-linecap="round"/>`,
+  lettuce: (cx, cy, k) => `<circle cx="${cx}" cy="${cy}" r="${13*k}" fill="#7cc24e" stroke="#3f7a26" stroke-width="${1.6*k}"/><circle cx="${cx-5*k}" cy="${cy-3*k}" r="${8*k}" fill="#a6dc6a"/><circle cx="${cx+5*k}" cy="${cy-2*k}" r="${7*k}" fill="#93d058"/><circle cx="${cx}" cy="${cy+3*k}" r="${6*k}" fill="#c8ec8c"/><path d="M${cx} ${cy-9*k}v${16*k}M${cx-8*k} ${cy}q${8*k} ${-3*k} ${16*k} 0" stroke="#5a9a34" stroke-width="${1.2*k}" fill="none"/>`,
+  corn: (cx, cy, k) => `<path d="M${cx-11*k} ${cy+14*k}q${-2*k} ${-20*k} ${8*k} ${-28*k}l${2*k} ${28*k}z" fill="#6cb83f" stroke="#3f7a26" stroke-width="${1.4*k}"/><path d="M${cx+11*k} ${cy+14*k}q${2*k} ${-20*k} ${-8*k} ${-28*k}l${-2*k} ${28*k}z" fill="#5ea83a" stroke="#3f7a26" stroke-width="${1.4*k}"/><ellipse cx="${cx}" cy="${cy-2*k}" rx="${6.5*k}" ry="${15*k}" fill="#ffd23a" stroke="#c8901a" stroke-width="${1.5*k}"/><path d="M${cx-4*k} ${cy-10*k}h${8*k}M${cx-5*k} ${cy-4*k}h${10*k}M${cx-5*k} ${cy+2*k}h${10*k}M${cx-4*k} ${cy+8*k}h${8*k}M${cx} ${cy-16*k}v${28*k}" stroke="#e0a52a" stroke-width="${1*k}"/>`,
+  eggplant: (cx, cy, k) => `<path d="M${cx-3*k} ${cy-12*k}c${-10*k} ${4*k} ${-12*k} ${26*k} ${2*k} ${26*k}c${12*k} 0 ${10*k} ${-16*k} ${4*k} ${-24*k}z" fill="#6a3a8f" stroke="#3e1f58" stroke-width="${1.6*k}"/><path d="M${cx-4*k} ${cy-4*k}q${-2*k} ${8*k} ${2*k} ${12*k}" stroke="#a079c4" stroke-width="${2*k}" fill="none" stroke-linecap="round"/><path d="M${cx-7*k} ${cy-12*k}l${4*k} ${-3*k}l${3*k} ${2*k}l${3*k} ${-2*k}l${3*k} ${4*k}z" fill="#4f8a2f"/><path d="M${cx} ${cy-15*k}v${-5*k}" stroke="#4f8a2f" stroke-width="${2.4*k}" stroke-linecap="round"/>`,
+  pumpkin: (cx, cy, k) => `<ellipse cx="${cx}" cy="${cy}" rx="${16*k}" ry="${12*k}" fill="#f08a1a" stroke="#a8520c" stroke-width="${1.6*k}"/><path d="M${cx-6*k} ${cy-11*k}q${-4*k} ${11*k} 0 ${22*k}M${cx+6*k} ${cy-11*k}q${4*k} ${11*k} 0 ${22*k}M${cx} ${cy-12*k}v${24*k}" stroke="#c8650e" stroke-width="${1.4*k}" fill="none"/><path d="M${cx} ${cy-11*k}q${1*k} ${-6*k} ${5*k} ${-8*k}" stroke="#4f8a2f" stroke-width="${3*k}" fill="none" stroke-linecap="round"/>`,
+};
+function vegSvg(c, x, y, stage) {
+  const spots = c === "pumpkin" ? [[50, 52]] : c === "corn" ? [[26, 44], [50, 40], [74, 44], [38, 72], [62, 72]] : [[30, 36], [70, 36], [30, 70], [70, 70]];
+  let s = "";
+  if (stage === 0) { spots.forEach(([a, b]) => s += `<ellipse cx="${x+a}" cy="${y+b+6}" rx="4" ry="3" fill="#e9d29a"/>`); return s; }
+  const g = stage <= 2 ? "#6cb83f" : "#4f9a2f";
+  spots.forEach(([a, b]) => { const cx = x + a, cy = y + b, r = [0, 5, 8, 11, 11][stage] * (c === "pumpkin" ? 2 : 1);
+    if (c === "corn") { const h = [0, 12, 22, 32, 36][stage]; s += `<path d="M${cx} ${cy+14}v${-h}" stroke="${g}" stroke-width="3.5"/><path d="M${cx} ${cy+10-h*.4}q-9 -4 -12 -12M${cx} ${cy+10-h*.6}q9 -4 12 -12" stroke="${g}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      if (stage === 4) s += `<ellipse cx="${cx+4}" cy="${cy+4-h*.5}" rx="4" ry="9" fill="#ffd23a" stroke="#c8901a" stroke-width="1.5"/>`; return; }
+    s += `<circle cx="${cx-r*.6}" cy="${cy}" r="${r*.6}" fill="${g}"/><circle cx="${cx+r*.6}" cy="${cy}" r="${r*.6}" fill="${g}"/><circle cx="${cx}" cy="${cy-r*.5}" r="${r*.7}" fill="#7cc24e"/>`;
+    if (stage === 4) s += PRODUCE[c](cx, cy + 4, c === "pumpkin" ? 1.1 : .55);
+  });
+  return s;
+}
 function potatoSvg(x, y, stage) {
   const spots = [[30, 36], [70, 36], [30, 70], [70, 70]];
   let s = "";
@@ -2351,6 +2416,7 @@ function showLoader(text, ms, hold) {
   ldTimer = setTimeout(done, ms);
 }
 function enterScene(sc) {
+  try { objMenuHide(); } catch (e) {}
   setTimeout(() => { try { renderHotbar(); sendPos(true); } catch (e) {} }, 0);
   showLoader(firstScene ? "Çiftliğin hazırlanıyor" : sc.kind === "plaza" ? "Meydana gidiliyor" : sc.kind === "visit" ? (sc.farm && sc.farm.name ? sc.farm.name : "Çiftçi") + " Çiftliğine gidiliyor" : "Çiftliğine dönülüyor", firstScene ? 2600 : 3300);
   firstScene = false;
@@ -2410,7 +2476,7 @@ function visitorHere(puid) { if (scene.kind !== "home") return null; for (const 
 function cleanFarm(d) {
   const f = {
     name: censor(String(d.name || "Çiftçi")).slice(0, 16), level: Math.min(MAX_LEVEL, +d.level || 1), g: d.g === "k" ? "k" : "e",
-    well: wellLv(d), store: { wheat: Math.max(0, Math.floor(+(d.store && d.store.wheat) || 0)), apple: Math.max(0, Math.floor(+(d.store && d.store.apple) || 0)), potato: Math.max(0, Math.floor(+(d.store && d.store.potato) || 0)), bread: Math.max(0, Math.floor(+(d.store && d.store.bread) || 0)) },
+    well: wellLv(d), store: Object.fromEntries(STORE_KEYS.map(k => [k, Math.max(0, Math.floor(+(d.store && d.store[k]) || 0))])),
     plots: cleanPlots(d.plots, d.mapv), fences: [], size: farmSize(d), landBought: Math.max(0, Math.floor(+d.landBought || 0)),
     layout: cleanLayout(d.layout, d.mapv), kicks: cleanKicks(d.kicks)
   };
@@ -2463,27 +2529,7 @@ function tapHome(i) {
   if (mode === "land") return landTap(i);
   if (isFog(S, i)) { offerExpand(); return; }
   const o = occMap(S).get(i), kind = o && o.t;
-  if (kind === "scare" || kind === "sign" || kind === "decor") return;
-  if (kind === "spr") {
-    const sp = sprAt(S, i), busy = [current, ...queue].some(t => t && (t.k === "spray" || t.k === "sprfill") && t.cell === i); if (!sp || busy) return;
-    if (sp.w <= 0) { hint("Fıskiyenin suyu bitti. Çiftçin kuyudan su alıp dolduruyor."); enqueue({ k: "fill" }); enqueue({ k: "sprfill", cell: i }); return; }
-    pop(i, "Su: " + sp.w + "/" + sprCap(), "#bfe9ff");
-    enqueue({ k: "spray", cell: i }); return;
-  }
-  if (kind === "well") {
-    const fillQueued = [current, ...queue].some(t => t && t.k === "fill");
-    if (S.bucket >= bucketMax() && !fillQueued) return;
-    if (!fillQueued) enqueue({ k: "fill" });
-    return;
-  }
-  if (kind === "house") { cancelAll(); walkTo(new Set([doorOf(S)]), null); return; }
-  if (kind === "oven") { cancelAll(); if (!walkTo(sidesOf(fpCells("oven", S.layout.oven), curBlocked()), () => { renderOven(); openSheet($("oven")); })) { renderOven(); openSheet($("oven")); } return; }
-  if (kind === "barn") { cancelAll(); if (!walkTo(new Set(barnDoors(S)), () => { renderDepot(); openSheet($("depot")); })) hint("Depoya giden bir yol yok."); return; }
-  if (kind === "tree") {
-    const tr = treeAt(S, i);
-    if (treeRipe(tr)) { if (!queuedCells().has(i)) enqueue({ k: "tree", cell: i }); return; }
-    hint("Elma ağacı büyüyor, " + fmt(tr.t + TREE_MS - Date.now()) + " kaldı. Sulamaya gerek yok."); return;
-  }
+  if (kind && kind !== "plot" && kind !== "fence") { objMenuShow(i, kind); return; }
   const p = plotAt(S, i);
   if (p) {
     const q = queuedCells(); if (q.has(i)) return;
@@ -2515,6 +2561,71 @@ function tapHome(i) {
   if (curBlocked()(i)) { hint("Çitin üstüne çıkamazsın."); return; }
   walkPlain(i);
 }
+
+// ---------- Tap on a building / tree / decoration: a small action bar appears under it ----------
+// (the first button is what a tap used to do; "Taşı" picks it up to move it, like the move mode)
+function objAct(kind, i) {
+  if (kind === "spr") {
+    const sp = sprAt(S, i), busy = [current, ...queue].some(t => t && (t.k === "spray" || t.k === "sprfill") && t.cell === i); if (!sp || busy) return;
+    if (sp.w <= 0) { hint("Fıskiyenin suyu bitti. Çiftçin kuyudan su alıp dolduruyor."); enqueue({ k: "fill" }); enqueue({ k: "sprfill", cell: i }); return; }
+    pop(i, "Su: " + sp.w + "/" + sprCap(), "#bfe9ff");
+    enqueue({ k: "spray", cell: i }); return;
+  }
+  if (kind === "well") {
+    const fillQueued = [current, ...queue].some(t => t && t.k === "fill");
+    if (S.bucket >= bucketMax() && !fillQueued) return;
+    if (!fillQueued) enqueue({ k: "fill" });
+    return;
+  }
+  if (kind === "house") { cancelAll(); walkTo(new Set([doorOf(S)]), null); return; }
+  if (OVENS.includes(kind)) { const id = kind; cancelAll(); if (!walkTo(sidesOf(fpCells(id, S.layout[id]), curBlocked()), () => openOven(id))) openOven(id); return; }
+  if (kind === "barn") { cancelAll(); if (!walkTo(new Set(barnDoors(S)), () => { renderDepot(); openSheet($("depot")); })) hint("Depoya giden bir yol yok."); return; }
+  if (kind === "tree") {
+    const tr = treeAt(S, i);
+    if (treeRipe(tr)) { if (!queuedCells().has(i)) enqueue({ k: "tree", cell: i }); return; }
+    hint("Elma ağacı büyüyor, " + fmt(tr.t + TREE_MS - Date.now()) + " kaldı. Sulamaya gerek yok."); return;
+  }
+}
+const OBJ_ACTS = {
+  oven: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
+  oven2: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
+  barn: [["📦", "Depo", "use"], ["✋", "Taşı", "move"]],
+  well: [["🪣", "Su al", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
+  house: [["🚪", "Eve git", "use"], ["✋", "Taşı", "move"]],
+  spr: [["💦", "Sula", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
+  tree: [["🍎", "Topla", "use"], ["✋", "Taşı", "move"]],
+  decor: [["✋", "Taşı", "move"]], scare: [["✋", "Taşı", "move"]], sign: [["✋", "Taşı", "move"]],
+};
+let objMenu = null;   // { i, kind, x, z }
+function objMenuShow(i, kind) {
+  const acts = OBJ_ACTS[kind]; if (!acts) return objAct(kind, i);
+  const cells = kind in OBJ ? fpCells(kind, S.layout[kind]) : [i];
+  const cs = cells.map(colOf), rs = cells.map(rowOf), x = (Math.min(...cs) + Math.max(...cs) + 1) / 2, z = Math.max(...rs) + 1;
+  if (objMenu && objMenu.i === i) { objMenuHide(); return; }
+  objMenu = { i, kind, x, z };
+  const name = kind === "decor" ? ((DECOR[(occMap(S).get(i) || {}).k] || {}).name || "Süs") : OBJ_NAME(kind);
+  const tr = kind === "tree" ? treeAt(S, i) : null;
+  $("objMenu").innerHTML = `<b>${esc(name)}${kind === "tree" && !treeRipe(tr) ? ` · ${fmt(tr.t + TREE_MS - Date.now())}` : ""}</b><div>${acts.filter(a => !(kind === "tree" && a[2] === "use" && !treeRipe(tr)))
+    .map(([e, t, a]) => `<button data-oa="${a}" data-ot="${t}"><span>${e}</span>${t}</button>`).join("")}</div>`;
+  $("objMenu").classList.add("on"); objMenuPlace();
+}
+function objMenuHide() { objMenu = null; $("objMenu").classList.remove("on"); }
+function objMenuPlace() {
+  if (!objMenu) return; const el = $("objMenu"), root = $("root");
+  let px, py;
+  if (R3.on && R3.toScreen) { const p = R3.toScreen(objMenu.x, .05, objMenu.z); px = p.x; py = p.y; }
+  else { const v = viewSize(); px = (objMenu.x * CELL - cam.x) / cam.w * v.w; py = (objMenu.z * CELL - cam.y) / cam.h * v.h; }
+  const W = root.clientWidth || 800, H = root.clientHeight || 400, w = el.offsetWidth || 200, h = el.offsetHeight || 60;
+  el.style.left = Math.max(6, Math.min(W - w - 80, px - w / 2)) + "px"; el.style.top = Math.max(60, Math.min(H - h - 70, py + 6)) + "px";
+}
+$("objMenu").addEventListener("click", e => {
+  const b = e.target.closest("[data-oa]"); if (!b || !objMenu) return;
+  const { i, kind } = objMenu, a = b.getAttribute("data-oa"); objMenuHide();
+  if (a === "move") { setMode("move"); moveSel = { t: kind, from: kind in OBJ ? S.layout[kind] : i }; setMode("move"); return; }
+  if (a === "up") { mtab = "up"; renderMarket(); openSheet($("market")); return; }
+  if (b.getAttribute("data-ot") === "Geliştir" && OVENS.includes(kind)) { openOven(kind); setTimeout(() => { const u = $("ovenBody").querySelector("[data-oup]"); if (u) scrollInSheet(u.closest(".card")); }, 80); return; }
+  objAct(kind, i);
+});
 // a copy of the farm's layout to try a change on before making it
 const tryFarm = () => ({ layout: Object.assign({}, S.layout), trees: S.trees.map(t => Object.assign({}, t)), plots: S.plots.map(p => Object.assign({}, p)), fences: S.fences.slice(), decor: (S.decor || []).map(d => Object.assign({}, d)), spr: (S.spr || []).map(d => Object.assign({}, d)), size: S.size });
 const meCells = () => [cellAt(me), ...me.path];
@@ -2661,7 +2772,7 @@ function sellInfo(sel) {
   if (sel.t === "decor") { const d = (S.decor || []).find(x => x.cell === sel.from); return d && DECOR[d.t] ? { name: DECOR[d.t].name, price: DECOR[d.t].price } : null; }
   if (sel.t === "tree") return { name: "Elma ağacı", price: TREE_PRICE };
   if (sel.t === "spr") return { name: "Fıskiye", price: SPR_PRICE };
-  if (sel.t === "oven") return S.layout.oven >= 0 ? { name: "Taş fırın", price: OVEN_PRICE } : null;
+  if (OVENS.includes(sel.t)) return S.layout[sel.t] >= 0 ? { name: OBJ[sel.t].name, price: OVEN_PRICE } : null;
   if (sel.t === "fence") return { name: "Çit", price: fencePrice(Math.max(0, (S.fencesBought || 1) - 1)) };
   if (sel.t === "plot") { const pl = plotAt(S, sel.from); return pl && !pl.c ? { name: "Toprak", price: landPrice(Math.max(0, (S.landBought || 0) - 1)) } : null; }
   return null;
@@ -2670,11 +2781,11 @@ const sellBack = price => Math.floor(price * .9);
 function sellSelected() {
   const sel = moveSel, info = sellInfo(sel); if (!info) return;
   const back = sellBack(info.price);
-  if (sel.t === "oven" && bakeInfo(S, Date.now()).q > 0) { hint("Fırında ekmek varken fırını satamazsın."); return; }
+  if (OVENS.includes(sel.t) && bakeInfo(S, Date.now(), sel.t).q > 0) { hint("Fırında pişen bir şey varken fırını satamazsın."); return; }
   if (sel.t === "decor") S.decor = S.decor.filter(d => d.cell !== sel.from);
   else if (sel.t === "tree") S.trees = S.trees.filter(t => t.cell !== sel.from);
   else if (sel.t === "spr") S.spr = S.spr.filter(t => t.cell !== sel.from);
-  else if (sel.t === "oven") { S.layout.oven = -1; S.oven = false; S.bake = null; }
+  else if (OVENS.includes(sel.t)) { S.layout[sel.t] = -1; S[sel.t] = false; if (S.bakes) delete S.bakes[sel.t]; if (S.ovenLv) delete S.ovenLv[sel.t]; }
   else if (sel.t === "fence") { S.fences = S.fences.filter(f => f !== sel.from); S.fencesBought = Math.max(0, (S.fencesBought || 0) - 1); }
   else if (sel.t === "plot") { S.plots = S.plots.filter(p => p.cell !== sel.from); S.landBought = Math.max(0, (S.landBought || 0) - 1); }
   S.gold = round1(S.gold + back); pop(sel.from, "+" + fmtG(back) + " altın", "#ffe27a");
@@ -2709,8 +2820,8 @@ function tapVisit(i) {
   }
   if (kind === "house") { hint(f.name + " adlı çiftçinin evi."); return; }
   if (kind === "well") { hint(f.name + " adlı çiftçinin " + "su kuyusu."); return; }
-  if (kind === "oven") { hint(f.name + " adlı çiftçinin taş fırını."); return; }
-  if (kind === "barn") { hint(f.name + " adlı çiftçinin deposunda " + (f.store.wheat || 0) + " buğday, " + (f.store.potato || 0) + " patates ve " + (f.store.apple || 0) + " elma var."); return; }
+  if (OVENS.includes(kind)) { hint(f.name + " adlı çiftçinin taş fırını."); return; }
+  if (kind === "barn") { { const parts = [...CROP_KEYS.map(k => [k, CROPS[k].name]), ["apple", "Elma"], ["bread", "Ekmek"]].filter(([k]) => +f.store[k] > 0).map(([k, n]) => f.store[k] + " " + n.toLocaleLowerCase("tr")); hint(f.name + " adlı çiftçinin deposunda " + (parts.length ? parts.join(", ") : "bir şey yok") + "."); } return; }
   if (kind === "tree") { const tr = treeAt(f, i); hint(treeRipe(tr) ? "Elmalar toplanmayı bekliyor." : "Elma ağacı büyüyor, " + fmt(tr.t + TREE_MS - Date.now()) + " kaldı."); return; }
   if (curBlocked()(i)) return;
   walkPlain(i);
@@ -2723,7 +2834,7 @@ function tapPlaza(i) {
   walkPlain(i);
 }
 $("stage").addEventListener("click", e => {
-  tryLandscape();
+  tryLandscape(); if (objMenu) { objMenuHide(); if (!dragMoved) return; }
   if (dragMoved) { dragMoved = false; return; }
   if (R3.on) { const h = R3.pick(e.clientX, e.clientY); if (h.peer) { openProfile(h.peer); return; } if (h.cell != null) onCell(h.cell); return; }
   const pe = e.target.closest("[data-peer]");
@@ -2975,7 +3086,7 @@ function frame(ts) {
   try { step(); } catch (err) { console.error(err); }
 }
 function step() {
-  const t = performance.now();
+  const t = performance.now(); if (objMenu) objMenuPlace();
   const dt = Math.max(0, Math.min(.05, (t - lastT) / 1000)); lastT = t;
   if (me.el) {
     if (me.busy) {
@@ -3237,6 +3348,7 @@ let mtab = "crops";
 function treeThumb() { return `<svg viewBox="-55 -62 110 118" width="70" height="70"><rect x="-55" y="-62" width="110" height="118" fill="#8cbf4f"/>${treeInner(true)}</svg>`; }
 const potatoThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><ellipse cx="36" cy="60" rx="22" ry="16" fill="#d2a066" stroke="#8a5a32" stroke-width="3"/><ellipse cx="64" cy="54" rx="20" ry="15" fill="#c99358" stroke="#8a5a32" stroke-width="3"/><ellipse cx="52" cy="72" rx="17" ry="12" fill="#d8aa70" stroke="#8a5a32" stroke-width="3"/><circle cx="30" cy="56" r="2" fill="#8a5a32"/><circle cx="66" cy="50" r="2" fill="#8a5a32"/><circle cx="56" cy="72" r="1.8" fill="#8a5a32"/></svg>`;
 const appleThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><circle cx="38" cy="60" r="20" fill="#d9483a" stroke="#8e2a1e" stroke-width="3"/><circle cx="62" cy="60" r="20" fill="#d9483a" stroke="#8e2a1e" stroke-width="3"/><circle cx="50" cy="52" r="22" fill="#e25544" stroke="#8e2a1e" stroke-width="3"/><path d="M50 32q2-10 8-14" stroke="#6b4423" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M53 26q12-8 20 0q-10 6-20 0z" fill="#4f8a2f"/><ellipse cx="42" cy="44" rx="6" ry="4" fill="#fff" opacity=".45"/></svg>`;
+const cropThumb = k => k === "wheat" ? wheatThumb() : k === "potato" ? potatoThumb() : `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/>${PRODUCE[k](50, 54, 2)}</svg>`;
 function wheatThumb() { return `<svg viewBox="0 0 100 100" width="70" height="70"><rect x="5" y="5" width="90" height="90" rx="14" fill="#5e3a22"/>${wheatSvg(0, 0, 4)}</svg>`; }
 function fenceThumb() { return `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><rect x="0" y="36" width="100" height="9" rx="3" fill="#c08a4f" stroke="#7b5128" stroke-width="2.5"/><rect x="0" y="54" width="100" height="9" rx="3" fill="#c08a4f" stroke="#7b5128" stroke-width="2.5"/><rect x="18" y="26" width="18" height="44" rx="4" fill="#a8743f" stroke="#6b4423" stroke-width="3"/><rect x="64" y="26" width="18" height="44" rx="4" fill="#a8743f" stroke="#6b4423" stroke-width="3"/></svg>`; }
 function renderHire() {
@@ -3274,14 +3386,14 @@ function renderHire() {
 }
 // everything the market sells, so players can find it by typing
 const MARKET_INDEX = () => [
-  { n: "Buğday", tab: "crops", k: "tohum ekin tarla ekmek", price: CROPS.wheat.seed, th: wheatThumb },
-  { n: "Patates", tab: "crops", k: "tohum ekin tarla sebze", price: CROPS.potato.seed, th: potatoThumb },
+  ...CROP_KEYS.map(k => ({ n: CROPS[k].name, tab: "crops", k: "tohum ekin tarla sebze ekmek", price: CROPS[k].seed, th: () => cropThumb(k) })),
   { n: "Elma ağacı", tab: "crops", k: "agac meyve elma fidan", price: TREE_PRICE, th: treeThumb },
   { n: "Tırpan", tab: "tools", k: "arac hasat toplama", price: 0, th: () => TOOLS.scythe.icon },
   { n: "Elektrikli tırpan", tab: "tools", k: "arac hasat motorlu cift", price: TOOLS.escythe.price, th: () => TOOLS.escythe.icon },
   { n: "Ekim aleti", tab: "tools", k: "arac ekim tohum ekme mibzer cift", price: TOOLS.seeder.price, th: () => TOOLS.seeder.icon },
   { n: "Traktör", tab: "tools", k: "arac hasat traktor motorlu dort arac binmek", price: TOOLS.tractor.price, th: () => TOOLS.tractor.icon },
-  { n: "Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin", price: OVEN_PRICE, th: () => `<svg viewBox="-6 0 212 200" width="48" height="48">${ovenInner()}</svg>` },
+  { n: "Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma", price: OVEN_PRICE, th: () => ovenIcon() },
+  { n: "2. Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma ikinci", price: OVEN_PRICE, th: () => ovenIcon() },
   { n: "Tarla toprağı", tab: "land", k: "toprak tarla arazi", price: landPrice(S.landBought) },
   { n: "Alan genişletme", tab: "land", k: "arazi sis bolge genislet buyut", price: expandPrice(S) },
   { n: "Ahşap çit", tab: "decor", k: "cit dekor sus", price: fencePrice(S.fencesBought), th: fenceThumb },
@@ -3324,20 +3436,23 @@ function renderMarket0() {
   if (mq.trim()) { renderSearch(); return; }
   if (mtab === "crops") {
     const card = (thumb, name, price, id, label) => `<div class="card"><div class="thumb">${thumb}</div><div><h3>${name}</h3><p><span class="price">${fmtG(price)} altın</span></p><div class="row"><button class="big green sm" id="${id}_v8" ${S.gold >= price ? "" : "disabled"}>${S.gold >= price ? label : "Altının yetmiyor"}</button></div></div></div>`;
-    body.innerHTML = card(wheatThumb(), "Buğday", CROPS.wheat.seed, "buyWheat", "Satın al") + card(potatoThumb(), "Patates", CROPS.potato.seed, "buyPotato", "Satın al") + card(treeThumb(), "Elma ağacı", TREE_PRICE, "buyTree", "Satın al");
-    $("buyWheat").onclick = () => { plantCrop = "wheat"; closeAll(); setMode("plant"); };
-    $("buyPotato").onclick = () => { plantCrop = "potato"; closeAll(); setMode("plant"); };
+    body.innerHTML = CROP_KEYS.map(k => { const C = CROPS[k], open = cropOpen(k);
+      return `<div class="card${open ? "" : " locked"}"><div class="thumb">${cropThumb(k)}</div><div><h3>${C.name}</h3><p><span class="price">${fmtG(C.seed)} altın</span></p><p class="keep">${Math.round(C.ms / MIN)} dk · ${fmtG(C.sell)} altına satılır</p><div class="row">${open
+        ? `<button class="big green sm" data-crop="${k}" ${S.gold >= C.seed ? "" : "disabled"}>${S.gold >= C.seed ? "Satın al" : "Altının yetmiyor"}</button>` : `<button class="big sm" disabled>🔒 ${C.lv}. seviyede açılır</button>`}</div></div></div>`; }).join("")
+      + card(treeThumb(), "Elma ağacı", TREE_PRICE, "buyTree", "Satın al");
+    body.querySelectorAll("[data-crop]").forEach(b => b.onclick = () => { const k = b.getAttribute("data-crop"); if (!cropOpen(k)) return; plantCrop = k; closeAll(); setMode("plant"); });
     $("buyTree").onclick = () => { if (S.gold < TREE_PRICE) return; closeAll(); setMode("tree"); };
   } else if (mtab === "ovens") {
-    const own = !!S.oven, placed = S.layout.oven >= 0;
-    body.innerHTML = `<div class="card"><div class="thumb" style="background:#8cbf4f"><svg viewBox="-6 0 212 200" width="66" height="66">${ovenInner()}</svg></div><div>
-      <h3>Taş fırın</h3>
-      <p>${own ? "Sende var." : `<span class="price">${fmtG(OVEN_PRICE)} altın</span>`} Buğdaydan ekmek yapar.</p>
-      <div class="row">${!own ? `<button class="big green sm" id="buyOven_v8" ${S.gold >= OVEN_PRICE ? "" : "disabled"}>${S.gold >= OVEN_PRICE ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
-        : !placed ? `<button class="big green sm" id="placeOven_v8">Yerleştir</button>` : `<span class="pill">Çiftliğinde duruyor</span>`}</div></div></div>`;
-    const go = () => { closeAll(); placeKind = "oven"; setMode("place"); };
-    if ($("buyOven")) $("buyOven").onclick = () => { if (S.oven || S.gold < OVEN_PRICE) return; S.gold = round1(S.gold - OVEN_PRICE); S.oven = true; renderHud(); saveNow(); go(); };
-    if ($("placeOven")) $("placeOven").onclick = go;
+    body.innerHTML = OVENS.map((id, k) => { const own = ovenOwned(S, id), placed = S.layout[id] >= 0, lock = id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin();
+      return `<div class="card${lock ? " locked" : ""}"><div class="thumb ovthumb">${ovenIcon()}</div><div>
+      <h3>${OBJ[id].name}</h3>
+      <p>${own ? "Sende var." : `<span class="price">${fmtG(OVEN_PRICE)} altın</span>`}</p><p class="keep">Ekmek ve patates kızartması pişirir.</p>
+      <div class="row">${lock ? `<button class="big sm" disabled>🔒 ${OVEN2_LEVEL}. seviyede açılır</button>` : !own ? `<button class="big green sm" data-obuy="${id}" ${S.gold >= OVEN_PRICE ? "" : "disabled"}>${S.gold >= OVEN_PRICE ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
+        : !placed ? `<button class="big green sm" data-oplace="${id}">Yerleştir</button>` : `<span class="pill">Çiftliğinde · ${ovenLv(S, id)}. seviye</span>`}</div></div></div>`; }).join("");
+    const go = id => { closeAll(); placeKind = id; setMode("place"); };
+    body.querySelectorAll("[data-obuy]").forEach(b => b.onclick = () => { const id = b.getAttribute("data-obuy"); if (ovenOwned(S, id) || S.gold < OVEN_PRICE || (id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin())) return;
+      S.gold = round1(S.gold - OVEN_PRICE); S[id] = true; renderHud(); saveNow(); go(id); });
+    body.querySelectorAll("[data-oplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-oplace")));
   } else if (mtab === "tools") {
     body.innerHTML = Object.keys(TOOLS).map(k => { const T = TOOLS[k], own = S.tools.includes(k), sel = S.slot === k;
       return `<div class="card"><div class="thumb" style="background:#e9d9b4">${T.icon.replace('width="34" height="34"', 'width="58" height="58"')}</div><div>
@@ -3413,39 +3528,78 @@ function renderMarket0() {
 document.querySelectorAll("#root_v8 [data-mtab]").forEach(b => b.onclick = () => { mtab = b.getAttribute("data-mtab"); mq = ""; $("mSearch").value = ""; $("mClear").hidden = true; renderMarket(); });
 
 // ---------- Depot ----------
+const friesThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M30 26l4 30M40 20l2 36M50 18v38M60 20l-2 36M70 26l-4 30" stroke="#ffd23a" stroke-width="7" stroke-linecap="round"/><path d="M24 50h52l-6 34H30z" fill="#e0473a" stroke="#8e2416" stroke-width="3"/><path d="M38 66a12 8 0 0 0 24 0" fill="#ffd34d"/></svg>`;
 const breadThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M14 66q0-30 36-32t36 32z" fill="#d48a3a" stroke="#8a4f1c" stroke-width="3"/><path d="M14 66h72v6q-36 6-72 0z" fill="#b8702c" stroke="#8a4f1c" stroke-width="3"/><path d="M34 46l6 10M48 42l5 11M62 44l4 10" stroke="#f3c27a" stroke-width="4" stroke-linecap="round"/></svg>`;
-let ovenAmt = 2;
+// the oven window: one card per tray, then the upgrade
+let ovenSel = "oven", ovenAmt = { 0: 2, 1: 2 }, ovenRec = { 0: "bread", 1: "bread" };
+function openOven(id) { ovenSel = id; renderOven(); openSheet($("oven")); }
 function renderOven() {
-  const body = $("ovenBody"), now = Date.now(), B = bakeInfo(S, now), w = +S.store.wheat || 0, maxA = Math.floor(w / WHEAT_PER_BREAD) * WHEAT_PER_BREAD;
-  ovenAmt = Math.max(WHEAT_PER_BREAD, Math.min(maxA || WHEAT_PER_BREAD, ovenAmt));
+  const id = ovenSel, body = $("ovenBody"), now = Date.now(), lv = ovenLv(S, id), cap = OVEN_CAP[lv];
+  $("oven").querySelector(".sheet-head h2").textContent = OBJ[id].name + " · " + lv + ". seviye";
   let h = "";
-  if (B.done > 0) h += `<div class="card"><div class="thumb">${breadThumb()}</div><div><h3>${B.done} ekmek hazır</h3><div class="row"><button class="big green sm" id="ovenTake_v8">Ekmekleri depoya al</button></div></div></div>`;
-  if (B.q > B.done) h += `<p class="note">Pişiyor: ${B.q - B.done} ekmek. Sıradaki ${fmt(B.next)} sonra hazır.</p>`;
-  h += `<div class="card"><div class="thumb">${wheatThumb()}</div><div>
-    <h3>Ekmek pişir</h3>
-    <p>${WHEAT_PER_BREAD} buğday = 1 ekmek, her ekmek ${Math.round(BREAD_MS / 60000)} dakika. Depoda ${w} buğday var.</p>
-    ${maxA ? `<div class="row"><div class="stepper"><button id="oMinus_v8" aria-label="Azalt">−</button><b id="oVal_v8">${ovenAmt} buğday</b><button id="oPlus_v8" aria-label="Artır">+</button></div><button class="big ghost sm" id="oMax_v8">Hepsi</button></div>
-    <p><b>${ovenAmt / WHEAT_PER_BREAD} ekmek</b>, ${Math.round(ovenAmt / WHEAT_PER_BREAD * BREAD_MS / 60000)} dakika</p>
-    <div class="row"><button class="big green sm" id="oBake_v8">Pişir</button></div>` : `<p>Ekmek için en az ${WHEAT_PER_BREAD} buğday gerekir.</p>`}</div></div>`;
+  for (let k = 0; k < ovenSlots(S, id); k++) {
+    const t = trayOf(S, id, k), I = trayInfo(t, now), R = RECIPES[I.r || ovenRec[k]] || RECIPES.bread;
+    if (t) {
+      const left = I.q - I.done;
+      h += `<div class="card"><div class="thumb ovthumb"><span class="rec">${R.emoji}</span></div><div><h3>${ovenSlots(S, id) > 1 ? (k + 1) + ". tepsi: " : ""}${R.name}</h3>
+        <p class="keep">${I.done} hazır${left ? `, ${left} pişiyor · sıradaki ${fmt(I.next)} sonra` : ""}</p>
+        <div class="obar"><u style="width:${(I.done / I.q * 100).toFixed(0)}%"></u></div>
+        <div class="row">${I.done ? `<button class="big green sm" data-otake="${k}">${I.done} ${R.name.toLocaleLowerCase("tr")} depoya al</button>` : `<span class="pill">Pişiyor 🔥</span>`}</div></div></div>`;
+    } else {
+      const rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], have = +S.store[Rr.from] || 0, maxN = Math.min(cap, Math.floor(have / Rr.n)), lockR = rk === "fries" && !cropOpen("potato");
+      ovenAmt[k] = Math.max(1, Math.min(maxN || 1, ovenAmt[k] || 1));
+      h += `<div class="card"><div class="thumb ovthumb"><span class="rec">${Rr.emoji}</span></div><div><h3>${ovenSlots(S, id) > 1 ? (k + 1) + ". tepsi boş" : "Fırın boş"}</h3>
+        <div class="seg oseg">${Object.keys(RECIPES).map(r => `<button data-orec="${k}:${r}" aria-pressed="${r === rk}">${RECIPES[r].emoji} ${RECIPES[r].name}</button>`).join("")}</div>
+        <p class="keep">${Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} = 1 ${Rr.name.toLocaleLowerCase("tr")}, tanesi ${fmtDurS(Rr.ms)}. Depoda ${have} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} var. Tepsiye en fazla ${cap} sığar.</p>
+        ${lockR ? `<p class="keep">Patates ${CROPS.potato.lv}. seviyede açılır.</p>` : maxN ? `<div class="row"><div class="stepper"><button data-ominus="${k}" aria-label="Azalt">−</button><b>${ovenAmt[k]} ${Rr.name.toLocaleLowerCase("tr")}</b><button data-oplus="${k}" aria-label="Artır">+</button></div><button class="big ghost sm" data-omax="${k}">En fazla</button></div>
+        <p class="keep"><b>${ovenAmt[k] * Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")}</b> kullanılır, ${fmtDurS(ovenAmt[k] * Rr.ms)} sürer.</p>
+        <div class="row"><button class="big green sm" data-obake="${k}">Pişir 🔥</button></div>` : `<p class="keep">Pişirmek için en az ${Rr.n} ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} gerekir.</p>`}</div></div>`;
+    }
+  }
+  h += lv >= OVEN_MAX ? `<p class="note">Fırının en üst seviyede: iki tepside aynı anda ${OVEN_CAP[OVEN_MAX]}'şer ürün.</p>`
+    : `<div class="card"><div class="thumb ovthumb"><span class="rec">⬆️</span></div><div><h3>Fırını geliştir</h3><p><span class="price">${fmtG(OVEN_UP[lv])} altın</span></p>
+      <p class="keep">${lv + 1}. seviye: ${lv + 1 >= 3 ? "ikinci tepsi açılır, iki tepside aynı anda " + OVEN_CAP[lv + 1] + "'şer ürün" : "tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar"}.</p>
+      <div class="row"><button class="big green sm" data-oup="1" ${S.gold >= OVEN_UP[lv] ? "" : "disabled"}>${S.gold >= OVEN_UP[lv] ? "Geliştir" : "Altının yetmiyor"}</button></div></div></div>`;
   body.innerHTML = h;
-  const set = v => { ovenAmt = Math.max(WHEAT_PER_BREAD, Math.min(maxA, v)); renderOven(); };
-  if ($("oMinus")) { $("oMinus").onclick = () => set(ovenAmt - WHEAT_PER_BREAD); $("oPlus").onclick = () => set(ovenAmt + WHEAT_PER_BREAD); $("oMax").onclick = () => set(maxA); }
-  if ($("oBake")) $("oBake").onclick = () => {
-    const n = Math.floor(Math.min(ovenAmt, +S.store.wheat || 0) / WHEAT_PER_BREAD); if (!n) return;
-    S.store.wheat -= n * WHEAT_PER_BREAD;
-    const cur = bakeInfo(S, Date.now());
-    if (cur.q > 0) S.bake.q += n; else S.bake = { q: n, t0: Date.now() };
-    saveNow(); renderPlots(); renderOven(); toast(n + " ekmek fırına girdi");
-  };
-  if ($("ovenTake")) $("ovenTake").onclick = () => {
-    const cur = bakeInfo(S, Date.now()); if (!cur.done) return;
-    S.store.bread = (+S.store.bread || 0) + cur.done; S.bake.q -= cur.done; S.bake.t0 += cur.done * BREAD_MS;
-    if (S.bake.q <= 0) S.bake = null;
-    gainXp(cur.done * XP.bread); questEv("bread", cur.done); popAt(me.x, me.y - .3, "+" + cur.done + " ekmek", "#ffe27a");
-    saveNow(); renderHud(); renderPlots(); renderOven();
-  };
 }
-const PRODUCTS = [{ key: "wheat", name: "Buğday", price: CROPS.wheat.sell, thumb: () => wheatThumb() }, { key: "potato", name: "Patates", price: CROPS.potato.sell, thumb: potatoThumb }, { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }];
+const fmtDurS = ms => ms >= 60000 ? (ms % 60000 ? (ms / 60000).toFixed(1).replace(".", ",") : ms / 60000) + " dk" : Math.round(ms / 1000) + " sn";
+$("ovenBody").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !S) return;
+  const id = ovenSel, now = Date.now(), A = (n) => b.getAttribute(n);
+  S.bakes = S.bakes || {}; S.bakes[id] = S.bakes[id] || [null, null];
+  if (A("data-orec")) { const [k, r] = A("data-orec").split(":"); ovenRec[k] = r; renderOven(); return; }
+  if (A("data-ominus") !== null) { const k = +A("data-ominus"); ovenAmt[k] = Math.max(1, ovenAmt[k] - 1); renderOven(); return; }
+  if (A("data-oplus") !== null) { const k = +A("data-oplus"); ovenAmt[k]++; renderOven(); return; }
+  if (A("data-omax") !== null) { const k = +A("data-omax"); ovenAmt[k] = 999; renderOven(); return; }
+  if (A("data-obake") !== null) {
+    const k = +A("data-obake"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", R = RECIPES[rk]; if (trayOf(S, id, k)) return;
+    if (rk === "fries" && !cropOpen("potato")) return;
+    const n = Math.min(OVEN_CAP[ovenLv(S, id)], ovenAmt[k], Math.floor((+S.store[R.from] || 0) / R.n)); if (n < 1) return;
+    S.store[R.from] -= n * R.n; S.bakes[id][k] = { q: n, t0: now, r: rk };
+    saveNow(); renderPlots(); renderOven(); toast(n + " " + R.name.toLocaleLowerCase("tr") + " fırına girdi 🔥"); return;
+  }
+  if (A("data-otake") !== null) {
+    const k = +A("data-otake"), t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return;
+    const key = I.r; S.store[key] = (+S.store[key] || 0) + I.done; t.q -= I.done; t.t0 += I.done * RECIPES[key].ms;
+    if (t.q <= 0) S.bakes[id][k] = null;
+    gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done);
+    popAt(me.x, me.y - .3, "+" + I.done + " " + RECIPES[key].name.toLocaleLowerCase("tr"), "#ffe27a");
+    saveNow(); renderHud(); renderPlots(); renderOven(); return;
+  }
+  if (A("data-oup")) {
+    adminTopUp(); const lv = ovenLv(S, id); if (lv >= OVEN_MAX || S.gold < OVEN_UP[lv]) return;
+    S.gold = round1(S.gold - OVEN_UP[lv]); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderOven();
+    toast(OBJ[id].name + " " + (lv + 1) + ". seviye oldu"); return;
+  }
+});
+// a cleaner market / menu icon for the stone oven: brick dome, arched mouth with fire, chimney
+const ovenIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-hidden="true"><rect width="100" height="100" rx="14" fill="#f3d9a6"/>
+  <ellipse cx="50" cy="88" rx="40" ry="6" fill="rgba(0,0,0,.18)"/><rect x="12" y="62" width="76" height="24" rx="5" fill="#a89b88" stroke="#6e665a" stroke-width="2.5"/><path d="M12 72h76" stroke="#8a7f70" stroke-width="2"/>
+  <path d="M18 64q0-46 32-46t32 46z" fill="#c8704f" stroke="#7d2f1c" stroke-width="3"/><path d="M26 48h48M22 58h56M32 38h36M40 28h20" stroke="#a8553a" stroke-width="2"/>
+  <rect x="64" y="14" width="10" height="20" fill="#b5583d" stroke="#7d2f1c" stroke-width="2"/><rect x="62" y="11" width="14" height="5" rx="1.5" fill="#5e3226"/>
+  <path d="M36 64v-12a14 14 0 0 1 28 0v12z" fill="#2a1a10" stroke="#e2dccf" stroke-width="4"/><path d="M42 64q2-10 6-12q-1 6 3 7q1-8 5-10q2 9 2 15z" fill="#ff8a1a"/><path d="M46 64q2-6 4-7q0 4 2 4q1-4 3-5q0 5 0 8z" fill="#ffe066"/>
+  <circle cx="72" cy="6" r="4" fill="#e9e6e0" opacity=".7"/></svg>`;
+const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }];
 function renderDepot() {
   const body = $("depotBody"), items = PRODUCTS.filter(pr => (+S.store[pr.key] || 0) > 0);
   if (!items.length) { body.innerHTML = `<p class="empty">Depon boş.<br>Hasat ettiğin ürünler burada görünür, buradan satarsın.</p>`; return; }
@@ -3656,7 +3810,7 @@ function designAdminFarm() {
 function makeAdminFarm() {
   if (!S || !isAdmin() || S.adminFarm >= 5) return;
   const d = designAdminFarm();
-  S.size = EXPAND_MAX; S.layout = d.layout; S.oven = true; S.well = 3; S.bucket = 20;
+  S.size = EXPAND_MAX; S.layout = Object.assign({ oven2: -1 }, d.layout); S.oven = true; S.well = 3; S.bucket = 20;
   S.plots = d.plots; S.trees = d.trees.map(t => ({ cell: t.cell, t: Date.now() - TREE_MS })); S.fences = d.fences; S.decor = d.decor; S.spr = d.spr;
   S.landBought = Math.max(0, S.plots.length - DEFAULT_SOIL.length); S.fencesBought = S.fences.length; S.adminFarm = 5;
   S.pos = null; saveNow();
@@ -3957,8 +4111,11 @@ function enterGame() {
   S.size = farmSize(S);
   S.layout = cleanLayout(S.layout, mv);
   S.trees = cleanTrees(S.trees, mv, S.layout);
-  S.store.wheat = +S.store.wheat || 0; S.store.apple = +S.store.apple || 0; S.store.potato = +S.store.potato || 0; S.store.bread = +S.store.bread || 0;
-  if (!S.bake || !(+S.bake.q > 0)) S.bake = null;
+  STORE_KEYS.forEach(k => { S.store[k] = Math.max(0, +S.store[k] || 0); });
+  if (S.bake && +S.bake.q > 0) { S.bakes = S.bakes || {}; S.bakes.oven = S.bakes.oven || [null, null]; if (!S.bakes.oven[0]) S.bakes.oven[0] = { q: +S.bake.q, t0: +S.bake.t0, r: "bread" }; }
+  delete S.bake;
+  { const B = S.bakes && typeof S.bakes === "object" ? S.bakes : {}; S.bakes = {}; OVENS.forEach(id => { const a = toArr(B[id]); S.bakes[id] = [0, 1].map(k => a[k] && +a[k].q > 0 && RECIPES[a[k].r || "bread"] ? { q: Math.floor(+a[k].q), t0: +a[k].t0 || Date.now(), r: a[k].r || "bread" } : null); }); }
+  S.ovenLv = Object.fromEntries(OVENS.map(id => [id, ovenLv(S, id)]));
   S.tools = toArr(S.tools).filter(t => TOOLS[t]); if (!S.tools.includes("scythe")) S.tools.unshift("scythe");
   if (!S.tools.includes(S.slot)) S.slot = "scythe";
   S.plots = cleanPlots(S.plots, mv);
@@ -3983,6 +4140,8 @@ function enterGame() {
     const r = Math.round(S.pos.y), c = Math.round(S.pos.x), i = idx(r, c);
     if (r >= 0 && c >= 0 && r < ROWS && c < COLS && !curBlocked()(i)) { me.x = c; me.y = r; me.path = []; centerCam(true); }
   }
+  // start with the whole farm in the middle of the screen
+  { const [r0, r1, c0, c1] = OWN[farmSize(S)]; fitCam(); cam.x = (c0 + c1 + 1) / 2 * CELL - cam.w / 2; cam.y = (r0 + r1 + 1) / 2 * CELL - cam.h / 2; clampCam(); applyCam(); cam.lastDrag = performance.now(); }
   renderChatFoot(); renderMailDot(); renderAdminBtn(); applyAdminForMe();
   $("start").classList.remove("on");
   if (mv !== MAPV) save();
@@ -4274,7 +4433,7 @@ function nextReadyAt() {
   if (!S) return 0; const now = Date.now(); let t = Infinity;
   (S.plots || []).forEach(p => { if (p.c && p.w) { const r = +p.w + growMs(p); if (r > now) t = Math.min(t, r); } });
   (S.trees || []).forEach(tr => { const r = +tr.t + TREE_MS; if (r > now) t = Math.min(t, r); });
-  const B = bakeInfo(S, now); if (B.q > B.done && B.next > 0) t = Math.min(t, now + B.next);
+  const B = bakeInfo(S, now); if (B.next > 0) t = Math.min(t, now + B.next);
   return isFinite(t) ? Math.round(t) : 0;
 }
 function pushDue() {
@@ -4459,10 +4618,16 @@ function applyAdminForMe() {
   // gold sent or taken by the admin, applied once each
   if (S && a.ops && typeof a.ops === "object") {
     S.adminOps = S.adminOps || {}; let ch = false;
-    Object.entries(a.ops).forEach(([id, op]) => { if (S.adminOps[id] || !op) return; S.adminOps[id] = 1; ch = true;
+    let lvGiven = 0, more = false;
+    Object.entries(a.ops).forEach(([id, op]) => { if (S.adminOps[id] || !op) return;
+      const lv = Math.max(0, Math.min(5, Math.round(+op.lv || 0)));
+      if (lv) { if (lvGiven + lv > 5 || S.level >= MAX_LEVEL) { more = more || S.level < MAX_LEVEL; if (S.level >= MAX_LEVEL) S.adminOps[id] = 1; return; }   // the server allows +5 levels per save
+        S.adminOps[id] = 1; ch = true; lvGiven += lv; S.level = Math.min(MAX_LEVEL, S.level + lv); S.xp = 0; toast("Yönetici seni " + S.level + ". seviyeye çıkardı 🎉"); return; }
+      S.adminOps[id] = 1; ch = true;
       const d = Math.round(+op.delta || 0); if (!d) return;
       S.gold = Math.max(0, round1(S.gold + d)); toast(d > 0 ? "Yönetici sana " + fmtBig(d) + " altın gönderdi" : "Yönetici hesabından " + fmtBig(-d) + " altın aldı"); });
-    if (ch) { saveNow(); renderHud(); }
+    if (ch) { saveNow(); renderHud(); try { renderMarket(); } catch (e) {} }
+    if (more) setTimeout(() => { if (alive()) applyAdminForMe(); }, 2500);
   }
   if (isAdmin()) return;
   if (a.ban) return blockMe("Hesabın oyundan yasaklandı", "Neden: " + String(a.ban.reason || "Belirtilmedi").slice(0, 200));
@@ -4513,6 +4678,8 @@ function renderAdmin() {
       ${a.ban ? `<small>Yasak nedeni: ${esc(String(a.ban.reason || "-"))}</small>` : ""}${pn === "kick" ? `<small>Uzaklaştırma nedeni: ${esc(String(a.kick.reason || "-"))}, bitiş: ${new Date(+a.kick.until).toLocaleString("tr-TR")}</small>` : ""}
       <small>Altın</small>
       <div class="chips">${[100, 1000, 10000, 100000].map(n => `<button data-aq="${n}">+${fmtBig(n)}</button>`).join("")}${[100, 1000].map(n => `<button data-aq="-${n}">-${fmtBig(n)}</button>`).join("")}</div>
+      <small>Seviye (şu an ${p.level})</small>
+      <div class="chips"><button data-alv="${esc(p.id)}" data-n="1">+1 seviye</button><button data-alv="${esc(p.id)}" data-n="5">+5 seviye</button><button data-alv="${esc(p.id)}" data-n="10">+10 seviye</button></div>
       <div class="ln"><input class="n" type="number" min="1" inputmode="numeric" placeholder="Altın" id="aGold_v8"><button class="big green" data-agive="${esc(p.id)}">Altın ver</button><button class="big ghost" data-atake="${esc(p.id)}">Altın al</button></div>
       ${me ? "" : `<small>Ceza süresi</small>
       <div class="chips">${PUN_LEN.map(([ms, t]) => `<button data-adur="${ms}" aria-pressed="${admSel.dur === ms}">${t}</button>`).join("")}</div>
@@ -4551,6 +4718,11 @@ $("admList").addEventListener("click", async e => {
     if (ch.hasAttribute("data-aq")) { const v = +ch.getAttribute("data-aq"); $("aGold").value = Math.abs(v); (v > 0 ? document.querySelector("[data-agive]") : document.querySelector("[data-atake]")).click(); return; }
     const keep = { gold: ($("aGold") || {}).value, why: ($("aWhy") || {}).value }; renderAdmin(); if ($("aGold")) $("aGold").value = keep.gold || ""; if ($("aWhy")) $("aWhy").value = keep.why || ""; return;
   }
+  const lb = e.target.closest("[data-alv]");
+  if (lb) { const id = lb.getAttribute("data-alv"), n = +lb.getAttribute("data-n"), pl = admPlayers.find(x => x.id === id) || { name: "Oyuncu", level: 1 }; lb.disabled = true;
+    try { for (let left = n; left > 0; left -= 5) { const opId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); await db.doc("admin/" + id + "/ops/" + opId).set({ lv: Math.min(5, left), ts: Date.now() }); }
+      pl.level = Math.min(MAX_LEVEL, pl.level + n); toast(pl.name + " " + n + " seviye atlatıldı (" + pl.level + ")"); }
+    catch (err) { toast("Seviye verilemedi"); } renderAdmin(); return; }
   const b = e.target.closest("[data-agive],[data-atake],[data-apun],[data-afree]"); if (!b) return;
   const id = b.getAttribute("data-agive") || b.getAttribute("data-atake") || b.getAttribute("data-apun") || b.getAttribute("data-afree");
   const pl = admPlayers.find(x => x.id === id) || { name: "Oyuncu", gold: 0 }, base = "admin/" + id, a = admPun[id] || (admPun[id] = {});
@@ -4608,6 +4780,15 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 87, d: "9 Ekim 2026", e: "🥕", t: "Yeni ekinler ve iki fırın", c: "#e0762a", b: "#ffe9cf", items: [
+    "Yeni ekinler: <b>havuç</b> (7. sv), <b>salata</b> (9), <b>mısır</b> (12), <b>patlıcan</b> (15) ve <b>kabak</b> (20). Patates artık 5. seviyede açılıyor ve 4 dakikada yetişiyor.",
+    "Taş fırın artık 40 altın. <b>İkinci fırın</b> 20. seviyede açılıyor. Fırınlar 3 seviyeye geliştirilebiliyor: 7, 15 ve iki tepside 20+20 ürün.",
+    "Fırında <b>patates kızartması</b> da yapılıyor: 2 patatese 1 kızartma, 5 dakika.",
+    "Çiftlikteki binalara, ağaçlara ve süslere dokununca altında <b>Pişir, Geliştir, Taşı</b> gibi seçenekler çıkıyor.",
+    "Ekim aleti 10. seviyede 500 altın, elektrikli tırpan 15. seviyede 1.000 altın. Fıskiye 400 altın, 6 seviyeye kadar geliştirilebiliyor.",
+    "Yeni oyuncular 50 altınla başlıyor, kuyu tarlanın hemen yanında. Açılmamış araziler bulutlu, oyun çiftliğin ortada açılıyor.",
+    "Yazılara basılı tutunca artık kopyalama menüsü çıkmıyor.",
+  ] },
   { v: 86, d: "9 Ekim 2026", e: "🌾", t: "Altın başaklar ve yanan fırın", c: "#d9961a", b: "#fff3d0", items: [
     "Buğday yeniden tasarlandı: her tarlada daha gür sap, gerçek yaprak ve taneli, kılçıklı başaklar var. Olgunlaşınca altın sarısına dönüyor ve rüzgârda hafifçe sallanıyor.",
     "Taş fırın yenilendi: tuğla kubbe, taş kemerli ağız, tuğla baca, odun yığını ve ekmek küreği.",
@@ -5062,7 +5243,7 @@ function setup3D(T) {
   // While bread is baking the mouth glows, flames dance inside, embers rise and the chimney smokes (fx.oven, stepOven).
   const emberTex = canvasTex("ember", 64, 64, (x) => { const g = x.createRadialGradient(32, 32, 0, 32, 32, 30); g.addColorStop(0, "rgba(255,240,180,1)"); g.addColorStop(.3, "rgba(255,150,40,.85)"); g.addColorStop(1, "rgba(255,80,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); });
   function buildOven(a, baking) {
-    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, O = fx.oven = { baking, flames: [], embers: [], smoke: [], glow: null, inner: null };
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1, O = { baking, flames: [], embers: [], smoke: [], glow: null, inner: null }; (fx.ovens = fx.ovens || []).push(O);
     blob(g, x, z + .1, 2.6, 2.4);
     // plinth with a stone top slab
     g.add(mesh(G.box, TM("#a89b88", "stone", 3, 1), x, .22, z, 1.7, .44, 1.5)); g.add(mesh(G.box, TM("#8a7f70", "stone", 3, 1), x, .47, z + .02, 1.82, .07, 1.62));
@@ -5099,8 +5280,9 @@ function setup3D(T) {
     O.x = x; O.z = z; O.mz = mz;
     return g;
   }
-  function stepOven(sec) {
-    const O = fx.oven; if (!O || !O.baking || REDUCED) return;
+  function stepOven(sec) { (fx.ovens || []).forEach(O => stepOven1(O, sec)); }
+  function stepOven1(O, sec) {
+    if (!O || !O.baking || REDUCED) return;
     O.flames.forEach(f => { const u = f.userData, k = 1 + Math.sin(sec * 13 + u.ph) * .2 + Math.sin(sec * 23 + u.ph * 2) * .1; f.scale.y = u.h * k; f.position.y = .53 + u.h * k / 2; f.rotation.z = Math.sin(sec * 9 + u.ph) * .15; });
     if (O.glow) { const v = .62 + Math.sin(sec * 11) * .1 + Math.sin(sec * 17) * .06; O.glow.material.opacity = v; O.glow.scale.set(1.6 + v * .5, 1.25 + v * .4, 1); }
     if (O.inner) { const v = .75 + Math.sin(sec * 9) * .15; O.inner.material.color.setRGB(1, .42 * v + .1, .08); }
@@ -5303,7 +5485,9 @@ gl_Position = projectionMatrix * mvPosition;`); };
     whead: pool(wheatHeadGeo, windy(LAM({ roughness: .7 })), 5200),
     blade: pool(leafBladeGeo, windy(LAM({ side: T.DoubleSide, roughness: .9 })), 10400, false),
     ear: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .7 }), 3150),
-    leaf: pool(new T.IcosahedronGeometry(1, 0), LAM({ roughness: .9 }), 6300),
+    leaf: pool(new T.IcosahedronGeometry(1, 0), LAM({ roughness: .9 }), 12000),
+    fruit: pool(new T.SphereGeometry(1, 12, 9), LAM({ roughness: .55 }), 3000),
+    cone: pool(new T.ConeGeometry(1, 1, 8), LAM({ roughness: .7 }), 3000),
     tuber: pool(new T.SphereGeometry(1, 6, 4), LAM({ roughness: .95 }), 4200),
     post: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.wood, roughness: .9 }), 240),
     rail: pool(new T.BoxGeometry(1, 1, 1), LAM({ map: TEX.wood, roughness: .9 }), 520),
@@ -5329,19 +5513,19 @@ gl_Position = projectionMatrix * mvPosition;`); };
     if (n.isPoints) { n.geometry.dispose(); n.material.dispose(); return; } if ((n.isMesh || n.isSprite) && n.material && !Object.values(mats).includes(n.material)) n.material.dispose();
     if (n.isMesh && n.geometry && !sharedGeo.has(n.geometry)) n.geometry.dispose(); }); }
   let dyn = new T.Group(); scene3.add(dyn); let staticSig = "";
-  const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "whead", "blade", "ear", "leaf", "tuber", "hl"];
+  const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "whead", "blade", "ear", "leaf", "tuber", "fruit", "cone", "hl"];
   function staticSigOf(f, now) {
     if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length;
     if (!f) return "none|" + tuftCount;
-    const B = f === S ? bakeInfo(S, now) : { q: 0, done: 0 };
-    return [scene.kind, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : "")).join(","),
+    const B = { q: 0, done: 0 }; const oSig = f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") : "";
+    return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : "")).join(","),
       f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
   }
   function rebuild() {
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
     if (sig !== staticSig) {
       staticSig = sig;
-      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.oven = null;
+      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = [];
       if (scene.kind === "plaza") buildPlaza(); else if (f) buildFarm(f, now, "s");
       const scs = sceneryKey(f);
       if (scs !== scenSig) { scenSig = scs; scenery(f); ["tuft", "ftrunk", "fleaf"].forEach(k => P[k].done()); }
@@ -5400,10 +5584,10 @@ gl_Position = projectionMatrix * mvPosition;`); };
     world.add(buildWell(L.well, f.well || 1)); proxy(colOf(L.well) + .5, .5, rowOf(L.well) + .5, 1, 1, 1, L.well);
     world.add(buildScare(L.scare)); proxy(colOf(L.scare) + .5, .6, rowOf(L.scare) + .5, 1, 1.2, 1, L.scare);
     world.add(buildSign(L.sign, String(f.name || "Çiftçi"))); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
-    if (L.oven >= 0) {
-      const B = isMe ? bakeInfo(S, now) : { q: 0, done: 0 };
-      const o = buildOven(L.oven, B.q > B.done); world.add(o);
-      proxy(colOf(L.oven) + 1, .7, rowOf(L.oven) + 1, 2, 1.4, 2, L.oven);
+    for (const oid of OVENS) if (L[oid] >= 0) {
+      const B = isMe ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
+      const o = buildOven(L[oid], B.q > B.done); world.add(o);
+      proxy(colOf(L[oid]) + 1, .7, rowOf(L[oid]) + 1, 2, 1.4, 2, L[oid]);
     }
     // sprinklers
     (f.spr || []).forEach(s => { world.add(buildSprinkler(s.cell)); proxy(colOf(s.cell) + .5, .5, rowOf(s.cell) + .5, 1, 1, 1, s.cell); });
@@ -5425,7 +5609,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     fog3(f);
   }
   function farmDyn(f, now, L, home, isMe) {
-    if (L.oven >= 0 && isMe) { const B = bakeInfo(S, now); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), .7, .35); s.position.set(colOf(L.oven) + 1.7, 1.75, rowOf(L.oven) + 1); dyn.add(s); } }
+    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), .7, .35); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });
     // plots and crops
@@ -5437,7 +5621,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
       for (let k = 0; k < 4; k++) P.furrow.add(x, .125, z - .32 + k * .213, .8, .05, .07, wet ? "#5a3d27" : "#97683f");
       if (!p.c) return;
       const stage = !p.w ? 0 : (now - p.w >= growMs(p) ? 4 : (now - p.w) / growMs(p) < .33 ? 1 : (now - p.w) / growMs(p) < .66 ? 2 : 3);
-      if (p.c === "potato") potato3(x, z, stage); else wheat3(x, z, stage);
+      if (p.c === "potato") potato3(x, z, stage); else if (p.c === "wheat" || !CROPS[p.c]) wheat3(x, z, stage); else veg3(p.c, x, z, stage);
       if (!p.w) drops.push(x, 1.0, z);
       else if (stage === 4) stars.push(x + .32, .78, z - .2);
     });
@@ -5467,6 +5651,33 @@ gl_Position = projectionMatrix * mvPosition;`); };
       P.blade.add(px, .13, pz, .05, h * .62, .05, leafCol, rot, 0, .25); P.blade.add(px, .13 + h * .2, pz, .045, h * .5, .045, leafCol, rot + 2.9, 0, .3);
       if (stage >= 3) { const hy = .12 + h - .01, tx = px - Math.sin(lean) * h; P.whead.add(tx, hy, pz, .1, stage === 4 ? .22 : .17, .1, stage === 4 ? WGOLD[(k + 2) % 4] : WTURN[(k + 1) % 3], rot, 0, lean * 1.6); }
     });
+  }
+  // the newer vegetables: carrot (feathery tops, orange shoulders), lettuce (round heads), corn (tall stalks with cobs),
+  // eggplant (bushes with purple fruit), pumpkin (a vine with one big pumpkin)
+  function veg3(c, x, z, stage) {
+    const g1 = "#6db744", g2 = "#4f9a2f", g3 = "#7cc24e";
+    if (stage === 0) { const sp = c === "pumpkin" ? [[0, 0]] : [[-.22, -.18], [.22, -.18], [-.22, .22], [.22, .22]]; sp.forEach(([a, b]) => P.tuber.add(x + a, .15, z + b, .04, .03, .04, "#e9d29a")); return; }
+    const t = [0, .35, .65, 1, 1][stage];
+    if (c === "carrot") { [[-.22, -.2], [.22, -.2], [-.22, .2], [.22, .2], [0, 0]].forEach(([a, b], k) => {
+        for (let q = 0; q < 4; q++) P.blade.add(x + a, .13, z + b, .05, .26 * t + .04, .05, q % 2 ? g1 : g3, q * 1.6 + k, 0, .35);
+        if (stage === 4) P.cone.add(x + a, .17, z + b, .085, .13, .085, "#f07a1e", 0, Math.PI, 0); }); return; }
+    if (c === "lettuce") { [[-.2, -.18], [.2, -.18], [-.2, .2], [.2, .2]].forEach(([a, b], k) => { const r = .06 + .09 * t;
+        for (let q = 0; q < 5; q++) { const an = q / 5 * 6.28 + k; P.leaf.add(x + a + Math.cos(an) * r * .55, .14 + r * .45, z + b + Math.sin(an) * r * .55, r * .62, r * .5, r * .62, q % 2 ? "#7cc24e" : "#93d058", q); }
+        P.fruit.add(x + a, .15 + r * .6, z + b, r * .55, r * .5, r * .55, stage === 4 ? "#c8ec8c" : "#a6dc6a"); }); return; }
+    if (c === "corn") { [[-.25, -.2], [0, -.2], [.25, -.2], [-.13, .18], [.13, .18]].forEach(([a, b], k) => { const h = [0, .14, .34, .58, .64][stage];
+        P.stalk.add(x + a, .12 + h / 2, z + b, .035, h, .035, stage === 4 ? "#a9b83c" : g2, 0, 0, (k % 2 ? .05 : -.05));
+        P.blade.add(x + a, .14 + h * .2, z + b, .06, h * .6, .06, g1, k * 2.1, 0, .45); P.blade.add(x + a, .14 + h * .45, z + b, .055, h * .5, .055, g3, k * 2.1 + 3.1, 0, .45);
+        if (stage >= 3) { P.fruit.add(x + a + .05, .12 + h * .55, z + b, .045, .1, .045, stage === 4 ? "#ffd23a" : "#d9e08a", 0, 0, -.3); P.blade.add(x + a + .05, .12 + h * .45, z + b, .05, .13, .05, "#8fc456", 0, 0, -.3); }
+        if (stage === 4) P.cone.add(x + a, .14 + h, z + b, .025, .08, .025, "#c99a3a"); }); return; }
+    if (c === "eggplant") { [[-.2, -.18], [.2, -.18], [-.2, .2], [.2, .2]].forEach(([a, b], k) => { const r = .05 + .08 * t;
+        P.leaf.add(x + a, .15 + r * .8, z + b, r, r * .8, r, g2, k); P.leaf.add(x + a - r * .5, .14 + r * .6, z + b + .03, r * .75, r * .6, r * .75, g1, k + 1); P.leaf.add(x + a + r * .5, .14 + r * .6, z + b - .02, r * .75, r * .6, r * .75, g3, k + 2);
+        if (stage === 3) P.ear.add(x + a, .17 + r * 1.6, z + b, .025, .025, .025, "#b98ad6");
+        if (stage === 4) { P.fruit.add(x + a + .08, .16, z + b + .08, .05, .1, .05, "#5a2d7a", 0, .9, .3); P.fruit.add(x + a - .07, .16, z + b + .1, .045, .09, .045, "#6a3a8f", 0, .9, -.4); } }); return; }
+    if (c === "pumpkin") { const r = .1 + .14 * t;
+        for (let q = 0; q < 6; q++) { const an = q / 6 * 6.28; P.leaf.add(x + Math.cos(an) * .28, .15, z + Math.sin(an) * .28, .11 * t + .05, .04, .11 * t + .05, q % 2 ? g1 : g2, q); }
+        if (stage >= 3) { const col = stage === 4 ? "#f08a1a" : "#a9c24a";
+          for (let q = 0; q < 6; q++) { const an = q / 6 * 6.28; P.fruit.add(x + Math.cos(an) * r * .35, .12 + r * .55, z + Math.sin(an) * r * .35, r * .55, r * .55, r * .55, col); }
+          P.fruit.add(x, .12 + r * .6, z, r * .7, r * .6, r * .7, col); P.stalk.add(x, .12 + r * 1.2, z, .03, .08, .03, "#6b7a2a", 0, 0, .3); } return; }
   }
   function potato3(x, z, stage) {
     const spots = [[-.22, -.18], [.22, -.18], [-.22, .22], [.22, .22]];
@@ -5503,7 +5714,6 @@ gl_Position = projectionMatrix * mvPosition;`); };
     for (let k = 0; k < 60; k++) {
       const x = -1 + rnd(k * 37 + sz) * (COLS + 2), z = -1 + rnd(k * 53 + sz) * (ROWS + .2);
       if (x > c0 - 1.2 && x < c1 + 2.2 && z > r0 - 1.2 && z < r1 + 2.2) continue;
-      if (x < nc0 - .3 || x > nc1 + 1.3 || z < nr0 - .3 || z > nr1 + 1.3) continue;   // only over the next expansion
       const s = sprite(puffTex, 2.4 + rnd(k) * 2.4, 1.3 + rnd(k * 3) * 1.1, { opacity: .55 + rnd(k * 7) * .3 });
       s.position.set(x, .5 + rnd(k * 11) * 1.1, z); s.userData.base = s.position.clone(); s.userData.ph = k; s.renderOrder = 4; fx.clouds.push(s); world.add(s);
     }
@@ -5668,6 +5878,8 @@ gl_Position = projectionMatrix * mvPosition;`); };
     let lx, ly; if (rotated()) { lx = cy - root.top; ly = root.right - cx; } else { lx = cx - root.left; ly = cy - root.top; }
     ndc.set(lx / w * 2 - 1, -(ly / h * 2 - 1)); ray.setFromCamera(ndc, camera);
   }
+  const scrV = new T.Vector3();
+  R3.toScreen = (x, y, z) => { scrV.set(x, y, z).project(camera); return { x: (scrV.x + 1) / 2 * (cv.clientWidth || 1), y: (1 - scrV.y) / 2 * (cv.clientHeight || 1) }; };
   R3.pick = (cx, cy, groundOnly) => {
     toNdc(cx, cy);
     if (!groundOnly) {
@@ -5843,6 +6055,9 @@ setInterval(() => {
   for (const [cell, at] of pending) if (Date.now() - at > 180000) pending.delete(cell);
 }, 1000);
 init();
+// a long press must not open the browser's copy / save-image menu (the game should feel like an app)
+document.addEventListener("contextmenu", e => { if (!(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) e.preventDefault(); });
+document.addEventListener("selectstart", e => { if (!(e.target && e.target.closest && e.target.closest("input,textarea"))) e.preventDefault(); });
 })();
 </script>
 

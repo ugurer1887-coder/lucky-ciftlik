@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 86). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 87). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -44,6 +44,13 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Firebase kuralı: `"push": { ".indexOn": ["due"], "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }`.
 
 - 3D buğday: `wheat3()` tarla başına 10 sap, `whead` (taneli/kılçıklı başak) ve `blade` (yaprak) havuzları; `windy()` ile rüzgârda sallanır (`WIND` uniform). Fırın: `buildOven()` tuğla kubbe, taş kemer, baca, odun; pişerken alev/kor/duman `stepOven()`.
+
+## v87 ekonomi ve yapılar
+- Ekinler `CROPS` (seed, sell, ms, lv, xp): buğday 1dk sv1, patates 4dk sv5, havuç 15dk sv7, salata 20dk sv9, mısır 30dk sv12, patlıcan 45dk sv15, kabak 60dk sv20. `STORE_KEYS` depo anahtarları; 3D `veg3()`, 2D `vegSvg()`, resim `PRODUCE`/`cropThumb`.
+- Fırınlar `OVENS = ["oven","oven2"]` (2. fırın sv20, 40 altın). `S.ovenLv[id]` 1-3 (`OVEN_CAP` 7/15/20, Lv3 iki tepsi), `S.bakes[id] = [tepsi0, tepsi1]` her biri `{q,t0,r}`; `RECIPES` ekmek (2 buğday, 2.5dk) ve kızartma (2 patates, 5dk, 60 altın). Geliştirme `OVEN_UP` 1000/3000.
+- Nesne menüsü: binaya dokununca `objMenuShow()` (Pişir/Geliştir/Taşı vb.), `objAct()` eski doğrudan işlem.
+- Fiyatlar: ekim aleti 500 sv10, elektrikli tırpan 1000 sv15, fıskiye 400, fıskiye 6 seviye (`SPR_UP` 600/850/1500/2250/3500), başlangıç 50 altın, kuyu `at(4,9)`.
+- Admin paneli: oyuncuya +1/+5/+10 seviye (`admin/{id}/ops/{op} = {lv}`; sunucu kuralı kayıt başına +5 seviyeye izin verdiği için 5'erli uygulanır).
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
