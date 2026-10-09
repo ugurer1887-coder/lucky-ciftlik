@@ -60,6 +60,12 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Döndürme: `S.rot[anahtar]` (0-3), anahtar bina adı ya da `"c"+hücre`. Ev ve depo dönmez (kapı yönü). 3D'de `spin()` ile.
 - Ekonomi notu: yumurta (10) 2 buğdaydan (10) yapılan yemle üretildiği için kârı XP; süt 25 olduğu için inek yemi tarifi 3 adet veriyor.
 
+## v89 siparişler ve günlük görevler
+- Yumurta 15, süt 40 altın (`EGG_PRICE`, `MILK_PRICE`).
+- Günlük görevler (sv3+, `DAILY_LEVEL`): `DAILY` şablonları, `S.daily = {d, list:[{k,n,g,x}], c, got, b, bg}`; gün değişince `dailyEnsure()` tarih + uid tohumlu rastgele 3 görev seçer. Sayaçlar `dailyEv(anahtar, n)`: `plant`, `water`, `harv:<ekin|apple>`, `sellg` (altın), `bake:<bread|fries>`, `prod:<egg|milk>`, `feed`, `order`, `wish`. Ödül 15+5·sv altın, 8+2·sv XP; üçü bitince sandık 40+12·sv.
+- Siparişler (sv3+, `ORDER_LEVEL`): `S.orders` 3 yuva; dolu yuva `{p: köylü, it:{ürün:adet}, g, x}`, boş yuva `{w: geleceği zaman}`. Ödül ürün değerinin 1.4 katı, XP değer/5+3. Teslimden sonra 5 dk, reddedince 15 dk bekleme. Sadece oyuncunun üretebildiği ürünler istenir (`orderItems`).
+- Görevler penceresi sekmeli (`qtab`: tut/daily/orders, `#qtabs_v8`). Çiftlikteki tabela (`OBJ.sign`, "Sipariş tabelası") menüsünde Siparişler var; teslim edilebilir sipariş varsa 3D'de tabelanın üstünde 📋 rozeti.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

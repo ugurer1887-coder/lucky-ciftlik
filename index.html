@@ -562,6 +562,19 @@ body{font-family:var(--body);letter-spacing:.1px}
 .qcard.next{opacity:.8}
 .qcard.next .qe{filter:grayscale(.5)}
 .qcard .qwait{font-weight:800;color:#2f9a43}
+.qtabs{display:flex;gap:6px;justify-content:center;margin:2px 0 8px;flex-wrap:wrap}
+.qtabs button{position:relative;border:0;border-radius:99px;padding:7px 13px;font:700 .84rem Fredoka,Nunito,sans-serif;color:#6b4a14;background:#fff;box-shadow:0 2px 8px rgba(60,50,20,.12)}
+.qtabs button[aria-pressed=true]{background:linear-gradient(160deg,#ffd34d,#f6a623);color:#4a2c00}
+.qtabs button i{position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:#e0473a;border:2px solid #fff}
+.qinfo{text-align:center;font-size:.8rem;color:#6a6040;margin:0 0 8px}
+.qcard .qcoin.xp{background:#bfe6ff;color:#1d4f7a}
+.qcard.chest .qe{background:linear-gradient(160deg,#ffd9a0,#e9a24a)}
+.qcard.wait{opacity:.75}.qcard.wait .qe{background:#eee6d2}
+.qcard .qe.npc{font-size:1.7rem;background:linear-gradient(160deg,#fff1c9,#ffd98a)}
+.oitems{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.oit{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 5px;border-radius:99px;background:#fbe1dc;color:#9a2a1c;font:700 .82rem Fredoka,Nunito,sans-serif}
+.oit i{font-style:normal;font-size:1.1rem}.oit.ok{background:#dcf3d2;color:#256b2a}
+.obtns{display:flex;gap:8px;flex-wrap:wrap}.obtns .big[disabled]{opacity:.45;filter:grayscale(.5)}
 .admreset{width:auto!important;min-height:30px!important;padding:4px 12px!important;font-size:.76rem!important;margin-left:auto}
 #notifAsk_v8 .box{max-width:380px;background:linear-gradient(180deg,#fff8e1,#e9f8ff);color:#2a2410}
 #notifAsk_v8 h1{font-size:1.25rem;margin:4px 0 6px}#notifAsk_v8 p{font-size:.88rem;color:#5c5240;margin:0 0 12px}
@@ -845,7 +858,8 @@ body{font-family:var(--body);letter-spacing:.1px}
   <div class="modal" id="quests_v8">
     <div class="box set">
       <h1><span class="h1e">📜</span> <span class="h1g">Görevler</span></h1>
-      <p class="lead">Görevleri bitir, ödül altınlarını buradan topla. Görevler seni adım adım çiftçiliğe hazırlar.</p>
+      <div class="qtabs" id="qtabs_v8"></div>
+      <p class="lead" id="questLead_v8">Görevleri bitir, ödül altınlarını buradan topla.</p>
       <div id="questList_v8"></div>
       <p class="qmore" id="questMore_v8"></p>
       <button class="big ghost" id="questClose_v8">Kapat</button>
@@ -1121,7 +1135,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "88";
+const VERSION = "89";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1160,7 +1174,7 @@ const g4 = (r, c) => idx(r + SY, c + SX);           // a cell given in the previ
 const area = (r0, r1, c0, c1) => { const s = new Set(); for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) s.add(idx(r, c)); return s; };
 const coreArea = (r0, r1, c0, c1) => area(r0 + OY, r1 + OY, c0 + OX, c1 + OX);
 // Farm yard: flat land. Buildings belong to each player and can be moved; these are only the starting spots.
-const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, coop: { w: 3, h: 3, name: "Tavuk kümesi" }, cowbarn: { w: 4, h: 4, name: "İnek ahırı" }, mill: { w: 2, h: 2, name: "Ambar" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Tabela" } };
+const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, coop: { w: 3, h: 3, name: "Tavuk kümesi" }, cowbarn: { w: 4, h: 4, name: "İnek ahırı" }, mill: { w: 2, h: 2, name: "Ambar" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Sipariş tabelası" } };
 const DEFAULT_LAYOUT = { house: at(0,0), barn: at(0,11), well: at(4,9), scare: at(3,8), sign: at(3,0) };
 const DEFAULT_SOIL = [at(4,5), at(4,6), at(4,7), at(5,5), at(5,6), at(5,7)];
 const ROAD = area(ROWS - 1, ROWS - 1, 0, COLS - 1);
@@ -1359,8 +1373,8 @@ const CROPS = {
   pumpkin: { name: "Kabak", seed: 70, sell: 160, ms: 60 * MIN, lv: 20, xp: 9 },
 };
 // ---------- Animals and the feed mill (ambar) ----------
-const COOP_LEVEL = 10, COOP_PRICE = 500, COOP_CAP = 10, HEN_PRICE = 100, EGG_MS = 5 * MIN, EGG_PRICE = 10;
-const COWBARN_LEVEL = 13, COWBARN_PRICE = 750, COW_CAP = 4, COW_PRICE = 200, MILK_MS = 8 * MIN, MILK_PRICE = 25;
+const COOP_LEVEL = 10, COOP_PRICE = 500, COOP_CAP = 10, HEN_PRICE = 100, EGG_MS = 5 * MIN, EGG_PRICE = 15;
+const COWBARN_LEVEL = 13, COWBARN_PRICE = 750, COW_CAP = 4, COW_PRICE = 200, MILK_MS = 8 * MIN, MILK_PRICE = 40;
 const MILL_LEVEL = 10, MILL_PRICE = 300, MILL_CAP = 10;
 // feed recipes: what one batch uses, how many feeds it gives, how long one batch takes
 const FEEDS = {
@@ -1735,12 +1749,12 @@ function doAction(t) {
       .sort((a, b) => Math.hypot(rowOf(a.cell) - r0, colOf(a.cell) - c0) - Math.hypot(rowOf(b.cell) - r0, colOf(b.cell) - c0)).slice(0, sprN());
     for (const pl of todo) { if (sp.w <= 0) break; pl.w = now; sp.w--; done.push(pl.cell); }
     if (!done.length) { pop(t.cell, "Su: " + sp.w + "/" + sprCap(), "#bfe9ff"); hint("Fıskiyenin yakınında sulanacak ekin yok. İçinde " + sp.w + "/" + sprCap() + " su var."); return; }
-    gainXp(done.length * XP.water); questEv("water", done.length); pop(t.cell, done.length + " ekin sulandı, su " + sp.w + "/" + sprCap(), "#bfe9ff"); if (R3.glow) R3.glow(done.slice(0, 8), "#7fd6ff", 700);
+    gainXp(done.length * XP.water); questEv("water", done.length); dailyEv("water", done.length); pop(t.cell, done.length + " ekin sulandı, su " + sp.w + "/" + sprCap(), "#bfe9ff"); if (R3.glow) R3.glow(done.slice(0, 8), "#7fd6ff", 700);
     saveNow();
   }
   else if (t.k === "tree") {
     const tr = treeAt(S, t.cell); if (!treeRipe(tr)) return;
-    tr.t = now; S.store.apple = (+S.store.apple || 0) + 1; questEv("harvest", 1); saveNow();
+    tr.t = now; S.store.apple = (+S.store.apple || 0) + 1; questEv("harvest", 1); dailyEv("harv:apple", 1); saveNow();
     try { gainXp(XP.apple); pop(t.cell, "+1 elma", "#ffb3a8"); } catch (e) { console.error(e); }
   }
   else {
@@ -1752,20 +1766,20 @@ function doAction(t) {
         const q2 = plotAt(S, c); if (!q2 || q2.c) continue;
         adminTopUp();
         if (S.gold < C.seed) { hint("Yeterli altının yok. " + C.name + " tohumu " + C.seed + " altın."); break; }
-        S.gold = round1(S.gold - C.seed); q2.c = cr; q2.p = now; q2.w = 0; gainXp(XP[cr] || XP.wheat); questEv("plant", 1);
+        S.gold = round1(S.gold - C.seed); q2.c = cr; q2.p = now; q2.w = 0; gainXp(XP[cr] || XP.wheat); questEv("plant", 1); dailyEv("plant", 1);
         pop(c, "-" + fmtG(C.seed) + " altın", "#ffd0c4");
       }
     } else if (t.k === "water") {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || !q2.c || q2.w) continue;
         if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); break; }
-        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); pop(c, "Sulandı", "#bfe9ff");
+        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); dailyEv("water", 1); pop(c, "Sulandı", "#bfe9ff");
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
       taskCells(t).forEach(c => {
         const q = c == null ? null : plotAt(S, c); if (!ripe(q)) return;
-        const key = q.c; q.c = null; q.p = 0; q.w = 0; S.store[key] = (+S.store[key] || 0) + 1; questEv("harvest", 1);
+        const key = q.c; q.c = null; q.p = 0; q.w = 0; S.store[key] = (+S.store[key] || 0) + 1; questEv("harvest", 1); dailyEv("harv:" + key, 1);
         try { gainXp(XP[key] || XP.wheat); pop(c, "+1 " + CROPS[key].name.toLocaleLowerCase("tr"), "#ffe27a"); } catch (e) { console.error(e); }
       });
       saveNow();
@@ -2608,7 +2622,7 @@ function collectAnimals(kind) {
   const A = ANIMALS[kind], now = Date.now(); let n = 0;
   animalsOf(S, kind).forEach(a => { if (a.f && now - a.f >= A.ms) { a.f = 0; n++; } });
   if (!n) { const I = animalInfo(S, kind, now); hint(I.n ? (I.hungry === I.n ? "Hayvanların aç, önce yem ver." : A.prodName + " henüz hazır değil, " + fmt(I.next) + " kaldı.") : "Önce " + A.one.toLocaleLowerCase("tr") + " almalısın."); return 0; }
-  S.store[A.prod] = (+S.store[A.prod] || 0) + n; gainXp(n * XP[A.prod]);
+  S.store[A.prod] = (+S.store[A.prod] || 0) + n; gainXp(n * XP[A.prod]); dailyEv("prod:" + A.prod, n);
   popAt(colOf(S.layout[kind]) + 1, rowOf(S.layout[kind]), "+" + n + " " + A.prodName.toLocaleLowerCase("tr"), "#fff6c9");
   saveNow(); renderHud(); renderPlots(); return n;
 }
@@ -2665,7 +2679,7 @@ $("farmbBody").addEventListener("click", e => {
     Object.entries(F.need).forEach(([c, q]) => S.store[c] -= n * q); S.millQ = { r: k, q: n, t0: Date.now() }; saveNow(); renderPlots(); toast(F.name + " yapılıyor ⚙️"); }
   else if (A("data-mtake")) { const I = millInfo(S, Date.now()); if (!I.done) return; const F = FEEDS[I.r];
     S.store[I.r] = (+S.store[I.r] || 0) + I.done * F.out; S.millQ.q -= I.done; S.millQ.t0 += I.done * F.ms; if (S.millQ.q <= 0) S.millQ = null;
-    gainXp(I.done * XP.feed); popAt(me.x, me.y - .3, "+" + I.done * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
+    gainXp(I.done * XP.feed); dailyEv("feed", I.done * F.out); popAt(me.x, me.y - .3, "+" + I.done * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
   renderFarmB();
 });
 // ---------- Tap on a building / tree / decoration: a small action bar appears under it ----------
@@ -2684,6 +2698,7 @@ function objAct(kind, i) {
     return;
   }
   if (kind === "house") { cancelAll(); walkTo(new Set([doorOf(S)]), null); return; }
+  if (kind === "sign") { openQuests(lvl() >= ORDER_LEVEL ? "orders" : undefined); return; }
   if (kind === "coop" || kind === "cowbarn" || kind === "mill") { cancelAll(); if (!walkTo(sidesOf(fpCells(kind, S.layout[kind]), curBlocked()), () => openFarmB(kind))) openFarmB(kind); return; }
   if (OVENS.includes(kind)) { const id = kind; cancelAll(); if (!walkTo(sidesOf(fpCells(id, S.layout[id]), curBlocked()), () => openOven(id))) openOven(id); return; }
   if (kind === "barn") { cancelAll(); if (!walkTo(new Set(barnDoors(S)), () => { renderDepot(); openSheet($("depot")); })) hint("Depoya giden bir yol yok."); return; }
@@ -2701,7 +2716,7 @@ const OBJ_ACTS = {
   house: [["🚪", "Eve git", "use"], ["✋", "Taşı", "move"]],
   spr: [["💦", "Sula", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
   tree: [["🍎", "Topla", "use"], ["✋", "Taşı", "move"]],
-  decor: [["✋", "Taşı", "move"]], scare: [["✋", "Taşı", "move"]], sign: [["✋", "Taşı", "move"]],
+  decor: [["✋", "Taşı", "move"]], scare: [["✋", "Taşı", "move"]], sign: [["📋", "Siparişler", "use"], ["✋", "Taşı", "move"]],
   coop: [["🥚", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐔", "Kümes", "use"], ["✋", "Taşı", "move"]],
   cowbarn: [["🥛", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐄", "Ahır", "use"], ["✋", "Taşı", "move"]],
   mill: [["⚙️", "Yem yap", "use"], ["✋", "Taşı", "move"]],
@@ -3713,7 +3728,7 @@ $("ovenBody").addEventListener("click", e => {
     const k = +A("data-otake"), t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return;
     const key = I.r; S.store[key] = (+S.store[key] || 0) + I.done; t.q -= I.done; t.t0 += I.done * RECIPES[key].ms;
     if (t.q <= 0) S.bakes[id][k] = null;
-    gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done);
+    gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done); dailyEv("bake:" + key, I.done);
     popAt(me.x, me.y - .3, "+" + I.done + " " + RECIPES[key].name.toLocaleLowerCase("tr"), "#ffe27a");
     saveNow(); renderHud(); renderPlots(); renderOven(); return;
   }
@@ -3761,7 +3776,7 @@ $("depotBody").addEventListener("click", e => {
   const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr) return;
   const have = +S.store[pr.key] || 0, k = b.getAttribute("data-n") === "all" ? have : Math.min(1, have);
   if (!k) return;
-  S.store[pr.key] = have - k; S.gold = round1(S.gold + k * pr.price); questEv("sell", k);
+  S.store[pr.key] = have - k; S.gold = round1(S.gold + k * pr.price); questEv("sell", k); dailyEv("sellg", k * pr.price);
   renderHud(); renderPlots(); save(); renderDepot();
   popAt(me.x, me.y - .3, "+" + fmtG(k * pr.price) + " altın", "#ffe27a");
 });
@@ -4281,7 +4296,7 @@ function enterGame() {
   if (mv !== MAPV) { if ((mv === 3 || mv === 4) && S.pos && isFinite(S.pos.x) && isFinite(S.pos.y)) S.pos = mv === 4 ? { x: S.pos.x + SX, y: S.pos.y + SY } : { x: S.pos.x + DX, y: S.pos.y + DY }; else S.pos = null; }
   S.mapv = MAPV; S.nameKey = nameKey(S.name);
   S.landBought = Math.max(0, Math.floor(+S.landBought || 0));
-  tutInit(); checkBroke(); renderHud();
+  tutInit(); try { ordersEnsure(); dailyEnsure(); } catch (e) { console.error(e); } checkBroke(); renderHud();
   entered = true;
   ensureMe();
   enterScene({ kind: "home" });
@@ -4522,7 +4537,7 @@ $("wishBtn").onclick = () => {
   if (amt > S.gold) { res.className = "wishres lose"; res.textContent = "O kadar altının yok. Sende " + fmtBig(S.gold) + " altın var."; return; }
   if (amt > WISH_MAX) { res.className = "wishres lose"; res.textContent = "Bir seferde en fazla " + fmtBig(WISH_MAX) + " altın atabilirsin."; return; }
   if (wheelBusy) return;
-  S.wish = { d: today(), n: (S.wish && S.wish.d === today() ? +S.wish.n || 0 : 0) + 1 }; questEv("wish", 1);
+  S.wish = { d: today(), n: (S.wish && S.wish.d === today() ? +S.wish.n || 0 : 0) + 1 }; questEv("wish", 1); dailyEv("wish", 1);
   // the result is decided and saved right away; the wheel only shows it
   let r = Math.random(), out = "none"; for (const [k, p] of WISH_ODDS) { if (r < p) { out = k; break; } r -= p; }
   const delta = amt * (WISH_MULT[out] - 1), win = delta > 0;
@@ -4678,9 +4693,9 @@ function questPct(q) {
 let qOldReady = false;
 function renderQuest() {
   const t = $("qtrack"); if (!t || !S || !S.tut) return;
-  const q = questCur(), any = !!q && questReady(q);
+  const q = questCur(), tq = !!q && questReady(q), any = tq || dailyAny() || orderAny();
   $("questDot").classList.toggle("on", any);
-  $("questBtn").classList.toggle("glow", any);
+  $("questBtn").classList.toggle("glow", tq);
   if (!q || !entered) { t.hidden = true; questPulse(null); return; }
   t.hidden = false;
   const ready = questReady(q);
@@ -4699,6 +4714,12 @@ function questPulse(q) {
   document.querySelectorAll("#dock_v8 [data-act]").forEach(b => b.classList.toggle("qpulse", !!act && b.getAttribute("data-act") === act));
 }
 function renderQuestList() {
+  renderQuestTabs();
+  if (qtab === "tut") renderTutList();
+  else { $("questList").innerHTML = qtab === "daily" ? renderDailyList() : renderOrderList(); $("questMore").textContent = ""; }
+  tickUntil();
+}
+function renderTutList() {
   const cur = S.tut.i;
   $("questList").innerHTML = (cur >= QUESTS.length ? `<div class="qdone-all">🎉 Bütün görevleri bitirdin! Artık çiftliğini dilediğin gibi büyütebilirsin.</div>` : "") + QUESTS.map((q, k) => {
     if (k !== cur) return "";                     // claimed quests disappear, later ones appear one by one
@@ -4714,7 +4735,8 @@ function renderQuestList() {
   const left = QUESTS.length - Math.min(QUESTS.length, cur + 1);
   $("questMore").textContent = left > 0 ? "🔒 Bu görevi bitirince yeni görev açılır." : "";
 }
-function openQuests() { if (!S) return; tutInit(); S.tut.o = 1; renderQuestList(); $("quests").classList.add("on"); const c = $("questList").querySelector(".qcard.cur"); if (c) setTimeout(() => c.scrollIntoView({ block: "center", behavior: "smooth" }), 60); }
+function openQuests(tab) { if (!S) return; tutInit(); S.tut.o = 1;
+  qtab = typeof tab === "string" ? tab : tutOn() ? "tut" : orderAny() && !dailyAny() ? "orders" : "daily"; renderQuestList(); $("quests").classList.add("on"); const c = $("questList").querySelector(".qcard.cur"); if (c) setTimeout(() => c.scrollIntoView({ block: "center", behavior: "smooth" }), 60); }
 function claimQuest(k) {
   if (!tutOn() || k !== S.tut.i) return;
   const q = QUESTS[k]; if (!questReady(q)) return;
@@ -4736,13 +4758,187 @@ function coinBurst(from, amount) {
     c.style.animationDelay = (k * 35) + "ms"; root.appendChild(c); setTimeout(() => c.remove(), 1400);
   }
 }
-$("questBtn").onclick = openQuests;
-$("qtrack").onclick = openQuests;
+$("questBtn").onclick = () => openQuests();
+$("qtrack").onclick = () => openQuests("tut");
 $("questClose").onclick = () => $("quests").classList.remove("on");
 $("quests").addEventListener("click", e => {
   if (e.target === $("quests")) { $("quests").classList.remove("on"); return; }
   const b = e.target.closest("[data-qclaim]"); if (b) claimQuest(+b.getAttribute("data-qclaim"));
+  const A = n => { const el = e.target.closest("[" + n + "]"); return el ? el.getAttribute(n) : null; };
+  if (A("data-dclaim") !== null) dailyClaim(+A("data-dclaim"));
+  if (A("data-dbonus") !== null) dailyBonusClaim();
+  if (A("data-ogive") !== null) orderGive(+A("data-ogive"));
+  if (A("data-oskip") !== null) orderSkip(+A("data-oskip"));
 });
+// ---------- Daily tasks (3 new small jobs every day) and the order board (villagers ask for products) ----------
+const DAILY_LEVEL = 3, ORDER_LEVEL = 3, ORDER_SLOTS = 3, ORDER_NEXT = 5 * MIN, ORDER_SKIP = 15 * MIN;
+const ITEM_EMO = { wheat: "🌾", potato: "🥔", carrot: "🥕", lettuce: "🥬", corn: "🌽", eggplant: "🍆", pumpkin: "🎃", apple: "🍎", bread: "🍞", fries: "🍟", egg: "🥚", milk: "🥛", chickfeed: "🐔", cowfeed: "🐄" };
+const itemName = k => (CROPS[k] && CROPS[k].name) || (FEEDS[k] && FEEDS[k].name) || ({ apple: "Elma", bread: "Ekmek", fries: "Patates kızartması", egg: "Yumurta", milk: "Süt" })[k] || k;
+const itemPrice = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.price : 0; };
+const hasOven = () => OVENS.some(id => S[id] && S.layout[id] >= 0);
+const lvl = () => S.level || 1;
+// every task: key of the event it counts, emoji, text, when it can show up, how many are needed
+const DAILY = [
+  { k: "harv:wheat", e: "🌾", t: n => n + " buğday topla", ok: () => true, n: L => Math.min(120, 20 + L * 2) },
+  ...["potato", "carrot", "lettuce", "corn", "eggplant", "pumpkin"].map(c => ({ k: "harv:" + c, e: ITEM_EMO[c], t: n => n + " " + CROPS[c].name.toLocaleLowerCase("tr") + " topla",
+    ok: () => cropOpen(c), n: L => Math.min(60, Math.round((c === "potato" ? 8 : 5) + L / (c === "potato" ? 1.5 : 3))) })),
+  { k: "plant", e: "🌱", t: n => n + " tohum ek", ok: () => true, n: L => Math.min(150, 20 + L * 2) },
+  { k: "water", e: "💧", t: n => n + " ekin sula", ok: () => true, n: L => Math.min(150, 20 + L * 2) },
+  { k: "sellg", e: "💰", t: n => "Depoda " + fmtBig(n) + " altınlık satış yap", ok: () => true, n: L => Math.min(20000, 60 + L * L * 6) },
+  { k: "bake:bread", e: "🍞", t: n => n + " ekmek pişir", ok: hasOven, n: L => Math.min(40, 5 + Math.floor(L / 2)) },
+  { k: "bake:fries", e: "🍟", t: n => n + " patates kızartması yap", ok: () => hasOven() && cropOpen("potato"), n: L => Math.min(30, 3 + Math.floor(L / 4)) },
+  { k: "harv:apple", e: "🍎", t: n => n + " elma topla", ok: () => (S.trees || []).length > 0, n: L => Math.max(1, Math.min((S.trees || []).length * 2, 3 + Math.floor(L / 5))) },
+  { k: "prod:egg", e: "🥚", t: n => n + " yumurta topla", ok: () => (S.chickens || []).length > 0, n: L => Math.min(60, 5 + Math.floor(L / 2)) },
+  { k: "prod:milk", e: "🥛", t: n => n + " süt topla", ok: () => (S.cows || []).length > 0, n: L => Math.min(30, 3 + Math.floor(L / 4)) },
+  { k: "feed", e: "⚙️", t: n => "Ambarda " + n + " yem yap", ok: () => !!S.mill, n: L => Math.min(40, 6 + Math.floor(L / 3)) },
+  { k: "order", e: "📋", t: n => n + " sipariş teslim et", ok: () => lvl() >= ORDER_LEVEL, n: L => 2 + Math.floor(L / 15) },
+  { k: "wish", e: "⛲", t: () => "Dilek çeşmesinde dilek tut", ok: () => lvl() >= WISH_LEVEL, n: () => 1 },
+];
+const dailyGold = L => 15 + L * 5, dailyXp = L => 8 + L * 2, dailyBonus = L => 40 + L * 12;
+function seededRng(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; }; }
+function dailyEnsure() {
+  if (!S || lvl() < DAILY_LEVEL) return null;
+  const d = today();
+  if (S.daily && S.daily.d === d && toArr(S.daily.list).length) { const D = S.daily; D.list = toArr(D.list); D.c = D.list.map((_, j) => +toArr(D.c)[j] || 0); D.got = D.list.map((_, j) => +toArr(D.got)[j] || 0); return D; }
+  const L = lvl(), rnd2 = seededRng(d + "|" + (uid || S.name || "")), pool = DAILY.filter(t => t.ok()), pick = [];
+  while (pick.length < 3 && pool.length) {
+    const t = pool.splice(Math.floor(rnd2() * pool.length), 1)[0];
+    if (t.k.startsWith("harv:") && pick.filter(x => x.k.startsWith("harv:")).length >= 2) continue;
+    pick.push(t);
+  }
+  S.daily = { d, list: pick.map(t => ({ k: t.k, n: t.n(L), g: dailyGold(L), x: dailyXp(L) })), c: pick.map(() => 0), got: pick.map(() => 0), b: 0, bg: dailyBonus(L) };
+  return S.daily;
+}
+const dailyTpl = k => DAILY.find(t => t.k === k);
+const dailyReady = (D, j) => !D.got[j] && (+D.c[j] || 0) >= D.list[j].n;
+function dailyAny() { const D = S && S.daily && S.daily.d === today() ? S.daily : null; return !!D && (D.list.some((_, j) => dailyReady(D, j)) || (!D.b && D.got.every(Boolean))); }
+function dailyEv(k, n) {
+  if (!S) return; const D = dailyEnsure(); if (!D) return;
+  let changed = false;
+  D.list.forEach((t, j) => { if (t.k !== k || D.got[j]) return; const was = dailyReady(D, j);
+    D.c[j] = Math.min(t.n, (+D.c[j] || 0) + Math.max(0, +n || 0)); changed = true;
+    if (!was && dailyReady(D, j)) toast("Günlük görev tamam: " + dailyTpl(t.k).t(t.n) + "! Ödülünü al"); });
+  if (changed) renderQuest();
+}
+function dailyClaim(j) {
+  const D = dailyEnsure(); if (!D || !dailyReady(D, j)) return;
+  const t = D.list[j]; D.got[j] = 1; S.gold = round1(S.gold + t.g); gainXp(t.x);
+  coinBurst($("questList").querySelector(`[data-dclaim="${j}"]`), t.g); saveNow(); renderHud(); renderQuest(); renderQuestList();
+  toast("+" + t.g + " altın, +" + t.x + " XP");
+}
+function dailyBonusClaim() {
+  const D = dailyEnsure(); if (!D || D.b || !D.got.every(Boolean)) return;
+  D.b = 1; S.gold = round1(S.gold + D.bg); gainXp(dailyXp(lvl()));
+  coinBurst($("questList").querySelector("[data-dbonus]"), 14); saveNow(); renderHud(); renderQuest(); renderQuestList();
+  toast("Günün sandığı açıldı: +" + D.bg + " altın 🎁");
+}
+// ---- orders ----
+const ORDER_NPC = [["👵", "Ayşe teyze"], ["👴", "Hasan amca"], ["👨‍🍳", "Aşçı Mehmet"], ["👩‍🌾", "Zeynep"], ["🧔", "Bakkal Ali"], ["👩‍🏫", "Elif öğretmen"], ["🧑‍💼", "Muhtar"], ["👧", "Küçük Defne"], ["👨‍🌾", "Çoban Yusuf"], ["👩‍🍳", "Pastacı Selin"]];
+function orderItems() {
+  const L = lvl(), out = [];
+  CROP_KEYS.forEach(k => { if (!cropOpen(k)) return; const base = k === "wheat" ? 6 + L * .8 : k === "potato" ? 3 + L / 3 : 2 + L / 6; out.push([k, base]); });
+  if ((S.trees || []).length) out.push(["apple", 2 + L / 6]);
+  if (hasOven()) out.push(["bread", 2 + L / 4]);
+  if (hasOven() && cropOpen("potato")) out.push(["fries", 2 + L / 6]);
+  if ((S.chickens || []).length) out.push(["egg", 2 + L / 4], ["egg", 2 + L / 4]);
+  if ((S.cows || []).length) out.push(["milk", 1 + L / 6], ["milk", 1 + L / 6]);
+  return out;
+}
+function newOrder() {
+  const L = lvl(), pool = orderItems(), it = {};
+  const kinds = Math.min(pool.length, L < 6 ? 1 : L < 12 ? 1 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 3));
+  while (Object.keys(it).length < kinds && pool.length) {
+    const [k, base] = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; if (it[k]) continue;
+    it[k] = Math.max(1, Math.round(base * (.7 + Math.random() * .6)));
+  }
+  const val = Object.entries(it).reduce((a, [k, q]) => a + q * itemPrice(k), 0);
+  return { p: Math.floor(Math.random() * ORDER_NPC.length), it, g: Math.max(5, Math.round(val * 1.4)), x: Math.round(val / 5) + 3 };
+}
+function ordersEnsure() {
+  if (!S || lvl() < ORDER_LEVEL) return null;
+  S.orders = toArr(S.orders);
+  const now = Date.now(); let changed = false;
+  for (let j = 0; j < ORDER_SLOTS; j++) {
+    const o = S.orders[j];
+    if (!o || typeof o !== "object" || (o.it && !Object.entries(o.it).every(([k, q]) => STORE_KEYS.includes(k) && +q > 0)) || (!o.it && !(+o.w > 0)) || (!o.it && +o.w <= now)) { S.orders[j] = newOrder(); changed = true; }
+  }
+  S.orders.length = ORDER_SLOTS;
+  if (changed) save();
+  return S.orders;
+}
+const orderCan = o => !!(o && o.it) && Object.entries(o.it).every(([k, q]) => (+S.store[k] || 0) >= q);
+function orderAny() { return !!(S && Array.isArray(S.orders) && S.orders.some(orderCan)); }
+function orderGive(j) {
+  const O = ordersEnsure(), o = O && O[j]; if (!orderCan(o)) return;
+  Object.entries(o.it).forEach(([k, q]) => S.store[k] -= q);
+  S.gold = round1(S.gold + o.g); gainXp(o.x);
+  coinBurst($("questList").querySelector(`[data-ogive="${j}"]`), Math.min(14, 5 + Math.round(o.g / 20)));
+  toast(ORDER_NPC[o.p][1] + " çok sevindi! +" + fmtG(o.g) + " altın, +" + o.x + " XP");
+  O[j] = { w: Date.now() + ORDER_NEXT }; dailyEv("order", 1);
+  saveNow(); renderHud(); renderPlots(); renderQuest(); renderQuestList();
+}
+function orderSkip(j) {
+  const O = ordersEnsure(); if (!O || !O[j] || !O[j].it) return;
+  O[j] = { w: Date.now() + ORDER_SKIP }; saveNow(); renderPlots(); renderQuest(); renderQuestList();
+}
+// ---- the Görevler window: tabs ----
+let qtab = "tut";
+const fmtLong = ms => ms >= 3600000 ? Math.floor(ms / 3600000) + " sa " + Math.floor(ms % 3600000 / 60000) + " dk" : fmt(ms);
+function untilMidnight() { const d = new Date(); d.setHours(24, 0, 0, 0); return d.getTime(); }
+function renderDailyList() {
+  if (lvl() < DAILY_LEVEL) return `<div class="qdone-all">📅 Günlük görevler ${DAILY_LEVEL}. seviyede açılır.<br>Şu an ${lvl()}. seviyedesin.</div>`;
+  const D = dailyEnsure();
+  let h = `<p class="qinfo">Her gün 3 yeni görev. Yenileri <b data-until="${untilMidnight()}"></b> sonra gelir.</p>`;
+  h += D.list.map((t, j) => { const T = dailyTpl(t.k), c = Math.min(t.n, +D.c[j] || 0), got = !!D.got[j], rd = dailyReady(D, j);
+    return `<div class="qcard ${got ? "claimed" : rd ? "cur ready" : "cur"}"><span class="qe">${got ? "✅" : T ? T.e : "⭐"}</span><div class="qbody">
+      <h3>${T ? T.t(t.n) : t.k}<span class="qcoin">+${t.g} altın</span><span class="qcoin xp">+${t.x} XP</span></h3>
+      ${got ? `<p>Tamamlandı, ödül alındı.</p>` : `<div class="qbar"><u style="width:${(c / t.n * 100).toFixed(0)}%"></u><span>${t.k === "sellg" ? fmtBig(c) + "/" + fmtBig(t.n) : c + "/" + t.n}</span></div>`}
+      ${rd ? `<button class="big green" data-dclaim="${j}">Ödülü al</button>` : ""}</div></div>`; }).join("");
+  const all = D.got.every(Boolean);
+  h += `<div class="qcard chest ${D.b ? "claimed" : all ? "cur ready" : ""}"><span class="qe">${D.b ? "✅" : "🎁"}</span><div class="qbody">
+    <h3>Günün sandığı<span class="qcoin">+${D.bg} altın</span></h3>
+    <p>${D.b ? "Bugünün sandığını açtın. Yarın yine gel!" : all ? "Bütün görevleri bitirdin, sandığını aç!" : "3 görevin hepsini bitirince açılır (" + D.got.filter(Boolean).length + "/3)."}</p>
+    ${all && !D.b ? `<button class="big green" data-dbonus="1">Sandığı aç</button>` : ""}</div></div>`;
+  return h;
+}
+function renderOrderList() {
+  if (lvl() < ORDER_LEVEL) return `<div class="qdone-all">📋 Siparişler ${ORDER_LEVEL}. seviyede açılır.<br>Şu an ${lvl()}. seviyedesin.</div>`;
+  const O = ordersEnsure();
+  let h = "";
+  h += O.map((o, j) => {
+    if (!o.it) return `<div class="qcard wait"><span class="qe">⏳</span><div class="qbody"><h3>Yeni sipariş yolda</h3><p><b data-until="${o.w}"></b> sonra gelir.</p></div></div>`;
+    const [em, nm] = ORDER_NPC[o.p] || ORDER_NPC[0], can = orderCan(o);
+    return `<div class="qcard order ${can ? "cur ready" : "cur"}"><span class="qe npc">${em}</span><div class="qbody">
+      <h3>${nm}<span class="qcoin">+${fmtG(o.g)} altın</span><span class="qcoin xp">+${o.x} XP</span></h3>
+      <div class="oitems">${Object.entries(o.it).map(([k, q]) => { const have = +S.store[k] || 0; return `<span class="oit ${have >= q ? "ok" : ""}" title="${itemName(k)}"><i>${ITEM_EMO[k] || "📦"}</i>${Math.min(have, q)}/${q}</span>`; }).join("")}</div>
+      <div class="obtns"><button class="big green" data-ogive="${j}" ${can ? "" : "disabled"}>Teslim et</button><button class="big ghost" data-oskip="${j}">Reddet</button></div></div></div>`; }).join("");
+  return h;
+}
+function renderQuestTabs() {
+  const tutLeft = tutOn();
+  if (!tutLeft && qtab === "tut") qtab = "daily";
+  const dot = { tut: tutLeft && questReady(questCur()), daily: dailyAny(), orders: orderAny() };
+  $("qtabs").innerHTML = [["tut", "📜 Görevler"], ["daily", "📅 Günlük"], ["orders", "📋 Siparişler"]].filter(([k]) => k !== "tut" || tutLeft)
+    .map(([k, t]) => `<button data-qtab="${k}" aria-pressed="${k === qtab}">${t}${dot[k] ? "<i></i>" : ""}</button>`).join("");
+  $("questLead").textContent = qtab === "tut" ? "Görevleri bitir, ödül altınlarını buradan topla. Görevler seni adım adım çiftçiliğe hazırlar."
+    : qtab === "daily" ? "Günlük görevleri bitir, altın ve XP topla. Üçünü de bitirirsen günün sandığı açılır." : "Köylüler ürün istiyor. Depodan teslim et, normal satıştan daha çok altın ve XP kazan. Çiftliğindeki tabeladan da bakabilirsin.";
+}
+function tickUntil() {
+  let due = false;
+  document.querySelectorAll("#quests_v8 [data-until]").forEach(el => { const ms = +el.getAttribute("data-until") - Date.now(); if (ms <= 0) due = true; el.textContent = fmtLong(Math.max(0, ms)); });
+  if (due && $("quests").classList.contains("on")) renderQuestList();
+}
+setInterval(() => {
+  if (!alive() || !S || !entered) return;
+  if ($("quests").classList.contains("on")) tickUntil();
+}, 1000);
+// empty order slots fill up in the background, and the red dot follows
+setInterval(() => {
+  if (!alive() || !S || !entered) return;
+  const before = orderAny(); ordersEnsure(); dailyEnsure();
+  if (orderAny() !== before) { renderQuest(); try { renderPlots(); } catch (e) {} }
+}, 15000);
+$("qtabs").addEventListener("click", e => { const b = e.target.closest("[data-qtab]"); if (!b) return; qtab = b.getAttribute("data-qtab"); renderQuestList(); $("questList").scrollTop = 0; });
 // ---------- Admin: bans, timed kicks and gold for any player ----------
 // admin/{uid}: { ban: {reason, ts}, kick: {until, reason}, ops: {id: {delta, ts}} } - only the admin may write it (Firebase rules)
 let adminData = null, blocked = false;
@@ -4932,6 +5128,12 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 89, d: "9 Ekim 2026", e: "📋", t: "Siparişler ve günlük görevler", c: "#2f7fbf", b: "#dcefff", items: [
+    "<b>Sipariş tabelası</b> (3. sv): Köylüler ürün istiyor. Depodan teslim et, normal satıştan daha çok altın ve XP kazan. Çiftliğindeki tabelaya dokunarak da bakabilirsin.",
+    "<b>Günlük görevler</b> (3. sv): Her gün 3 yeni görev. Üçünü de bitirirsen <b>günün sandığı</b> açılır.",
+    "Görevler penceresinde artık sekmeler var: Görevler, Günlük ve Siparişler.",
+    "Yeni fiyatlar: <b>yumurta 15</b>, <b>süt 40</b> altın.",
+  ] },
   { v: 88, d: "9 Ekim 2026", e: "🐔", t: "Tavuklar, inekler ve ambar", c: "#c8453a", b: "#ffe3dc", items: [
     "<b>Tavuk kümesi</b> (10. sv, 500 altın): 10 tavuk sığar, tavuğu 100 altın. Yem yiyen tavuk 5 dakikada yumurtlar, yumurta 10 altın.",
     "<b>İnek ahırı</b> (13. sv, 750 altın): 4 inek sığar, ineği 200 altın. Yem yiyen inek 8 dakikada süt verir, süt 25 altın.",
@@ -5875,6 +6077,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
       [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
         const em = I.ready ? e : I.hungry && I.hungry === I.n ? "🍽️" : null; if (!em) return;
         const sp = sprite(emojiBadge(em, I.ready || 0), .8, .8); sp.position.set(colOf(L[k]) + o.w / 2, 1.9 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
+      if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), .75, .75); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
       if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), .8, .8); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
     }
     // empty sprinklers show a small red "!"
