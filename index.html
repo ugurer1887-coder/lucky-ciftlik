@@ -1149,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "92";
+const VERSION = "93";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -3807,7 +3807,7 @@ $("depotBody").addEventListener("click", e => {
 // market/{id}: { seller, sn: seller name, item, q, price, ts, buyer?, bn?: buyer name, bt? }
 // the seller's goods leave the depot when listed; the buyer marks the listing as bought (once), the seller's game collects the gold and removes it
 const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk"];
-let pzAll = [], pzMine = [], pzTab = "buy", pzFilter = "all", pzForm = null, pzAllOn = false, pzMineOn = false, pzBusy = false, pzDenied = false;
+let pzShown = -1, pzAll = [], pzMine = [], pzTab = "buy", pzFilter = "all", pzForm = null, pzAllOn = false, pzMineOn = false, pzBusy = false, pzDenied = false;
 const pzVal = (k, q) => itemPrice(k) * q, pzMax = (k, q) => Math.max(10, Math.ceil(pzVal(k, q) * 3));
 const pzThumb = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.thumb() : ""; };
 const pzAgo = ts => { const m = Math.max(0, Math.floor((Date.now() - (+ts || 0)) / 60000)); return m < 1 ? "az önce" : m < 60 ? m + " dk önce" : m < 1440 ? Math.floor(m / 60) + " sa önce" : Math.floor(m / 1440) + " gün önce"; };
@@ -3818,7 +3818,8 @@ function listenPazarMine() {
 }
 function listenPazarAll() {
   if (!db || !uid || pzAllOn) return; pzAllOn = true;
-  try { db.collection("market").orderBy("ts", "desc").limit(150).onSnapshot(s => { pzDenied = false; pzAll = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(pzOk); if ($("pazar").classList.contains("on")) renderPazar(); },
+  try { db.collection("market").orderBy("ts", "desc").limit(150).onSnapshot(s => { pzDenied = false; pzAll = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(pzOk); if ($("pazar").classList.contains("on")) renderPazar();
+    if (scene.kind === "plaza" && pzAll.filter(l => !l.buyer).length !== pzShown) { try { R3.dirty = true; renderPlots(); } catch (e) {} } },
     e => { pzAllOn = false; if (e && e.code === "PERMISSION_DENIED") pzDenied = true; if ($("pazar").classList.contains("on")) renderPazar(); }); } catch (e) { pzAllOn = false; }
 }
 // gold for my sold goods comes in by itself (each sale is paid only once)
@@ -5297,6 +5298,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 93, d: "9 Ekim 2026", e: "🏪", t: "Pazar yeri tepeden belli", c: "#3f8fd0", b: "#e2f0ff", items: [
+    "Her tezgahın tentesinde büyük numara ve PAZAR yazısı var (1, 2, 3, 4); tepeden bakınca hemen görünüyor.",
+    "Tezgahların altında renkli halılar var, pazar yeri zeminde de belli oluyor.",
+    "Pankartın üstünde kaç tezgah olduğu ve kaç ürünün satışta olduğu yazıyor.",
+  ] },
   { v: 92, d: "9 Ekim 2026", e: "🎪", t: "Pazar yeri ve köy fırınları", c: "#c8453a", b: "#ffe6df", items: [
     "Meydanda <b>PAZAR YERİ</b> pankartı ve rengârenk bayrak süsleri var.",
     "Tezgahlar yenilendi: küçük meyve kasaları, fiyat etiketleri, terazi, kavanoz ve ekmek rafı.",
@@ -6288,8 +6294,16 @@ function setup3D(T) {
     [[-.78, .35], [-.82, .12]].forEach(([dx, dz], q) => { g.add(mesh(G.sph, M(q ? "#e2cc95" : "#ead7a6"), x + dx, .14, z + dz, .1, .14, .09)); g.add(mesh(G.cyl, M(set[q]), x + dx, .27, z + dz, .07, .02, .07, false)); });
     // striped awning, sloping to the front, with a scalloped edge
     for (let q = 0; q < 8; q++) { const st = mesh(G.box, M(q % 2 ? a2 : a1), x - .6 + .075 + q * .15, 1.18, z + .02, .15, .03, .82); st.rotation.x = .28; g.add(st); }
+    // painted roof seen from above: big stall number and PAZAR, so players can count and find the stalls easily
+    { const tx = canvasTex("stallTop" + k, 512, 352, (c, w, h) => { for (let q = 0; q < 8; q++) { c.fillStyle = q % 2 ? a2 : a1; c.fillRect(q * w / 8, 0, w / 8 + 1, h); }
+        c.fillStyle = "rgba(255,250,236,.97)"; rr(c, 22, 40, w - 44, h - 80, 56); c.fill(); c.lineWidth = 14; c.strokeStyle = a1; rr(c, 22, 40, w - 44, h - 80, 56); c.stroke();
+        c.fillStyle = a1; c.beginPath(); c.arc(118, h / 2, 82, 0, 6.3); c.fill(); c.fillStyle = "#fff"; c.font = "700 128px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(String(k + 1), 118, h / 2 + 8);
+        c.fillStyle = "#4a2410"; c.font = "700 96px Fredoka, Nunito, sans-serif"; c.fillText("PAZAR", 336, h / 2 + 6); });
+      const top = new T.Mesh(G.plane, new T.MeshLambertMaterial({ map: tx, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); top.position.set(x, 1.2, z + .02); top.rotation.x = .28; top.scale.set(1.2, 1, .84); g.add(top); }
+    // a coloured rug under the stall so the market place stands out on the ground
+    { const rg = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: a1, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 })); rg.position.set(x, .02, z + .1); rg.scale.set(1.62, 1, 1.28); g.add(rg);
+      const rin = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: "#f3e3c0", polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); rin.position.set(x, .022, z + .1); rin.scale.set(1.46, 1, 1.12); g.add(rin); }
     for (let q = 0; q < 8; q++) { const sc = mesh(G.cyl, M(q % 2 ? a2 : a1), x - .6 + .075 + q * .15, 1.05, z + .42, .075, .02, .075, false); sc.rotation.x = Math.PI / 2 + .28; sc.scale.set(.075, .02, .05); g.add(sc); }
-    { const sb = boardMesh(.56, .16, boardTex("pazarSign", "🛒 PAZAR", "#fff3cf", "#b8322a", "#7b4f27")); sb.position.set(x, 1.36, z - .3); g.add(sb); }
   }
   // the market's entrance: two painted posts with a cloth banner "PAZAR YERİ" and strings of little flags to the stalls on both sides
   function buildPazarBanner() {
@@ -6301,6 +6315,10 @@ function setup3D(T) {
       c.font = "700 140px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.lineWidth = 14; c.strokeStyle = "#7a1d14"; c.strokeText("🛒 PAZAR YERİ", w / 2, h / 2 + 6); c.fillStyle = "#fff6e6"; c.fillText("🛒 PAZAR YERİ", w / 2, h / 2 + 6); });
     { const ban = new T.Mesh(new T.PlaneGeometry(xb - xa - .14, .58), LAM({ map: tx, side: T.DoubleSide })); ban.position.set(cx, top - .36, z); g.add(ban); }
     { const rod = mesh(G.cyl8, M(COL.woodD), cx, top - .05, z, .025, xb - xa, .025); rod.rotation.z = Math.PI / 2; g.add(rod); }
+    { const n = pzAll.filter(l => !l.buyer).length, st = STALL_SETS.length;
+      const tx2 = canvasTex("pazarCount" + n, 512, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.25)"; rr(c, 10, 16, w - 16, h - 22, 60); c.fill(); c.fillStyle = "#fffaf0"; rr(c, 4, 6, w - 16, h - 22, 60); c.fill(); c.lineWidth = 10; c.strokeStyle = "#e8463a"; rr(c, 4, 6, w - 16, h - 22, 60); c.stroke();
+        c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#b8322a"; c.font = "700 58px Fredoka, Nunito, sans-serif"; c.fillText("🛒 " + st + " tezgah", w / 2 - 6, 52); c.fillStyle = "#3a2410"; c.font = "700 42px Fredoka, Nunito, sans-serif"; c.fillText(n ? n + " ürün satışta" : "Satış yap, kazan!", w / 2 - 6, 106); });
+      const sp = sprite(tx2, 2.3, .72); sp.position.set(cx, top + .9, z); sp.renderOrder = 7; g.add(sp); }
     // little flag strings from each post to the nearest stall roof
     const tri = new T.ShapeGeometry((() => { const s = new T.Shape(); s.moveTo(-.07, 0); s.lineTo(.07, 0); s.lineTo(0, -.13); s.closePath(); return s; })());
     const FLAGC = ["#e8463a", "#f6c445", "#3f8fd0", "#2f9a43", "#ffffff"];
@@ -6331,7 +6349,7 @@ function setup3D(T) {
     else if (t === "flag") { g.add(mesh(G.cyl8, MS("#9aa3ab", { metalness: .6, roughness: .3 }), x - .25, .9, z, .03, 1.8, .03)); g.add(mesh(G.sph, M("#ffd34d"), x - .25, 1.82, z, .05, .05, .05, false));
       const tx = canvasTex("flagL", 256, 160, (c, w, h) => { c.fillStyle = "#38a84a"; c.fillRect(0, 0, w, h); c.fillStyle = "#2f8a3c"; c.fillRect(0, h - 26, w, 26); c.fillStyle = "#ffe27a"; c.font = "700 74px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("Lucky", w / 2, h / 2 - 8); });
       const fl = new T.Mesh(new T.PlaneGeometry(.62, .4), LAM({ map: tx, side: T.DoubleSide })); fl.position.set(x + .07, 1.56, z); g.add(fl); fx.flags.push(fl); }
-    else if (t === "stall") buildStall(g, x, z, k);
+    else if (t === "stall") buildStall(g, x, z, Math.max(0, P_DECOR.filter(d => d.t === "stall").findIndex(d => d.cell === i)));
     else if (t === "fountain") { blob(g, x, z, 1.1, 1.1, .5); g.add(mesh(G.cyl, TM("#d8d2c6", "stone", 3, 1), x, .12, z, .42, .24, .42)); g.add(mesh(G.cyl, MS("#3594c0", { roughness: .05, metalness: .1 }), x, .245, z, .36, .02, .36, false));
       g.add(mesh(G.cyl, M("#c9c2b5"), x, .45, z, .06, .45, .06)); g.add(mesh(G.cyl, M("#c9c2b5"), x, .66, z, .18, .05, .18)); const wm = MS("#e6f7ff", { transparent: true, opacity: .6, roughness: .1 });
       g.add(mesh(G.sph, wm, x, .76, z, .05, .08, .05, false)); for (let q = 0; q < 6; q++) { const a = q / 6 * Math.PI * 2; g.add(mesh(G.sph, wm, x + Math.cos(a) * .19, .6, z + Math.sin(a) * .19, .03, .05, .03, false)); } }
@@ -6421,7 +6439,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
   let dyn = new T.Group(); scene3.add(dyn); let staticSig = "";
   const STATIC_POOLS = ["post", "rail", "tuft", "ftrunk", "fleaf"], DYN_POOLS = ["soil", "furrow", "stalk", "whead", "blade", "ear", "leaf", "tuber", "fruit", "cone", "hl"];
   function staticSigOf(f, now) {
-    if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length;
+    if (scene.kind === "plaza") return "P|" + tuftCount + "|" + openJobs.filter(j => j.owner !== uid).length + "|" + pzAll.filter(l => !l.buyer).length;
     if (!f) return "none|" + tuftCount;
     const B = { q: 0, done: 0 }; const oSig = (f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") + (millInfo(S, now).q > millInfo(S, now).done ? "m" : "") : "")
       + "|" + animalsOf(f, "coop").length + "." + animalsOf(f, "cowbarn").length + "|" + JSON.stringify(f.rot || {});
@@ -6478,6 +6496,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
     P_TREES.forEach((i, k) => { world.add(buildTree(colOf(i) + .5, rowOf(i) + .5, true, k)); proxy(colOf(i) + .5, .7, rowOf(i) + .5, 1, 1.4, 1, i); });
     P_BENCH.forEach(i => world.add(buildBench(i))); P_LAMP.forEach(i => world.add(buildLamp(i))); P_FLOWER.forEach(i => world.add(buildFlowerBed(i)));
     world.add(buildTitle()); proxy(colOf(P_TITLE[1]), .7, rowOf(P_TITLE[0]) + .5, 2, 1.2, 1, P_TITLE[0]);
+    try { listenPazarAll(); } catch (e) {} pzShown = pzAll.filter(l => !l.buyer).length;
     world.add(buildPazarBanner());
     world.add(buildJobBoard()); proxy(colOf(P_JOBS[1]), .7, rowOf(P_JOBS[0]) + .6, 2, 1.4, 1, P_JOBS[0]);
     const n = openJobs.filter(j => j.owner !== uid).length;

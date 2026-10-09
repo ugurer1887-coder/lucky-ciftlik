@@ -81,6 +81,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Fırın 2: büyük tuğla kubbe (`brickDome`), odunluk, ekmek masası; fırın 3: çift kubbeli köy fırını (her tepsi için bir kubbe), ortada baca ve FIRIN tabelası, arkada kiremit sundurma.
 - Tezgahlar `buildStall()` (her tezgah farklı tente rengi ve ürünler), meydan girişinde `buildPazarBanner()` (iki direk, PAZAR YERİ pankartı, bayrak dizileri).
 
+## v93
+- Tezgah tentesine tepeden okunan numara + PAZAR dokusu (`stallTop{n}`), altında renkli halı. Pankart üstünde "N tezgah / X ürün satışta" sprite'ı; meydan imzası (`staticSigOf`) satıştaki ürün sayısını içerir, sayı değişince meydan yeniden çizilir.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.
