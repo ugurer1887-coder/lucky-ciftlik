@@ -217,8 +217,20 @@ html,body{background:#000!important}
 .wishres{font-weight:800!important;min-height:1.3em;margin-top:8px!important}
 .wishres.win{color:#2f9a43!important}.wishres.lose{color:#c0503a!important}
 .gear.rankbtn{right:calc(116px + env(safe-area-inset-right,0px))}
+.gear.updbtn{right:calc(170px + env(safe-area-inset-right,0px))}
+#root_v8 .gear.updbtn{background:linear-gradient(160deg,#7650dc,#e0473a 55%,#f0a01a)}
+#upd_v8 .box{max-width:560px;background:linear-gradient(170deg,#fff6e3 0%,#ffeef3 45%,#eaf3ff 100%);color:#2a2240}
+#upd_v8 h1{background:linear-gradient(90deg,#7650dc,#e0473a,#f0a01a);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.7rem;margin-bottom:2px}
+#upd_v8 .lead{text-align:center;margin:0 0 10px;color:#6a5f80;font-size:.85rem}
+.updcard{position:relative;border-radius:18px;padding:12px 14px 10px 62px;margin:0 0 10px;background:#fff;box-shadow:0 4px 14px rgba(60,40,120,.1);border-left:6px solid var(--uc)}
+.updcard .ue{position:absolute;left:12px;top:12px;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:1.35rem;background:var(--ub)}
+.updcard h3{margin:0;font:700 1.02rem Fredoka,Nunito,sans-serif;color:var(--uc)}
+.updcard .um{font-size:.72rem;color:#8a809c;margin:1px 0 6px}
+.updcard .um b{display:inline-block;background:var(--uc);color:#fff;border-radius:999px;padding:1px 8px;margin-right:6px;font-size:.7rem}
+.updcard ul{margin:0;padding-left:18px}.updcard li{font-size:.86rem;line-height:1.38;margin:2px 0}
+.updcard.new::after{content:"YENİ";position:absolute;right:12px;top:12px;background:#e0473a;color:#fff;font:700 .65rem Fredoka,Nunito,sans-serif;padding:3px 8px;border-radius:999px;letter-spacing:.5px}
 .hud{right:204px}
-.gear.adminbtn{right:calc(170px + env(safe-area-inset-right,0px));z-index:7;touch-action:manipulation}
+.gear.adminbtn{right:calc(224px + env(safe-area-inset-right,0px));z-index:7;touch-action:manipulation}
 .gear.adminbtn[hidden]{display:none}
 .hud.adm-on{right:258px}
 #rank_v8 .box{max-width:520px;background:linear-gradient(170deg,#e9f1ff 0%,#f3e9ff 55%,#fff1e0 100%);color:#24203a}
@@ -592,6 +604,7 @@ body{font-family:var(--body);letter-spacing:.1px}
     </div>
   </div>
   <button class="gear adminbtn" id="adminBtn_v8" aria-label="Yönetim paneli" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.1 8.4-7.5 9.8-4.4-1.4-7.5-5.2-7.5-9.8V5.8z" fill="none" stroke="#ffd34d" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.4 2.4 4.6-4.8" fill="none" stroke="#ffd34d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button class="gear updbtn" id="updBtn_v8" aria-label="Güncellemeler"><i class="gdot" id="updDot_v8"></i><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.5l2.3 5.6 6 .5-4.6 3.9 1.4 5.9L12 15.3l-5.1 3.1 1.4-5.9-4.6-3.9 6-.5z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
 <button class="gear rankbtn" id="rankBtn_v8" aria-label="Sıralama"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M7 4h10v4.5a5 5 0 0 1-10 0z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M7 6H4.5v1.2A3 3 0 0 0 7.4 10M17 6h2.5v1.2a3 3 0 0 1-2.9 2.8M12 13.5V17M8.5 20h7M9.5 17h5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="gear mailbtn" id="mailBtn_v8" aria-label="Mektuplar"><i class="gdot" id="mailDot_v8"></i><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M4 7.5l8 6 8-6" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
   <button class="gear" id="gear_v8" aria-label="Ayarlar"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z" fill="none" stroke="#fff" stroke-width="2"/><path d="M19.4 13.5l1.7 1.3-1.8 3.1-2-.8a7.4 7.4 0 0 1-1.9 1.1l-.3 2.1h-3.6l-.3-2.1a7.4 7.4 0 0 1-1.9-1.1l-2 .8-1.8-3.1 1.7-1.3a7.6 7.6 0 0 1 0-3l-1.7-1.3 1.8-3.1 2 .8a7.4 7.4 0 0 1 1.9-1.1l.3-2.1h3.6l.3 2.1a7.4 7.4 0 0 1 1.9 1.1l2-.8 1.8 3.1-1.7 1.3a7.6 7.6 0 0 1 0 3z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
@@ -625,6 +638,14 @@ body{font-family:var(--body);letter-spacing:.1px}
     </div>
   </div>
   <div class="modal blocked" id="blocked_v8"><div class="box"><h1 id="blkTitle_v8"></h1><p id="blkText_v8"></p></div></div>
+  <div class="modal" id="upd_v8">
+    <div class="box set">
+      <h1>✨ Güncellemeler</h1>
+      <p class="lead">Lucky Çiftlik'e gelen yenilikler burada. İyi hasatlar!</p>
+      <div id="updList_v8"></div>
+      <button class="big ghost" id="updClose_v8">Kapat</button>
+    </div>
+  </div>
   <div class="modal" id="rank_v8">
     <div class="box set rank">
       <h1>Sıralama</h1>
@@ -901,7 +922,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "77";
+const VERSION = "78";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -3903,16 +3924,20 @@ $("mSend").onclick = async () => {
   $("mSend").disabled = false;
 };
 // ---------- Wishing fountain: throw any amount, 35% chance to get double back, 3 throws a day ----------
-const WISH_PER_DAY = 3, WISH_CHANCE = .25, WISH_MAX = 100000;
-const WHEEL_N = 8, WHEEL_WIN = [0, 4];   // 2 of 8 slices are "2x": 25%
+const WISH_PER_DAY = 3, WISH_MAX = 20000;   // 100x of 20.000 stays inside the server's per-save gold limit
+// outcome odds: 1% 100x, 25% 2x, 34% the gold comes back, 40% nothing
+const WISH_ODDS = [["x100", .01], ["x2", .25], ["back", .34], ["none", .40]];
+const WHEEL = ["x100", "none", "x2", "back", "none", "x2", "back", "none", "x2", "back", "none", "back"], WHEEL_N = WHEEL.length;
+const WHEEL_LOOK = { x100: ["#e0402f", "#fff6c2", "100x", 17], x2: ["#f5b324", "#5a3300", "2x", 22], back: ["#4aa3df", "#fff", "Geri", 14], none: ["#3fa34d", "#fff", "Boş", 14] };
+const WISH_MULT = { x100: 100, x2: 2, back: 1, none: 0 };
 function wheelSvg() {
   let s = "";
   for (let i = 0; i < WHEEL_N; i++) {
-    const a0 = (i - .5) / WHEEL_N * Math.PI * 2, a1 = (i + .5) / WHEEL_N * Math.PI * 2, win = WHEEL_WIN.includes(i);
+    const a0 = (i - .5) / WHEEL_N * Math.PI * 2, a1 = (i + .5) / WHEEL_N * Math.PI * 2, L = WHEEL_LOOK[WHEEL[i]], win = WHEEL[i] === "x2" || WHEEL[i] === "x100";
     const P = a => [Math.sin(a) * 100, -Math.cos(a) * 100].map(v => v.toFixed(1)).join(" ");
-    s += `<path d="M0 0L${P(a0)}A100 100 0 0 1 ${P(a1)}Z" fill="${win ? "#f5b324" : i % 2 ? "#3fa34d" : "#5cc06b"}" stroke="#fff" stroke-width="3"/>`;
+    s += `<path d="M0 0L${P(a0)}A100 100 0 0 1 ${P(a1)}Z" fill="${WHEEL[i] === "none" && i % 2 ? "#5cc06b" : L[0]}" stroke="#fff" stroke-width="3"/>`;
     const am = i / WHEEL_N * Math.PI * 2;
-    s += `<text x="${(Math.sin(am) * 66).toFixed(1)}" y="${(-Math.cos(am) * 66 + 7).toFixed(1)}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="${win ? 22 : 15}" fill="${win ? "#5a3300" : "#fff"}" transform="rotate(${i * 360 / WHEEL_N} ${(Math.sin(am) * 66).toFixed(1)} ${(-Math.cos(am) * 66).toFixed(1)})">${win ? "2x" : "Boş"}</text>`;
+    s += `<text x="${(Math.sin(am) * 66).toFixed(1)}" y="${(-Math.cos(am) * 66 + 7).toFixed(1)}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="${L[3]}" fill="${L[1]}" transform="rotate(${i * 360 / WHEEL_N} ${(Math.sin(am) * 66).toFixed(1)} ${(-Math.cos(am) * 66).toFixed(1)})">${L[2]}</text>`;
   }
   return `<svg viewBox="-112 -122 224 234" width="170" height="178" aria-hidden="true"><circle r="108" fill="#8a5a32"/><g id="wheelRot_v8">${s}</g><circle r="16" fill="#fff" stroke="#8a5a32" stroke-width="4"/><circle r="6" fill="#f5b324"/><path d="M-13 -118h26l-13 24z" fill="#d9483a" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg>`;
 }
@@ -3921,7 +3946,7 @@ const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.ge
 const wishLeft = () => { const w = S && S.wish; return w && w.d === today() ? Math.max(0, WISH_PER_DAY - (+w.n || 0)) : WISH_PER_DAY; };
 function renderWish() {
   const left = wishLeft();
-  $("wishInfo").textContent = "Çeşmeye istediğin kadar altın at ve çarkı çevir. %25 ihtimalle attığın altının 2 katı geri gelir. Bugün kalan hakkın: " + left + "/" + WISH_PER_DAY + ".";
+  $("wishInfo").textContent = "Altın at, çarkı çevir: %1 ihtimalle 100 katı, %25 ihtimalle 2 katı, %34 ihtimalle altının geri gelir, %40 ihtimalle boş. En fazla " + fmtBig(WISH_MAX) + " altın. Bugün kalan hakkın: " + left + "/" + WISH_PER_DAY + ".";
   $("wishBtn").disabled = !left || wheelBusy; $("wishIn").disabled = !left || wheelBusy;
   if (!left) $("wishRes").textContent = $("wishRes").textContent || "Bugünkü hakların bitti. Yarın tekrar gel.";
 }
@@ -3940,10 +3965,11 @@ $("wishBtn").onclick = () => {
   if (wheelBusy) return;
   S.wish = { d: today(), n: (S.wish && S.wish.d === today() ? +S.wish.n || 0 : 0) + 1 };
   // the result is decided and saved right away; the wheel only shows it
-  const win = Math.random() < WISH_CHANCE;
-  S.gold = round1(S.gold + (win ? amt : -amt)); saveNow();
-  $("gold").textContent = isAdmin() ? "Sınırsız" : fmtG(S.gold + (win ? -amt : amt));
-  const pool = win ? WHEEL_WIN : [...Array(WHEEL_N).keys()].filter(i => !WHEEL_WIN.includes(i)), slice = pool[Math.floor(Math.random() * pool.length)];
+  let r = Math.random(), out = "none"; for (const [k, p] of WISH_ODDS) { if (r < p) { out = k; break; } r -= p; }
+  const delta = amt * (WISH_MULT[out] - 1), win = delta > 0;
+  S.gold = round1(S.gold + delta); saveNow();
+  $("gold").textContent = isAdmin() ? "Sınırsız" : fmtG(S.gold - delta);
+  const pool = [...Array(WHEEL_N).keys()].filter(i => WHEEL[i] === out), slice = pool[Math.floor(Math.random() * pool.length)];
   const from = wheelRot, seg = 360 / WHEEL_N, aim = ((360 - slice * seg) % 360), jit = (Math.random() - .5) * seg * .6;
   const to = from + 360 * 5 + ((aim - from % 360) + 360) % 360 + jit, t0 = performance.now(), dur = 3600;
   wheelBusy = true; res.className = "wishres"; res.textContent = "Çark dönüyor..."; renderWish();
@@ -3953,7 +3979,9 @@ $("wishBtn").onclick = () => {
     wheelRot = from + (to - from) * e; el.setAttribute("transform", `rotate(${wheelRot.toFixed(2)})`);
     if (u < 1) { requestAnimationFrame(tick); return; }
     wheelBusy = false; renderHud();
-    if (win) { res.className = "wishres win"; res.textContent = "Dileğin kabul oldu! " + fmtBig(amt * 2) + " altın geri geldi."; popAt(me.x, me.y - .3, "+" + fmtBig(amt) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ffd54a", 900); }
+    if (out === "x100") { res.className = "wishres win"; res.textContent = "BÜYÜK İKRAMİYE! 100 kat kazandın: " + fmtBig(amt * 100) + " altın!"; popAt(me.x, me.y - .3, "+" + fmtBig(delta) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ff6a3d", 1600); }
+    else if (out === "x2") { res.className = "wishres win"; res.textContent = "Dileğin kabul oldu! " + fmtBig(amt * 2) + " altın geri geldi."; popAt(me.x, me.y - .3, "+" + fmtBig(amt) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ffd54a", 900); }
+    else if (out === "back") { res.className = "wishres"; res.textContent = "Çeşme altınlarını geri verdi. Ne kazandın ne kaybettin."; }
     else { res.className = "wishres lose"; res.textContent = "Altınların çeşmenin dibinde parlıyor. Belki bir dahaki sefere!"; popAt(me.x, me.y - .3, "-" + fmtBig(amt) + " altın", "#ffd0c4"); }
     renderWish();
   };
@@ -4106,6 +4134,44 @@ function renderRank() {
     + (myRank > 50 ? `<p class="note" style="text-align:center">Senin sıran: ${myRank}</p>` + row(rows[myRank - 1], myRank - 1) : "");
 }
 $("rankBtn").onclick = openRank;
+// ---------- What's new: every update is told to the players here (newest first) ----------
+const UPDATES = [
+  { v: 78, d: "9 Ekim 2026", e: "🎡", t: "Şans çarkı yenilendi!", c: "#e0473a", b: "#ffe1d9", items: [
+    "Meydandaki dilek çeşmesinde artık <b>%1 ihtimalle 100 kat</b> kazanma şansı var!",
+    "%25 ihtimalle attığın altının 2 katı, %34 ihtimalle altının geri geliyor.",
+    "Bir seferde en fazla 20.000 altın atabilirsin, günde 3 hakkın var.",
+    "Bu <b>Güncellemeler</b> bölümü eklendi. Yenilikleri artık buradan takip edebilirsin." ] },
+  { v: 77, d: "9 Ekim 2026", e: "⚡", t: "Oyun çok daha akıcı", c: "#7650dc", b: "#ece4ff", items: [
+    "Görüntü motoru hafifletildi, telefonlarda saniyedeki kare sayısı belirgin şekilde arttı.",
+    "Uygulama tam ekran açılıyor, bildirimlere bakarken oyun kaymıyor." ] },
+  { v: 76, d: "9 Ekim 2026", e: "🛒", t: "Daha derli toplu market", c: "#2b7fc4", b: "#dcefff", items: [
+    "Market kartları küçüldü, bir bakışta daha çok ürün görünüyor.",
+    "Kuş bakışı görünüm biraz yakınlaştı, çiftliğin daha net görünüyor." ] },
+  { v: 75, d: "9 Ekim 2026", e: "🌿", t: "Daha doğal bir çiftlik", c: "#2f8a3c", b: "#dff3dc", items: [
+    "Çimen, ağaçlar ve gökyüzü daha doğal renklere kavuştu, uzaklarda hafif pus var.",
+    "Gölgeler sadeleşti, oyun daha hafif ve hızlı çalışıyor.",
+    "Oyunumuzun adı artık <b>Lucky Çiftlik</b>!" ] },
+  { v: 72, d: "9 Ekim 2026", e: "🚜", t: "Yeni açılış ekranı", c: "#f0861a", b: "#fff0d6", items: [
+    "Oyun açılırken renkli yükleme ekranı ve ipuçları geliyor.",
+    "Oyun ikinci açılıştan itibaren çok daha hızlı yükleniyor.",
+    "Lucky Çiftlik artık Google Play'de!" ] },
+  { v: 69, d: "9 Ekim 2026", e: "💧", t: "Su kuyusu ve fıskiyeler güçlendi", c: "#1f8fb3", b: "#d9f3fb", items: [
+    "Su kuyusu 5. seviyeye kadar geliştirilebiliyor: 35 ve 50 kovalık yeni seviyeler.",
+    "5. seviye kuyu ile ekinler dörder dörder sulanıyor.",
+    "Fıskiyeler 5 seviyeye kadar geliştirilebiliyor: 200 su, tek dokunuşta 12 ekin!" ] }
+];
+const updSeen = () => { try { return +localStorage.getItem("lucky-upd-seen") || 0; } catch (e) { return 0; } };
+function renderUpdDot() { $("updDot").style.display = UPDATES[0].v > updSeen() ? "block" : "none"; }
+function openUpd() {
+  const seen = updSeen();
+  $("updList").innerHTML = UPDATES.map(u => `<div class="updcard${u.v > seen ? " new" : ""}" style="--uc:${u.c};--ub:${u.b}"><span class="ue">${u.e}</span><h3>${u.t}</h3><div class="um"><b>Sürüm ${u.v}</b>${u.d}</div><ul>${u.items.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("");
+  try { localStorage.setItem("lucky-upd-seen", String(UPDATES[0].v)); } catch (e) {}
+  renderUpdDot(); $("upd").classList.add("on");
+}
+$("updBtn").onclick = openUpd;
+$("updClose").onclick = () => $("upd").classList.remove("on");
+$("upd").addEventListener("click", e => { if (e.target === $("upd")) $("upd").classList.remove("on"); });
+renderUpdDot();
 $("rankClose").onclick = () => $("rank").classList.remove("on");
 $("rank").addEventListener("click", e => { if (e.target === $("rank")) $("rank").classList.remove("on"); });
 $("rankSeg").addEventListener("click", e => { const b = e.target.closest("[data-rk]"); if (!b) return; rankTab = b.getAttribute("data-rk"); renderRank(); });
