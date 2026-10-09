@@ -40,7 +40,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## Hasat bildirimleri (Web Push)
 - Oyun `push/{uid} = { sub, due, sent, on }` yazar; `due` sıradaki ekin/ağaç/ekmek hazır olma zamanı (`nextReadyAt`, `pushDue`). Ayarlar'da aç/kapa, ilk sulamada bir kez sorulur (`notifAsk`).
 - `netlify/functions/harvest-push.mjs` 5 dakikada bir çalışır (bağımlılıksız, VAPID imzası Node crypto ile), içeriksiz push yollar; yazıyı `sw.js` gösterir. Oyun açık ve odaktaysa bildirim gösterilmez.
-- Netlify ortam değişkenleri: `FIREBASE_DB_SECRET`, `VAPID_PUBLIC` (oyundaki `VAPID_PUBLIC` ile aynı), `VAPID_PRIVATE_D` (özel anahtar, depoda YOK, sahibinde).
+- Netlify ortam değişkenleri (9 Ekim 2026'da eklendi): `FIREBASE_DB_SECRET` ve `VAPID_PRIVATE_D` gizli, `VAPID_PUBLIC` (oyundaki `VAPID_PUBLIC` ile aynı). Değerler depoda YOK. Fonksiyon Netlify > Logs > Functions > harvest-push altında izlenir, oradan "Run now" ile elle de çalıştırılabilir.
 - Firebase kuralı: `"push": { ".indexOn": ["due"], "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": "auth != null && auth.uid === $uid" } }`.
 
 ## Performans kararları
