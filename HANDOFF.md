@@ -107,6 +107,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Çözünürlük: kalite seviyeleri dpr 1.3/1.7/2.25; otomatik modda önce 30 fps'e iner, sonra kaliteyi düşürür.
 - LuckyTr çiftliği: kümes, ahır, ambar, iki 3. seviye fırın, 5. seviye kuyu, tüm ekin türleri.
 
+## v98
+- Yükleme ekranı yeniden: gün batımı gökyüzü, dönen güneş ışınları, bulanık bulutlar, kuşlar, ahır+silo+yel değirmeni silüeti, buğday tarlası şeritleri, sallanan başaklar (SVG içinde üretilmiş başak taneleri), ışık zerreleri, parlak "Lucky" logosu (parlama şeridi) + yeşil "FARM" rozeti, camsı ilerleme kartı. ID'ler aynı (`ldTip`, `ldText`, `ldFill`, `ldPct`).
+- İnek: `sculpt()` ile yontulmuş tek parça gövde/baş/burun/kulak (`COWG`), `cowHide2` yumuşak kenarlı benek dokusu, MS malzemeler, eklemli bacaklar; otlarken baş aşağıda.
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

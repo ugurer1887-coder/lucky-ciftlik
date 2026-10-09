@@ -466,49 +466,49 @@ body{font-family:var(--body);letter-spacing:.1px}
 .gpick button{border:0;border-radius:18px;background:#b9df86;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
 .gpick button[aria-pressed="true"]{background:#d6f0a8;box-shadow:0 0 0 3px var(--gold)}
 .nm{font-family:"Fredoka","Nunito",sans-serif;font-weight:600}
-/* loading screen between maps */
-.loader{position:absolute;inset:0;z-index:80;background:#bfe6f7;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s;overflow:hidden}
+/* loading screen: golden-hour farm landscape with a glossy logo and a glass progress card */
+.loader{position:absolute;inset:0;z-index:80;background:#7fbdf0;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s;overflow:hidden}
 .loader.on{opacity:1;visibility:visible;transition:opacity .25s ease}
 .ld-art{position:absolute;inset:0;width:100%;height:100%}
-.ld-logo{font:700 104px Fredoka,Nunito,sans-serif;fill:url(#ldGold);stroke:#6b3a14;stroke-width:12;paint-order:stroke;stroke-linejoin:round;letter-spacing:2px}
-.ld-sub{font:600 36px Fredoka,Nunito,sans-serif;fill:#fff;stroke:#3f7a26;stroke-width:9;paint-order:stroke;stroke-linejoin:round;letter-spacing:6px}
-.loader.on .ld-logo{animation:ldLogo 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
-@keyframes ldLogo{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(2deg) translateY(-6px)}}
-.loader.on .ld-far{animation:ldScroll 16s linear infinite}
-.loader.on .ld-near{animation:ldScroll 7s linear infinite}
-.loader.on .ld-clouds{animation:ldScroll 40s linear infinite}
+.ld-logo{font:700 96px Fredoka,Nunito,sans-serif;letter-spacing:1px}
+.ld-logoBack{fill:#7a3a0c;stroke:#7a3a0c;stroke-width:16;stroke-linejoin:round}
+.ld-sub{font:700 26px Fredoka,Nunito,sans-serif;fill:#fff;letter-spacing:9px}
+.ld-logoG{transform-box:fill-box;transform-origin:50% 100%}
+.loader.on .ld-logoG{animation:ldFloat 3.2s ease-in-out infinite}
+@keyframes ldFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.loader.on .ld-shine{animation:ldShine 3.4s ease-in-out infinite}
+@keyframes ldShine{0%{transform:skewX(-18deg) translateX(0)}55%,100%{transform:skewX(-18deg) translateX(760px)}}
+.ld-rays{transform-box:view-box;transform-origin:0 0}
+.loader.on .ld-rays{animation:ldSpin 60s linear infinite}
+.loader.on .ld-clouds{animation:ldScroll 50s linear infinite}
 @keyframes ldScroll{to{transform:translateX(-800px)}}
-.loader.on .ld-road{animation:ldRoad .45s linear infinite}
-@keyframes ldRoad{to{transform:translateX(-80px)}}
-.ld-wheel{transform-box:fill-box;transform-origin:center}
-.loader.on .ld-wheel{animation:ldSpin .7s linear infinite}
-@keyframes ldSpin{to{transform:rotate(360deg)}}
-.loader.on .ld-bob{animation:ldBob .32s ease-in-out infinite alternate}
-@keyframes ldBob{to{transform:translateY(-3px)}}
-.loader.on .ld-a1,.loader.on .ld-a2,.loader.on .ld-a3,.loader.on .ld-a4,.loader.on .ld-cow{animation:ldBob .38s ease-in-out infinite alternate;transform-box:fill-box}
-.loader.on .ld-a2{animation-delay:.1s}.loader.on .ld-a3{animation-delay:.2s}.loader.on .ld-a4{animation-delay:.05s}.loader.on .ld-cow{animation-duration:.5s}
-.ld-puffs circle{opacity:0}
-.loader.on .ld-puffs circle{animation:ldPuff 1.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
-.loader.on .ld-puffs .p2{animation-delay:.4s}.loader.on .ld-puffs .p3{animation-delay:.8s}
-@keyframes ldPuff{0%{opacity:.85;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(-50px,-46px) scale(2.2)}}
-.ld-foot{position:absolute;left:50%;bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;transform:translateX(-50%);width:min(380px,70%);text-align:center;color:#fff;
-  background:rgba(20,30,22,.55);border-radius:999px;padding:7px 16px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.ld-foot b{font:600 .95rem Fredoka,Nunito,sans-serif;letter-spacing:.3px;white-space:nowrap}
-.ld-bar{flex:1;height:9px;border-radius:999px;background:rgba(255,255,255,.25);overflow:hidden}
-.ld-bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ffe27a,#f5a524)}
-.ld-ribbon{filter:drop-shadow(0 4px 0 rgba(0,0,0,.18))}
-.ld-logo{font-size:104px}
-.ld-sub{fill:#fff;stroke:#7d1f12;stroke-width:7;letter-spacing:10px;font-size:29px}
+.loader.on .ld-birds{animation:ldBirds 14s linear infinite}
+@keyframes ldBirds{0%{transform:translate(-80px,120px)}100%{transform:translate(880px,60px)}}
 .ld-blades{transform-box:fill-box;transform-origin:center}
-.loader.on .ld-blades{animation:ldSpin 3.2s linear infinite}
+.loader.on .ld-blades{animation:ldSpin 5s linear infinite}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
+.ld-sway1,.ld-sway2{transform-box:fill-box;transform-origin:50% 100%}
+.loader.on .ld-sway1{animation:ldSway 3s ease-in-out infinite}.loader.on .ld-sway2{animation:ldSway 3.4s ease-in-out infinite reverse}
+@keyframes ldSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.ld-motes circle{transform-box:fill-box}
+.loader.on .ld-motes circle{animation:ldMote 5s ease-in-out infinite}
+.loader.on .ld-motes circle:nth-child(2n){animation-duration:6.5s;animation-delay:-2s}.loader.on .ld-motes circle:nth-child(3n){animation-duration:4.2s;animation-delay:-1s}
+@keyframes ldMote{0%{opacity:0;transform:translate(0,0)}30%{opacity:1}100%{opacity:0;transform:translate(14px,-70px)}}
 .ld-spark path{opacity:0;transform-box:fill-box;transform-origin:center}
-.loader.on .ld-spark path{animation:ldTw 1.8s ease-in-out infinite}
-.loader.on .ld-spark .s2{animation-delay:.45s}.loader.on .ld-spark .s3{animation-delay:.9s}.loader.on .ld-spark .s4{animation-delay:1.3s}
+.loader.on .ld-spark path{animation:ldTw 2.2s ease-in-out infinite}
+.loader.on .ld-spark .s2{animation-delay:.7s}.loader.on .ld-spark .s3{animation-delay:1.4s}
 @keyframes ldTw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(45deg)}}
-.ld-tip{position:absolute;left:50%;bottom:calc(52px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(520px,86%);text-align:center;color:#3e2a17;font:600 .82rem Nunito,sans-serif;
-  background:rgba(255,248,230,.88);border-radius:12px;padding:5px 12px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.ld-foot{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;transform:translateX(-50%);width:min(420px,76%);color:#fff;
+  background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.45);border-radius:20px;padding:10px 16px;box-shadow:0 10px 30px rgba(40,30,10,.25)}
+.ld-foot b{font:600 .95rem Fredoka,Nunito,sans-serif;letter-spacing:.3px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.ld-bar{position:relative;flex:1;height:12px;border-radius:999px;background:rgba(0,0,0,.22);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.ld-bar i{position:relative;display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#9be15d,#f9d423 60%,#ff9f1a);box-shadow:0 0 12px rgba(255,214,90,.8);overflow:hidden}
+.ld-bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);background-size:200% 100%;animation:ldBarShine 1.4s linear infinite}
+@keyframes ldBarShine{from{background-position:200% 0}to{background-position:-200% 0}}
+.ld-tip{position:absolute;left:50%;bottom:calc(70px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(520px,86%);text-align:center;color:#fff;font:600 .84rem Nunito,sans-serif;
+  background:rgba(30,40,20,.32);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:14px;padding:6px 14px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .ld-tip:empty{display:none}
-.ld-pct{font:700 .85rem Fredoka,Nunito,sans-serif;min-width:34px;text-align:right}
+.ld-pct{font:700 .9rem Fredoka,Nunito,sans-serif;min-width:38px;text-align:right;text-shadow:0 1px 3px rgba(0,0,0,.35)}
 @media (prefers-reduced-motion: reduce){.loader *{animation:none!important}}
 
 
@@ -921,60 +921,66 @@ body{font-family:var(--body);letter-spacing:.1px}
     </div>
   </div>
   <div id="loader_v8" class="loader on" aria-live="polite">
-    <svg class="ld-art" viewBox="0 0 800 450" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <svg class="ld-art" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
-        <linearGradient id="ldSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0f5"/><stop offset=".7" stop-color="#d9f1fb"/><stop offset="1" stop-color="#fff6dc"/></linearGradient>
-        <linearGradient id="ldGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset=".55" stop-color="#ffc83d"/><stop offset="1" stop-color="#f08c1a"/></linearGradient>
-        <radialGradient id="ldSun"><stop offset="0" stop-color="#fff7c2"/><stop offset=".55" stop-color="#ffe27a"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient>
-        <linearGradient id="ldRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ef5a3c"/><stop offset="1" stop-color="#b8301e"/></linearGradient>
+        <linearGradient id="ldSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fc4"/><stop offset=".38" stop-color="#7fbdf0"/><stop offset=".66" stop-color="#ffe2b0"/><stop offset=".8" stop-color="#ffbf7a"/></linearGradient>
+        <radialGradient id="ldSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffbe6"/><stop offset=".25" stop-color="#fff0b0"/><stop offset=".6" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffb35a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="ldHill1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9cc7a8"/><stop offset="1" stop-color="#7fae8e"/></linearGradient>
+        <linearGradient id="ldHill2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8cc45a"/><stop offset="1" stop-color="#5f9a3c"/></linearGradient>
+        <linearGradient id="ldHill3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fb043"/><stop offset="1" stop-color="#3f7a26"/></linearGradient>
+        <linearGradient id="ldWheat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#d9a23a"/></linearGradient>
+        <linearGradient id="ldBarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9452e"/><stop offset="1" stop-color="#9e2a1a"/></linearGradient>
+        <linearGradient id="ldSilo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfd6dc"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#aab4bd"/></linearGradient>
+        <linearGradient id="ldLogo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe8"/><stop offset=".45" stop-color="#ffe066"/><stop offset="1" stop-color="#ff9f1a"/></linearGradient>
+        <linearGradient id="ldShine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="ldPill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ccf5f"/><stop offset="1" stop-color="#2a8f3c"/></linearGradient>
+        <filter id="ldBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+        <filter id="ldSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+        <filter id="ldShadow" x="-20%" y="-30%" width="140%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#5a2a08" flood-opacity=".45"/></filter>
+        <clipPath id="ldTextClip"><text x="400" y="146" text-anchor="middle" class="ld-logo">Lucky</text></clipPath>
       </defs>
       <rect width="800" height="450" fill="url(#ldSky)"/>
-      <circle cx="660" cy="95" r="80" fill="url(#ldSun)"/><circle cx="660" cy="95" r="34" fill="#fff3b0"/>
-      <g class="ld-clouds"><g fill="#fff" opacity=".92"><ellipse cx="120" cy="80" rx="58" ry="20"/><ellipse cx="150" cy="66" rx="34" ry="22"/><ellipse cx="96" cy="70" rx="26" ry="16"/>
-        <ellipse cx="470" cy="60" rx="46" ry="16"/><ellipse cx="494" cy="49" rx="26" ry="17"/><ellipse cx="920" cy="80" rx="58" ry="20"/><ellipse cx="950" cy="66" rx="34" ry="22"/><ellipse cx="1270" cy="60" rx="46" ry="16"/><ellipse cx="1294" cy="49" rx="26" ry="17"/></g></g>
-      <g class="ld-far"><path d="M0 300 Q90 230 200 268 T420 250 T620 270 T800 255 L800 340 L0 340Z M800 300 Q890 230 1000 268 T1220 250 T1420 270 T1600 255 L1600 340 L800 340Z" fill="#a9d585"/>
-        <g fill="#6fa64a"><circle cx="150" cy="262" r="16"/><circle cx="168" cy="268" r="12"/><circle cx="520" cy="256" r="14"/><circle cx="950" cy="262" r="16"/><circle cx="968" cy="268" r="12"/><circle cx="1320" cy="256" r="14"/></g></g>
-      <g class="ld-near"><path d="M0 330 Q120 286 260 312 T520 300 T800 318 L800 360 L0 360Z M800 330 Q920 286 1060 312 T1320 300 T1600 318 L1600 360 L800 360Z" fill="#7cbd55"/>
-        <g stroke="#8a5a32" stroke-width="5"><path d="M40 322v-26M90 320v-26M140 318v-26M640 312v-26M690 312v-26M840 322v-26M890 320v-26M940 318v-26M1440 312v-26M1490 312v-26"/></g>
-        <g stroke="#a8743f" stroke-width="4"><path d="M36 304h110M636 296h60M836 304h110M1436 296h60"/></g></g>
-      <rect y="352" width="800" height="98" fill="#6aa844"/>
-      <rect y="364" width="800" height="62" fill="#d2ab6c"/><rect y="364" width="800" height="6" fill="#b88f52"/>
-      <g class="ld-road"><path d="M0 398h40M80 398h40M160 398h40M240 398h40M320 398h40M400 398h40M480 398h40M560 398h40M640 398h40M720 398h40M800 398h40M880 398h40" stroke="#f3dfb2" stroke-width="5" stroke-linecap="round"/></g>
-      <g class="ld-mill" transform="translate(120 238)"><path d="M-16 92l8 -92h16l8 92z" fill="#f4e7cf" stroke="#a7825a" stroke-width="3"/><path d="M-20 4l20 -22 20 22z" fill="url(#ldRed)"/><rect x="-6" y="60" width="12" height="32" rx="5" fill="#8a5a32"/>
-        <g class="ld-blades"><path d="M0 0l-6 -58h12z M0 0l58 -6v12z M0 0l6 58h-12z M0 0l-58 6v-12z" fill="#fff8ea" stroke="#a7825a" stroke-width="2"/><circle r="6" fill="#8a5a32"/></g></g>
-      <g class="ld-ribbon"><path d="M236 198h328l-16 22 16 22h-328l16 -22z" fill="url(#ldRed)" stroke="#7d1f12" stroke-width="4" stroke-linejoin="round"/></g>
-      <text class="ld-logo" x="400" y="184" text-anchor="middle">Lucky</text>
-      <text class="ld-sub" x="400" y="231" text-anchor="middle">FARM</text>
-      <g class="ld-spark" fill="#fff6c2"><path class="s1" d="M178 92l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5z"/><path class="s2" d="M624 84l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/><path class="s3" d="M600 190l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path class="s4" d="M206 196l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/></g>
-      <g transform="translate(480 290) scale(.85)">
-        <g class="ld-puffs"><circle class="p1" cx="150" cy="-36" r="9" fill="#ece8e0"/><circle class="p2" cx="150" cy="-36" r="9" fill="#ece8e0"/><circle class="p3" cx="150" cy="-36" r="9" fill="#ece8e0"/></g>
-        <g class="ld-bob">
-          <!-- trailer with the passengers -->
-          <path d="M-20 64h-14" stroke="#4a3a2a" stroke-width="7" stroke-linecap="round"/>
-          <g class="ld-a1"><ellipse cx="-198" cy="6" rx="26" ry="20" fill="#9a9590"/><path d="M-214 -14l-8 -30q4 -4 8 0l8 26z M-200 -16l0 -32q5 -3 8 1l-1 30z" fill="#8a857f"/><path d="M-216 -40l-3 -16M-196 -44l1 -15" stroke="#5c5650" stroke-width="2"/>
-            <ellipse cx="-180" cy="12" rx="14" ry="11" fill="#d9d2c6"/><circle cx="-196" cy="-2" r="3.2" fill="#2a2420"/><circle cx="-176" cy="10" r="1.8" fill="#5c5650"/><path d="M-214 -6q-6 -14 4 -22" stroke="#4a4540" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-          <g class="ld-a2"><g fill="#fbfaf6"><circle cx="-142" cy="4" r="18"/><circle cx="-156" cy="-4" r="11"/><circle cx="-128" cy="-6" r="11"/><circle cx="-142" cy="-12" r="11"/></g><ellipse cx="-140" cy="8" rx="9" ry="11" fill="#3a3430"/><circle cx="-143" cy="5" r="1.8" fill="#fff"/><circle cx="-137" cy="5" r="1.8" fill="#fff"/></g>
-          <g class="ld-a3"><circle cx="-96" cy="6" r="15" fill="#fbfaf6" stroke="#d8d0c0" stroke-width="2"/><circle cx="-86" cy="-10" r="9" fill="#fbfaf6" stroke="#d8d0c0" stroke-width="2"/><path d="M-90 -19q2 -7 5 -2q2 -6 5 -1q1 4 -3 5z" fill="#e0402f"/><path d="M-78 -11l8 2 -8 3z" fill="#f2a12e"/><circle cx="-84" cy="-12" r="1.6" fill="#222"/><path d="M-80 -4q2 5 -1 6" fill="#e0402f"/></g>
-          <g class="ld-a4"><circle cx="-60" cy="8" r="13" fill="#c8834a" stroke="#9a5a2e" stroke-width="2"/><circle cx="-52" cy="-7" r="8" fill="#c8834a" stroke="#9a5a2e" stroke-width="2"/><path d="M-56 -15q2 -6 4 -2q2 -5 4 -1q1 3 -2 4z" fill="#e0402f"/><path d="M-45 -8l7 2 -7 3z" fill="#f2a12e"/><circle cx="-50" cy="-9" r="1.5" fill="#222"/></g>
-          <rect x="-232" y="16" width="204" height="54" rx="6" fill="#b5793d" stroke="#7a4f27" stroke-width="3"/><path d="M-232 34h204M-232 52h204M-180 16v54M-130 16v54M-80 16v54" stroke="#8f5c2c" stroke-width="2.5"/>
-          <g transform="translate(-130 82)"><g class="ld-wheel"><circle r="24" fill="#2b2b2b"/><circle r="11" fill="#f2c14e"/><path d="M0 -18v36M-18 0h36" stroke="#2b2b2b" stroke-width="3"/></g></g>
-          <!-- tractor -->
-          <path d="M-6 82a48 48 0 0 1 96 0" fill="#9e2a1a"/>
-          <rect x="70" y="30" width="128" height="52" rx="14" fill="url(#ldRed)"/><rect x="186" y="40" width="16" height="34" rx="4" fill="#5a1f14"/><path d="M190 46h8M190 54h8M190 62h8" stroke="#2a1410" stroke-width="2.5"/>
-          <rect x="100" y="22" width="70" height="10" rx="5" fill="#b8301e"/>
-          <rect x="146" y="-30" width="9" height="56" rx="3" fill="#3b3b3b"/>
-          <rect x="-2" y="-46" width="96" height="112" rx="10" fill="url(#ldRed)"/><rect x="-10" y="-56" width="112" height="14" rx="6" fill="#8e2416"/>
-          <rect x="8" y="-34" width="76" height="58" rx="8" fill="#bfe6f7"/>
-          <!-- the cow driving -->
-          <g class="ld-cow"><path d="M28 -18q-12 -10 -18 0q8 6 18 4z M66 -18q12 -10 18 0q-8 6 -18 4z" fill="#f4ede2" stroke="#3a3430" stroke-width="2"/>
-            <path d="M34 -26q-4 -12 4 -14M60 -26q4 -12 -4 -14" stroke="#f3e0b0" stroke-width="5" stroke-linecap="round"/>
-            <ellipse cx="47" cy="-6" rx="22" ry="22" fill="#fbf8f2" stroke="#3a3430" stroke-width="2"/><path d="M30 -18q8 -8 16 -2q-4 10 -14 8z" fill="#2f2a26"/><circle cx="62" cy="2" r="6" fill="#2f2a26"/>
-            <circle cx="39" cy="-8" r="3.2" fill="#2a2420"/><circle cx="55" cy="-8" r="3.2" fill="#2a2420"/><circle cx="40" cy="-9" r="1" fill="#fff"/><circle cx="56" cy="-9" r="1" fill="#fff"/>
-            <ellipse cx="47" cy="10" rx="15" ry="10" fill="#f2a9b0" stroke="#3a3430" stroke-width="2"/><circle cx="42" cy="10" r="2.2" fill="#a0525c"/><circle cx="52" cy="10" r="2.2" fill="#a0525c"/></g>
-          <circle cx="74" cy="22" r="11" fill="none" stroke="#2b2b2b" stroke-width="4"/><path d="M62 18q6 4 10 4" stroke="#2f2a26" stroke-width="6" stroke-linecap="round"/>
-          <g transform="translate(42 82)"><g class="ld-wheel"><circle r="46" fill="#2b2b2b"/><circle r="38" fill="none" stroke="#444" stroke-width="5" stroke-dasharray="7 6"/><circle r="20" fill="#f2c14e"/><path d="M0 -30v60M-30 0h60M-21 -21l42 42M21 -21l-42 42" stroke="#2b2b2b" stroke-width="4"/><circle r="6" fill="#c8901a"/></g></g>
-          <g transform="translate(172 96)"><g class="ld-wheel"><circle r="26" fill="#2b2b2b"/><circle r="12" fill="#f2c14e"/><path d="M0 -18v36M-18 0h36" stroke="#2b2b2b" stroke-width="3"/></g></g>
-        </g>
+      <!-- sun with slowly turning rays -->
+      <g transform="translate(560 262)"><g class="ld-rays" opacity=".32">
+        <path d="M0 0L-14 -330L14 -330Z M0 0L180 -280L196 -258Z M0 0L330 -60L330 -30Z M0 0L-180 -280L-196 -258Z M0 0L-330 -60L-330 -30Z M0 0L90 -320L116 -310Z M0 0L-90 -320L-116 -310Z M0 0L260 -180L276 -160Z M0 0L-260 -180L-276 -160Z" fill="#fff6d8"/></g>
+        <circle r="150" fill="url(#ldSun)"/><circle r="42" fill="#fff6d0"/></g>
+      <!-- soft drifting clouds -->
+      <g class="ld-clouds" filter="url(#ldBlur)" fill="#fff" opacity=".85">
+        <ellipse cx="120" cy="96" rx="80" ry="18"/><ellipse cx="160" cy="84" rx="44" ry="18"/><ellipse cx="440" cy="62" rx="70" ry="14"/><ellipse cx="700" cy="110" rx="60" ry="14"/>
+        <ellipse cx="920" cy="96" rx="80" ry="18"/><ellipse cx="960" cy="84" rx="44" ry="18"/><ellipse cx="1240" cy="62" rx="70" ry="14"/><ellipse cx="1500" cy="110" rx="60" ry="14"/></g>
+      <!-- birds -->
+      <g class="ld-birds" fill="none" stroke="#3a4a5a" stroke-width="2" stroke-linecap="round"><path d="M0 0q6 -6 12 0q6 -6 12 0"/><path d="M30 14q5 -5 10 0q5 -5 10 0"/><path d="M-26 18q4 -4 8 0q4 -4 8 0"/></g>
+      <!-- far hills in the haze -->
+      <path d="M0 290 Q120 238 240 262 T480 250 T720 262 T800 256 L800 340 L0 340Z" fill="url(#ldHill1)"/>
+      <!-- the farm on the middle hill -->
+      <path d="M0 312 Q160 268 330 288 T620 280 T800 296 L800 380 L0 380Z" fill="url(#ldHill2)"/>
+      <g transform="translate(205 228)">
+        <ellipse cx="40" cy="64" rx="70" ry="8" fill="#3f6e2a" opacity=".35"/>
+        <rect x="-4" y="6" width="34" height="58" rx="3" fill="url(#ldSilo)"/><path d="M-4 8q17 -26 34 0z" fill="#c4ccd3"/><path d="M-4 22h34M-4 38h34M-4 52h34" stroke="#9aa5ad" stroke-width="1.5"/>
+        <path d="M30 64V28l30 -22 30 22v36z" fill="url(#ldBarn)"/><path d="M24 30l36 -27 36 27" fill="none" stroke="#fff4e6" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M24 30l36 -27 36 27" fill="none" stroke="#5a5048" stroke-width="2" stroke-linejoin="round" transform="translate(0 -3)"/>
+        <rect x="47" y="38" width="26" height="26" fill="#7a1d12"/><path d="M47 38l26 26M73 38l-26 26" stroke="#fff4e6" stroke-width="3"/><rect x="47" y="38" width="26" height="26" fill="none" stroke="#fff4e6" stroke-width="3"/>
+        <rect x="54" y="16" width="12" height="10" fill="#fff4e6"/><rect x="56" y="18" width="8" height="6" fill="#3a2410"/>
+        <g fill="#3f7a26"><circle cx="112" cy="46" r="16"/><circle cx="126" cy="40" r="14"/><circle cx="138" cy="50" r="12"/></g><rect x="120" y="52" width="4" height="12" fill="#5a3a1c"/>
+        <path d="M-40 62h-30M-40 62h170" stroke="#fff4e6" stroke-width="2"/><path d="M-60 56v8M-40 56v8M100 56v8M150 56v8" stroke="#fff4e6" stroke-width="2"/></g>
+      <g transform="translate(620 214)"><path d="M-10 74l6 -66h8l6 66z" fill="#f6ecd8" stroke="#b08a5a" stroke-width="2"/><path d="M-12 10l12 -14 12 14z" fill="url(#ldBarn)"/>
+        <g class="ld-blades"><path d="M0 0l-4 -44h8z M0 0l44 -4v8z M0 0l4 44h-8z M0 0l-44 4v-8z" fill="#fffaf0" stroke="#b08a5a" stroke-width="1.5"/><circle r="4" fill="#8a5a32"/></g></g>
+      <!-- the near hill with golden wheat rows -->
+      <path d="M0 352 Q200 300 420 326 T800 318 L800 450 L0 450Z" fill="url(#ldHill3)"/>
+      <g opacity=".9"><path d="M-10 372 Q200 330 420 350 T810 340" stroke="url(#ldWheat)" stroke-width="10" fill="none"/><path d="M-10 396 Q200 356 420 376 T810 368" stroke="url(#ldWheat)" stroke-width="12" fill="none"/>
+        <path d="M-10 424 Q200 384 420 406 T810 398" stroke="url(#ldWheat)" stroke-width="14" fill="none"/></g>
+      <!-- tall swaying wheat in the front corners -->
+      <g class="ld-sway1"><path d="M40 460 Q44 380 30 330" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(30 330) rotate(-8) scale(1.15)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g><path d="M70 460 Q72 390 82 344" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(82 344) rotate(10) scale(1.05)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g><path d="M14 460 Q16 400 8 362" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(8 362) rotate(-6) scale(0.95)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g></g>
+      <g class="ld-sway2"><path d="M760 460 Q756 382 770 334" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(770 334) rotate(8) scale(1.15)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g><path d="M730 460 Q728 396 716 350" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(716 350) rotate(-10) scale(1.05)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g><path d="M790 460 Q792 404 798 366" fill="none" stroke="#c99a3a" stroke-width="3"/><g transform="translate(798 366) rotate(6) scale(0.95)"><g stroke="#e9c46a" stroke-width=".7" fill="none"><path d="M-3.5 -8.2l-7.0 -12"/><path d="M3.5 -8.2l7.0 -12"/><path d="M-3.5 -13.4l-7.0 -12"/><path d="M3.5 -13.4l7.0 -12"/><path d="M-3.5 -18.6l-7.0 -12"/><path d="M3.5 -18.6l7.0 -12"/><path d="M-3.5 -23.8l-7.0 -12"/><path d="M3.5 -23.8l7.0 -12"/><path d="M-3.5 -29.0l-7.0 -12"/><path d="M3.5 -29.0l7.0 -12"/><path d="M-3.5 -34.2l-7.0 -12"/><path d="M3.5 -34.2l7.0 -12"/></g><g fill="url(#ldWheat)" stroke="#b07a22" stroke-width=".6"><ellipse cx="-3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 0.0)"/><ellipse cx="3.2" cy="0.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 0.0)"/><ellipse cx="-3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -5.2)"/><ellipse cx="3.2" cy="-5.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -5.2)"/><ellipse cx="-3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -10.4)"/><ellipse cx="3.2" cy="-10.4" rx="3.1" ry="5.4" transform="rotate(22 3.2 -10.4)"/><ellipse cx="-3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -15.6)"/><ellipse cx="3.2" cy="-15.6" rx="3.1" ry="5.4" transform="rotate(22 3.2 -15.6)"/><ellipse cx="-3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -20.8)"/><ellipse cx="3.2" cy="-20.8" rx="3.1" ry="5.4" transform="rotate(22 3.2 -20.8)"/><ellipse cx="-3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -26.0)"/><ellipse cx="3.2" cy="-26.0" rx="3.1" ry="5.4" transform="rotate(22 3.2 -26.0)"/><ellipse cx="-3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(-22 -3.2 -31.2)"/><ellipse cx="3.2" cy="-31.2" rx="3.1" ry="5.4" transform="rotate(22 3.2 -31.2)"/><ellipse cx="0" cy="-36" rx="2.8" ry="5"/></g></g></g>
+      <!-- floating light motes -->
+      <g class="ld-motes" fill="#fff6c8"><circle cx="160" cy="330" r="2.6"/><circle cx="300" cy="360" r="2"/><circle cx="470" cy="340" r="2.8"/><circle cx="600" cy="370" r="2.2"/><circle cx="690" cy="320" r="2.4"/><circle cx="380" cy="300" r="1.8"/><circle cx="240" cy="290" r="2.2"/><circle cx="540" cy="290" r="1.8"/></g>
+      <!-- logo -->
+      <g class="ld-logoG" filter="url(#ldShadow)">
+        <text x="400" y="146" text-anchor="middle" class="ld-logo ld-logoBack">Lucky</text>
+        <text x="400" y="146" text-anchor="middle" class="ld-logo" fill="url(#ldLogo)">Lucky</text>
+        <g clip-path="url(#ldTextClip)"><rect class="ld-shine" x="-120" y="40" width="90" height="140" fill="url(#ldShine)" transform="skewX(-18)"/></g>
+        <g transform="translate(400 176) scale(.88)"><rect x="-74" y="-21" width="148" height="42" rx="21" fill="url(#ldPill)" stroke="#fff" stroke-width="3"/><text y="10" text-anchor="middle" class="ld-sub">FARM</text></g>
+        <g class="ld-spark" fill="#fff"><path class="s1" d="M256 66l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4z"/><path class="s2" d="M548 92l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3z"/><path class="s3" d="M512 40l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/></g>
       </g>
     </svg>
     <div class="ld-tip" id="ldTip_v8"></div>
@@ -1149,7 +1155,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "97";
+const VERSION = "98";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -5319,6 +5325,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 98, d: "9 Ekim 2026", e: "🐄", t: "Yeni yükleme ekranı ve inekler", c: "#2f6fc4", b: "#e2f0ff", items: [
+    "Yepyeni yükleme ekranı: gün batımında çiftlik, sallanan başaklar ve parlayan Lucky Farm logosu.",
+    "İnekler baştan yapıldı: tek parça yumuşak gövde, gerçek benekler, gerçekçi baş ve bacaklar.",
+  ] },
   { v: 97, d: "9 Ekim 2026", e: "✨", t: "Daha güzel Lucky Farm", c: "#2f9a43", b: "#e3f7dc", items: [
     "Görüntü daha keskin ve canlı; çimenler rüzgârda sallanıyor.",
     "Yeni gerçekçi inekler, dolgun yapraklı elma ağaçları: elmalar dalda büyüyüp kızarıyor.",
@@ -5957,33 +5967,70 @@ function setup3D(T) {
     x.fillStyle = "#26221f"; for (let p = 0; p < 7; p++) { const cx = r() * w, cy = 20 + r() * (h - 50), R = 12 + r() * 16;
       for (let q = 0; q < 7; q++) { const a = r() * 6.28, d = r() * R * .8; x.beginPath(); x.ellipse(cx + Math.cos(a) * d, cy + Math.sin(a) * d * .7, R * (.5 + r() * .4), R * (.4 + r() * .35), r() * 3, 0, 6.3); x.fill(); } }
     const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(.85, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(230,220,210,.6)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+  // sculpted shapes: a high-resolution sphere reshaped by a function, so bodies are one smooth surface instead of glued balls
+  const sculpt = (fn, a = 40, b = 28) => { const g = new T.SphereGeometry(1, a, b), p = g.attributes.position, v = new T.Vector3();
+    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); fn(v); p.setXYZ(i, v.x, v.y, v.z); } g.computeVertexNormals(); return g; };
+  const COWG = (() => {
+    // barrel-shaped torso: deep chest, straight back, slightly hanging belly, square hips
+    const body = sculpt(v => { const u = v.z, au = Math.abs(u);
+      const w = .2 * (1 - .1 * u * u) * (u > 0 ? 1 + .05 * u : 1 + .04 * u), ht = .19 * (1 - .32 * Math.pow(au, 4)), hb = .2 * (1 - .4 * u * u);
+      const y = v.y > 0 ? v.y * ht : v.y * hb - .03 * (1 - u * u);
+      const z = Math.sign(u) * (au < .7 ? au : .7 + (au - .7) * .55) * .5;
+      v.set(v.x * w * (v.y > .4 && u < -.3 ? 1.06 : 1), y, z); });
+    // head: wide flat forehead narrowing to a long face, then a broad rounded muzzle
+    const head = sculpt(v => { const u = v.z, t = (u + 1) / 2;
+      const w = .085 * (1 - .32 * t) + .02 * Math.max(0, (t - .8) * 5) * .6, h = .085 * (1 - .18 * t);
+      v.set(v.x * w, v.y * h * (v.y > 0 ? .95 : 1.05), u * .14); }, 28, 20);
+    const muzzle = sculpt(v => { v.set(v.x * .07, v.y * .052 * (v.y > 0 ? 1 : 1.15), v.z * .055); }, 22, 14);
+    const ear = sculpt(v => { const t = (v.x + 1) / 2; v.set(v.x * .055, v.y * .015, v.z * .034 * (1 - .4 * Math.pow(t, 2))); }, 16, 10);
+    const thigh = sculpt(v => { v.set(v.x * .065, v.y * .14 * (v.y < 0 ? 1.1 : 1), v.z * .1); }, 18, 12);
+    const legU = new T.CylinderGeometry(.042, .032, .2, 14), legL = new T.CylinderGeometry(.031, .029, .17, 12), knee = new T.SphereGeometry(.034, 12, 8), hoof = new T.CylinderGeometry(.031, .037, .05, 14);
+    const neck = new T.CylinderGeometry(.085, .12, .26, 20, 1, true);
+    sharedGeoExtra.push(body, head, muzzle, ear, thigh, legU, legL, knee, hoof, neck);
+    return { body, head, muzzle, ear, thigh, legU, legL, knee, hoof, neck };
+  })();
+  const cowHide2 = v => canvasTex("cowHide2" + v, 512, 256, (x, w, h) => { x.fillStyle = "#f8f6f1"; x.fillRect(0, 0, w, h);
+    let sd = 11 + v * 29; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    // organic black patches with soft edges, kept away from the belly (bottom of the texture) and the very top
+    x.fillStyle = "#1f1b19"; x.shadowColor = "#1f1b19"; x.shadowBlur = 3;
+    for (let p = 0; p < 6; p++) { const cx = (p + .3 + r() * .5) / 6 * w, cy = 50 + r() * 110, R = 26 + r() * 22;
+      x.beginPath(); for (let k = 0; k <= 20; k++) { const a = k / 20 * Math.PI * 2, rr = R * (.7 + .35 * Math.sin(a * 3 + p) + .15 * Math.sin(a * 5 + p * 2)); const px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr * .75; k ? x.lineTo(px, py) : x.moveTo(px, py); } x.closePath(); x.fill(); }
+    x.shadowBlur = 0; const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(0,0,0,.06)"); g.addColorStop(.5, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(120,100,90,.18)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
   function buildCow(v = 0) {
     const g = new T.Group(), b = new T.Group(); g.add(b);
-    const W = "#f7f5f0", K = "#24201d", P = "#e9a6a8", NOSE = "#d99595", HIDE = MS("#ffffff", { map: cowHide(v % 3), roughness: .85 }), SK = G.sphHi;
-    // long, deep body: chest, barrel and hips, with a slightly dropped belly and visible hip bones
-    b.add(mesh(SK, HIDE, 0, .58, -.02, .2, .2, .36)); b.add(mesh(SK, HIDE, 0, .6, .2, .19, .2, .19)); b.add(mesh(SK, HIDE, 0, .6, -.27, .19, .19, .17));
-    b.add(mesh(SK, HIDE, 0, .5, 0, .17, .14, .3)); [-1, 1].forEach(s => b.add(mesh(SK, HIDE, s * .12, .74, -.28, .05, .04, .05, false)));
-    { const nk = mesh(SK, M(W), 0, .7, .37, .1, .13, .14); nk.rotation.x = .6; b.add(nk); b.add(mesh(SK, M(W), 0, .58, .32, .06, .1, .08, false)); }
-    b.add(mesh(SK, M(P), 0, .4, -.2, .085, .065, .085, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .34, -.2 + dz, .011, .05, .011, false)));
-    { const col = mesh(G.cyl, M("#b8402c"), 0, .68, .4, .095, .03, .11, false); col.rotation.x = .9; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .75, roughness: .25 }), 0, .58, .46, .032, .04, .032, false)); }
-    const tail = new T.Group(); tail.position.set(0, .72, -.42); b.add(tail);
-    { const t1 = mesh(G.cyl8, M(W), 0, -.17, -.02, .012, .34, .012, false); t1.rotation.x = .1; tail.add(t1); tail.add(mesh(G.sph, M(K), 0, -.36, -.04, .028, .06, .028, false)); }
-    // head: skull, long muzzle, nostrils, eyes on the sides, ears and short horns, a dark patch
-    const hd = new T.Group(); hd.position.set(0, .8, .48); hd.rotation.x = .25; b.add(hd);
-    hd.add(mesh(SK, M(W), 0, 0, 0, .095, .1, .12)); hd.add(mesh(SK, M(K), .045, .03, -.01, .065, .07, .08, false));
-    hd.add(mesh(SK, M(W), 0, -.04, .11, .078, .075, .1)); hd.add(mesh(SK, M(NOSE), 0, -.06, .19, .07, .055, .045, false));
-    [-.028, .028].forEach(dx => hd.add(mesh(G.sph, M("#5a2a2e"), dx, -.05, .232, .012, .015, .006, false)));
-    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#1a1714"), s * .085, .03, .05, .016, .019, .014, false)); hd.add(mesh(G.sph, M("#ffffff"), s * .095, .038, .056, .004, .004, .003, false));
-      const ear = new T.Group(); ear.position.set(s * .09, .04, -.05); ear.rotation.z = s * -.15; ear.rotation.y = s * .3; hd.add(ear);
-      ear.add(mesh(SK, M(s > 0 ? K : W), s * .06, 0, 0, .065, .018, .035, false)); ear.add(mesh(SK, M(P), s * .065, -.004, .008, .045, .01, .022, false));
-      const hn = mesh(G.cone, M("#e9dcbc"), s * .06, .1, -.04, .016, .06, .016, false); hn.rotation.z = -s * .9; hd.add(hn); });
-    hd.add(mesh(SK, M(W), 0, .085, .02, .05, .025, .05, false));
-    // slim jointed legs with knees and dark hooves
+    const W = MS("#f6f3ee", { roughness: .7 }), K = MS("#211d1b", { roughness: .6 }), P = MS("#eaa5a6", { roughness: .55 }), NOSE = MS("#dfa0a0", { roughness: .4 }),
+      HIDE = MS("#ffffff", { map: cowHide2(v % 3), roughness: .72 }), HORN = MS("#efe4c8", { roughness: .45 }), HOOF = MS("#3a3330", { roughness: .5 });
+    const add = (geo, mat, x, y, z, sx = 1, sy = 1, sz = 1, par = b) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); par.add(m); return m; };
+    add(COWG.body, HIDE, 0, .6, 0);
+    [-1, 1].forEach(s => { add(COWG.thigh, HIDE, s * .12, .55, -.3); add(COWG.thigh, W, s * .11, .55, .27, .85, .8, .8); });
+    { const nk = add(COWG.neck, W, 0, .7, .4); nk.rotation.x = 1.05; }
+    add(COWG.body, W, 0, .5, .36, .32, .5, .2);
+    // udder and teats
+    add(G.sphHi, P, 0, .43, -.22, .085, .065, .085); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => add(G.cyl8, P, dx, .36, -.22 + dz, .011, .05, .011));
+    // collar with a bell
+    { const col = new T.Mesh(new T.TorusGeometry(.105, .014, 8, 24), MS("#b8402c", { roughness: .5 })); col.position.set(0, .72, .46); col.rotation.x = 1.0; b.add(col);
+      add(G.sphHi, MS("#e2b33c", { metalness: .8, roughness: .25 }), 0, .62, .53, .03, .036, .03); }
+    // tail
+    const tail = new T.Group(); tail.position.set(0, .74, -.48); tail.rotation.x = -.12; b.add(tail);
+    { const t1 = add(G.cyl8, W, 0, -.18, -.02, .011, .36, .011, tail); t1.rotation.x = .02; add(G.sphHi, K, 0, -.38, -.035, .026, .06, .026, tail); }
+    // head
+    const hd = new T.Group(); hd.position.set(0, .86, .55); hd.rotation.x = .45; b.add(hd);
+    add(COWG.head, W, 0, 0, 0, 1, 1, 1, hd); add(COWG.head, K, .02, .015, -.03, .62, .7, .6, hd).position.x = .04;
+    add(COWG.muzzle, NOSE, 0, -.035, .13, 1, 1, 1, hd);
+    [-.025, .025].forEach(dx => add(G.sph, MS("#5a2a2e", { roughness: .5 }), dx, -.03, .183, .011, .014, .006, hd));
+    add(G.sph, MS("#c98888", { roughness: .5 }), 0, -.068, .145, .045, .006, .03, hd);
+    [-1, 1].forEach(s => { add(G.sph, MS("#16120f", { roughness: .2 }), s * .07, .03, .045, .017, .02, .015, hd); add(G.sph, MS("#ffffff", { roughness: .1 }), s * .078, .038, .052, .004, .004, .003, hd);
+      add(G.sph, W, s * .066, .046, .05, .02, .008, .016, hd);
+      const ear = new T.Group(); ear.position.set(s * .072, .045, -.06); ear.rotation.z = s * -.25; ear.rotation.y = s * .25; hd.add(ear);
+      add(COWG.ear, s > 0 ? K : W, s * .06, 0, 0, 1, 1, 1, ear); add(COWG.ear, P, s * .064, -.004, .004, .7, .6, .6, ear);
+      const hn = new T.Mesh(new T.TorusGeometry(.03, .01, 6, 10, Math.PI * .6), HORN); hn.position.set(s * .045, .085, -.06); hn.rotation.set(0, s > 0 ? 0 : Math.PI, .5); hd.add(hn); });
+    add(G.sphHi, K, 0, .08, -.02, .045, .02, .05, hd);
+    // legs: muscled top, knee, slim cannon, dark hoof; they swing from the hip/shoulder
     const legs = [];
-    [[-.11, .24, 0], [.11, .24, Math.PI], [-.11, -.27, Math.PI], [.11, -.27, 0]].forEach(([dx, dz, ph]) => { const L = new T.Group(); L.position.set(dx, .46, dz); L.userData.ph = ph; g.add(L); legs.push(L);
-      L.add(mesh(SK, M(W), 0, -.08, 0, .05, .12, .055)); L.add(mesh(G.cyl, M(W), 0, -.2, 0, .033, .14, .033)); L.add(mesh(SK, M(W), 0, -.28, 0, .036, .03, .036, false));
-      L.add(mesh(G.cyl, M(W), 0, -.36, 0, .028, .14, .028)); L.add(mesh(G.cyl, M(K), 0, -.44, .005, .034, .04, .036, false)); });
-    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .75, 1.05);
+    [[-.11, .27, 0], [.11, .27, Math.PI], [-.11, -.3, Math.PI], [.11, -.3, 0]].forEach(([dx, dz, ph], k) => { const L = new T.Group(); L.position.set(dx, .5, dz); L.userData.ph = ph; g.add(L); legs.push(L);
+      const top = k > 1 ? HIDE : W; add(COWG.legU, top, 0, -.1, 0, 1, 1, 1, L); add(COWG.knee, W, 0, -.21, k > 1 ? -.005 : .005, 1, 1, 1, L); add(COWG.legL, W, 0, -.31, 0, 1, 1, 1, L);
+      add(COWG.hoof, HOOF, 0, -.42, .006, 1, 1, 1, L); add(G.sph, W, 0, -.385, -.01, .03, .02, .03, L); });
+    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .8, 1.1);
     return { g, hd, legs, tail, body: b, kind: "cow" };
   }
   function buildCowbarn(a, nCows) {
@@ -6081,7 +6128,7 @@ function setup3D(T) {
       if (d < .03) { it.wait -= dt; if (it.wait <= 0) { it.tx = pen.x0 + Math.random() * (pen.x1 - pen.x0); it.tz = pen.z0 + Math.random() * (pen.z1 - pen.z0); it.wait = (it.cow ? 3 : 1) + Math.random() * (it.cow ? 6 : 3); } }
       else { const st = Math.min(d, it.sp * dt); it.x += dx / d * st; it.z += dz / d * st; it.m.g.rotation.y = Math.atan2(dx, dz); }
       it.m.g.position.set(it.x, 0, it.z); animWalk(it.m, d >= .03, sec, dt);
-      if (it.m.hd) it.m.hd.rotation.x = d < .03 ? (it.cow ? .5 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : 0;
+      if (it.m.hd) it.m.hd.rotation.x = d < .03 ? (it.cow ? 1.0 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : (it.cow ? .35 : 0);
     }));
   }
   function buildScare(a) {
