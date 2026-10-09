@@ -84,6 +84,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v93
 - Tezgah tentesine tepeden okunan numara + PAZAR dokusu (`stallTop{n}`), altında renkli halı. Pankart üstünde "N tezgah / X ürün satışta" sprite'ı; meydan imzası (`staticSigOf`) satıştaki ürün sayısını içerir, sayı değişince meydan yeniden çizilir.
 
+## v94
+- Pazar etiketleri (`stallLbl{n}`, `pazarCount{n}`) `sizeAttenuation: false` sprite: ekranda hep aynı boyda (kamera fov 30°, ölçek ≈ ekran yüksekliği oranı × 0.54).
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

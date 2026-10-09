@@ -1149,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "93";
+const VERSION = "94";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -5298,6 +5298,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 94, d: "9 Ekim 2026", e: "🔎", t: "Uzaktan okunan pazar yazıları", c: "#2f9a43", b: "#e3f7dc", items: [
+    "Pazar tezgahlarının üstündeki numaralar ve PAZAR YERİ yazısı artık uzaklaşınca küçülmüyor, kuş bakışında da okunuyor.",
+  ] },
   { v: 93, d: "9 Ekim 2026", e: "🏪", t: "Pazar yeri tepeden belli", c: "#3f8fd0", b: "#e2f0ff", items: [
     "Her tezgahın tentesinde büyük numara ve PAZAR yazısı var (1, 2, 3, 4); tepeden bakınca hemen görünüyor.",
     "Tezgahların altında renkli halılar var, pazar yeri zeminde de belli oluyor.",
@@ -6300,6 +6303,11 @@ function setup3D(T) {
         c.fillStyle = a1; c.beginPath(); c.arc(118, h / 2, 82, 0, 6.3); c.fill(); c.fillStyle = "#fff"; c.font = "700 128px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(String(k + 1), 118, h / 2 + 8);
         c.fillStyle = "#4a2410"; c.font = "700 96px Fredoka, Nunito, sans-serif"; c.fillText("PAZAR", 336, h / 2 + 6); });
       const top = new T.Mesh(G.plane, new T.MeshLambertMaterial({ map: tx, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); top.position.set(x, 1.2, z + .02); top.rotation.x = .28; top.scale.set(1.2, 1, .84); g.add(top); }
+    // a label that keeps the same size on screen, so it can be read even from far away
+    { const lt = canvasTex("stallLbl" + k, 256, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.28)"; rr(c, 10, 14, w - 14, h - 18, 54); c.fill(); c.fillStyle = a1; rr(c, 4, 6, w - 14, h - 18, 54); c.fill();
+        c.lineWidth = 9; c.strokeStyle = "#ffffff"; rr(c, 4, 6, w - 14, h - 18, 54); c.stroke();
+        c.fillStyle = "#fff"; c.textAlign = "center"; c.textBaseline = "middle"; c.font = "700 84px Fredoka, Nunito, sans-serif"; c.fillText(String(k + 1), w / 2 + 34, h / 2 - 2); c.font = "64px serif"; c.fillText("🛒", w / 2 - 42, h / 2); });
+      const sp = sprite(lt, .036 * 256 / 160, .036, { sizeAttenuation: false, depthTest: false }); sp.position.set(x, 1.7, z); sp.renderOrder = 9; g.add(sp); }
     // a coloured rug under the stall so the market place stands out on the ground
     { const rg = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: a1, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 })); rg.position.set(x, .02, z + .1); rg.scale.set(1.62, 1, 1.28); g.add(rg);
       const rin = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: "#f3e3c0", polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); rin.position.set(x, .022, z + .1); rin.scale.set(1.46, 1, 1.12); g.add(rin); }
@@ -6316,9 +6324,9 @@ function setup3D(T) {
     { const ban = new T.Mesh(new T.PlaneGeometry(xb - xa - .14, .58), LAM({ map: tx, side: T.DoubleSide })); ban.position.set(cx, top - .36, z); g.add(ban); }
     { const rod = mesh(G.cyl8, M(COL.woodD), cx, top - .05, z, .025, xb - xa, .025); rod.rotation.z = Math.PI / 2; g.add(rod); }
     { const n = pzAll.filter(l => !l.buyer).length, st = STALL_SETS.length;
-      const tx2 = canvasTex("pazarCount" + n, 512, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.25)"; rr(c, 10, 16, w - 16, h - 22, 60); c.fill(); c.fillStyle = "#fffaf0"; rr(c, 4, 6, w - 16, h - 22, 60); c.fill(); c.lineWidth = 10; c.strokeStyle = "#e8463a"; rr(c, 4, 6, w - 16, h - 22, 60); c.stroke();
-        c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#b8322a"; c.font = "700 58px Fredoka, Nunito, sans-serif"; c.fillText("🛒 " + st + " tezgah", w / 2 - 6, 52); c.fillStyle = "#3a2410"; c.font = "700 42px Fredoka, Nunito, sans-serif"; c.fillText(n ? n + " ürün satışta" : "Satış yap, kazan!", w / 2 - 6, 106); });
-      const sp = sprite(tx2, 2.3, .72); sp.position.set(cx, top + .9, z); sp.renderOrder = 7; g.add(sp); }
+      const tx2 = canvasTex("pazarCount" + n, 640, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.25)"; rr(c, 10, 16, w - 16, h - 22, 60); c.fill(); c.fillStyle = "#fffaf0"; rr(c, 4, 6, w - 16, h - 22, 60); c.fill(); c.lineWidth = 10; c.strokeStyle = "#e8463a"; rr(c, 4, 6, w - 16, h - 22, 60); c.stroke();
+        c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#b8322a"; c.font = "700 52px Fredoka, Nunito, sans-serif"; c.fillText("PAZAR YERİ · " + st + " tezgah", w / 2 - 6, 52); c.fillStyle = "#3a2410"; c.font = "700 44px Fredoka, Nunito, sans-serif"; c.fillText(n ? "🛒 " + n + " ürün satışta" : "🛒 Satış yap, kazan!", w / 2 - 6, 108); });
+      const sp = sprite(tx2, .058 * 640 / 160, .058, { sizeAttenuation: false, depthTest: false }); sp.position.set(cx, top + 1.1, z - 1.2); sp.renderOrder = 9; g.add(sp); }
     // little flag strings from each post to the nearest stall roof
     const tri = new T.ShapeGeometry((() => { const s = new T.Shape(); s.moveTo(-.07, 0); s.lineTo(.07, 0); s.lineTo(0, -.13); s.closePath(); return s; })());
     const FLAGC = ["#e8463a", "#f6c445", "#3f8fd0", "#2f9a43", "#ffffff"];
