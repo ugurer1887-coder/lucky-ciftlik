@@ -1,4 +1,4 @@
-// Lucky Çiftlik: "hasadın hazır" bildirimleri.
+// Lucky Farm: "hasadın hazır" bildirimleri.
 // Her 5 dakikada bir çalışır. Firebase'deki push/{uid} kayıtlarından zamanı gelmiş olanları bulur
 // (due <= şimdi ve henüz gönderilmemiş) ve oyuncunun telefonuna Web Push bildirimi yollar.
 // Bağımlılık yok: VAPID imzası Node'un kendi crypto modülüyle yapılır, bildirim içeriksiz gönderilir

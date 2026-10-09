@@ -90,6 +90,14 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v95
 - Kullanıcı isteğiyle pazar yerindeki bütün yazılar kaldırıldı (tente numarası/PAZAR, sabit boyutlu etiketler, sayaç, pankart yazısı). Pankartta sadece ürün emojileri var. Pazarda yazı eklemeyin.
 
+## v96 (Lucky Farm)
+- Oyunun adı **Lucky Farm** (title, manifest, sw bildirim başlığı, yükleme ekranı "FARM", Android `app_name`; Android versionCode 8 / 1.0.7 – Play'e yeni paket yüklenmeli). Repo/site adı aynı.
+- Tezgah üstünde yazısız sepet rozetleri (`stallBadge{n}`, sabit ekran boyutu).
+- Çimen: `scenery()` öbek öbek, yumuşak renkli kısa tutamlar; `paintGrass` açık/koyu yamalar ve kır çiçeği benekleri; detay dokusu daha hafif.
+- Dokunma parıltısı `R3.tapMark(x,z)` / `stepTap` (onCell'de çağrılır).
+- Yeni `buildCow(v)` (benekli deri dokusu `cowHide`, eklemli bacaklar, kuyruk) ve `buildHen`; ortak `animWalk(m, moving, sec, dt)` hem ağıllarda (`stepPens`) hem avludaki tavuklarda (`syncHens`).
+- Kelebekler `stepButterflies` (7 adet, çiftlikte sahip olunan alanda, meydanda meydan çevresinde).
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.

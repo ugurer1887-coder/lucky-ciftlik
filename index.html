@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="theme-color" content="#8fc456"></head><body>
-<title>Lucky Çiftlik</title>
+<title>Lucky Farm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -778,7 +778,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 
   <div class="modal" id="start_v8">
     <div class="box">
-      <h1 id="startTitle_v8">Lucky Çiftlik'e hoş geldin</h1>
+      <h1 id="startTitle_v8">Lucky Farm'a hoş geldin</h1>
       <p id="startText_v8">Çiftliğe bağlanılıyor</p>
       <div id="startForm_v8" hidden>
         <input id="nameIn_v8" maxlength="16" placeholder="Çiftçi adın" autocomplete="off">
@@ -846,7 +846,7 @@ body{font-family:var(--body);letter-spacing:.1px}
   <div class="modal" id="upd_v8">
     <div class="box set">
       <h1><span class="h1e">✨</span> <span class="h1g">Güncellemeler</span></h1>
-      <p class="lead">Lucky Çiftlik'e gelen yenilikler burada. İyi hasatlar!</p>
+      <p class="lead">Lucky Farm'a gelen yenilikler burada. İyi hasatlar!</p>
       <div id="updList_v8"></div>
       <button class="big ghost" id="updClose_v8">Kapat</button>
     </div>
@@ -944,7 +944,7 @@ body{font-family:var(--body);letter-spacing:.1px}
         <g class="ld-blades"><path d="M0 0l-6 -58h12z M0 0l58 -6v12z M0 0l6 58h-12z M0 0l-58 6v-12z" fill="#fff8ea" stroke="#a7825a" stroke-width="2"/><circle r="6" fill="#8a5a32"/></g></g>
       <g class="ld-ribbon"><path d="M236 198h328l-16 22 16 22h-328l16 -22z" fill="url(#ldRed)" stroke="#7d1f12" stroke-width="4" stroke-linejoin="round"/></g>
       <text class="ld-logo" x="400" y="184" text-anchor="middle">Lucky</text>
-      <text class="ld-sub" x="400" y="231" text-anchor="middle">ÇİFTLİK</text>
+      <text class="ld-sub" x="400" y="231" text-anchor="middle">FARM</text>
       <g class="ld-spark" fill="#fff6c2"><path class="s1" d="M178 92l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5z"/><path class="s2" d="M624 84l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/><path class="s3" d="M600 190l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path class="s4" d="M206 196l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/></g>
       <g transform="translate(480 290) scale(.85)">
         <g class="ld-puffs"><circle class="p1" cx="150" cy="-36" r="9" fill="#ece8e0"/><circle class="p2" cx="150" cy="-36" r="9" fill="#ece8e0"/><circle class="p3" cx="150" cy="-36" r="9" fill="#ece8e0"/></g>
@@ -984,7 +984,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 </div>
 
 <script>
-/* ===== Lucky Çiftlik: Firebase sunucu bağlantısı (Netlify gibi kendi sitende çalışırken) =====
+/* ===== Lucky Farm: Firebase sunucu bağlantısı (Netlify gibi kendi sitende çalışırken) =====
    Firebase konsolu > Proje ayarları > Uygulamalarınız > Web uygulaması > "firebaseConfig" bilgilerini
    aşağıdaki FIREBASE_CONFIG içine yapıştır. Claude içinde açıldığında bu kısım kullanılmaz. */
 window.LUCKY_INAPP = /FBAN|FBAV|FB_IAB|Instagram|Line\/|WhatsApp|Snapchat|TikTok|musical_ly|Twitter|; wv\)/i.test(navigator.userAgent || "");
@@ -1149,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "95";
+const VERSION = "96";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2311,13 +2311,19 @@ function paintGrass(ctx, W, H, kind) {
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(lc, 0, 0, W, H);
   // thousands of small blades for texture
   // small tufts: 3 blades fanning out from one root, darker at the base, lighter tips
-  const cols = ["rgba(58,108,34,.55)", "rgba(92,150,52,.55)", "rgba(132,188,74,.5)", "rgba(176,214,104,.45)"], sc = W / 3200;
+  const cols = ["rgba(62,112,36,.32)", "rgba(92,150,52,.4)", "rgba(132,188,74,.42)", "rgba(176,214,104,.4)"], sc = W / 3200;
   cols.forEach((c, ci) => {
     ctx.strokeStyle = c; ctx.lineWidth = Math.max(1, (2.2 - ci * .3) * sc * 1.4); ctx.lineCap = "round"; ctx.beginPath();
     for (let k = 0; k < W * H / 5200; k++) { const x = rand() * W, y = rand() * H, base = (4 + rand() * 5) * sc * 1.5;
       for (let b = -1; b <= 1; b++) { const a = -1.57 + b * (.35 + rand() * .25), l = base * (b ? .8 : 1); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + Math.cos(a) * l * .5, y + Math.sin(a) * l * .6, x + Math.cos(a) * l, y + Math.sin(a) * l); } }
     ctx.stroke();
   });
+  // soft lighter clover patches and darker lush patches, so the meadow is not one flat colour
+  for (let k = 0; k < W * H / 60000; k++) { const x = rand() * W, y = rand() * H, r = (30 + rand() * 70) * sc * 1.4, lite = rand() < .55;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, lite ? "rgba(190,225,120,.22)" : "rgba(50,100,30,.16)"); g.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); }
+  // little wildflower specks in a few colours
+  ["rgba(255,255,255,.75)", "rgba(255,226,110,.75)", "rgba(240,160,190,.7)", "rgba(190,170,255,.65)"].forEach(cf => { ctx.fillStyle = cf;
+    for (let k = 0; k < W * H / 160000; k++) { const x0 = rand() * W, y0 = rand() * H; for (let q = 0; q < 5; q++) { const r = (1.4 + rand() * 1.4) * sc * 1.4; ctx.beginPath(); ctx.arc(x0 + (rand() - .5) * 30 * sc, y0 + (rand() - .5) * 30 * sc, r, 0, 6.283); ctx.fill(); } } });
   // tiny clover and pebble specks
   ctx.fillStyle = "rgba(220,240,180,.35)";
   for (let k = 0; k < W * H / 9000; k++) { const x = rand() * W, y = rand() * H, r = (1 + rand() * 1.6) * sc * 1.4; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); }
@@ -2566,6 +2572,7 @@ function visitFriend(fuid) { if (S && S.friends.includes(fuid)) visitFarm(fuid, 
 // ---------- Taps ----------
 function onCell(i) {
   if (!S || !entered || !alive()) return;
+  try { if (R3.on && R3.tapMark && Number.isInteger(i) && i >= 0) R3.tapMark(colOf(i) + .5, rowOf(i) + .5); } catch (e) {}
   if (scene.kind === "home") return tapHome(i);
   if (scene.kind === "visit") return tapVisit(i);
   return tapPlaza(i);
@@ -4276,7 +4283,7 @@ async function openProfile(puid) {
   const w = whereIs(puid);
   $("pfInfo").textContent = "Seviye " + d.level + ", " + (d.g === "k" ? "kız" : "erkek") + " çiftçi. " + (w ? (w === "plaza" ? "Şu an meydanda." : "Şu an çevrimiçi.") : "Şu an çevrimdışı.");
   let h = "";
-  if (puid === BOT_UID) { $("pfInfo").textContent = "Lucky Çiftlik'in resmi çiftliği. Seviye " + MAX_LEVEL + ", her zaman ziyarete açık."; h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button>`; }
+  if (puid === BOT_UID) { $("pfInfo").textContent = "Lucky Farm'ın resmi çiftliği. Seviye " + MAX_LEVEL + ", her zaman ziyarete açık."; h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button>`; }
   else if (isFriend(puid)) h = `<button class="big green" data-visit="${esc(puid)}">Çiftliğini ziyaret et</button><button class="big ghost" data-unfriend="${esc(puid)}">Arkadaşlıktan çıkar</button>`;
   else if (outPending(puid)) h = `<button class="big" disabled>İstek gönderildi</button>`;
   else if (inPending(puid)) h = `<button class="big green" data-accept="${esc(puid)}">İsteği kabul et</button>`;
@@ -4345,7 +4352,7 @@ function showCharFields(on) {
 function openCharModal(m) {
   if (m !== "new" && charLocked()) { openAccount(); return; }
   charMode = m;
-  $("startTitle").textContent = m === "new" ? "Lucky Çiftlik'e hoş geldin" : "Karakterini oluştur";
+  $("startTitle").textContent = m === "new" ? "Lucky Farm'a hoş geldin" : "Karakterini oluştur";
   $("startText").textContent = "Adını yaz ve karakterini seç. Ad ve cinsiyet bir kere seçilir, sonra değiştirilemez.";
   $("nameIn").value = S ? S.name : "";
   setPick(S && S.g ? S.g : null);
@@ -4573,7 +4580,7 @@ function renderSettings() {
   $("gfxNow").textContent = !R3.on ? "3D görünüm bu cihazda kapalı" : GFX.mode === "auto" ? "Şu an: " + ["Düşük", "Orta", "Yüksek"][GFX.level] + (GFX.frameMs > 20 ? ", 30 kare" : ", 60 kare") : "Telefonun zorlanırsa Otomatik'i seç";
   $("musicSw").setAttribute("aria-checked", MUSIC.on); $("musicVol").value = Math.round(MUSIC.vol * 100); $("musicVol").disabled = !MUSIC.on;
   const a = window.LUCKY_AUTH, btns = $("setBtns");
-  $("setVer").textContent = "Lucky Çiftlik, sürüm " + VERSION + (S ? " · " + S.name : "");
+  $("setVer").textContent = "Lucky Farm, sürüm " + VERSION + (S ? " · " + S.name : "");
   if (!a || !online) {
     $("setAcct").textContent = window.claude && window.claude.use ? "Claude hesabınla oynuyorsun." : "Sunucuya bağlı değilsin, ilerlemen bu cihazda saklanıyor.";
     btns.innerHTML = ""; return;
@@ -4590,9 +4597,9 @@ function listenMail() {
   if (!db) return;
   try { db.collection("mail").orderBy("ts", "desc").limit(30).onSnapshot(s => { mailOk = true; mails = s.docs.map(d => Object.assign({ id: d.id }, d.data())).filter(m => m && m.ts).sort((a, b) => b.ts - a.ts); renderMailDot(); if ($("mailbox").classList.contains("on")) renderMail(); }, () => {}); } catch (e) {}
 }
-const WELCOME_MAIL = () => ({ id: "welcome", welcome: true, ts: (S && +S.created) || Date.now(), title: "Lucky Çiftlik'e hoş geldin!",
+const WELCOME_MAIL = () => ({ id: "welcome", welcome: true, ts: (S && +S.created) || Date.now(), title: "Lucky Farm'a hoş geldin!",
   text: "Merhaba " + (S ? S.name : "çiftçi") + ",\n\nYeni çiftliğin seni bekliyor! Toprağını ekip sula, ürünlerini hasat edip depodan sat, kazandığın altınlarla çiftliğini büyüt ve dilediğin gibi süsle. " +
-    "Meydanda diğer çiftçilerle tanış, arkadaş ol, birbirinizin çiftliğini ziyaret edin. Takıldığın bir şey olursa LuckyTr'nin çiftliğine uğrayıp ilham alabilirsin.\n\nBereketli hasatlar ve çiftliğinde bol şans dileriz!\nLucky Çiftlik ekibi" });
+    "Meydanda diğer çiftçilerle tanış, arkadaş ol, birbirinizin çiftliğini ziyaret edin. Takıldığın bir şey olursa LuckyTr'nin çiftliğine uğrayıp ilham alabilirsin.\n\nBereketli hasatlar ve çiftliğinde bol şans dileriz!\nLucky Farm ekibi" });
 const allMails = () => [...mails, WELCOME_MAIL()];
 const mailNew = m => !(S && S.mailRead && S.mailRead[m.id]);
 const mailGift = m => +m.gold > 0 && !(S && S.mailGot && S.mailGot[m.id]);
@@ -4760,7 +4767,7 @@ function renderNotif() {
   const sw = $("notifSw"); if (!sw) return;
   const ok = notifSupported(), denied = ok && Notification.permission === "denied";
   sw.setAttribute("aria-checked", NOTIF.on && ok && !denied); sw.disabled = !ok;
-  $("notifNow").textContent = !ok ? "Bu cihaz bildirimleri desteklemiyor" : denied ? "İzin kapalı: telefon ayarlarından Lucky Çiftlik bildirimlerine izin ver" : NOTIF.on ? "Açık: ekinlerin hazır olunca haber gelir" : "Kapalı";
+  $("notifNow").textContent = !ok ? "Bu cihaz bildirimleri desteklemiyor" : denied ? "İzin kapalı: telefon ayarlarından Lucky Farm bildirimlerine izin ver" : NOTIF.on ? "Açık: ekinlerin hazır olunca haber gelir" : "Kapalı";
 }
 async function notifEnable(quiet) {
   if (!notifSupported()) { if (!quiet) toast("Bu cihaz bildirimleri desteklemiyor"); return false; }
@@ -5298,6 +5305,13 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 96, d: "9 Ekim 2026", e: "🦋", t: "Lucky Farm canlanıyor", c: "#e0702a", b: "#fff0dc", items: [
+    "Oyunumuzun adı artık <b>Lucky Farm</b>!",
+    "Yeni inekler ve tavuklar: yürürken bacakları oynuyor, ineklerin kuyruğu sallanıyor, tavuklar başını sallayarak yürüyor.",
+    "Dokunduğun yerde parıltı çıkıyor, karakterin nereye gideceğini kolayca görürsün.",
+    "Çimenler daha doğal, çayırda kır çiçekleri ve uçuşan kelebekler var.",
+    "Pazar tezgahlarının üstündeki sepet işaretleri geri geldi.",
+  ] },
   { v: 95, d: "9 Ekim 2026", e: "🧺", t: "Sade pazar yeri", c: "#2f9a43", b: "#e3f7dc", items: [
     "Pazar yerindeki yazılar kaldırıldı; tezgahlar renkli tenteleri ve halılarıyla, pankart da meyve resimleriyle sade bir görünümde.",
   ] },
@@ -5655,8 +5669,8 @@ function setup3D(T) {
   const ground = mesh(G.plane, groundMat, (RX + RW / 2) / CELL, 0, (RY + RH / 2) / CELL, RW / CELL, 1, RH / CELL, false); scene3.add(ground);
   const detailTex = canvasTex("gdetail", 256, 256, (x, w, h) => {
     let sd = 11; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
-    for (let k = 0; k < 900; k++) { const px = r() * w, py = r() * h, len = 3 + r() * 7, a = (r() - .5) * .9, dark = r() < .62;
-      x.strokeStyle = dark ? `rgba(28,52,12,${(.18 + r() * .3).toFixed(2)})` : `rgba(235,250,190,${(.12 + r() * .22).toFixed(2)})`; x.lineWidth = .8 + r() * 1.1;
+    for (let k = 0; k < 700; k++) { const px = r() * w, py = r() * h, len = 2 + r() * 5, a = (r() - .5) * 1.2, dark = r() < .45;
+      x.strokeStyle = dark ? `rgba(40,70,20,${(.08 + r() * .14).toFixed(2)})` : `rgba(235,250,190,${(.1 + r() * .18).toFixed(2)})`; x.lineWidth = .7 + r() * .9;
       x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.sin(a) * len, py - Math.cos(a) * len); x.stroke(); }
     for (let k = 0; k < 60; k++) { const px = r() * w, py = r() * h, rr = 6 + r() * 16; const g = x.createRadialGradient(px, py, 0, px, py, rr);
       g.addColorStop(0, `rgba(${r() < .5 ? "40,60,15" : "150,130,70"},${(.06 + r() * .08).toFixed(2)})`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(px - rr, py - rr, rr * 2, rr * 2); }
@@ -5894,24 +5908,33 @@ function setup3D(T) {
     fx.pens.push(pen);
     return g;
   }
-  // a Holstein cow: rounded body with black patches, pink muzzle and udder, horns, ears, a red collar with a little bell
-  function buildCow() {
+  // Holstein cow: a spotted hide texture wrapped on rounded body parts, a neck, a real head with muzzle, ears and horns,
+  // jointed legs that swing when it walks, a swishing tail, udder and a bell
+  const cowHide = v => canvasTex("cowHide" + v, 256, 128, (x, w, h) => { x.fillStyle = "#fbfaf6"; x.fillRect(0, 0, w, h);
+    let sd = 7 + v * 13; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    x.fillStyle = "#26221f"; for (let p = 0; p < 7; p++) { const cx = r() * w, cy = 20 + r() * (h - 50), R = 12 + r() * 16;
+      for (let q = 0; q < 7; q++) { const a = r() * 6.28, d = r() * R * .8; x.beginPath(); x.ellipse(cx + Math.cos(a) * d, cy + Math.sin(a) * d * .7, R * (.5 + r() * .4), R * (.4 + r() * .35), r() * 3, 0, 6.3); x.fill(); } }
+    const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(.85, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(230,220,210,.6)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+  function buildCow(v = 0) {
     const g = new T.Group(), b = new T.Group(); g.add(b);
-    const W = "#fbfaf6", K = "#2b2724", P = "#f3a7ae";
-    b.add(mesh(G.sph, M(W), 0, .46, -.04, .18, .165, .31)); b.add(mesh(G.sph, M(W), 0, .5, .17, .16, .155, .15));
-    [[.12, .52, .04, .1, .09, .13], [-.13, .48, -.15, .09, .1, .11], [0, .6, -.1, .1, .05, .12], [-.12, .53, .17, .07, .07, .07], [.13, .44, -.22, .06, .07, .08]].forEach(([x, y, z, sx, sy, sz]) => b.add(mesh(G.sph, M(K), x, y, z, sx, sy, sz, false)));
-    b.add(mesh(G.sph, M(P), 0, .3, -.15, .085, .06, .085, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .25, -.15 + dz, .012, .05, .012, false)));
-    [[-.1, -.22], [.1, -.22], [-.1, .18], [.1, .18]].forEach(([dx, dz]) => { g.add(mesh(G.cyl8, M(W), dx, .18, dz, .045, .3, .045)); g.add(mesh(G.cyl8, M(K), dx, .03, dz, .05, .06, .05, false)); });
-    { const col = mesh(G.cyl, M("#c8453a"), 0, .52, .28, .105, .035, .1, false); col.rotation.x = 1.0; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .7, roughness: .3 }), 0, .42, .33, .035, .04, .035, false)); }
-    { const tl = mesh(G.cyl8, M(W), 0, .4, -.36, .014, .26, .014, false); tl.rotation.x = .25; b.add(tl); b.add(mesh(G.sph, M(K), 0, .27, -.39, .03, .05, .03, false)); }
-    const hd = new T.Group(); hd.position.set(0, .6, .3); b.add(hd);
-    hd.add(mesh(G.sph, M(W), 0, 0, .04, .1, .11, .12)); hd.add(mesh(G.sph, M(K), .05, .05, .03, .065, .07, .08, false));
-    hd.add(mesh(G.sph, M(P), 0, -.05, .14, .085, .065, .06, false)); [-.03, .03].forEach(dx => hd.add(mesh(G.sph, M("#9a4a52"), dx, -.04, .195, .012, .014, .008, false)));
-    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#fff"), s * .065, .03, .11, .022, .022, .015, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .07, .03, .122, .013, .014, .008, false));
-      const ear = mesh(G.sph, M(s > 0 ? K : W), s * .13, .05, .0, .06, .022, .035, false); ear.rotation.z = s * .35; hd.add(ear);
-      const hn = mesh(G.cone, M("#efe2c0"), s * .065, .13, .0, .018, .07, .018, false); hn.rotation.z = -s * .5; hd.add(hn); });
-    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .7, .9);
-    return { g, hd };
+    const W = "#fbfaf6", K = "#26221f", P = "#f2a3ab", HIDE = new T.MeshLambertMaterial({ map: cowHide(v % 3) });
+    b.add(mesh(G.sph, HIDE, 0, .5, -.03, .19, .18, .33)); b.add(mesh(G.sph, HIDE, 0, .53, .16, .17, .17, .17)); b.add(mesh(G.sph, HIDE, 0, .52, -.24, .17, .165, .15));
+    { const nk = mesh(G.cyl, M(W), 0, .6, .3, .09, .2, .1); nk.rotation.x = -1.0; b.add(nk); }
+    b.add(mesh(G.sph, M(P), 0, .33, -.17, .08, .06, .08, false)); [[-.03, -.03], [.03, -.03], [-.03, .03], [.03, .03]].forEach(([dx, dz]) => b.add(mesh(G.cyl8, M(P), dx, .28, -.17 + dz, .012, .045, .012, false)));
+    { const col = mesh(G.cyl, M("#c8453a"), 0, .6, .33, .1, .03, .1, false); col.rotation.x = -1.0; b.add(col); b.add(mesh(G.sph, MS("#e2b33c", { metalness: .7, roughness: .3 }), 0, .5, .38, .035, .042, .035, false)); }
+    const tail = new T.Group(); tail.position.set(0, .64, -.36); b.add(tail);
+    { const t1 = mesh(G.cyl8, M(W), 0, -.14, -.02, .013, .28, .013, false); t1.rotation.x = .15; tail.add(t1); tail.add(mesh(G.sph, M(K), 0, -.3, -.04, .03, .055, .03, false)); }
+    const hd = new T.Group(); hd.position.set(0, .7, .4); b.add(hd);
+    hd.add(mesh(G.sph, M(W), 0, 0, 0, .1, .105, .12)); hd.add(mesh(G.sph, M(K), .04, .04, .0, .07, .065, .085, false)); hd.add(mesh(G.sph, M(K), 0, .1, -.01, .04, .02, .04, false));
+    hd.add(mesh(G.sph, M(P), 0, -.055, .11, .085, .068, .07, false)); [-.03, .03].forEach(dx => hd.add(mesh(G.sph, M("#8a3a42"), dx, -.045, .175, .013, .016, .008, false)));
+    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#ffffff"), s * .07, .025, .08, .024, .026, .016, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .074, .025, .092, .015, .017, .008, false)); hd.add(mesh(G.sph, M("#ffffff"), s * .07, .033, .099, .005, .005, .003, false));
+      const ear = new T.Group(); ear.position.set(s * .1, .05, -.02); ear.rotation.z = s * -.35; hd.add(ear); ear.add(mesh(G.sph, M(s > 0 ? K : W), s * .05, 0, 0, .06, .02, .035, false)); ear.add(mesh(G.sph, M(P), s * .055, -.005, .006, .04, .012, .022, false));
+      const hn = mesh(G.cone, M("#efe2c0"), s * .065, .12, -.02, .018, .08, .018, false); hn.rotation.z = -s * .55; hd.add(hn); });
+    const legs = [];
+    [[-.1, .2, 0], [.1, .2, Math.PI], [-.1, -.22, Math.PI], [.1, -.22, 0]].forEach(([dx, dz, ph]) => { const L = new T.Group(); L.position.set(dx, .38, dz); L.userData.ph = ph; g.add(L); legs.push(L);
+      L.add(mesh(G.cyl, M(W), 0, -.1, 0, .048, .2, .048)); L.add(mesh(G.sph, M(W), 0, -.2, 0, .042, .03, .042, false)); L.add(mesh(G.cyl, M(W), 0, -.29, 0, .036, .16, .036)); L.add(mesh(G.cyl, M(K), 0, -.36, 0, .042, .05, .042, false)); });
+    g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .75, .95);
+    return { g, hd, legs, tail, body: b, kind: "cow" };
   }
   function buildCowbarn(a, nCows) {
     const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .08, x1 = c + 3.92, z0 = r + .08, z1 = r + 3.92;
@@ -5945,7 +5968,7 @@ function setup3D(T) {
     g.add(mesh(G.box, TM(COL.wood, "planks", 2, 1), c + 1.7, .12, r + 1.88, 1.7, .18, .26)); g.add(mesh(G.box, M("#d9c26a"), c + 1.7, .22, r + 1.88, 1.6, .05, .2, false));
     g.add(mesh(G.box, TM("#9a9286", "stone", 1, 2), c + 3.4, .11, r + 2.75, .32, .2, .9)); g.add(mesh(G.box, MS("#4fa8d6", { roughness: .1 }), c + 3.4, .21, r + 2.75, .24, .01, .8, false));
     const pen = { items: [], x0: c + .55, x1: c + 3.0, z0: r + 2.2, z1: r + 3.45 };
-    for (let k = 0; k < nCows; k++) { const m = buildCow(); m.g.scale.setScalar(.95); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
+    for (let k = 0; k < nCows; k++) { const m = buildCow(k); m.g.scale.setScalar(.95); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: 1 + Math.random() * 4, sp: .22, cow: 1 }); }
     fx.pens.push(pen);
     return g;
@@ -6007,7 +6030,7 @@ function setup3D(T) {
       const dx = it.tx - it.x, dz = it.tz - it.z, d = Math.hypot(dx, dz);
       if (d < .03) { it.wait -= dt; if (it.wait <= 0) { it.tx = pen.x0 + Math.random() * (pen.x1 - pen.x0); it.tz = pen.z0 + Math.random() * (pen.z1 - pen.z0); it.wait = (it.cow ? 3 : 1) + Math.random() * (it.cow ? 6 : 3); } }
       else { const st = Math.min(d, it.sp * dt); it.x += dx / d * st; it.z += dz / d * st; it.m.g.rotation.y = Math.atan2(dx, dz); }
-      it.m.g.position.set(it.x, 0, it.z);
+      it.m.g.position.set(it.x, 0, it.z); animWalk(it.m, d >= .03, sec, dt);
       if (it.m.hd) it.m.hd.rotation.x = d < .03 ? (it.cow ? .5 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : 0;
     }));
   }
@@ -6300,6 +6323,11 @@ function setup3D(T) {
     [[-.78, .35], [-.82, .12]].forEach(([dx, dz], q) => { g.add(mesh(G.sph, M(q ? "#e2cc95" : "#ead7a6"), x + dx, .14, z + dz, .1, .14, .09)); g.add(mesh(G.cyl, M(set[q]), x + dx, .27, z + dz, .07, .02, .07, false)); });
     // striped awning, sloping to the front, with a scalloped edge
     for (let q = 0; q < 8; q++) { const st = mesh(G.box, M(q % 2 ? a2 : a1), x - .6 + .075 + q * .15, 1.18, z + .02, .15, .03, .82); st.rotation.x = .28; g.add(st); }
+    // a basket badge that keeps the same size on screen, so the stalls are easy to spot even from far away (no text)
+    { const lt = canvasTex("stallBadge" + k, 160, 160, (c, w, h) => { c.fillStyle = "rgba(0,0,0,.25)"; c.beginPath(); c.arc(84, 88, 66, 0, 6.3); c.fill();
+        c.fillStyle = a1; c.beginPath(); c.arc(78, 80, 66, 0, 6.3); c.fill(); c.lineWidth = 9; c.strokeStyle = "#ffffff"; c.stroke();
+        c.font = "78px serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("🧺", 78, 86); });
+      const sp = sprite(lt, .042, .042, { sizeAttenuation: false, depthTest: false }); sp.position.set(x, 1.7, z); sp.renderOrder = 9; g.add(sp); }
     // a coloured rug under the stall so the market place stands out on the ground
     { const rg = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: a1, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 })); rg.position.set(x, .02, z + .1); rg.scale.set(1.62, 1, 1.28); g.add(rg);
       const rin = new T.Mesh(G.plane, new T.MeshLambertMaterial({ color: "#f3e3c0", polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); rin.position.set(x, .022, z + .1); rin.scale.set(1.46, 1, 1.12); g.add(rin); }
@@ -6468,12 +6496,16 @@ gl_Position = projectionMatrix * mvPosition;`); };
     const busy = new Set();
     if (scene.kind === "plaza") { for (let r = PSQ.r0; r <= PSQ.r1; r++) for (let c = PSQ.c0; c <= PSQ.c1; c++) busy.add(idx(r, c)); P_BLOCK.forEach(i => busy.add(i)); }
     else if (f) { occMap(f).forEach((v, k) => busy.add(k)); }
-    const greens = ["#4f8a2c", "#5e9a35", "#6aa63c", "#7bb247", "#8cbf52"];
-    for (let k = 0; k < tuftCount; k++) {
-      const x = -1 + r1() * (COLS + 2), z = -1 + r1() * (ROWS + 1.2), c = Math.floor(x), r = Math.floor(z);
+    // soft grass in natural clumps: colours close to the meadow, short and leaning, a few taller wild tufts
+    const greens = ["#679f3c", "#74aa44", "#7fb34b", "#8cbd55", "#9ac760", "#86b24c"];
+    let cx0 = 0, cz0 = 0;
+    for (let k = 0; k < tuftCount * .7; k++) {
+      if (k % 5 === 0) { cx0 = -1 + r1() * (COLS + 2); cz0 = -1 + r1() * (ROWS + 1.2); }
+      const x = cx0 + (r1() - .5) * .9, z = cz0 + (r1() - .5) * .7, c = Math.floor(x), r = Math.floor(z);
       if (r === ROWS - 1) continue; if (c >= 0 && r >= 0 && c < COLS && r < ROWS && busy.has(idx(r, c))) continue;
       if (f && scene.kind !== "plaza" && !(c >= 0 && r >= 0 && c < COLS && r < ROWS && inOwned(f, idx(r, c)))) continue;   // none under the fog
-      const s = .1 + r1() * .12; P.tuft.add(x, 0, z, s * (1.3 + r1() * .6), s * (.8 + r1() * .8), s * 1.3, greens[(k % 4) + 1], r1() * 6.28);
+      const tall = r1() < .08, s = (tall ? .13 : .07) + r1() * (tall ? .08 : .06);
+      P.tuft.add(x, 0, z, s * (1.4 + r1() * .6), s * (.7 + r1() * .7) * (tall ? 1.6 : 1), s * 1.4, greens[Math.floor(r1() * greens.length)], r1() * 6.28);
     }
     // a forest ring frames the map
     for (let k = 0; k < 290; k++) {
@@ -6782,29 +6814,42 @@ gl_Position = projectionMatrix * mvPosition;`); };
   const progBg = sprite(canvasTex("pbg", 64, 16, (x) => { x.fillStyle = "rgba(30,20,10,.8)"; rr(x, 0, 0, 64, 16, 8); x.fill(); }), .62, .14), progFg = sprite(canvasTex("pfg", 64, 16, (x) => { x.fillStyle = "#f5b324"; rr(x, 0, 0, 64, 16, 8); x.fill(); }), .58, .1);
   progFg.center.set(0, .5); progBg.renderOrder = 8; progFg.renderOrder = 9; scene3.add(progBg); scene3.add(progFg);
   const henCache = new Map();
+  // hen: round feathered body with folded wings and a tail fan, comb and wattle, little legs that patter when she walks
   function buildHen(brown) {
-    const g = new T.Group(), body = brown ? "#c8834a" : "#fbfaf6", wing = brown ? "#a35f2c" : "#e9e3d6", tail = brown ? "#5e3218" : "#d8d1c2";
+    const g = new T.Group(), body = brown ? "#c8834a" : "#fbfaf6", wing = brown ? "#a35f2c" : "#ece6d9", tail = brown ? "#4e2a14" : "#2f2a26", breast = brown ? "#d99a5e" : "#ffffff";
     const b = new T.Group(); g.add(b);
-    b.add(mesh(G.sph, M(body), 0, .17, -.01, .13, .12, .16)); b.add(mesh(G.sph, M(body), 0, .22, .07, .085, .1, .085));
-    [-1, 1].forEach(s => { const w = mesh(G.sph, M(wing), s * .115, .18, -.03, .035, .075, .12, false); w.rotation.z = s * .15; b.add(w); });
-    [-.4, 0, .4].forEach((ang, k) => { const t = mesh(G.sph, M(k === 1 ? tail : wing), Math.sin(ang) * .03, .27, -.14, .028, .1, .045, false); t.rotation.x = -.6; t.rotation.z = ang; b.add(t); });
-    const hd = new T.Group(); hd.position.set(0, .31, .1); b.add(hd);
-    hd.add(mesh(G.sph, M(body), 0, 0, 0, .065, .068, .065));
-    { const bk = mesh(G.cone, M("#f0a42a"), 0, -.008, .078, .022, .055, .022, false); bk.rotation.x = Math.PI / 2; hd.add(bk); }
-    [[.07, .02, .022], [.076, -.012, .02], [.062, -.04, .017]].forEach(([y, z, s]) => hd.add(mesh(G.sph, M("#e0372a"), 0, y, z, s * .7, s * 1.2, s, false)));
-    hd.add(mesh(G.sph, M("#e0372a"), 0, -.045, .056, .014, .025, .014, false));
-    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#ffffff"), s * .042, .015, .045, .014, .014, .01, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .046, .015, .05, .008, .009, .006, false)); });
-    [-.045, .045].forEach(dx => { g.add(mesh(G.cyl8, M("#e39a2b"), dx, .04, 0, .011, .08, .011, false)); g.add(mesh(G.box, M("#e39a2b"), dx, .005, .02, .03, .01, .05, false)); });
+    b.add(mesh(G.sph, M(body), 0, .2, -.02, .125, .115, .155)); b.add(mesh(G.sph, M(breast), 0, .2, .07, .1, .1, .09)); b.add(mesh(G.sph, M(body), 0, .27, .1, .07, .09, .065));
+    [-1, 1].forEach(s => { const w = mesh(G.sph, M(wing), s * .112, .21, -.03, .035, .075, .11, false); w.rotation.z = s * .18; w.rotation.x = -.15; b.add(w); });
+    [-.5, -.17, .17, .5].forEach((ang, k) => { const t = mesh(G.sph, M(k % 3 ? tail : wing), Math.sin(ang) * .04, .3, -.14, .024, .1, .04, false); t.rotation.x = -.7; t.rotation.z = ang; b.add(t); });
+    const hd = new T.Group(); hd.position.set(0, .35, .12); b.add(hd);
+    hd.add(mesh(G.sph, M(body), 0, 0, 0, .06, .064, .062));
+    { const bk = mesh(G.cone, M("#f0a42a"), 0, -.008, .074, .02, .05, .02, false); bk.rotation.x = Math.PI / 2; hd.add(bk); }
+    [[.065, .022, .02], [.074, -.005, .022], [.066, -.032, .018]].forEach(([y, z, sz]) => hd.add(mesh(G.sph, M("#e0372a"), 0, y, z, sz * .6, sz * 1.15, sz, false)));
+    hd.add(mesh(G.sph, M("#e0372a"), 0, -.045, .05, .013, .025, .013, false));
+    [-1, 1].forEach(s => { hd.add(mesh(G.sph, M("#ffffff"), s * .04, .014, .043, .013, .013, .009, false)); hd.add(mesh(G.sph, M("#1d1a14"), s * .044, .014, .048, .007, .008, .005, false)); });
+    const legs = [];
+    [[-.045, 0], [.045, Math.PI]].forEach(([dx, ph]) => { const L = new T.Group(); L.position.set(dx, .1, 0); L.userData.ph = ph; g.add(L); legs.push(L);
+      L.add(mesh(G.cyl8, M("#e39a2b"), 0, -.05, 0, .011, .1, .011, false)); [-.5, 0, .5].forEach(a => { const toe = mesh(G.box, M("#e39a2b"), Math.sin(a) * .02, -.098, Math.cos(a) * .02 + .005, .008, .006, .045, false); toe.rotation.y = a; L.add(toe); }); });
     g.traverse(n => { n.castShadow = false; }); blob(g, 0, 0, .42, .42);
-    return { g, hd };
+    return { g, hd, legs, body: b, kind: "hen" };
+  }
+  // shared walking animation: legs swing, the body bobs a little, the head nods (hens) and the tail swishes (cows)
+  function animWalk(m, moving, sec, dt) {
+    const sp = m.kind === "cow" ? 6.5 : 16; m.wp = (m.wp || 0) + (moving ? dt * sp : 0); m.amt = Math.max(0, Math.min(1, (m.amt || 0) + (moving ? dt * 6 : -dt * 6)));
+    const amp = (m.kind === "cow" ? .5 : .7) * m.amt;
+    (m.legs || []).forEach(L => { L.rotation.x = Math.sin(m.wp + L.userData.ph) * amp; });
+    if (m.body) m.body.position.y = Math.abs(Math.sin(m.wp)) * (m.kind === "cow" ? .015 : .02) * m.amt;
+    if (m.kind === "hen" && m.hd) m.hd.position.z = .12 + Math.sin(m.wp * 2) * .025 * m.amt;
+    if (m.tail) m.tail.rotation.z = Math.sin(sec * 2.2 + (m.wp || 0) * .3) * .35;
   }
   function syncHens(t) {
     const live = new Set();
     for (const h of hens) {
       let m = henCache.get(h); if (!m) { m = buildHen(h.id === "hen1" || h.id === "hen3"); henCache.set(h, m); scene3.add(m.g); }
       live.add(h); const x = h.x + .5, z = h.y + .5;
-      if (m.px != null && Math.hypot(x - m.px, z - m.pz) > .001) m.g.rotation.y = Math.atan2(x - m.px, z - m.pz);
-      m.px = x; m.pz = z; m.g.position.set(x, 0, z);
+      const mv = m.px != null && Math.hypot(x - m.px, z - m.pz) > .001, dt = Math.min(.1, Math.max(0, (t - (m.lt || t)) / 1000)); m.lt = t;
+      if (mv) m.g.rotation.y = Math.atan2(x - m.px, z - m.pz);
+      m.px = x; m.pz = z; m.g.position.set(x, 0, z); animWalk(m, mv, t / 1000, dt);
       m.hd.rotation.x = h._p ? (Math.sin(t / 1000 * 11) > 0 ? .9 : .1) : 0;
     }
     for (const [h, m] of henCache) if (!live.has(h)) { scene3.remove(m.g); henCache.delete(h); }
@@ -6890,7 +6935,7 @@ gl_Position = projectionMatrix * mvPosition;`); };
       if (!p.s) { p.s = sprite(popTex(p.text, p.color), 1.6, .4); p.s.renderOrder = 10; scene3.add(p.s); }
       if (u >= 1) { scene3.remove(p.s); p.s.material.dispose(); R3.pops.splice(i, 1); continue; }
       p.s.position.set(p.x + .5, 1.1 + u * .7, p.y + .5); p.s.material.opacity = 1 - u * u; }
-    stepGlows(performance.now());
+    stepGlows(performance.now()); stepTap(performance.now()); try { stepButterflies(performance.now() / 1000); } catch (e) {}
     renderer.render(scene3, camera);
   };
   R3.chars = new Set();
@@ -6906,6 +6951,42 @@ gl_Position = projectionMatrix * mvPosition;`); };
     [pad, ring, beam].forEach(o => { o.renderOrder = 11; scene3.add(o); });
     for (let k = 0; k < 4; k++) { const s = new T.Sprite(new T.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: T.AdditiveBlending })); s.renderOrder = 12; scene3.add(s); sp.push(s); }
     return (glowFx[i] = { pad, ring, beam, sp });
+  }
+  // tap marker: where the player tapped, a golden ring spreads out with a soft glow and a burst of little sparkles
+  const tapFx = (() => { const am = tex => new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: T.AdditiveBlending, color: "#ffe9a0" });
+    const ring = new T.Mesh(G.plane, am(ringTex)), ring2 = new T.Mesh(G.plane, am(ringTex)), pad = new T.Mesh(G.plane, am(glowTex)), sp = [];
+    [ring, ring2, pad].forEach(o => { o.renderOrder = 12; o.visible = false; scene3.add(o); });
+    for (let k = 0; k < 8; k++) { const s = new T.Sprite(new T.SpriteMaterial({ map: starTex, transparent: true, depthWrite: false, blending: T.AdditiveBlending, color: k % 2 ? "#fff6c9" : "#ffd34d" })); s.renderOrder = 13; s.visible = false; scene3.add(s); sp.push(s); }
+    return { ring, ring2, pad, sp, t0: -1e9, x: 0, z: 0 }; })();
+  R3.tapMark = (x, z) => { tapFx.t0 = performance.now(); tapFx.x = x; tapFx.z = z; }; R3._tap = tapFx;
+  function stepTap(now) {
+    const e = now - tapFx.t0, on = e < 900, F = tapFx; [F.ring, F.ring2, F.pad, ...F.sp].forEach(o => o.visible = on); if (!on) return;
+    const u = e / 900, a = 1 - u;
+    F.pad.position.set(F.x, .05, F.z); F.pad.scale.set(.9, 1, .9); F.pad.material.opacity = a * .8;
+    const r1 = .3 + u * 1.0; F.ring.position.set(F.x, .06, F.z); F.ring.scale.set(r1, 1, r1); F.ring.material.opacity = a;
+    const u2 = Math.max(0, (e - 160) / 740), r2 = .2 + u2 * .7; F.ring2.position.set(F.x, .06, F.z); F.ring2.scale.set(r2, 1, r2); F.ring2.material.opacity = u2 > 0 ? (1 - u2) * .8 : 0;
+    F.sp.forEach((s, k) => { const an = k / 8 * Math.PI * 2 + .3, d = .1 + Math.sqrt(u) * .55; s.position.set(F.x + Math.cos(an) * d, .12 + Math.sin(u * Math.PI) * .35 + (k % 2) * .08, F.z + Math.sin(an) * d);
+      s.scale.setScalar((.16 + (k % 3) * .04) * (1 - u * .6)); s.material.opacity = a; s.material.rotation = e / 300 + k; });
+  }
+  // butterflies drifting over the meadow (farm) or the square (plaza): a little life on screen
+  const wingTex = canvasTex("bwing", 64, 64, (x) => { x.fillStyle = "#fff"; x.beginPath(); x.ellipse(30, 22, 26, 18, -.4, 0, 6.3); x.fill(); x.beginPath(); x.ellipse(26, 46, 16, 12, .5, 0, 6.3); x.fill();
+    x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(36, 20, 5, 0, 6.3); x.fill(); x.strokeStyle = "rgba(0,0,0,.4)"; x.lineWidth = 3; x.beginPath(); x.ellipse(30, 22, 25, 17, -.4, 0, 6.3); x.stroke(); });
+  const BCOL = ["#ffd34d", "#ffffff", "#f6a6c1", "#8fd0ff", "#ffa64d", "#c9a6ff"], bflies = [];
+  for (let k = 0; k < 7; k++) { const b = new T.Group(), mat = new T.MeshBasicMaterial({ map: wingTex, transparent: true, side: T.DoubleSide, color: BCOL[k % BCOL.length], depthWrite: false });
+    const wl = new T.Group(), wr = new T.Group(); [wl, wr].forEach((w, s2) => { const m = new T.Mesh(new T.PlaneGeometry(.13, .13), mat); m.rotation.x = -Math.PI / 2; m.position.x = s2 ? .065 : -.065; if (!s2) m.scale.x = -1; w.add(m); b.add(w); });
+    b.add(mesh(G.cyl8, M("#3a2a1c"), 0, 0, 0, .008, .08, .008, false)); b.children[2].rotation.x = Math.PI / 2;
+    b.visible = false; scene3.add(b); bflies.push({ b, wl, wr, ax: 0, az: 0, ph: k * 1.9, sp: .5 + (k % 3) * .15 }); }
+  let bfKey = "";
+  function stepButterflies(sec) {
+    const f = typeof farmData === "function" ? farmData() : null, key = scene.kind + "|" + (f ? farmSize(f) : 0) + "|" + (scene.owner || "");
+    if (key !== bfKey) { bfKey = key; let r0, r1, c0, c1;
+      if (scene.kind === "plaza") { r0 = PSQ.r0; r1 = PSQ.r1 + 3; c0 = PSQ.c0 - 2; c1 = PSQ.c1 + 2; } else { const o = OWN[Math.min(OWN.length - 1, f ? farmSize(f) : 0)]; [r0, r1, c0, c1] = o; }
+      bflies.forEach(B => { B.ax = c0 + Math.random() * (c1 - c0 + 1); B.az = r0 + Math.random() * (r1 - r0 + 1); }); }
+    const on = !REDUCED && scene.kind !== "none";
+    bflies.forEach((B, k) => { B.b.visible = on; if (!on) return; const t = sec * B.sp + B.ph;
+      const x = B.ax + Math.sin(t * .7) * 1.6 + Math.sin(t * 1.9) * .3, z = B.az + Math.cos(t * .53) * 1.3 + Math.cos(t * 2.3) * .25, y = .45 + Math.sin(t * 2.1) * .15 + Math.max(0, Math.sin(t * .4)) * .4;
+      const dx = Math.cos(t * .7) * 1.12 + Math.cos(t * 1.9) * .57, dz = -Math.sin(t * .53) * .69 - Math.sin(t * 2.3) * .58;
+      B.b.position.set(x, y, z); B.b.rotation.y = Math.atan2(dx, dz); const fl = Math.sin(sec * 22 + k) * .9; B.wl.rotation.z = fl; B.wr.rotation.z = -fl; });
   }
   R3.glow = (cells, color, ms) => { const t0 = performance.now(); cells.forEach(c => glows.push({ c, color: new T.Color(color), t0, hold: Math.max(250, ms || 300) })); while (glows.length > 8) glows.shift(); };
   function stepGlows(now) {

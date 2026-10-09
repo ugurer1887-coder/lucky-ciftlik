@@ -1,10 +1,10 @@
-// Lucky Çiftlik service worker.
+// Lucky Farm service worker.
 // - The game page is always fetched fresh (falls back to the saved copy when offline).
 // - Libraries with a fixed version in their address (3D engine, Firebase, fonts) are kept on the phone,
 //   so from the second launch on they load instantly instead of being downloaded again.
 // - Live game data (Firebase database / sign-in) is never touched.
 // - Shows the "hasadın hazır" push notifications sent by netlify/functions/harvest-push.mjs.
-const CACHE = "lucky-v31", LIBS = "lucky-libs-v1";
+const CACHE = "lucky-v32", LIBS = "lucky-libs-v1";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"])).catch(() => {}).then(() => self.skipWaiting()));
 });
@@ -31,7 +31,7 @@ self.addEventListener("fetch", e => {
 self.addEventListener("push", e => {
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
     if (list.some(c => c.visibilityState === "visible" && c.focused)) return;   // already playing: no need to ring
-    return self.registration.showNotification("Lucky Çiftlik", {
+    return self.registration.showNotification("Lucky Farm", {
       body: "🌾 Hasadın hazır! Ekinlerin toplanmayı bekliyor.", icon: "/icon-192.png", badge: "/badge-96.png",
       tag: "harvest", renotify: true, vibrate: [80, 40, 80], data: { url: "/" } });
   }));
