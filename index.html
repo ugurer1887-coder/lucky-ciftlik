@@ -520,7 +520,9 @@ body{font-family:var(--body);letter-spacing:.1px}
 .qtrack{display:flex;align-items:center;gap:9px;width:min(310px,100%);padding:7px 10px 7px 7px;border:0;border-radius:18px;text-align:left;color:#3a2410;cursor:pointer;
   background:linear-gradient(135deg,#fff7dc,#ffe7a8);box-shadow:0 6px 18px rgba(80,50,10,.28),inset 0 0 0 2px rgba(255,255,255,.6);font-family:Nunito,sans-serif}
 .qtrack[hidden]{display:none!important}
-.qtrack.mini{position:relative;width:auto;padding:5px;border-radius:16px;gap:0}.qtrack.mini .qt,.qtrack.mini .qg{display:none}
+.qtrack{position:relative;max-width:310px;overflow:hidden;transition:max-width .35s ease,padding .35s ease,border-radius .35s ease,gap .35s ease}
+.qtrack .qt,.qtrack .qg{transition:opacity .25s ease}
+.qtrack.mini{max-width:52px;padding:5px;border-radius:16px;gap:0}.qtrack.mini .qt,.qtrack.mini .qg{opacity:0;pointer-events:none}
 .qtrack.mini .qe{position:relative;flex-basis:40px;height:40px}.qtrack.mini::after{content:"";position:absolute;left:8px;right:8px;bottom:3px;height:4px;border-radius:9px;background:linear-gradient(90deg,#2f9a43 var(--qp,0%),rgba(0,0,0,.15) var(--qp,0%))}
 .qtrack .qe{flex:0 0 38px;height:38px;border-radius:13px;display:grid;place-items:center;font-size:1.3rem;background:linear-gradient(160deg,#ffbe55,#f08a1a);box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
 .qtrack .qt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -1147,7 +1149,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "90";
+const VERSION = "91";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -4834,18 +4836,34 @@ function questPct(q) {
   if (q.id === "oven" && !questProg(q)) return Math.min(100, S.gold / OVEN_PRICE * 100);
   return questProg(q) / q.need * 100;
 }
-let qOldReady = false;
+let qOldReady = false, qStrip = null;
+// what the strip on the left shows: the tutorial quest, then today's tasks, then the orders
+function stripInfo() {
+  const q = questCur();
+  if (q) { const ready = questReady(q); return { tab: "tut", ready, e: q.e, title: ready ? "Görev tamamlandı!" : "Görev " + (S.tut.i + 1) + ": " + q.t, line: ready ? "Dokun, ödülünü al" : questLine(q), pct: questPct(q), gold: q.gold }; }
+  const D = typeof dailyEnsure === "function" ? dailyEnsure() : null;
+  if (D) {
+    const j = D.list.findIndex((t, k) => dailyReady(D, k));
+    if (j >= 0) { const t = D.list[j], T0 = dailyTpl(t.k); return { tab: "daily", ready: true, e: T0 ? T0.e : "⭐", title: "Günlük görev tamam!", line: "Dokun, ödülünü al", pct: 100, gold: t.g }; }
+    if (!D.b && D.got.every(Boolean)) return { tab: "daily", ready: true, e: "🎁", title: "Günün sandığı hazır!", line: "Dokun, sandığını aç", pct: 100, gold: D.bg };
+    const k = D.list.findIndex((t, k2) => !D.got[k2]);
+    if (k >= 0) { const t = D.list[k], T0 = dailyTpl(t.k), c = Math.min(t.n, +D.c[k] || 0); return { tab: "daily", ready: false, e: T0 ? T0.e : "⭐", title: "Günlük: " + (T0 ? T0.t(t.n) : t.k), line: (t.k === "sellg" ? fmtBig(c) + "/" + fmtBig(t.n) : c + "/" + t.n) + " · " + D.got.filter(Boolean).length + "/3 bitti", pct: c / t.n * 100, gold: t.g }; }
+  }
+  if (orderAny()) { const n = S.orders.filter(orderCan).length; return { tab: "orders", ready: true, e: "📋", title: n + " sipariş teslime hazır!", line: "Dokun, siparişlere bak", pct: 100, gold: 0 }; }
+  if (D) return { tab: "orders", ready: false, e: "📋", title: "Bugünün görevleri bitti", line: "Siparişlere göz at", pct: 100, gold: 0 };
+  return { tab: "daily", ready: false, e: "📜", title: "Görevler", line: "Günlük görevler " + DAILY_LEVEL + ". seviyede açılır", pct: Math.min(100, S.level / DAILY_LEVEL * 100), gold: 0 };
+}
 function renderQuest() {
   const t = $("qtrack"); if (!t || !S || !S.tut) return;
   const q = questCur(), tq = !!q && questReady(q), any = tq || dailyAny() || orderAny();
   $("questDot").classList.toggle("on", any);
   $("questBtn").classList.toggle("glow", tq);
-  if (!q || !entered) { t.hidden = true; questPulse(null); return; }
+  if (!entered) { t.hidden = true; questPulse(null); return; }
   t.hidden = false;
-  const ready = questReady(q);
-  t.classList.toggle("ready", ready); t.classList.toggle("mini", qMini && !ready);
-  t.innerHTML = `<span class="qe">${q.e}</span><span class="qt"><b>${ready ? "Görev tamamlandı!" : "Görev " + (S.tut.i + 1) + ": " + q.t}</b><small>${ready ? "Dokun, ödülünü al" : questLine(q)}</small><i><u style="width:${questPct(q).toFixed(0)}%"></u></i></span><span class="qg">+${q.gold}</span>`; t.style.setProperty("--qp", questPct(q).toFixed(0) + "%");
-  questPulse(ready ? null : q);
+  const st = stripInfo(); qStrip = st;
+  t.classList.toggle("ready", st.ready); t.classList.toggle("mini", qMini && !st.ready);
+  t.innerHTML = `<span class="qe">${st.e}</span><span class="qt"><b>${esc(st.title)}</b><small>${esc(st.line)}</small><i><u style="width:${st.pct.toFixed(0)}%"></u></i></span>${st.gold ? `<span class="qg">+${st.gold}</span>` : ""}`; t.style.setProperty("--qp", st.pct.toFixed(0) + "%");
+  questPulse(q && !st.ready ? q : null);
   if ($("quests").classList.contains("on")) renderQuestList();
 }
 // the dock button that leads to the current quest gently pulses
@@ -4906,7 +4924,7 @@ $("questBtn").onclick = () => openQuests();
 // tapping the quest bar folds it into a small round button (and back); a finished quest opens the window
 let qMini = false; try { qMini = localStorage.getItem("lucky-qmin") === "1"; } catch (e) {}
 $("qtrack").onclick = () => {
-  const q = questCur(); if (q && questReady(q)) { openQuests("tut"); return; }
+  const st = qStrip || stripInfo(); if (st.ready) { openQuests(st.tab); return; }
   qMini = !qMini; try { localStorage.setItem("lucky-qmin", qMini ? "1" : "0"); } catch (e) {}
   if (qMini) hint("Görev çubuğu küçüldü. Açmak için yeniden dokun, ayrıntılar için yukarıdaki görev düğmesi.");
   renderQuest();
@@ -5279,6 +5297,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 91, d: "9 Ekim 2026", e: "🧺", t: "Düzeltmeler", c: "#b8402c", b: "#ffe9dc", items: [
+    "Kümes ve ahırın zemini artık titremiyor; kümeste saman, ahırda çimen zemin var.",
+    "Görev şeridi hep açık kalıyor. Dokununca sola doğru küçülüp kutucuk oluyor, yeniden dokununca açılıyor. Başlangıç görevleri bitince günlük görevleri gösteriyor.",
+    "Meydandaki pazar tezgahları daha büyük ve meyve sepetli.",
+  ] },
   { v: 90, d: "9 Ekim 2026", e: "🛒", t: "Pazar ve yeni binalar", c: "#2f9a43", b: "#e3f7dc", items: [
     "<b>Pazar</b> (5. sv): Meydandaki tezgahlarda oyuncular birbirine ürün satıyor. Ürününü kendi fiyatınla tezgaha koy, biri alınca altın kendiliğinden sana gelir. En fazla 4 tezgah.",
     "Yeni <b>tavuk kümesi</b> ve <b>inek ahırı</b>, daha sevimli tavuklar ve inekler.",
@@ -5791,12 +5814,28 @@ function setup3D(T) {
   }
   const boardTex = (key, text, bg, fg, edge) => canvasTex(key, 512, 150, (x, w, h) => { x.fillStyle = edge; rr(x, 4, 4, w - 8, h - 8, 26); x.fill(); x.fillStyle = bg; rr(x, 16, 16, w - 32, h - 32, 18); x.fill();
     x.fillStyle = fg; x.font = "700 84px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, h / 2 + 4); });
+  // pen floors: soft straw for the hens, fresh meadow for the cows; lifted above the ground shadows and drawn first so they never flicker
+  const floorTex = {
+    straw: canvasTex("penStraw", 256, 256, (x, w, h) => { x.fillStyle = "#e9d49a"; x.fillRect(0, 0, w, h);
+      for (let k = 0; k < 900; k++) { const a = trand() * Math.PI, l = 6 + trand() * 14, px = trand() * w, py = trand() * h, v = trand();
+        x.strokeStyle = v < .5 ? "rgba(196,156,74,.55)" : v < .85 ? "rgba(250,232,170,.8)" : "rgba(160,120,50,.45)"; x.lineWidth = 1.2 + trand(); x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); } }),
+    meadow: canvasTex("penMeadow", 256, 256, (x, w, h) => { x.fillStyle = "#8cc256"; x.fillRect(0, 0, w, h);
+      for (let k = 0; k < 40; k++) { const g2 = x.createRadialGradient(0, 0, 0, 0, 0, 40); const px = trand() * w, py = trand() * h; x.save(); x.translate(px, py); g2.addColorStop(0, trand() < .5 ? "rgba(70,130,40,.25)" : "rgba(170,210,100,.3)"); g2.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g2; x.fillRect(-40, -40, 80, 80); x.restore(); }
+      for (let k = 0; k < 1400; k++) { const px = trand() * w, py = trand() * h, l = 3 + trand() * 6; x.strokeStyle = trand() < .5 ? "rgba(60,120,35,.55)" : "rgba(180,225,120,.6)"; x.lineWidth = 1; x.beginPath(); x.moveTo(px, py); x.lineTo(px + (trand() - .5) * 3, py - l); x.stroke(); }
+      for (let k = 0; k < 18; k++) { x.fillStyle = trand() < .5 ? "#fff6c9" : "#ffffff"; x.beginPath(); x.arc(trand() * w, trand() * h, 1.6, 0, 6.3); x.fill(); } })
+  };
+  Object.values(floorTex).forEach(t => { t.wrapS = t.wrapT = T.RepeatWrapping; });
+  function penFloor(g, x, z, size, kind) {
+    const t = floorTex[kind].clone(); t.needsUpdate = true; t.repeat.set(size / 1.4, size / 1.4);
+    const fl = new T.Mesh(G.plane, new T.MeshLambertMaterial({ map: t, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    fl.position.set(x, .03, z); fl.scale.set(size, 1, size); fl.receiveShadow = true; fl.renderOrder = 2; g.add(fl);
+  }
   const sunflower = (g, x, z, hgt) => { g.add(mesh(G.cyl8, M("#4f8a2f"), x, hgt / 2, z, .018, hgt, .018, false)); [-.6, .5].forEach((a, k) => { const lf = mesh(G.sph, M("#5aa03a"), x + Math.sin(a) * .06, hgt * (.4 + k * .2), z, .06, .02, .035, false); lf.rotation.z = a; g.add(lf); });
     const hd = mesh(G.cyl, M("#f6c21c"), x, hgt, z + .03, .11, .02, .11, false); hd.rotation.x = 1.2; g.add(hd); const ce = mesh(G.cyl, M("#6b3f1a"), x, hgt + .005, z + .045, .05, .02, .05, false); ce.rotation.x = 1.2; g.add(ce); };
   function buildCoop(a, nHens) {
     const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .08, x1 = c + 2.92, z0 = r + .08, z1 = r + 2.92;
     blob(g, c + 1.5, r + 1.5, 3.4, 3.4, .45);
-    { const fl = new T.Mesh(G.plane, TM("#e6d08f", "soil", 2, 2)); fl.position.set(c + 1.5, .012, r + 1.5); fl.scale.set(2.84, 1, 2.84); fl.receiveShadow = true; g.add(fl); }
+    penFloor(g, c + 1.5, r + 1.5, 2.84, "straw");
     const WF = "#f4f0e6", WR = "#ffffff";
     fenceRun(g, x0, z0, x1, z0, 0, WF, WR); fenceRun(g, x0, z0, x0, z1, 0, WF, WR); fenceRun(g, x1, z0, x1, z1, 0, WF, WR); fenceRun(g, x0, z1, x1, z1, .3, WF, WR);
     // the henhouse on short stilts: butter-yellow planks, red roof, green door, round window, ramp and a sign
@@ -5860,7 +5899,7 @@ function setup3D(T) {
   function buildCowbarn(a, nCows) {
     const g = new T.Group(), c = colOf(a), r = rowOf(a), x0 = c + .08, x1 = c + 3.92, z0 = r + .08, z1 = r + 3.92;
     blob(g, c + 2, r + 2, 4.4, 4.4, .45);
-    { const fl = new T.Mesh(G.plane, TM("#a3c463", "soil", 3, 3)); fl.position.set(c + 2, .012, r + 2); fl.scale.set(3.84, 1, 3.84); fl.receiveShadow = true; g.add(fl); }
+    penFloor(g, c + 2, r + 2, 3.84, "meadow");
     const WF = "#f4f0e6", WR = "#ffffff";
     fenceRun(g, x0, z0, x1, z0, 0, WF, WR); fenceRun(g, x0, z0, x0, z1, 0, WF, WR); fenceRun(g, x1, z0, x1, z1, 0, WF, WR); fenceRun(g, x0, z1, x1, z1, .22, WF, WR);
     // the red barn at the back: stone foundation, white trim, big X door, hay loft, small windows, AHIR board
@@ -6216,7 +6255,7 @@ function setup3D(T) {
     if (t === "bench") return buildBench(i);
     if (t === "lamp") return buildLamp(i);
     if (t === "bed") return buildFlowerBed(i);
-    const g = new T.Group();
+    let g = new T.Group();
     if (t === "pot") { blob(g, x, z, .7, .6, .5); g.add(mesh(G.cyl, TM("#c8693a", "stone", 1, 1), x, .17, z, .2, .34, .2)); g.children[g.children.length - 1].geometry = potGeo;
       g.add(mesh(leafGeo, M("#4f9a2f"), x, .45, z, .22, .2, .22)); [["#f6a6c1", -.1, .05], ["#fff6d6", .1, -.02], ["#ffd34d", .02, .14]].forEach(([c, dx, dz]) => g.add(mesh(G.sph, M(c), x + dx, .58, z + dz, .05, .05, .05, false))); }
     else if (t === "sunflower") { [[-.22, .1, .75], [.05, -.12, 1.0], [.25, .15, .65]].forEach(([dx, dz, h]) => { g.add(mesh(G.cyl8, M("#3f7a26"), x + dx, h / 2, z + dz, .025, h, .025));
@@ -6231,11 +6270,13 @@ function setup3D(T) {
     else if (t === "flag") { g.add(mesh(G.cyl8, MS("#9aa3ab", { metalness: .6, roughness: .3 }), x - .25, .9, z, .03, 1.8, .03)); g.add(mesh(G.sph, M("#ffd34d"), x - .25, 1.82, z, .05, .05, .05, false));
       const tx = canvasTex("flagL", 256, 160, (c, w, h) => { c.fillStyle = "#38a84a"; c.fillRect(0, 0, w, h); c.fillStyle = "#2f8a3c"; c.fillRect(0, h - 26, w, 26); c.fillStyle = "#ffe27a"; c.font = "700 74px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("Lucky", w / 2, h / 2 - 8); });
       const fl = new T.Mesh(new T.PlaneGeometry(.62, .4), LAM({ map: tx, side: T.DoubleSide })); fl.position.set(x + .07, 1.56, z); g.add(fl); fx.flags.push(fl); }
-    else if (t === "stall") { blob(g, x, z, 1.2, .9, .6); g.add(mesh(G.box, TM(COL.wood, "wood"), x, .3, z + .05, .82, .44, .46));
+    else if (t === "stall") { const g0 = g, k = 1.5; g = new T.Group(); g.position.set(x * (1 - k), 0, z * (1 - k)); g.scale.setScalar(k); g0.add(g); blob(g, x, z, 1.2, .9, .6); g.add(mesh(G.box, TM(COL.wood, "wood"), x, .3, z + .05, .82, .44, .46));
       [-.38, .38].forEach(dx => g.add(mesh(G.box, M(COL.woodD), x + dx, .55, z - .15, .05, 1.1, .05)));
       for (let q = 0; q < 6; q++) g.add(mesh(G.box, M(q % 2 ? "#ffffff" : "#e05a3a"), x - .375 + q * .15, 1.1, z - .02, .15, .04, .6));
       [["#d9483a", -.22], ["#f2c14e", 0], ["#7bbf4a", .22]].forEach(([c, dx]) => { g.add(mesh(G.sph, M(c), x + dx, .58, z + .1, .07, .07, .07, false)); g.add(mesh(G.sph, M(c), x + dx + .06, .58, z + .18, .06, .06, .06, false)); });
-      { const sb = boardMesh(.66, .19, boardTex("pazarSign", "🛒 PAZAR", "#fff3cf", "#b8322a", "#7b4f27")); sb.position.set(x, 1.27, z - .02); g.add(sb); } }
+      { const sb = boardMesh(.66, .19, boardTex("pazarSign", "🛒 PAZAR", "#fff3cf", "#b8322a", "#7b4f27")); sb.position.set(x, 1.27, z - .02); g.add(sb); }
+      [["#e0702a", -.3], ["#d9483a", 0], ["#f2c14e", .3]].forEach(([c, dx]) => { g.add(mesh(G.cyl, TM("#a8743f", "wood"), x + dx, .07, z + .42, .11, .13, .11)); [[0, 0], [.04, .03], [-.04, .03]].forEach(([ox, oz]) => g.add(mesh(G.sph, M(c), x + dx + ox, .15, z + .42 + oz, .045, .045, .045, false))); });
+      g = g0; }
     else if (t === "fountain") { blob(g, x, z, 1.1, 1.1, .5); g.add(mesh(G.cyl, TM("#d8d2c6", "stone", 3, 1), x, .12, z, .42, .24, .42)); g.add(mesh(G.cyl, MS("#3594c0", { roughness: .05, metalness: .1 }), x, .245, z, .36, .02, .36, false));
       g.add(mesh(G.cyl, M("#c9c2b5"), x, .45, z, .06, .45, .06)); g.add(mesh(G.cyl, M("#c9c2b5"), x, .66, z, .18, .05, .18)); const wm = MS("#e6f7ff", { transparent: true, opacity: .6, roughness: .1 });
       g.add(mesh(G.sph, wm, x, .76, z, .05, .08, .05, false)); for (let q = 0; q < 6; q++) { const a = q / 6 * Math.PI * 2; g.add(mesh(G.sph, wm, x + Math.cos(a) * .19, .6, z + Math.sin(a) * .19, .03, .05, .03, false)); } }

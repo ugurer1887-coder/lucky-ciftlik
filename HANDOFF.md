@@ -72,6 +72,11 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - 3D: yeni `buildCoop`, `buildCowbarn` (önü üçgen cepheli ahır, `gableZ`), `buildCow`, `buildHen`, `buildBarn` (kemerli çatılı depo), `buildMill` (yel değirmenli, silolu ambar). Fırın seviyeye göre: `buildOven(a, baking, lv)` → 1 taş, 2 `buildOven2` tuğla, 3 `buildOven3` modern. `fx.ovens` öğelerinde baca noktası `cx/cy/cz`, parlayan yüzeyler `inners`.
 - Görev çubuğu dokununca küçülür (`qMini`, localStorage `lucky-qmin`); hazır görevde pencereyi açar.
 
+## v91
+- Ağıl zeminleri `penFloor()` (saman/çimen canvas dokusu, y .03 + polygonOffset; eskisi gölge ile aynı yükseklikte olduğu için titriyordu).
+- Görev şeridi `stripInfo()`: başlangıç görevi → günlük görev → siparişler; dokununca `qMini` ile max-width animasyonlu küçülür; hazırsa ilgili sekmeyi açar.
+- Meydan tezgahları 1.5 kat büyük (`buildDecor` stall alt grubu).
+
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
 - Malzemelerin çoğu `MeshLambertMaterial` (LAM) – telefonlarda çok daha hızlı.
