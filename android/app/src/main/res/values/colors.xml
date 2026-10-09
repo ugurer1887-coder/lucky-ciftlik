@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Yükleme ekranının gök mavisi: açılış bununla aynı renkte, geçiş görünmez. -->
+    <color name="splash_bg">#BFE6F7</color>
+    <color name="bar">#8FC456</color>
+</resources>

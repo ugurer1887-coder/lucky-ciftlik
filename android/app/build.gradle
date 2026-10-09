@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Lucky Çiftlik Play uygulaması. Her yeni pakette versionCode bir artırılmalı.
+def ks = System.getenv("KEYSTORE_FILE")
+
+android {
+    namespace 'com.luckytr.ciftlik'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.luckytr.ciftlik"
+        minSdk 21
+        targetSdk 34
+        versionCode 4
+        versionName "1.0.3"
+    }
+
+    signingConfigs {
+        if (ks) {
+            release {
+                storeFile file(ks)
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS") ?: "my-key-alias"
+                keyPassword System.getenv("KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ks) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
