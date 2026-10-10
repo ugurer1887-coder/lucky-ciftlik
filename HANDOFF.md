@@ -229,3 +229,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v127
 - 3B taşıma: `objG` (kind->group) + `dragObjs` frame'de akıcı kaydırır (eski viewLayout 3B'de işe yaramıyordu çünkü staticSig f.layout kullanıyor). `fpShow` ayak izi kareleri. Yeni yapı: `beginPlace/ppSet/ppConfirm` (moveSel from:-1 = saydam hayalet, `ghostUpdate`), ✓ #modeOk. `panTo` kamera kaydırma, questGuide ile.
 - UYARI: 3B kod headless testte çalışmıyor, telefonda doğrulanmalı.
+
+## v128
+- Fırın sheet'inde geliştir kartı yok; `ovenUpgrade(id)` menüden. Sunucu yazısı HTML'de gizli (admin için renderOnline). Place modunda `#modeCancel` kırmızı "✕ İptal".

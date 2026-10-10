@@ -653,6 +653,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 #mode_v8 .ok:disabled{background:#9aa;box-shadow:none;opacity:.7}
 .chkflash{position:absolute;left:50%;top:42%;z-index:9500;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;display:grid;place-items:center;background:#3fbf5a;color:#fff;font:800 64px Nunito,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4);pointer-events:none;animation:chkPop 1.1s ease-out forwards}
 @keyframes chkPop{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.15);opacity:1}60%{transform:scale(1)}100%{transform:scale(1.05) translateY(-30px);opacity:0}}
+#mode_v8 .cancel{font:800 1rem Fredoka,Nunito,sans-serif;color:#fff;background:linear-gradient(160deg,#ff6b5e,#d0332a);border:0;border-radius:99px;box-shadow:0 3px 0 #8f1f18;padding:9px 18px}
 .msec{margin:14px 2px 6px;font:800 14px var(--body);color:var(--ink-soft,#6b5a3a);letter-spacing:.3px}.msec:first-child{margin-top:2px}
 .nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 13px var(--body),Nunito,Roboto,Arial,sans-serif;color:#fff;letter-spacing:.2px;text-shadow:-1.5px 0 #0b0d08,1.5px 0 #0b0d08,0 -1.5px #0b0d08,0 1.5px #0b0d08,-1.2px -1.2px #0b0d08,1.2px -1.2px #0b0d08,-1.2px 1.2px #0b0d08,1.2px 1.2px #0b0d08,0 2px 3px rgba(0,0,0,.55);will-change:transform;display:none;-webkit-font-smoothing:antialiased}
 .nlab.me{color:#ffe27a}
@@ -811,7 +812,7 @@ button:active{transform:scale(.96);filter:brightness(.96)}
       <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-2 13H7z" fill="#9aa5ad" stroke="#56606a" stroke-width="1.6"/><path d="M5 8c0-4 14-4 14 0" fill="none" stroke="#56606a" stroke-width="1.6"/><path d="M6.4 11h11.2l-.5 3H6.9z" fill="#4fa6d1"/></svg>
       <span id="bucket_v8">0/3</span>
     </div>
-    <div class="plate online" id="online_v8"><i class="dot on"></i>Sunucu 1</div>
+    <div class="plate online" id="online_v8" style="display:none"></div>
     <i class="qbreak"></i>
     <button class="qtrack" id="qtrack_v8" hidden aria-label="Görevler"></button>
   </header>
@@ -1314,7 +1315,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "127";
+const VERSION = "128";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2625,6 +2626,7 @@ function setMode(m) {
       : "Kaldırmak istediğin çite dokun.";
   }
   const si = m === "move" && moveSel && moveSel.ghost == null ? sellInfo(moveSel) : null;
+  $("modeCancel").textContent = m === "place" ? "✕ İptal" : "Bitir"; $("modeCancel").classList.toggle("cancel", m === "place");
   $("modeOk").hidden = !(m === "place" && placeKind && moveSel && moveSel.ghost != null);
   $("modeSell").hidden = !si; if (si) $("modeSell").textContent = "Sat, " + fmtG(sellBack(si.price)) + " altın";
   renderPlots(); renderFences(); renderHotbar();
@@ -3057,7 +3059,7 @@ $("objMenu").addEventListener("click", e => {
   if (a === "depup") { depotUpgrade(); return; }
   if (a === "collect") { collectAnimals(kind); return; }
   if (a === "feed") { feedAnimals(kind); return; }
-  if (b.getAttribute("data-ot") === "Geliştir" && OVENS.includes(kind)) { openOven(kind); setTimeout(() => { const u = $("ovenBody").querySelector("[data-oup]"); if (u) scrollInSheet(u.closest(".card")); }, 80); return; }
+  if (b.getAttribute("data-ot") === "Geliştir" && OVENS.includes(kind)) { ovenUpgrade(kind); return; }
   objAct(kind, i);
 });
 // a copy of the farm's layout to try a change on before making it
@@ -4069,6 +4071,14 @@ const friesThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rec
 const breadThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M14 66q0-30 36-32t36 32z" fill="#d48a3a" stroke="#8a4f1c" stroke-width="3"/><path d="M14 66h72v6q-36 6-72 0z" fill="#b8702c" stroke="#8a4f1c" stroke-width="3"/><path d="M34 46l6 10M48 42l5 11M62 44l4 10" stroke="#f3c27a" stroke-width="4" stroke-linecap="round"/></svg>`;
 // the oven window: one card per tray, then the upgrade
 let ovenSel = "oven", ovenAmt = { 0: 2, 1: 2 }, ovenRec = { 0: "bread", 1: "bread" };
+// upgrade straight from the building menu: more per tray, a second tray at level 3
+function ovenUpgrade(id) {
+  adminTopUp(); const lv = ovenLv(S, id);
+  if (lv >= OVEN_MAX) { hint(OBJ[id].name + " en üst seviyede."); return; }
+  if (S.gold < OVEN_UP[lv]) { hint(OBJ[id].name + " " + (lv + 1) + ". seviye için " + fmtG(OVEN_UP[lv]) + " altın gerekir."); SFX.play("error"); return; }
+  S.gold = round1(S.gold - OVEN_UP[lv]); SFX.play("buy"); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderPlots();
+  toast(OBJ[id].name + " " + (lv + 1) + ". seviye oldu, tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar" + (lv + 1 >= 3 ? ", ikinci tepsi açıldı" : "")); try { popAt(colOf(S.layout[id]) + 1, rowOf(S.layout[id]), "⬆ " + (lv + 1) + ". seviye", "#ffe27a"); } catch (e) {}
+}
 function openOven(id) { ovenSel = id; renderOven(); openSheet($("oven")); }
 // hand-drawn ingredient and product pictures for the oven (no emoji): a tied wheat sheaf, a crusty loaf, potatoes, fries in a carton
 let artN = 0;
@@ -4147,9 +4157,6 @@ function renderOven() {
         <button class="big green obake" data-obake="${k}">${id === "icecart" ? "Yap" : "Pişir"}</button>` : `<p class="keep">${id === "icecart" ? "Yapmak" : "Pişirmek"} için ${recIn(Rr, 1)} gerekir. ${recMeta(Rr)}.</p>`}</div>`;
     }
   }
-  if (lv < OVEN_MAX) h += `<div class="ovcard up"><div class="ovtop"><div class="ovart upart">⬆</div><div class="ovinfo"><h3>Fırını geliştir</h3>
-      <p>${lv + 1 >= 3 ? "İkinci tepsi açılır, her tepsiye " + OVEN_CAP[lv + 1] : "Tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar"}</p></div></div>
-      <button class="big green" data-oup="1" ${S.gold >= OVEN_UP[lv] ? "" : "disabled"}>${fmtG(OVEN_UP[lv])} altın · Geliştir</button></div>`;
   body.innerHTML = h;
 }
 $("ovenBody").addEventListener("input", e => { const r = e.target.closest("[data-orng]"); if (!r) return; const k = +r.getAttribute("data-orng"), rk = recFor(ovenSel, k), Rr = RECIPES[rk], v = +r.value;
@@ -4183,11 +4190,6 @@ $("ovenBody").addEventListener("click", e => {
     gainXp(nb * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", nb); dailyEv("bake:" + key, nb);
     popAt(me.x, me.y - .3, "+" + nb + " " + RECIPES[key].name.toLocaleLowerCase("tr"), "#ffe27a");
     saveNow(); renderHud(); renderPlots(); renderOven(); return;
-  }
-  if (A("data-oup")) {
-    adminTopUp(); const lv = ovenLv(S, id); if (lv >= OVEN_MAX || S.gold < OVEN_UP[lv]) return;
-    S.gold = round1(S.gold - OVEN_UP[lv]); SFX.play("buy"); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderOven();
-    toast(OBJ[id].name + " " + (lv + 1) + ". seviye oldu"); return;
   }
 });
 // a cleaner market / menu icon for the stone oven: brick dome, arched mouth with fire, chimney
@@ -6268,6 +6270,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 128, d: "11 Ekim 2026", e: "🧹", t: "Sadeleştirme", c: "#3b7a4a", b: "#e3f3e6", items: [
+    "Fırının içindeki geliştirme kartı kaldırıldı, geliştirme sadece fırına dokununca çıkan menüden.",
+    "Sunucu yazısı oyunculardan tamamen kaldırıldı.",
+    "Yapı yerleştirirken Bitir yerine kırmızı İptal düğmesi var.",
+  ] },
   { v: 127, d: "11 Ekim 2026", e: "✅", t: "Yerleştirme ve taşıma", c: "#2f8f4a", b: "#e0f5e6", items: [
     "Marketten aldığın yapı saydam olarak önüne geliyor. Dokunup ya da sürükleyip yerini seç, ✓ işaretine basınca kurulur.",
     "Yapıları taşırken artık parmağınla birlikte akıcı kayıyor, sahne yeniden kurulmuyor.",
