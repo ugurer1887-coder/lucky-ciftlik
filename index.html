@@ -626,6 +626,9 @@ body{font-family:var(--body);letter-spacing:.1px}
 .ovthumb{background:linear-gradient(160deg,#ffe2a8,#f6b25a)!important;display:grid;place-items:center}.ovthumb .rec{font-size:2.2rem}
 .obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
 .oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
+.nlayer{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 17px Roboto,'Segoe UI',Arial,Helvetica,sans-serif;color:#fff;letter-spacing:.2px;-webkit-text-stroke:5px #0b0d08;paint-order:stroke fill;text-shadow:0 1px 2px rgba(0,0,0,.6);will-change:transform;display:none}
+.nlab.me{color:#ffe27a}
 .objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
   background:rgba(30,24,16,.86);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:omIn .16s ease}
 .objmenu.on{display:flex}.objmenu::before{content:"";position:absolute;top:-7px;left:50%;margin-left:-7px;border:7px solid transparent;border-top:0;border-bottom-color:rgba(30,24,16,.86)}
@@ -1285,7 +1288,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "115";
+const VERSION = "116";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6025,7 +6028,11 @@ function renderRank() {
 }
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
-const UPDATES = [];   // her yeni sürümde buraya kart eklenir (en yenisi en üstte): { v, d, e, t, c, b, items }
+const UPDATES = [
+  { v: 116, d: "11 Ekim 2026", e: "🔤", t: "Net isimler", c: "#4a5a7a", b: "#e2e8f3", items: [
+    "Karakterlerin isimleri artık ekran yazısı olarak çiziliyor: her uzaklıkta keskin, kalın ve koyu çerçeveli, silik görünmüyor.",
+  ] },
+];   // her yeni sürümde buraya kart eklenir (en yenisi en üstte): { v, d, e, t, c, b, items }
 const updSeen = () => { try { return +localStorage.getItem("lucky-upd-seen") || 0; } catch (e) { return 0; } };
 function renderUpdDot() { $("updDot").style.display = UPDATES.length && UPDATES[0].v > updSeen() ? "block" : "none"; }
 function openUpd() {
@@ -7710,6 +7717,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     g.userData.spin = spin; return g;
   }
   function charLabel(c, isMe) {
+    return;   // isimler artık net görünsün diye ekran katmanında (DOM) çiziliyor, bkz. drawNames
     if (c.m3.lbl && c.m3.lblText === c.name) return;
     if (c.m3.lbl) c.m3.root.remove(c.m3.lbl);
     const s = sprite(labelTex(c.name || "Çiftçi", isMe ? "#ffe27a" : "#ffffff"), 1.9, .475, { fog: false }); s.position.set(0, 1.36, 0); s.renderOrder = 6; c.m3.root.add(s); c.m3.lbl = s; c.m3.lblText = c.name;
@@ -7956,6 +7964,24 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   let lastZE = 0, lastW = 0, lastH = 0, sceneSig = "", rsW = 0, rsH = 0, rsT = 0;
   let charS = 1.2, shX = NaN, shZ = NaN;
   const D0 = 27, TILT = 1.02;   // camera distance (at zoom 1) and pitch (radians above the ground)
+  let nameLayer = null; const nameEls = new Map();
+  function drawNames() {
+    if (!nameLayer) { nameLayer = document.createElement("div"); nameLayer.className = "nlayer"; $("root").appendChild(nameLayer); }
+    const seen = new Set();
+    for (const c of [me, ...peers.values()]) {
+      if (!c || !c.m3 || !c.name) continue;
+      let el = nameEls.get(c);
+      if (!el) { el = document.createElement("div"); el.className = "nlab" + (c === me ? " me" : ""); el.textContent = c.name; nameLayer.appendChild(el); nameEls.set(c, el); el._n = c.name; }
+      else if (el._n !== c.name) { el.textContent = c.name; el._n = c.name; }
+      const p = R3.toScreen(c.x + .5, 1.72, c.y + .5), W = cv.clientWidth || 1, H = cv.clientHeight || 1;
+      const on = p.x > -60 && p.x < W + 60 && p.y > -30 && p.y < H + 30;
+      if (!on) { el.style.display = "none"; seen.add(c); continue; }
+      seen.add(c); el.style.display = "block";
+      const tx = Math.round(p.x), ty = Math.round(p.y);
+      if (el._x !== tx || el._y !== ty) { el._x = tx; el._y = ty; el.style.transform = "translate(" + tx + "px," + ty + "px) translate(-50%,-100%)"; }
+    }
+    for (const [c, el] of nameEls) if (!seen.has(c)) { el.remove(); nameEls.delete(c); }
+  }
   R3.frame = t => {
     const w = cv.clientWidth, h = cv.clientHeight;
     if (w !== lastW || h !== lastH) {   // resize the drawing buffer only once the size has settled
@@ -8019,6 +8045,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
       if (post.w !== w || post.h !== h || post.pr !== pr) { post.w = w; post.h = h; post.pr = pr; post.composer.setPixelRatio(pr); post.composer.setSize(w, h); post.fxaa.material.uniforms.resolution.value.set(1 / (w * pr), 1 / (h * pr)); }
       post.composer.render();
     } else renderer.render(scene3, camera);
+    try { drawNames(); } catch (e) {}
   };
   R3.chars = new Set();
   const glowTex = canvasTex("glow", 128, 128, (x, w, h) => { const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(.4, "rgba(255,255,255,.6)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });

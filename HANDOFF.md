@@ -190,3 +190,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v115
 - Güncelleme kartları (`UPDATES`) sıfırlandı; yeni sürümlerde en üste kart eklenir. Eski kartlar git geçmişinde.
 - İsim etiketleri kameraya göre ölçeklenir (uzaktan da aynı okunaklılıkta).
+
+## v116
+- İsimler 3B sprite yerine DOM katmanında (`drawNames`, `.nlayer/.nlab`): her kare `R3.toScreen` ile konumlanır, her uzaklıkta keskin. Eski `charLabel` devre dışı.

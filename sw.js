@@ -4,7 +4,7 @@
 //   so from the second launch on they load instantly instead of being downloaded again.
 // - Live game data (Firebase database / sign-in) is never touched.
 // - Shows the "hasadın hazır" push notifications sent by netlify/functions/harvest-push.mjs.
-const CACHE = "lucky-v49", LIBS = "lucky-libs-v1";
+const CACHE = "lucky-v50", LIBS = "lucky-libs-v1";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"])).catch(() => {}).then(() => self.skipWaiting()));
 });
