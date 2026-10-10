@@ -207,3 +207,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Balon y=2.6 (isim 1.72). Sulama XP yok; QUESTS'te `xp` + `mk` (market ipucu: `questMarketHint`, `marketOpenTab`). Odun %3.
 - `unlocksAt/showLevelUnlocks` (#lvlUp, her yere dokununca kapanır). `autoPlace(kind)`: satın alınan yapı oyuncunun önüne, move modunda seçili. `viewLayout()`: sürüklerken nesne parmakla gider.
 - Görev çubuğu: `[data-qarr]` oku, `.mini` = translateX ile sola çekilir.
+
+## v121
+- Profilde XP barı (`#acctXp` in openAccount). Market sekmesi "Yükseltme", başlıksız. `quickCollect(kind)`: hazır ürün varsa nesneye dokununca direkt toplar (`ovenTakeAll`, `millTake`).

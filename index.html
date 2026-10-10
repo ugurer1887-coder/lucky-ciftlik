@@ -641,6 +641,9 @@ body{font-family:var(--body);letter-spacing:.1px}
 #lvlUp .lvrow{display:flex;align-items:center;gap:10px;margin:6px 0;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.75);text-align:left}
 #lvlUp .lvrow span{font-size:1.5rem}#lvlUp .lvrow b{font-size:.98rem}
 #lvlUp .lvtap{margin-top:10px;font-size:.78rem;font-weight:800;opacity:.6}
+.acctxp{margin:8px 0 10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.7);color:#4a2e08;font-family:Nunito,sans-serif}
+.acctxp .xr{display:flex;justify-content:space-between;font-weight:800}.acctxp .xb{height:12px;border-radius:9px;background:rgba(0,0,0,.14);overflow:hidden;margin:6px 0 4px}
+.acctxp .xb i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ffd45a,#f5a524)}.acctxp small{font-weight:700;opacity:.75}
 .msec{margin:14px 2px 6px;font:800 14px var(--body);color:var(--ink-soft,#6b5a3a);letter-spacing:.3px}.msec:first-child{margin-top:2px}
 .nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 13px var(--body),Nunito,Roboto,Arial,sans-serif;color:#fff;letter-spacing:.2px;text-shadow:-1.5px 0 #0b0d08,1.5px 0 #0b0d08,0 -1.5px #0b0d08,0 1.5px #0b0d08,-1.2px -1.2px #0b0d08,1.2px -1.2px #0b0d08,-1.2px 1.2px #0b0d08,1.2px 1.2px #0b0d08,0 2px 3px rgba(0,0,0,.55);will-change:transform;display:none;-webkit-font-smoothing:antialiased}
 .nlab.me{color:#ffe27a}
@@ -824,7 +827,7 @@ button:active{transform:scale(.96);filter:brightness(.96)}
       <button class="tab" role="tab" aria-selected="false" data-mtab="ovens">Ocaklar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="animals">Hayvanlar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="decor">Dekor</button>
-      <button class="tab" role="tab" aria-selected="false" data-mtab="up">Geliştir</button>
+      <button class="tab" role="tab" aria-selected="false" data-mtab="up">Yükseltme</button>
     </div>
     <div class="sheet-body" id="marketBody_v8"></div>
   </section>
@@ -1302,7 +1305,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "120";
+const VERSION = "121";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1715,7 +1718,7 @@ function unlocksAt(lv) {
   const u = [], add = (e, t) => u.push({ e, t });
   if (lv === DAILY_LEVEL) add("📅", "Günlük görevler ve siparişler");
   if (lv === CHAT_LEVEL) { add("💬", "Genel sohbet"); add("⛲", "Dilek çeşmesi"); }
-  if (lv === LAND_LEVEL) add("🟫", "Toprak satın alma (Market > Geliştir)");
+  if (lv === LAND_LEVEL) add("🟫", "Toprak satın alma (Market > Yükseltme)");
   if (lv === PAZAR_LEVEL) add("🛒", "Pazar: ürünlerini oyunculara sat");
   if (lv === JOB_LEVEL) add("📋", "İş ilanları");
   Object.keys(CROPS).forEach(k => { if (CROPS[k].lv === lv && lv > 1) add("🌱", CROPS[k].name + " ekebilirsin"); });
@@ -2826,7 +2829,7 @@ function tapHome(i) {
   if (mode === "land") return landTap(i);
   if (isFog(S, i)) { offerExpand(); return; }
   const o = occMap(S).get(i), kind = o && o.t;
-  if (kind && kind !== "plot" && kind !== "fence") { objMenuShow(i, kind); return; }
+  if (kind && kind !== "plot" && kind !== "fence") { if (quickCollect(kind)) return; objMenuShow(i, kind); return; }
   const p = plotAt(S, i);
   if (p) {
     const q = queuedCells(); if (q.has(i)) return;
@@ -2940,10 +2943,7 @@ $("farmbBody").addEventListener("click", e => {
   else if (A("data-mmake")) { const k = A("data-mmake"), F = FEEDS[k]; if (millInfo(S, Date.now()).q) return; if (k === "cowfeed" && !cropOpen("corn")) return;
     const n = Math.min(MILL_CAP, millAmt[k], ...Object.entries(F.need).map(([c, q]) => Math.floor((+S.store[c] || 0) / q))); if (n < 1) return;
     Object.entries(F.need).forEach(([c, q]) => S.store[c] -= n * q); S.millQ = { r: k, q: n, t0: Date.now() }; saveNow(); renderPlots(); toast(F.name + " yapılıyor ⚙️"); }
-  else if (A("data-mtake")) { const I = millInfo(S, Date.now()); if (!I.done) return; const F = FEEDS[I.r];
-    const nb = Math.min(I.done, Math.floor(depFree(S) / F.out)); if (nb < 1) { depotFullHint(); return; }
-    S.store[I.r] = (+S.store[I.r] || 0) + nb * F.out; S.millQ.q -= nb; S.millQ.t0 += nb * F.ms; if (S.millQ.q <= 0) S.millQ = null;
-    gainXp(nb * XP.feed); dailyEv("feed", nb * F.out); popAt(me.x, me.y - .3, "+" + nb * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
+  else if (A("data-mtake")) millTake();
   renderFarmB();
 });
 // ---------- Tap on a building / tree / decoration: a small action bar appears under it ----------
@@ -2971,6 +2971,28 @@ function objAct(kind, i) {
     if (treeRipe(tr)) { if (!queuedCells().has(i)) enqueue({ k: "tree", cell: i }); return; }
     hint("Elma ağacı büyüyor, " + fmt(tr.t + TREE_MS - Date.now()) + " kaldı. Sulamaya gerek yok."); return;
   }
+}
+function millTake() { const I = millInfo(S, Date.now()); if (!I.done) return 0; const F = FEEDS[I.r];
+    const nb = Math.min(I.done, Math.floor(depFree(S) / F.out)); if (nb < 1) { depotFullHint(); return 0; }
+    S.store[I.r] = (+S.store[I.r] || 0) + nb * F.out; S.millQ.q -= nb; S.millQ.t0 += nb * F.ms; if (S.millQ.q <= 0) S.millQ = null;
+    gainXp(nb * XP.feed); dailyEv("feed", nb * F.out); popAt(me.x, me.y - .3, "+" + nb * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); 
+  return 1;
+}
+// tapping a building with something ready collects it right away (no need to open it)
+function quickCollect(kind) {
+  const now = Date.now();
+  if (OVENS.includes(kind)) { if (!bakeInfo(S, now, kind).done) return false; ovenTakeAll(kind); return true; }
+  if (kind === "coop" || kind === "cowbarn") { if (!animalInfo(S, kind, now).ready) return false; collectAnimals(kind); return true; }
+  if (kind === "mill") { if (!millInfo(S, now).done) return false; millTake(); return true; }
+  return false;
+}
+function ovenTakeAll(id) {
+  const now = Date.now(); let got = 0, full = false, what = "";
+  S.bakes = S.bakes || {}; S.bakes[id] = S.bakes[id] || [null, null];
+  [0, 1].forEach(k => { const t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return; const key = I.r, nb = Math.min(I.done, depFree(S)); if (nb < 1) { full = true; return; }
+    S.store[key] = (+S.store[key] || 0) + nb; t.q -= nb; t.t0 += nb * RECIPES[key].ms; if (t.q <= 0) S.bakes[id][k] = null;
+    gainXp(nb * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", nb); dailyEv("bake:" + key, nb); got += nb; what = RECIPES[key].name.toLocaleLowerCase("tr"); });
+  if (got) { SFX.play("animal"); popAt(colOf(S.layout[id]) + 1, rowOf(S.layout[id]), "+" + got + " " + what, "#ffe27a"); saveNow(); renderHud(); renderPlots(); } else if (full) depotFullHint();
 }
 const OBJ_ACTS = {
   oven: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
@@ -3847,7 +3869,7 @@ const MARKET_INDEX = () => [
   { n: "Su kuyusu", tab: "up", k: "kuyu su kova gelistir depo", price: wellCost(Math.min(wellLv(S), WELL_MAX - 1)) },
   { n: "Fıskiye geliştir", tab: "up", k: "fiskiye gelistir seviye yukselt", price: SPR_UP[Math.min(sprLv(S), SPR_MAX - 1)], th: () => sprThumb() }
 ];
-const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", animals: "Hayvanlar", decor: "Dekor", up: "Geliştir" };
+const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", animals: "Hayvanlar", decor: "Dekor", up: "Yükseltme" };
 const fold = s => String(s).toLocaleLowerCase("tr").replace(/[çğıöşüâî]/g, c => ({ "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "â": "a", "î": "i" }[c]));
 let mq = "";
 function renderSearch() {
@@ -3962,12 +3984,12 @@ function renderMarket0() {
     });
   } else if (mtab === "up") {
     const lv = wellLv(S), cost = wellCost(lv);
-    body.innerHTML = `<h4 class="msec">🌱 Toprak ve alan</h4>` + landPart() + `<h4 class="msec">💧 Su ve sulama</h4><div class="card"><div class="thumb"><svg viewBox="800 0 100 100" width="70" height="70"><rect x="800" width="100" height="100" fill="#8cbf4f"/>${wellSvg(2)}</svg></div><div>
+    body.innerHTML = landPart() + `<div class="card"><div class="thumb"><svg viewBox="800 0 100 100" width="70" height="70"><rect x="800" width="100" height="100" fill="#8cbf4f"/>${wellSvg(2)}</svg></div><div>
       <h3>Su kuyusu</h3>
       <p class="keep">${lv}. seviye, kova ${bucketMax()}${lv >= 5 ? ", 4'er sular" : lv >= 3 ? ", 2'şer sular" : ""}</p>
       ${lv >= WELL_MAX ? `<p>Kuyun en üst seviyede.</p>` : `<p><span class="price">${cost} altın</span> ile ${lv + 1}. seviyeye çıkar: ${lv === 2 ? "kova 20 ekin sular ve topraklar ikişer ikişer sulanır." : lv === 4 ? "kova 50 ekin sular ve topraklar dörder dörder sulanır." : "kova bir dolumda " + WELL_BUCKET[lv + 1] + " ekin sular."}</p>
       <div class="row"><button class="big green sm" id="upWell_v8" ${S.gold >= cost ? "" : "disabled"}>${S.gold >= cost ? "Geliştir" : "Altının yetmiyor"}</button></div>`}</div></div>
-      <h4 class="msec">⛲ Fıskiye</h4><div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye</h3><p><span class="price">${SPR_PRICE} altın</span></p><p class="keep">${sprCap()} su, ${sprN()} ekin sular</p>
+      <div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye</h3><p><span class="price">${SPR_PRICE} altın</span></p><p class="keep">${sprCap()} su, ${sprN()} ekin sular</p>
       <div class="row"><button class="big green sm" id="buySpr_v8" ${S.gold >= SPR_PRICE ? "" : "disabled"}>${S.gold >= SPR_PRICE ? "Satın al" : "Altının yetmiyor"}</button></div></div></div>
       <div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye geliştir</h3><p class="keep">${sprLv(S)}. seviye: ${sprCap()} su, ${sprN()} ekin</p>
       ${sprLv(S) >= SPR_MAX ? `<p>Fıskiyelerin en üst seviyede.</p>` : `<p><span class="price">${SPR_UP[sprLv(S)]} altın</span> ile ${sprLv(S) + 1}. seviye: ${SPR_CAPS[sprLv(S) + 1]} su, ${SPR_NS[sprLv(S) + 1]} ekin</p>
@@ -4867,6 +4889,7 @@ document.querySelectorAll(".gpick button").forEach(b => b.onclick = () => setPic
 // Name and gender are chosen once, when the character is made, and never change after that.
 const charLocked = () => !!(S && S.g && S.name);
 function showCharFields(on) {
+  if (on) { const x = $("acctXp"); if (x) x.hidden = true; }
   $("nameIn").hidden = !on; document.querySelector("#root_v8 .gpick").hidden = !on; $("startBtn").hidden = !on;
 }
 function openCharModal(m) {
@@ -4890,6 +4913,10 @@ function openAccount() {
   $("startTitle").textContent = S.name;
   $("startText").textContent = "Seviye " + S.level + ", " + (S.g === "k" ? "kız" : "erkek") + " çiftçi. Adın ve cinsiyetin karakterine kayıtlı, değiştirilemez.";
   showCharFields(false);
+  { let x = $("acctXp"); if (!x) { x = document.createElement("div"); x.id = "acctXp"; $("startText").insertAdjacentElement("afterend", x); }
+    const mx = S.level >= MAX_LEVEL, need = xpNeed(S.level), have = Math.min(+S.xp || 0, need);
+    x.className = "acctxp"; x.hidden = false;
+    x.innerHTML = mx ? `<b>En yüksek seviyedesin 🏆</b>` : `<div class="xr"><b>Seviye ${S.level}</b><span>${fmtBig(have)} / ${fmtBig(need)} XP</span></div><div class="xb"><i style="width:${Math.min(100, have / need * 100).toFixed(1)}%"></i></div><small>${S.level + 1}. seviyeye ${fmtBig(Math.max(0, need - have))} XP kaldı</small>`; }
   $("startCancel").hidden = false; $("startCancel").textContent = "Kapat";
   $("startForm").hidden = false;
   $("start").classList.add("on");
@@ -6140,6 +6167,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 121, d: "11 Ekim 2026", e: "⭐", t: "Kolay toplama", c: "#b9770e", b: "#fdf0d5", items: [
+    "Sol üstten karakterine dokununca seviye atlamak için kaç XP gerektiği ve kaç XP kaldığı görünüyor.",
+    "Geliştir sekmesinin adı Yükseltme oldu, başlıklar kaldırıldı. Toprak ile alan genişletme yan yana.",
+    "Fırın, araba, kümes, ahır ve ambarda hazır ürün varsa üstüne dokununca içine girmeden direkt toplanıyor.",
+  ] },
   { v: 120, d: "11 Ekim 2026", e: "🎓", t: "Öğretici ve düzenlemeler", c: "#3b7a4a", b: "#e3f3e6", items: [
     "Yeni başlayanlar için görevler adım adım yazıldı. Markete yönlendiren görevlerde hangi sekmeye girip neyi alman gerektiği Market'in içinde gösteriliyor.",
     "Seviye atlayınca açılan şeyler ekrana çıkıyor, herhangi bir yere dokununca kapanıyor.",
