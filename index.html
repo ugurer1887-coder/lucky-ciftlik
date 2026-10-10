@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<!doctype html><html><head>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js"}}</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 .big.loading{pointer-events:none;opacity:.8;position:relative}.big.loading::after{content:"";display:inline-block;width:14px;height:14px;margin-left:8px;border:3px solid #fff8;border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:spn .7s linear infinite}@keyframes spn{to{transform:rotate(360deg)}}
 .ach-tabs{display:flex;gap:6px;overflow-x:auto;margin:8px 0}.ach-tabs button{border:2px solid var(--line);background:var(--panel2);border-radius:12px;padding:4px 10px;font-weight:800;white-space:nowrap}.ach-tabs .on{background:var(--leaf);color:#fff}
 .ach-c{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:14px;padding:8px;margin:6px 0;background:var(--panel)}.ach-c.lock{opacity:.6}.ach-c.done{border-color:var(--leaf)}.ach-c .ic{font-size:1.6rem}.ach-c .bar{height:7px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:4px 0}.ach-c .bar i{display:block;height:100%;background:var(--leaf)}
@@ -729,6 +730,31 @@ body{font-family:var(--body);letter-spacing:.1px}
 @media (max-width:640px){.lg-grid{grid-template-columns:repeat(4,1fr)}.lg-card.d7{grid-column:span 2}}
 @media (max-height:520px){#login_v8 .box{padding:10px 14px}#login_v8 h1{font-size:1.2rem;margin:0}#login_v8 .lg-streak{margin:0 0 10px;font-size:.84rem}.lg-card{padding:12px 2px 6px}.lg-card .ic{font-size:1.2rem}#login_v8 .linkbtn{margin-top:0;min-height:30px;padding:4px}}
 @media (prefers-reduced-motion: reduce){.lg-card.today{animation:none}}
+
+/* ---- Görsel cila: buton basma, toast kayması, glass tint, bar dolumu ---- */
+button{transition:transform .12s ease,box-shadow .12s ease,filter .12s ease}
+button:active{transform:scale(.96);filter:brightness(.96)}
+.toast{transition:opacity .28s ease,transform .28s cubic-bezier(.2,.9,.3,1.2);transform:translate(-50%,-14px)}
+.toast.on{transform:translate(-50%,0)}
+[class*="bar"] i,[class*="bar"]>div,[class*="fill"]{transition:width .5s ease}
+.toast[data-k="ok"]{box-shadow:0 8px 24px rgba(0,0,0,.3),inset 5px 0 0 #4cc16a}
+.toast[data-k="err"]{box-shadow:0 8px 24px rgba(0,0,0,.3),inset 5px 0 0 #e0473a}
+.toast[data-k="info"]{box-shadow:0 8px 24px rgba(0,0,0,.3),inset 5px 0 0 #4aa3e8}
+/* ---- Panel/modal açılış animasyonu ve güçlü cam efekti ---- */
+@keyframes fadeInBg{from{opacity:0}to{opacity:1}}
+@keyframes boxPop{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:none}}
+.modal.on{animation:fadeInBg .2s ease}
+.modal.on>.box{animation:boxPop .26s cubic-bezier(.2,.9,.3,1.15)}
+.sheet{transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s linear .28s}
+.sheet.on{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.plate{-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2)}
+@media (prefers-reduced-motion:reduce){.modal.on,.modal.on>.box{animation:none}}
+/* ---- Modal kapanış animasyonu (destek yoksa eski davranış: anında kapanır) ---- */
+.modal{opacity:0;transition:opacity .2s ease,display .2s allow-discrete}
+.modal.on{opacity:1}
+.modal>.box{transition:transform .2s ease,opacity .2s ease}
+.modal:not(.on)>.box{transform:scale(.94);opacity:0}
+@media (prefers-reduced-motion:reduce){.modal,.modal>.box{transition:none}}
 </style>
 
 <div id="root_v8">
@@ -1593,7 +1619,7 @@ let toastT, hintT;
 let toastQ = [], toastBusy = false;
 let lastToastT = "", lastToastAt = 0;
 function toast(t) { const nw = Date.now(); if (t === lastToastT && nw - lastToastAt < 4000) { lastToastAt = nw; return; } lastToastT = t; lastToastAt = nw; if (toastQ.length >= 5) return; toastQ.push(t); if (!toastBusy) toastNext(); }
-function toastNext() { const t = toastQ.shift(); if (t === undefined) { toastBusy = false; return; } toastBusy = true; const el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => { el.classList.remove("on"); setTimeout(toastNext, 220); }, 2200); }
+function toastNext() { const t = toastQ.shift(); if (t === undefined) { toastBusy = false; return; } toastBusy = true; const el = $("toast"); el.textContent = t; el.dataset.k = /yetersiz|hata|dolu|olmaz|başarısız|yok|alınamaz/i.test(t) ? "err" : /\+|kazandın|tamamlandı|hazır|toplandı|başardın/i.test(t) ? "ok" : "info"; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => { el.classList.remove("on"); setTimeout(toastNext, 220); }, 2200); }
 function hint(t, ms) { $("hint").textContent = t; clearTimeout(hintT); hintT = setTimeout(() => $("hint").textContent = "", ms || 3800); }
 function popAt(x, y, text, color) {
   R3.pops.push({ x, y, text, color: color || "#fff", t0: performance.now() });
@@ -6079,7 +6105,7 @@ function setup3D(T) {
   const cv = $("c3d");
   const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
-  renderer.shadowMap.enabled = false; renderer.shadowMap.type = T.PCFSoftShadowMap;   // real-time shadows off: every object has a soft ground shadow instead (much lighter for phones)
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;   // real-time shadows off: every object has a soft ground shadow instead (much lighter for phones)
   renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
   renderer.outputColorSpace = T.SRGBColorSpace;
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.06;
@@ -6087,10 +6113,29 @@ function setup3D(T) {
   const scene3 = new T.Scene();
   scene3.background = new T.Color("#b9cfb4");
   scene3.fog = new T.Fog("#c4d6c6", 30, 80);
+  // Gradyan gökyüzü dokusu (seviye 1-2): zenit mavi -> ufukta sıcak sarı/turuncu
+  const skyTex = (() => {
+    const c = document.createElement("canvas"); c.width = 4; c.height = 256;
+    const g = c.getContext("2d"), gr = g.createLinearGradient(0, 0, 0, 256);
+    gr.addColorStop(0, "#4f8fdc"); gr.addColorStop(.45, "#9cc6ee"); gr.addColorStop(.8, "#f3e2b8"); gr.addColorStop(1, "#ffd39a");
+    g.fillStyle = gr; g.fillRect(0, 0, 4, 256);
+    const tx = new T.CanvasTexture(c); tx.colorSpace = T.SRGBColorSpace; return tx;
+  })();
+  const skyFlat = scene3.background;
   const camera = new T.PerspectiveCamera(30, 1, 1, 200);
   const hemi = new T.HemisphereLight("#e6f0ff", "#5b6e3a", 1.25); scene3.add(hemi);
   const sun = new T.DirectionalLight("#ffe2b8", 2.75);
   sun.castShadow = false; sun.shadow.mapSize.set(1024, 1024);
+  // Gün döngüsü: sabah altın -> öğlen beyaz -> akşam turuncu (25 dk'lık oyun döngüsü, gerçek saatten bağımsız)
+  const DAY_SN = 1500, DAY_KEYS = [["#ffe2b8", 0], ["#ffffff", .33], ["#ffb060", .66], ["#ffe2b8", 1]].map(k => [new T.Color(k[0]), k[1]]);
+  const dayTmp = new T.Color();
+  function dayColor(p, out) {
+    for (let i = 0; i < DAY_KEYS.length - 1; i++) {
+      const a = DAY_KEYS[i], b = DAY_KEYS[i + 1];
+      if (p <= b[1]) { const k = (p - a[1]) / (b[1] - a[1]); return out.copy(a[0]).lerp(b[0], k); }
+    }
+    return out.copy(DAY_KEYS[0][0]);
+  }
   const sc = sun.shadow.camera; sc.left = -24; sc.right = 24; sc.top = 20; sc.bottom = -20; sc.near = 1; sc.far = 80;
   sun.shadow.bias = -.0006; sun.shadow.normalBias = .03;
   scene3.add(sun); scene3.add(sun.target);
@@ -6098,7 +6143,14 @@ function setup3D(T) {
   // ---------- shared materials and geometries ----------
   const mats = {};
   // most surfaces use the cheaper Lambert lighting (far less work per pixel on phones than the physically based material)
-  const LAM = o => { const c = Object.assign({}, o); delete c.roughness; delete c.metalness; delete c.envMapIntensity; return new T.MeshLambertMaterial(c); };
+  const LAM = o => { const c = Object.assign({}, o);
+    if (GFX.level === 2) {   // seviye 2: tam PBR; doku varsa aynı doku bump haritası olur (tuğla/taş/ahşap kabartması)
+      if (c.roughness === undefined) c.roughness = .85;
+      if (c.metalness === undefined) c.metalness = 0;
+      if (c.map && !c.transparent) { c.bumpMap = c.map; c.bumpScale = 1.2; }
+      return new T.MeshStandardMaterial(c);
+    }
+    delete c.roughness; delete c.metalness; delete c.envMapIntensity; return new T.MeshLambertMaterial(c); };
   const M = (color, o) => { const k = color + JSON.stringify(o || {}); return mats[k] || (mats[k] = LAM(Object.assign({ color }, o || {}))); };
   // sky light: a soft gradient sky baked into an environment map
   (() => { const es = new T.Scene(), geo = new T.SphereGeometry(50, 32, 16), cols = [], pos = geo.attributes.position, top = new T.Color("#8fc4ff"), hor = new T.Color("#f4f1e6"), bot = new T.Color("#5f7a3c"), c = new T.Color();
@@ -6107,7 +6159,13 @@ function setup3D(T) {
     es.add(new T.Mesh(geo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide })));
     const sunDisc = new T.Mesh(new T.SphereGeometry(4, 16, 8), new T.MeshBasicMaterial({ color: "#fff6e0" })); sunDisc.position.set(-25, 35, -15); es.add(sunDisc);
     const pm = new T.PMREMGenerator(renderer); scene3.environment = pm.fromScene(es, .03).texture; scene3.environmentIntensity = .9; pm.dispose(); })();
-  const MS = (color, o) => { const k = "s" + color + JSON.stringify(o || {}); return mats[k] || (mats[k] = new T.MeshStandardMaterial(Object.assign({ color, roughness: .8, metalness: 0 }, o || {}))); };
+  // Su yüzeyi malzemeleri (tekne, kuyu, çeşme): seviye 2'de CubeCamera yansıması alır
+  const waterMats = [], WATER_COLS = ["#4fa8d6", "#5ab0d6"];
+  const MS = (color, o) => { const k = "s" + color + JSON.stringify(o || {});
+    if (!mats[k]) { mats[k] = new T.MeshStandardMaterial(Object.assign({ color, roughness: .8, metalness: 0 }, o || {})); if (WATER_COLS.includes(color) && !(o && o.transparent)) waterMats.push(mats[k]); }
+    return mats[k]; };
+  const waterRT = new T.WebGLCubeRenderTarget(128, { generateMipmaps: true, minFilter: T.LinearMipmapLinearFilter });
+  const waterCam = new T.CubeCamera(1, 120, waterRT);
   const G = {
     box: new T.BoxGeometry(1, 1, 1), sph: new T.SphereGeometry(1, 16, 12), sphHi: new T.SphereGeometry(1, 26, 18), ico: new T.IcosahedronGeometry(1, 1),
     cyl: new T.CylinderGeometry(1, 1, 1, 16), cyl8: new T.CylinderGeometry(1, 1, 1, 8), cone: new T.ConeGeometry(1, 1, 12),
@@ -6431,6 +6489,7 @@ function setup3D(T) {
     for (let k = 0; k < nHens; k++) { const m = buildHen(k % 3 === 1); m.g.scale.setScalar(.95); const px = pen.x0 + Math.random() * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: Math.random() * 3, sp: .45 }); }
     fx.pens.push(pen);
+    if (GFX.level > 0) { const pl = new T.PointLight("#ffb866", 1.1, 4.2, 2); pl.position.set(c + 1.5, 1.1, r + 1.5); g.add(pl); }   // iç mekan sıcak ışığı
     return g;
   }
   // Holstein cow: a spotted hide texture wrapped on rounded body parts, a neck, a real head with muzzle, ears and horns,
@@ -6541,11 +6600,12 @@ function setup3D(T) {
     for (let k = 0; k < nCows; k++) { const m = buildCow(k); m.g.scale.setScalar(.82); const px = pen.x0 + (k + .5) / Math.max(1, nCows) * (pen.x1 - pen.x0), pz = pen.z0 + Math.random() * (pen.z1 - pen.z0);
       m.g.position.set(px, 0, pz); g.add(m.g); pen.items.push({ m, x: px, z: pz, tx: px, tz: pz, wait: 1 + Math.random() * 4, sp: .22, cow: 1 }); }
     fx.pens.push(pen);
+    if (GFX.level > 0) { const pl = new T.PointLight("#ffb866", 1.1, 4.2, 2); pl.position.set(c + 2, 1.1, r + 2); g.add(pl); }   // iç mekan sıcak ışığı
     return g;
   }
   function buildMill(a, busy) {
     const g = new T.Group(), c = colOf(a), r = rowOf(a), cx = c + .76, cz = r + 1.0, w = 1.3, d = 1.12, BEAM = "#4a2e1a", PL = "#f6ecd4";
-    const GOLD = MS("#e2b33c", { metalness: .8, roughness: .3 }), STEEL = MS("#d9dee3", { metalness: .55, roughness: .35 });
+    const GOLD = MS("#e2b33c", { metalness: .8, roughness: .3, emissive: "#e2b33c", emissiveIntensity: .18 }), STEEL = MS("#d9dee3", { metalness: .55, roughness: .35 });
     blob(g, c + 1, r + 1, 2.5, 2.5);
     g.add(mesh(G.box, TM("#d8d2c6", "stone", 2, 1), cx, .06, cz, w + .16, .12, d + .16));
     g.add(mesh(G.box, TM("#b9b0a0", "stone", 3, 1), cx, .32, cz, w, .4, d));
@@ -6601,7 +6661,14 @@ function setup3D(T) {
       if (d < .03) { it.wait -= dt; if (it.wait <= 0) { it.tx = pen.x0 + Math.random() * (pen.x1 - pen.x0); it.tz = pen.z0 + Math.random() * (pen.z1 - pen.z0); it.wait = (it.cow ? 3 : 1) + Math.random() * (it.cow ? 6 : 3); } }
       else { const st = Math.min(d, it.sp * dt); it.x += dx / d * st; it.z += dz / d * st; it.m.g.rotation.y = Math.atan2(dx, dz); }
       it.m.g.position.set(it.x, 0, it.z); animWalk(it.m, d >= .03, sec, dt);
-      if (it.m.hd) it.m.hd.rotation.x = d < .03 ? (it.cow ? 1.0 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : (it.cow ? .35 : 0);
+      const hm = it.m.hd;
+      if (hm) {
+        const idle = d < .03, tgt = idle ? (it.cow ? 1.0 + Math.sin(sec * 2 + it.x) * .15 : (Math.sin(sec * 11 + it.x * 9) > .2 ? .9 : .1)) : (it.cow ? .35 : 0);
+        hm.rotation.x += (tgt - hm.rotation.x) * Math.min(1, dt * (it.cow ? 5 : 14));   // ot yeme / gagalama, yumuşak geçişli
+        if (it.cow) hm.rotation.y += ((idle ? Math.sin(sec * .6 + it.z * 3) * .5 : 0) - hm.rotation.y) * Math.min(1, dt * 3);   // kafa çevirme
+        else { const hop = idle ? Math.pow(Math.max(0, Math.sin(sec * 2.6 + it.x * 7)), 14) : 0;   // zıplama + kanat çırpma (gövde genişler)
+          it.m.body.position.y += hop * .05; it.m.body.scale.x += ((1 + hop * .18) - it.m.body.scale.x) * Math.min(1, dt * 20); }
+      }
     }));
   }
   function buildScare(a) {
@@ -6746,7 +6813,16 @@ function setup3D(T) {
   }
   function stepOven(sec) { (fx.ovens || []).forEach(O => stepOven1(O, sec)); }
   function stepOven1(O, sec) {
+    if (O && O.cx !== undefined && GFX.level > 0 && !O.pl) {   // iç mekan sıcak ışığı (düşük mesafe)
+      O.pl = new T.PointLight("#ff9a45", 0, 5, 2); O.pl.position.set(O.cx, O.cy, O.cz + .5); world.add(O.pl);
+    }
+    if (O && O.pl) O.pl.intensity = (GFX.level > 0 && O.baking && !REDUCED) ? 1.8 + Math.sin(sec * 13) * .3 + Math.sin(sec * 21) * .15 : 0;
     if (!O || !O.baking || REDUCED) return;
+    if (GFX.level > 0 && O.cx !== undefined) {   // ek kıvılcım ve duman: mevcut yoğunluğun yaklaşık 2 katı
+      const k = GFX.level > 1 ? 1 : .6;
+      if (Math.random() < .3 * k) emitFx(O.cx, O.cy, O.cz, "spark");
+      if (Math.random() < .12 * k) emitFx(O.cx, O.cy + .1, O.cz, "smoke");
+    }
     O.flames.forEach(f => { const u = f.userData, k = 1 + Math.sin(sec * 13 + u.ph) * .2 + Math.sin(sec * 23 + u.ph * 2) * .1; f.scale.y = u.h * k; f.position.y = u.y0 + .01 + u.h * k / 2; f.rotation.z = Math.sin(sec * 9 + u.ph) * .15; });
     if (O.glow) { const v = .62 + Math.sin(sec * 11) * .1 + Math.sin(sec * 17) * .06; O.glow.material.opacity = v; O.glow.scale.set(1.6 + v * .5, 1.25 + v * .4, 1); }
     O.inners.forEach((inn, i) => { const v = .75 + Math.sin(sec * 9 + i * 2) * .15; inn.material.color.setRGB(1, .42 * v + .1, .08); });
@@ -7008,7 +7084,7 @@ function setup3D(T) {
 mvPosition = instanceMatrix * mvPosition;
 #endif
 float wh = max(0.0, mvPosition.y - 0.13), wp = mvPosition.x * 1.7 + mvPosition.z * 1.3;
-mvPosition.x += sin(uWind * 1.7 + wp) * 0.16 * wh; mvPosition.z += cos(uWind * 1.2 + wp * .8) * 0.07 * wh;
+mvPosition.x += sin(uWind * 1.7 + wp) * 0.26 * wh; mvPosition.z += cos(uWind * 1.2 + wp * .8) * 0.11 * wh;
 mvPosition = modelViewMatrix * mvPosition;
 gl_Position = projectionMatrix * mvPosition;`); };
     mat.customProgramCacheKey = () => "wind"; return mat; };
@@ -7083,12 +7159,29 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : ":" + Math.floor((now - t.t) / TREE_MS * 4))).join(","),
       f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, sprLv(f), B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
   }
+  // Yol kenarı detayları: küçük taşlar ve çiçekler (InstancedMesh, statik, çok ucuz; seviye 1-2)
+  function roadsideDetails() {
+    const NS = 36, NF = 50, zr = ROWS - 1;
+    const stones = new T.InstancedMesh(new T.SphereGeometry(1, 6, 5), new T.MeshLambertMaterial({ color: "#ffffff" }), NS);
+    const blooms = new T.InstancedMesh(new T.SphereGeometry(1, 6, 5), new T.MeshLambertMaterial({ color: "#ffffff" }), NF);
+    const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(), ps = new T.Vector3(), col = new T.Color();
+    for (let i = 0; i < NS; i++) {
+      const r0 = .04 + rnd(i * 7 + 1) * .06; ps.set(rnd(i * 13 + 2) * COLS, r0 * .5, zr + .03 + rnd(i * 5 + 3) * .12); sc.set(r0 * 1.4, r0, r0);
+      stones.setMatrixAt(i, m4.compose(ps, q, sc)); stones.setColorAt(i, col.set(["#9a948a", "#b3ada0", "#847e74"][i % 3]));
+    }
+    for (let i = 0; i < NF; i++) {
+      ps.set(rnd(i * 17 + 5) * COLS, .07, zr - .03 - rnd(i * 11 + 9) * .16); sc.set(.035, .03, .035);
+      blooms.setMatrixAt(i, m4.compose(ps, q, sc)); blooms.setColorAt(i, col.set(["#fff6d6", "#f6a6c1", "#ffe27a", "#c9a6ff"][i % 4]));
+    }
+    stones.receiveShadow = true; world.add(stones); world.add(blooms);
+  }
   function rebuild() {
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
     if (sig !== staticSig) {
       staticSig = sig;
       disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = []; fx.pens = [];
       if (scene.kind === "plaza") buildPlaza(); else if (f) buildFarm(f, now, "s");
+      if (scene.kind !== "plaza" && GFX.level > 0) roadsideDetails();
       const scs = sceneryKey(f);
       if (scs !== scenSig) { scenSig = scs; scenery(f); ["tuft", "ftrunk", "fleaf"].forEach(k => P[k].done()); }
       ["post", "rail"].forEach(k => P[k].done());
@@ -7422,9 +7515,11 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
       m.armL.rotation.x = m.armR.rotation.x = working ? -1.1 + Math.sin(t / 1000 * 18) * .25 : -1.0;
       const spin = walking ? .22 : working ? .08 : 0; m.tractor.userData.wheels.forEach(w => { w.wg.rotation.x += spin * .32 / w.r; });
     } else {
-    const sw = walking ? Math.sin(ph) * .6 : 0;
-    m.legL.rotation.x = sw; m.legR.rotation.x = -sw; m.armL.rotation.x = -sw * .8;
-    m.armR.rotation.x = working ? -1.2 + Math.sin(t / 1000 * 18) * .7 : sw * .8;
+    const sw = walking ? Math.sin(ph) * .75 : 0, lk = .35;   // swing güçlendirildi; duruşlar arası lerp ile yumuşak geçiş
+    m.legL.rotation.x += (sw - m.legL.rotation.x) * lk; m.legR.rotation.x += (-sw - m.legR.rotation.x) * lk; m.armL.rotation.x += (-sw * .8 - m.armL.rotation.x) * lk;
+    const armRt = working ? -1.2 + Math.sin(t / 1000 * 18) * .7 : sw * .8; m.armR.rotation.x += (armRt - m.armR.rotation.x) * lk;
+    const idleC = !walking && !working;   // nefes alma: dururken gövde hafifçe kalkıp iner
+    m.body.scale.y += ((idleC ? 1 + Math.sin(t / 1000 * 2.2) * .012 : 1) - m.body.scale.y) * .15;
     m.body.position.set(0, walking ? Math.abs(Math.sin(ph)) * .03 : working ? Math.abs(Math.sin(t / 1000 * 18)) * .02 : 0, 0);
     }
     m.bucket.visible = !!c.bk;
@@ -7508,10 +7603,140 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     return { cell: idx(r, c) };
   };
 
+  // ---------- Gökyüzü süsleri: bulut, kuş, dağ, polen/ateş böceği (seviye 1-2) ----------
+  const skyG = new T.Group(); scene3.add(skyG);
+  const cloudTex = (() => {   // prosedürel yumuşak bulut dokusu
+    const c = document.createElement("canvas"); c.width = 128; c.height = 64; const g = c.getContext("2d");
+    [[40, 38, 24], [64, 30, 28], [88, 38, 22], [64, 42, 26]].forEach(([x, y, r]) => {
+      const gr = g.createRadialGradient(x, y, 2, x, y, r); gr.addColorStop(0, "rgba(255,255,255,.9)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = gr; g.fillRect(0, 0, 128, 64); });
+    const tx = new T.CanvasTexture(c); tx.colorSpace = T.SRGBColorSpace; return tx;
+  })();
+  const clouds = [];
+  for (let i = 0; i < 8; i++) {
+    const sp = new T.Sprite(new T.SpriteMaterial({ map: cloudTex, transparent: true, opacity: .55 + Math.random() * .25, depthWrite: false, fog: false }));
+    const w = 16 + Math.random() * 14; sp.scale.set(w, w * .5, 1);
+    sp.userData = { x: -70 + i * 18 + Math.random() * 8, y: 22 + Math.random() * 10, z: -40 - Math.random() * 25, v: .25 + Math.random() * .3 };
+    skyG.add(sp); clouds.push(sp);
+  }
+  const birds = [];
+  for (let i = 0; i < 4; i++) {   // V şeklinde kuşlar: kanat çırpma = y ölçeği
+    const geo = new T.BufferGeometry().setAttribute("position", new T.Float32BufferAttribute([-.6, 0, .25, 0, 0, 0, .6, 0, .25], 3));
+    const b = new T.Line(geo, new T.LineBasicMaterial({ color: "#2b3340", fog: false }));
+    b.userData = { x: -50 - i * 6, y: 15 + (i % 2) * 2.5, z: -34 - i * 2.5, v: 2.2 + i * .15, ph: i * 1.7 };
+    skyG.add(b); birds.push(b);
+  }
+  [["#93aec0", 0], ["#a9c0cf", 1]].forEach(([col, row]) => {   // ufukta iki katmanlı paralaks dağ
+    for (let i = 0; i < 7; i++) {
+      const h = 10 + ((i * 7 + row * 3) % 5) * 2.2;
+      const m = new T.Mesh(new T.ConeGeometry(11 + (i % 3) * 3, h, 6), new T.MeshBasicMaterial({ color: col, fog: false }));
+      m.userData = { x: -66 + i * 22 + row * 11, y: h / 2 - 1, z: -62 - row * 14 }; skyG.add(m); clouds.push(m);
+    }
+  });
+  const PN = 140, pArr = new Float32Array(PN * 3), pSeed = [];
+  for (let i = 0; i < PN; i++) pSeed.push({ x: (Math.random() - .5) * 30, y: .4 + Math.random() * 3.2, z: (Math.random() - .5) * 24, ph: Math.random() * 6.28 });
+  const pGeo = new T.BufferGeometry(); pGeo.setAttribute("position", new T.BufferAttribute(pArr, 3));
+  const pMat = new T.PointsMaterial({ size: .16, transparent: true, opacity: .6, depthWrite: false, blending: T.AdditiveBlending, color: "#fff6c8" });
+  const pPts = new T.Points(pGeo, pMat); pPts.frustumCulled = false; skyG.add(pPts);
+  let skyLast = 0;
+  function skyUpdate(t, tx, tz, day) {
+    const dt = Math.min(.1, (t - skyLast) / 1000); skyLast = t;
+    clouds.forEach(c => { const u = c.userData; if (c.isSprite) { u.x += u.v * dt; if (u.x > 80) u.x = -80; } c.position.set(tx + u.x, u.y, tz + u.z); });
+    birds.forEach(b => { const u = b.userData; u.x += u.v * dt; if (u.x > 70) u.x = -70; b.position.set(tx + u.x, u.y + Math.sin(t / 900 + u.ph) * .6, tz + u.z); b.scale.y = .4 + Math.abs(Math.sin(t / 130 + u.ph)) * 1.4; });
+    const eve = day > .6 ? 1 : 0;   // akşam: ateş böceği (sarı-yeşil, yanıp söner); gündüz: soluk polen
+    pMat.color.set(eve ? "#d8ff60" : "#fff6c8"); pMat.opacity = eve ? .55 + Math.sin(t / 350) * .35 : .45; pMat.size = eve ? .22 : .14;
+    const n = GFX.level > 1 ? PN : 60; pGeo.setDrawRange(0, n);
+    for (let i = 0; i < n; i++) { const q = pSeed[i];
+      pArr[i * 3] = tx + q.x + Math.sin(t / 1800 + q.ph) * 1.2; pArr[i * 3 + 1] = q.y + Math.sin(t / 1200 + q.ph * 2) * .4; pArr[i * 3 + 2] = tz + q.z + Math.cos(t / 2100 + q.ph) * 1.2; }
+    pGeo.attributes.position.needsUpdate = true;
+  }
+
+  // ---------- Post-processing (yalnızca seviye 2): bloom + vinyet + kromatik sapma + FXAA ----------
+  const post = { composer: null, want: false, tried: false, w: 0, h: 0, pr: 0, fxaa: null };
+  async function initPost() {
+    if (post.tried) return; post.tried = true;
+    try {
+      const B = "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/";
+      const [EC, RP, UB, SP, OP, FX] = await Promise.all(["postprocessing/EffectComposer.js", "postprocessing/RenderPass.js", "postprocessing/UnrealBloomPass.js", "postprocessing/ShaderPass.js", "postprocessing/OutputPass.js", "shaders/FXAAShader.js"].map(f => import(B + f)));
+      const comp = new EC.EffectComposer(renderer);
+      comp.addPass(new RP.RenderPass(scene3, camera));
+      comp.addPass(new UB.UnrealBloomPass(new T.Vector2(512, 512), .45, .6, .88));   // hafif bloom (güç 0.45)
+      comp.addPass(new SP.ShaderPass({
+        uniforms: { tDiffuse: { value: null }, amt: { value: .0015 }, vig: { value: .32 } },
+        vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+        fragmentShader: "uniform sampler2D tDiffuse; uniform float amt; uniform float vig; varying vec2 vUv;" +
+          "void main(){ vec2 d = vUv - .5; vec4 c = texture2D(tDiffuse, vUv);" +
+          "c.r = texture2D(tDiffuse, vUv + d * amt).r; c.b = texture2D(tDiffuse, vUv - d * amt).b;" +   // kromatik sapma
+          "c.rgb *= 1.0 - vig * smoothstep(.3, .95, length(d) * 1.25); gl_FragColor = c; }"           // vinyet
+      }));
+      comp.addPass(new OP.OutputPass());   // ton eşleme + sRGB çıkışı
+      post.fxaa = new SP.ShaderPass(FX.FXAAShader); comp.addPass(post.fxaa);
+      post.composer = comp; post.w = 0;
+    } catch (e) { console.warn("Post-processing yüklenemedi, düz render kullanılıyor", e); post.composer = null; }
+  }
+
+  // ---------- Olay parçacıkları: su damlası, saman, 3D altın paralar (hafif fizik) ----------
+  const FXN = 160, fxP = [];
+  const fxMesh = new T.InstancedMesh(new T.BoxGeometry(1, 1, .3), new T.MeshBasicMaterial(), FXN);
+  fxMesh.frustumCulled = false; fxMesh.count = 0; fxMesh.setColorAt(0, new T.Color("#fff")); scene3.add(fxMesh);
+  const fxM = new T.Matrix4(), fxQ = new T.Quaternion(), fxE = new T.Euler(), fxS = new T.Vector3(), fxV = new T.Vector3(), fxC = new T.Color();
+  let fxLast = 0;
+  // Mevsim paleti (yalnızca görsel; gerçek aya göre): yaprak renkleri ve zemin ışığı tonu
+  const SEASONS = [
+    { ground: "#7d8a7a", leaf: ["#cfd8c2", "#a9b7a0"] },                     // kış
+    { ground: "#6c8a3a", leaf: ["#9ad46a", "#ffc4dd", "#cde88a"] },           // ilkbahar
+    { ground: "#5b6e3a", leaf: ["#6fb83e", "#8ccf4a"] },                      // yaz
+    { ground: "#7a6a30", leaf: ["#e8892a", "#d4562a", "#e9c040"] }            // sonbahar
+  ];
+  const SEASON = SEASONS[[0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0][new Date().getMonth()]];
+  function emitLeaves() {   // ağaçlardan ara sıra yaprak dökülür
+    if (REDUCED || GFX.level < 1 || scene.kind === "plaza" || Math.random() > .06 * (GFX.level > 1 ? 1.5 : 1) || fxP.length >= FXN) return;
+    const fd = farmData(); if (!fd || !fd.trees || !fd.trees.length) return;
+    const tr = fd.trees[Math.floor(Math.random() * fd.trees.length)];
+    fxP.push({ x: colOf(tr.cell) + .5 + (Math.random() - .5) * .8, y: 1.5 + Math.random() * .4, z: rowOf(tr.cell) + .5 + (Math.random() - .5) * .8, vx: (Math.random() - .5) * .3, vz: (Math.random() - .5) * .3, vy: 0,
+      g: 1.2, fall: true, size: .08, life: 3.2, age: 0, rot: Math.random() * 6, rv: 3, gold: false, col: SEASON.leaf[Math.floor(Math.random() * SEASON.leaf.length)] });
+  }
+  const STRAW = ["#f4d36a", "#e6b94a", "#fff0a0"];
+  function burstFor(p) {   // popAt metninden olay türünü anlar: sulama / hasat / altın
+    if (REDUCED) return;
+    const water = p.color === "#bfe9ff", gold = p.color === "#ffe27a" && /altın/.test(p.text) && p.text[0] === "+", straw = p.color === "#ffe27a" && !gold && p.text[0] === "+";
+    if (!water && !gold && !straw) return;
+    const n = Math.round([4, 9, 14][GFX.level] * (gold ? .8 : 1));   // seviye 0: yaklaşık %70 az
+    for (let i = 0; i < n && fxP.length < FXN; i++) {
+      const a = Math.random() * 6.283, sp = .4 + Math.random() * 1.1;
+      fxP.push({ x: p.x + .5, y: .5, z: p.y + .5, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: water ? 2 + Math.random() * 2 : gold ? 3 + Math.random() * 2.2 : 1.6 + Math.random() * 1.6,
+        g: water ? 9 : gold ? 12 : 3, size: water ? .07 : gold ? .15 : .1, life: water ? .7 : gold ? 1.5 : 1.2, age: 0, rot: Math.random() * 6, rv: (Math.random() - .5) * (gold ? 14 : 6),
+        gold, col: water ? "#9fd8ff" : gold ? "#ffd23a" : STRAW[i % 3] });
+    }
+  }
+  function emitFx(x, y, z, kind) {   // fırın kıvılcımı / dumanı (yukarı süzülür)
+    if (fxP.length >= FXN) return;
+    const sp = kind === "spark";
+    fxP.push({ x: x + (Math.random() - .5) * .2, y, z: z + (Math.random() - .5) * .1, vx: (Math.random() - .5) * .3, vz: (Math.random() - .5) * .2, vy: sp ? .6 + Math.random() * .8 : .35,
+      g: sp ? -.4 : -.1, size: sp ? .05 : .13, life: sp ? .9 : 1.7, age: 0, rot: Math.random() * 6, rv: 1, gold: false, col: sp ? "#ffb04a" : "#9a9a9a" });
+  }
+  function stepBursts(now) {
+    const dt = Math.min(.05, (now - fxLast) / 1000); fxLast = now;
+    let n = 0;
+    for (let i = fxP.length - 1; i >= 0; i--) {
+      const q = fxP[i]; q.age += dt;
+      if (q.age >= q.life) { fxP.splice(i, 1); continue; }
+      q.vy -= q.g * dt; if (q.fall) { q.vy = Math.max(q.vy, -.45); q.x += Math.sin(q.age * 3 + q.rot) * dt * .35; if (q.y < .03) { q.y = .03; q.vy = 0; } }
+      q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.rot += q.rv * dt;
+      if (q.gold && q.y < .08) { q.y = .08; q.vy *= -.4; q.vx *= .7; q.vz *= .7; }   // yere çarpınca sekme
+    }
+    for (let i = 0; i < fxP.length; i++) {
+      const q = fxP[i], k = Math.min(1, (q.life - q.age) / (q.life * .25)), sz = q.size * k;
+      fxE.set(q.gold ? q.rot : q.rot * .5, q.rot, 0); fxQ.setFromEuler(fxE); fxS.set(sz, sz * (q.gold ? 1 : .5), sz);
+      fxM.compose(fxV.set(q.x, q.y, q.z), fxQ, fxS); fxMesh.setMatrixAt(n, fxM); fxMesh.setColorAt(n, fxC.set(q.col)); n++;
+    }
+    fxMesh.count = n; fxMesh.instanceMatrix.needsUpdate = true; if (fxMesh.instanceColor) fxMesh.instanceColor.needsUpdate = true;
+  }
+
   // ---------- per frame ----------
   let lastW = 0, lastH = 0, sceneSig = "", rsW = 0, rsH = 0, rsT = 0;
   let charS = 1.2, shX = NaN, shZ = NaN;
-  const D0 = 27, TILT = 1.12;   // camera distance (at zoom 1) and pitch (radians above the ground)
+  const D0 = 27, TILT = 1.02;   // camera distance (at zoom 1) and pitch (radians above the ground)
   R3.frame = t => {
     const w = cv.clientWidth, h = cv.clientHeight;
     if (w !== lastW || h !== lastH) {   // resize the drawing buffer only once the size has settled
@@ -7524,8 +7749,20 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     // camera follows the same camera box the 2D view uses
     const tx = (cam.x + cam.w / 2) / CELL, tz = (cam.y + cam.h / 2) / CELL;
     const D = D0 * ZOOM;
-    camera.position.set(tx, Math.sin(TILT) * D, tz + Math.cos(TILT) * D); camera.lookAt(tx, 0, tz - .3);
-    scene3.fog.near = D * 1.05; scene3.fog.far = D * 2.9;
+    const tilt = TILT + Math.max(-.5, Math.min(.5, ZOOM - 1)) * .06;   // uzaklaşınca kamera hafif yükselir
+    camera.position.set(tx, Math.sin(tilt) * D, tz + Math.cos(tilt) * D); camera.lookAt(tx, 0, tz - .3);
+    scene3.fog.near = D * .9; scene3.fog.far = D * 3;
+    if (GFX.level > 1 && waterMats.length && (!R3.envT || t - R3.envT > 8000)) {   // su yansıması: 8 sn'de bir, 128px küp harita (yalnızca seviye 2)
+      R3.envT = t; skyG.visible = false; fxMesh.visible = false;
+      waterCam.position.set(tx, 2.5, tz); waterCam.update(renderer, scene3);
+      skyG.visible = true; fxMesh.visible = true;
+      waterMats.forEach(m => { if (m.envMap !== waterRT.texture) { m.envMap = waterRT.texture; m.needsUpdate = true; } m.envMapIntensity = .9; });
+    }
+    if (GFX.level > 0) {   // ışık rengi gün saatine göre kayar (seviye 0'da sabit kalır)
+      dayColor((t / 1000 % DAY_SN) / DAY_SN, dayTmp); sun.color.copy(dayTmp);
+      hemi.groundColor.set(SEASON.ground).lerp(dayTmp, .12);
+      skyUpdate(t, tx, tz, (t / 1000 % DAY_SN) / DAY_SN);
+    }
     // the shadow map is drawn only when the scene or the (snapped) light position changes, not every frame
     const sb = Math.max(14, 22 * ZOOM) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
     const stx = Math.round(tx / 3) * 3, stz = Math.round(tz / 3) * 3;
@@ -7558,11 +7795,15 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
       s.position.set(colOf(hs) + 2.5 + 1.2 + Math.sin(u * 5) * .08, 3.0 + u * 1.2, rowOf(hs) + 1.55 - .35); const sz = .3 + u * .6; s.scale.set(sz, sz, 1); s.material.opacity = .6 * (1 - u); });
     // floating "+1" texts
     for (let i = R3.pops.length - 1; i >= 0; i--) { const p = R3.pops[i], u = (performance.now() - p.t0) / 1200;
-      if (!p.s) { p.s = sprite(popTex(p.text, p.color), 1.6, .4); p.s.renderOrder = 10; scene3.add(p.s); }
+      if (!p.s) { burstFor(p); p.s = sprite(popTex(p.text, p.color), 1.6, .4); p.s.renderOrder = 10; scene3.add(p.s); }
       if (u >= 1) { scene3.remove(p.s); p.s.material.dispose(); R3.pops.splice(i, 1); continue; }
       p.s.position.set(p.x + .5, 1.1 + u * .7, p.y + .5); p.s.material.opacity = 1 - u * u; }
-    stepGlows(performance.now()); stepTap(performance.now()); try { stepButterflies(performance.now() / 1000); } catch (e) {}
-    renderer.render(scene3, camera);
+    stepGlows(performance.now()); stepTap(performance.now()); stepBursts(performance.now()); emitLeaves(); try { stepButterflies(performance.now() / 1000); } catch (e) {}
+    if (post.want && post.composer) {   // seviye 2: efekt zinciri; boyut/DPR değişince yeniden ayarla
+      const pr = renderer.getPixelRatio();
+      if (post.w !== w || post.h !== h || post.pr !== pr) { post.w = w; post.h = h; post.pr = pr; post.composer.setPixelRatio(pr); post.composer.setSize(w, h); post.fxaa.material.uniforms.resolution.value.set(1 / (w * pr), 1 / (h * pr)); }
+      post.composer.render();
+    } else renderer.render(scene3, camera);
   };
   R3.chars = new Set();
   const glowTex = canvasTex("glow", 128, 128, (x, w, h) => { const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(.4, "rgba(255,255,255,.6)"); g.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = g; x.fillRect(0, 0, w, h); });
@@ -7632,8 +7873,12 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   R3.quality = lvl => {
     const dpr = window.devicePixelRatio || 1;
     R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.7), Math.min(dpr, 2.25)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
-    sun.castShadow = false;
-    const ms = 1024; if (false && sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+    if (R3.pbr !== (lvl === 2)) { R3.pbr = lvl === 2; Object.keys(mats).forEach(k => { delete mats[k]; }); }   // PBR <-> Lambert geçişinde malzemeler yeniden üretilir
+    if (lvl < 2) { R3.envT = 0; waterMats.forEach(m => { if (m.envMap) { m.envMap = null; m.needsUpdate = true; } }); }   // yansıma yalnızca seviye 2
+    sun.castShadow = lvl > 0;   // seviye 0: gölge kapalı, yalnızca blob gölgeler
+    const ms = [0, 1024, 2048][lvl]; if (ms && sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+    scene3.background = lvl > 0 ? skyTex : skyFlat; skyG.visible = lvl > 0; post.want = lvl === 2; if (lvl === 2) initPost();
+    if (lvl === 0) { sun.color.set("#ffe2b8"); hemi.groundColor.set("#5b6e3a"); }
     tuftCount = [2500, 5500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
   };
   R3.setRes = k => { k = Math.max(.75, Math.min(1, Math.round(k * 10) / 10)); if (k === (R3.res || 1)) return; R3.res = k; renderer.setPixelRatio(Math.max(1, R3.baseDpr * k)); lastW = 0; };
