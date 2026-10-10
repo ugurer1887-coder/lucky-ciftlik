@@ -165,3 +165,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Depo yükseltmesi depo penceresinden çıkarıldı; çiftlikteki depo menüsünde "⬆️ Yükselt" (`OBJ_ACTS.barn`, `depotUpgrade`). Eksikleri tek mesajda söyler.
 - Fiyatlar: ekim aleti 1000, elektrikli tırpan 2500, traktör 20000 (`TOOLS`). Ambar market simgesi SVG.
 - Öğretici görevler 13 adıma çıktı (5. seviyeye kadar). `S.tut = {i, d:[claimed ids], c, v:2}`; eski kayıtlar `tutInit` içinde geçirilir (seviye>=5 olanlar öğreticiyi bitmiş sayılır). `chk()` ile durum-tabanlı görevler `questPoll` (1.5 sn) ile izlenir; `ev` ile aynı olayı sayan görevler.
+
+## v108
+- Meydan kamerası yakınlaştı: `zEff()` (meydanda ZOOM*0.7), 2B ve 3B kamera ile gölge kutusu bunu kullanır.
+- Nesne menüsü (`.objmenu`) ve 3B rozetler (kümes/ahır/ambar/fırın/sipariş) büyütüldü.
+- 10 sanal çiftçi (`BOT_DEFS`, uid `luckybot-N`, sunucuya yazılmaz): meydanda gezerler (`botTick`, 12 dakikalık programa göre meydanda / kendi çiftliğinde / yok), `botFarmOf` ile seviyeye göre üretilen çiftlikleri ziyaret edilir, oyuncu aramada ve sıralamada görünürler (`botRankRow`), arkadaş isteği hemen kabul edilir, hediye ve mesaj yok. Seviyeleri günler geçtikçe artar (`botLevel`, `BOT_T0`).

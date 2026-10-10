@@ -626,12 +626,12 @@ body{font-family:var(--body);letter-spacing:.1px}
 .ovthumb{background:linear-gradient(160deg,#ffe2a8,#f6b25a)!important;display:grid;place-items:center}.ovthumb .rec{font-size:2.2rem}
 .obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
 .oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
-.objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
+.objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:6px;padding:9px 12px 12px;border-radius:20px;pointer-events:auto;
   background:rgba(30,24,16,.86);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:omIn .16s ease}
 .objmenu.on{display:flex}.objmenu::before{content:"";position:absolute;top:-7px;left:50%;margin-left:-7px;border:7px solid transparent;border-top:0;border-bottom-color:rgba(30,24,16,.86)}
-.objmenu b{color:#ffe9b8;font:700 .78rem Fredoka,Nunito,sans-serif}.objmenu div{display:flex;gap:6px}
-.objmenu button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px;padding:5px 8px;border:0;border-radius:12px;color:#3a2410;font:700 .72rem Fredoka,Nunito,sans-serif;
-  background:linear-gradient(180deg,#fff6dc,#f3d79a);box-shadow:inset 0 -3px 0 rgba(120,70,10,.25)}.objmenu button span{font-size:1.15rem;line-height:1.1}.objmenu button:active{transform:scale(.94)}
+.objmenu b{color:#ffe9b8;font:700 1.05rem Fredoka,Nunito,sans-serif}.objmenu div{display:flex;gap:9px}
+.objmenu button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:80px;padding:8px 12px;border:0;border-radius:15px;color:#3a2410;font:700 .98rem Fredoka,Nunito,sans-serif;
+  background:linear-gradient(180deg,#fff6dc,#f3d79a);box-shadow:inset 0 -3px 0 rgba(120,70,10,.25)}.objmenu button span{font-size:1.7rem;line-height:1.1}.objmenu button:active{transform:scale(.94)}
 @keyframes omIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 #root_v8,#root_v8 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #root_v8 input,#root_v8 textarea,#root_v8 [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "107";
+const VERSION = "108";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -2714,6 +2714,9 @@ async function visitFarm(fuid, job) {
   if (fuid === BOT_UID) { closeAll(); closeProfile(); workJob = null; enterScene({ kind: "visit", owner: BOT_UID, farm: botFarm(), job: false });
     const tick = setInterval(() => { if (!alive() || scene.kind !== "visit" || scene.owner !== BOT_UID) { clearInterval(tick); return; } scene.farm = botFarm(); renderPlots(); renderFences(); }, 20000);
     visitUnsub = () => clearInterval(tick); return; }
+  if (isBotUid(fuid)) { const b = botDef(fuid); if (!b) return; closeAll(); closeProfile(); workJob = null; enterScene({ kind: "visit", owner: fuid, farm: botFarmOf(b), job: false });
+    const tick = setInterval(() => { if (!alive() || scene.kind !== "visit" || scene.owner !== fuid) { clearInterval(tick); return; } scene.farm = botFarmOf(b); renderPlots(); renderFences(); }, 20000);
+    visitUnsub = () => clearInterval(tick); return; }
   if (!db || !uid) return;
   let snap;
   try { snap = await db.doc("players/" + fuid).get(); } catch (e) { hint("Çiftliğe şu an ulaşılamıyor."); return; }
@@ -3258,6 +3261,7 @@ const ZOOM_MAX = 1.55;
 let ZOOM = 1; try { ZOOM = Math.max(.45, Math.min(ZOOM_MAX, +localStorage.getItem("lucky-zoom") || 1)); } catch (e) {}
 const cam = { x: 0, y: 0, w: 1600, h: 900, follow: true, lastDrag: 0, vx: 0, vy: 0 };
 const DRAG_GAIN = 1.6;
+const zEff = () => Math.max(.3, ZOOM * (typeof scene !== "undefined" && scene && scene.kind === "plaza" ? .7 : 1));   // meydanda kamera daha yakın
 const svgEl = $("stage"), svgReal = $("farm");
 const rotated = () => !!(window.matchMedia && window.matchMedia("(orientation: portrait)").matches);
 function viewSize() {
@@ -3267,7 +3271,7 @@ function viewSize() {
 function mapBox() { return scene.kind === "plaza" ? { x: SX * CELL, y: SY * CELL, w: 40 * CELL, h: 22 * CELL } : { x: 0, y: 0, w: COLS * CELL, h: ROWS * CELL }; }
 function fitCam() {
   const v = viewSize();
-  cam.h = 9.4 * CELL * ZOOM; cam.w = cam.h * (v.w / Math.max(1, v.h));
+  cam.h = 9.4 * CELL * zEff(); cam.w = cam.h * (v.w / Math.max(1, v.h));
   clampCam();
 }
 function clampCam() {
@@ -3587,7 +3591,7 @@ function syncPeers(list, announce) {
     }
     st.tx = tx; st.ty = ty; st.bk = !!pr.b; st.tool = pr.s === "plaza" ? "scythe" : ["scythe", "scythe", "escythe", "tractor", "seeder"][+pr.t] || "scythe"; st.moving = !!pr.m; st.lvl = +pr.l || 1;
   }
-  for (const [k, st] of peers) if (!seen.has(k)) { st.el.remove(); peers.delete(k); }
+  for (const [k, st] of peers) if (!seen.has(k) && !st.bot) { st.el.remove(); peers.delete(k); }
   const ids = new Set(lastPeers.filter(p => p.kind === "viewer").map(p => p.by || (p.presence && p.presence.u) || p.peer));
   onlineCount = Math.max(1, ids.size); renderOnline();
 }
@@ -3599,6 +3603,7 @@ function renderOnline() {
   if (h !== onlineHtml) { onlineHtml = h; $("online").innerHTML = h; }
 }
 function whereIs(fuid) {
+  if (isBotUid(fuid)) { const b = botDef(fuid); return b ? botWhere(b) : null; }
   for (const p of lastPeers) if (!p.isMe && (p.by || (p.presence && p.presence.u)) === fuid) return (p.presence && p.presence.s) || "online";
   return null;
 }
@@ -4393,8 +4398,89 @@ function makeAdminFarm() {
   S.pos = null; saveNow();
 }
 const pcache = new Map();
+// ---------- Bot çiftçiler: kendi çiftliği olan, meydanda gezen, sıralamada yer alan 10 sanal oyuncu (sunucuya yazmaz) ----------
+const BOT_T0 = Date.UTC(2026, 9, 11);
+const BOT_DEFS = [
+  { id: "luckybot-1", name: "Zeynep", g: "k", lv: 6, days: 3, wxp: 900, ms: 2 }, { id: "luckybot-2", name: "Mehmet58", g: "e", lv: 9, days: 4, wxp: 1500, ms: 2 },
+  { id: "luckybot-3", name: "Aylin", g: "k", lv: 12, days: 5, wxp: 2100, ms: 3 }, { id: "luckybot-4", name: "BuğdayKral", g: "e", lv: 15, days: 5, wxp: 2800, ms: 4 },
+  { id: "luckybot-5", name: "Selin34", g: "k", lv: 8, days: 3, wxp: 1200, ms: 2 }, { id: "luckybot-6", name: "Kemal", g: "e", lv: 19, days: 6, wxp: 3600, ms: 5 },
+  { id: "luckybot-7", name: "NarGül", g: "k", lv: 23, days: 7, wxp: 4300, ms: 6 }, { id: "luckybot-8", name: "Toprak", g: "e", lv: 27, days: 8, wxp: 5200, ms: 7 },
+  { id: "luckybot-9", name: "Deniz", g: "k", lv: 14, days: 4, wxp: 2500, ms: 3 }, { id: "luckybot-10", name: "Çiftçi Ali", g: "e", lv: 31, days: 9, wxp: 6200, ms: 8 },
+];
+const isBotUid = u => typeof u === "string" && u.startsWith("luckybot-");
+const botDef = u => BOT_DEFS.find(b => b.id === u) || null;
+const botLevel = b => Math.min(MAX_LEVEL, b.lv + Math.floor(Math.max(0, Date.now() - BOT_T0) / (86400000 * b.days)));
+const botIdx = b => BOT_DEFS.indexOf(b);
+// who is where: every bot spends part of the time in the plaza, part on its own farm and part away
+const botSlot = b => (Math.floor(Date.now() / (12 * 60000)) + botIdx(b) * 3) % 5;
+const botWhere = b => { const k = botSlot(b); return k < 2 ? "plaza" : k === 2 ? "farm:" + b.id : null; };
+const botInfo = b => ({ name: b.name, g: b.g, level: botLevel(b), plots: [], trees: [], fences: [], decor: [], spr: [], store: {}, layout: {} });
+function botRng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const botFarmCacheMap = new Map();
+function botFarmOf(b) {
+  const c = botFarmCacheMap.get(b.id); if (c && Date.now() - c.t < 20000) return c.f;
+  const f = designPlayerBot(b); botFarmCacheMap.set(b.id, { f, t: Date.now() }); return f;
+}
+function designPlayerBot(b) {
+  const now = Date.now(), lv = botLevel(b), rnd = botRng(botIdx(b) * 7919 + 13);
+  const size = Math.min(EXPAND_STEPS.filter(x => x[0] <= lv).length, b.ms);
+  const layout = Object.assign({}, DEFAULT_LAYOUT);
+  if (lv >= 3) layout.oven = at(5, 12);
+  if (lv >= COOP_LEVEL) layout.coop = at(5, 4);
+  const taken = new Set(); for (const k in OBJ) fpCells(k, layout[k]).forEach(c => taken.add(c));
+  taken.add(doorOf({ layout })); barnDoors({ layout }).forEach(c => taken.add(c));
+  const f0 = { size, level: lv }, cells = [];
+  for (let i = 0; i < COLS * ROWS; i++) if (inOwned(f0, i) && canBase(i) && !taken.has(i)) cells.push(i);
+  const cr = Math.floor(OY + 4), cc = OX + 7, dist = i => Math.hypot((rowOf(i) - cr) * 1.5, colOf(i) - cc);
+  const ok = i => rowOf(i) % 6 !== 5 && colOf(i) % 8 !== 7;
+  const want = Math.min(PLOT_CAP, 6 + Math.round(landMax({ level: lv }) * (.55 + .35 * rnd())));
+  const crops = CROP_KEYS.filter(k => CROPS[k].lv <= lv);
+  const field = cells.filter(ok).sort((a, c) => dist(a) - dist(c)).slice(0, want);
+  const plots = field.map((i, n) => { const crop = crops[(Math.floor(colOf(i) / 8) + Math.floor(rowOf(i) / 6) + botIdx(b)) % crops.length], ms = CROPS[crop].ms, cyc = ms * 1.6, el = (now + n * 7919 + botIdx(b) * 104729) % cyc;
+    return { cell: i, c: crop, p: now - el, w: n % 9 === 0 && el < ms * .3 ? 0 : now - el }; });
+  field.forEach(i => taken.add(i));
+  const rest = cells.filter(i => !taken.has(i));
+  const edge = rest.filter(i => { const r = rowOf(i), c = colOf(i); return (r + c) % 3 === 0 && (r === OWN[size][0] || c === OWN[size][2] || c === OWN[size][3]); });
+  const trees = edge.slice(0, 3 + Math.floor(lv / 2)).map((i, n) => { taken.add(i); return { cell: i, t: now - ((now + n * 1237) % (TREE_MS * 1.5)) }; });
+  const keys = Object.keys(DECOR).filter(k => k !== "stall"), near = rest.filter(i => !taken.has(i) && dist(i) > 3 && dist(i) < 14).sort(() => rnd() - .5);
+  const decor = near.slice(0, Math.min(28, 2 + Math.floor(lv * .9))).map((i, n) => { taken.add(i); return { t: keys[(n * 5 + botIdx(b)) % keys.length], cell: i }; });
+  const spr = lv >= 12 ? near.filter(i => !taken.has(i)).slice(0, 2 + Math.floor(lv / 12)).map(i => ({ cell: i, w: 30 })) : [];
+  const hens = layout.coop >= 0 ? Array.from({ length: COOP_CAP }, () => ({ f: now })) : [];
+  const f = cleanFarm({ name: b.name, level: lv, g: b.g, well: Math.min(WELL_MAX, 1 + Math.floor(lv / 10)), size, mapv: MAPV, plots, trees, fences: [], decor, spr, layout, landBought: Math.max(0, plots.length - 6),
+    chickens: hens, cows: [], rot: {}, store: { wheat: 40 + lv * 7, bread: lv * 3 }, ovenLv: { oven: Math.min(OVEN_MAX, 1 + Math.floor(lv / 15)) }, sprLv: Math.min(SPR_MAX, 1 + Math.floor(lv / 12)) });
+  f.decor = decor; f.spr = spr; return f;
+}
+const botRankRow = b => { const L = botLevel(b), wk = weekKey(), mk = monthKey(), frac = Math.min(1, (Date.now() % 604800000) / 604800000) * .8 + .2, w = Math.round(b.wxp * frac * (1 + (L % 5) / 20));
+  return { id: b.id, name: b.name, g: b.g, level: L, xp: Math.round(xpNeed(L) * ((botIdx(b) * 37 % 80 + 10) / 100)), adm: false, w: { k: wk, v: w }, m: { k: mk, v: Math.round(w * 3.4) } }; };
+// bots walk around the plaza while the player is there
+const botPeers = new Map(); const BOT_SAY = ["Merhaba!", "Bugün hasat güzel", "Kimse dilek tuttu mu?", "Fırın harika", "Selam çiftçiler", "Ekinler olgunlaştı", "Pazar bugün canlı"];
+function botTick() {
+  if (!entered || scene.kind !== "plaza") { if (botPeers.size) botPeers.clear(); return; }
+  const blocked = curBlocked(), here = new Set();
+  for (const b of BOT_DEFS) {
+    if (botWhere(b) !== "plaza") continue; here.add(b.id);
+    let st = peers.get("bot:" + b.id);
+    if (!st) {
+      let c = null; for (let k = 0; k < 40 && c == null; k++) { const i = idx(SY + 2 + Math.floor(Math.random() * 18), SX + 2 + Math.floor(Math.random() * 36)); if (!blocked(i)) c = i; }
+      if (c == null) continue;
+      st = { id: "bot:" + b.id, bot: b, x: colOf(c), y: rowOf(c), tx: colOf(c), ty: rowOf(c), face: 1, g: b.g, name: b.name, uid: b.id, el: makeChar(b.g, b.name, false, b.id), path: [], wait: 0, lvl: botLevel(b), tool: "scythe" };
+      peers.set(st.id, st);
+    }
+    if (Math.abs(st.x - st.tx) < .02 && Math.abs(st.y - st.ty) < .02) {
+      if (st.path.length) { const n = st.path.shift(); st.tx = colOf(n); st.ty = rowOf(n); st.moving = true; }
+      else { st.moving = false; if (--st.wait <= 0) {
+        st.wait = 8 + Math.floor(Math.random() * 40);
+        if (Math.random() < .12) setBubble(st, BOT_SAY[Math.floor(Math.random() * BOT_SAY.length)]);
+        let g = null; for (let k = 0; k < 12 && g == null; k++) { const i = idx(SY + 1 + Math.floor(Math.random() * 20), SX + 1 + Math.floor(Math.random() * 38)); if (!blocked(i)) g = i; }
+        if (g != null) { const p = bfs(idx(Math.round(st.y), Math.round(st.x)), new Set([g]), blocked); if (p && p.length < 30) st.path = p; } } }
+    }
+  }
+  for (const [k, st] of peers) if (st.bot && !here.has(st.bot.id)) { st.el.remove(); peers.delete(k); }
+}
+setInterval(() => { try { if (alive()) botTick(); } catch (e) {} }, 220);
 async function getPlayer(puid, fresh) {
   if (puid === BOT_UID) return botFarm();
+  if (isBotUid(puid)) { const b = botDef(puid); return b ? botInfo(b) : null; }
   const c = pcache.get(puid);
   if (c && !fresh && Date.now() - c.t < 30000) return c.d;
   try { const s = await db.doc("players/" + puid).get(); const d = s.exists ? cleanFarmFull(s.data()) : null; pcache.set(puid, { d, t: Date.now() }); return d; }
@@ -4428,6 +4514,7 @@ function handleOut() {
   refreshFriendsIfOpen();
 }
 async function sendRequest(to) {
+  if (isBotUid(to) && S && !isFriend(to)) { const b = botDef(to); S.friends.push(to); save(); hint((b ? b.name : "Çiftçi") + " arkadaşlık isteğini kabul etti."); return; }
   if (!db || !uid || to === uid || isFriend(to)) return;
   const inc = inPending(to);
   if (inc) return accept(inc);
@@ -4445,6 +4532,7 @@ async function reject(r) { try { await db.doc("friendreq/" + r.id).delete(); } c
 async function removeFriend(f) {
   if (f === BOT_UID) return;
   S.friends = S.friends.filter(x => x !== f); save();
+  if (isBotUid(f)) { hint("Arkadaş listenden çıkarıldı."); return; }
   try { await db.doc(reqPath(uid, f)).set({ from: uid, to: f, status: "removed", ts: Date.now() }); } catch (e) {}
   hint("Arkadaş listenden çıkarıldı.");
 }
@@ -4469,13 +4557,13 @@ function addBtnFor(f) {
 async function renderFriends() {
   document.querySelectorAll("[data-ftab]").forEach(b => b.setAttribute("aria-selected", b.getAttribute("data-ftab") === ftab));
   const body = $("friendsBody");
-  if (!db || !uid || !online) { body.innerHTML = personRow(BOT_UID, botFarm(), `<button class="big green sm" data-visit="${BOT_UID}">Ziyaret et</button>`) + `<p class="empty">Diğer arkadaşlar için oyunun bir sunucuya bağlı olması gerekiyor.</p>`; return; }
+  if (!db || !uid || !online) { body.innerHTML = personRow(BOT_UID, botFarm(), `<button class="big green sm" data-visit="${BOT_UID}">Ziyaret et</button>`) + S.friends.filter(isBotUid).map(f => personRow(f, botInfo(botDef(f)), `<button class="big green sm" data-visit="${f}">Ziyaret et</button>`)).join("") + `<p class="empty">Diğer arkadaşlar için oyunun bir sunucuya bağlı olması gerekiyor.</p>`; return; }
   if (ftab === "list") {
     if (!S.friends.length) { body.innerHTML = `<p class="empty">👥<br>Henüz arkadaşın yok. Meydanda bir çiftçiye dokun ya da Oyuncu ara sekmesinden bul.</p>`; return; }
     if (!body.querySelector(".frow")) body.innerHTML = `<p class="empty">Arkadaşların yükleniyor</p>`;
     const infos = await Promise.all(S.friends.map(f => getPlayer(f).then(d => [f, d])));
     if (ftab !== "list") return;
-    body.innerHTML = infos.map(([f, d]) => personRow(f, d, `<button class="big green sm" data-visit="${esc(f)}">Ziyaret et</button><button class="big sm" data-dm="${esc(f)}">Mesaj</button>`)).join("");
+    body.innerHTML = infos.map(([f, d]) => personRow(f, d, `<button class="big green sm" data-visit="${esc(f)}">Ziyaret et</button>${isBotUid(f) ? "" : `<button class="big sm" data-dm="${esc(f)}">Mesaj</button>`}`)).join("");
   } else if (ftab === "req") {
     const inc = reqIn.filter(r => r.status === "pending"), out = reqOut.filter(r => r.status === "pending");
     let h = `<h3 class="sub">Sana gelen istekler</h3>`;
@@ -4507,7 +4595,7 @@ async function renderFriends() {
 function renderFindList() {
   const box = $("findList"); if (!box || !allPlayers) return;
   const q = findQ.trim().toLocaleLowerCase("tr");
-  const list = [[BOT_UID, botFarm()], ...allPlayers.filter(([f]) => f !== BOT_UID)].filter(([, d]) => !q || d.name.toLocaleLowerCase("tr").includes(q)).sort((a, b) => b[1].level - a[1].level).slice(0, 30);
+  const list = [[BOT_UID, botFarm()], ...BOT_DEFS.map(b => [b.id, botInfo(b)]), ...allPlayers.filter(([f]) => f !== BOT_UID)].filter(([, d]) => !q || d.name.toLocaleLowerCase("tr").includes(q)).sort((a, b) => b[1].level - a[1].level).slice(0, 30);
   box.innerHTML = list.length ? list.map(([f, d]) => personRow(f, d, addBtnFor(f))).join("")
     : `<p class="empty">${q ? "Bu adla bir çiftçi bulunamadı." : "Henüz başka çiftçi yok. Bağlantıyı arkadaşlarınla paylaş."}</p>`;
 }
@@ -4533,7 +4621,7 @@ let profileUid = null;
 async function openProfile(puid) {
   try { ANALYTICS.log("screen_view", { s: "profile" }); } catch (e) {}
   if (!puid || puid === uid || !S) return;
-  if (puid !== BOT_UID && (!db || !online)) { hint("Profiller için oyunun sunucuya bağlı olması gerekiyor."); return; }
+  if (puid !== BOT_UID && !isBotUid(puid) && (!db || !online)) { hint("Profiller için oyunun sunucuya bağlı olması gerekiyor."); return; }
   profileUid = puid;
   $("profile").classList.add("on");
   $("pfName").textContent = "Çiftçi"; $("pfInfo").textContent = "Yükleniyor"; $("pfBtns").innerHTML = ""; $("pfAv").innerHTML = "";
@@ -4551,7 +4639,7 @@ async function openProfile(puid) {
   else if (inPending(puid)) h = `<button class="big green" data-accept="${esc(puid)}">İsteği kabul et</button>`;
   else h = `<button class="big green" data-add="${esc(puid)}">Arkadaş ekle</button>`;
   if (visitorHere(puid)) h += `<button class="big kick" data-kick="${esc(puid)}">Çiftlikten kov</button>`;
-  if (puid !== BOT_UID) h += `<button class="big" data-sendgift="${esc(puid)}">🎁 Hediye gönder</button>`;
+  if (puid !== BOT_UID && !isBotUid(puid)) h += `<button class="big" data-sendgift="${esc(puid)}">🎁 Hediye gönder</button>`;
   $("pfBtns").innerHTML = h;
 }
 function closeProfile() { $("profile").classList.remove("on"); profileUid = null; }
@@ -5906,7 +5994,7 @@ async function openRank() {
 }
 function renderRank() {
   document.querySelectorAll("#rankSeg_v8 [data-rk]").forEach(b => b.setAttribute("aria-pressed", b.getAttribute("data-rk") === rankTab));
-  const wk = weekKey(), mk = monthKey(), list = (rankCache || []).map(x => Object.assign({}, x));
+  const wk = weekKey(), mk = monthKey(), list = (rankCache || []).concat(BOT_DEFS.map(botRankRow)).map(x => Object.assign({}, x));
   // my own row uses the live numbers
   const mine = list.find(x => x.id === uid); if (mine && S) { mine.level = S.level; mine.xp = S.xp; mine.w = S.xpW; mine.m = S.xpM; mine.name = S.name; }
   let rows;
@@ -5922,6 +6010,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 108, d: "11 Ekim 2026", e: "🏘️", t: "Daha canlı meydan", c: "#3a7a3e", b: "#e2f3dc", items: [
+    "Meydandaki kamera biraz daha yakın, her şey daha net görünüyor.",
+    "Çiftlikteki depo, kümes ve ahır gibi yapıların menüsü ve üstündeki bildirimler daha büyük.",
+    "Meydan ve çiftlikler yeni çiftçilerle daha kalabalık: onların çiftliklerini ziyaret edebilir, arkadaş ekleyebilir, sıralamada görebilirsin.",
+  ] },
   { v: 107, d: "11 Ekim 2026", e: "🎓", t: "Depo, araç fiyatları ve yeni görevler", c: "#8a3a2e", b: "#f9e3dc", items: [
     "Depoyu yükseltmek için çiftlikteki <b>depoya dokun</b> ve <b>Yükselt</b>'i seç. Gerekenler eksikse sana söyler.",
     "Araç fiyatları: Ekim aleti 1.000, Elektrikli tırpan 2.500, Traktör 20.000 altın.",
@@ -7501,7 +7594,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     world.add(buildPazarBanner());
     world.add(buildJobBoard()); proxy(colOf(P_JOBS[1]), .7, rowOf(P_JOBS[0]) + .6, 2, 1.4, 1, P_JOBS[0]);
     const n = openJobs.filter(j => j.owner !== uid).length;
-    if (n) { const s = sprite(badgeTex(n, "jobs"), .7, .35); s.position.set(colOf(P_JOBS[1]) + .9, 1.65, rowOf(P_JOBS[0]) + .6); world.add(s); }
+    if (n) { const s = sprite(badgeTex(n, "jobs"), 1.05, .52); s.position.set(colOf(P_JOBS[1]) + .9, 1.65, rowOf(P_JOBS[0]) + .6); world.add(s); }
   }
   function buildFarm(f, now, part) {
     const L = f.layout, home = scene.kind === "home", isMe = f === S;
@@ -7543,13 +7636,13 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     fog3(f);
   }
   function farmDyn(f, now, L, home, isMe) {
-    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), .7, .35); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
+    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), 1.05, .52); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
     if (isMe) {
       [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
         const em = I.ready ? e : I.hungry && I.hungry === I.n ? "🍽️" : null; if (!em) return;
-        const sp = sprite(emojiBadge(em, I.ready || 0), .8, .8); sp.position.set(colOf(L[k]) + o.w / 2, 1.9 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
-      if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), .75, .75); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
-      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), .8, .8); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
+        const sp = sprite(emojiBadge(em, I.ready || 0), 1.2, 1.2); sp.position.set(colOf(L[k]) + o.w / 2, 2.25 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
+      if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), 1.15, 1.15); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
+      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
     }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });
@@ -8001,7 +8094,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   }
 
   // ---------- per frame ----------
-  let lastW = 0, lastH = 0, sceneSig = "", rsW = 0, rsH = 0, rsT = 0;
+  let lastZE = 0, lastW = 0, lastH = 0, sceneSig = "", rsW = 0, rsH = 0, rsT = 0;
   let charS = 1.2, shX = NaN, shZ = NaN;
   const D0 = 27, TILT = 1.02;   // camera distance (at zoom 1) and pitch (radians above the ground)
   R3.frame = t => {
@@ -8015,8 +8108,9 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     if (R3.dirty) { R3.dirty = false; rebuild(); renderer.shadowMap.needsUpdate = true; }
     // camera follows the same camera box the 2D view uses
     const tx = (cam.x + cam.w / 2) / CELL, tz = (cam.y + cam.h / 2) / CELL;
-    const D = D0 * ZOOM;
-    const tilt = TILT + Math.max(-.5, Math.min(.5, ZOOM - 1)) * .06;   // uzaklaşınca kamera hafif yükselir
+    const ZE = zEff(); if (ZE !== lastZE) { lastZE = ZE; try { fitCam(); } catch (e) {} }
+    const D = D0 * ZE;
+    const tilt = TILT + Math.max(-.5, Math.min(.5, ZE - 1)) * .06;   // uzaklaşınca kamera hafif yükselir
     camera.position.set(tx, Math.sin(tilt) * D, tz + Math.cos(tilt) * D); camera.lookAt(tx, 0, tz - .3);
     scene3.fog.near = D * .9; scene3.fog.far = D * 3;
     if (GFX.level > 0) {   // ışık rengi gün saatine göre kayar (seviye 0'da sabit kalır)
@@ -8025,7 +8119,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
       skyUpdate(t, tx, tz, (t / 1000 % DAY_SN) / DAY_SN);
     }
     // the shadow map is drawn only when the scene or the (snapped) light position changes, not every frame
-    const sb = Math.max(14, 22 * ZOOM) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
+    const sb = Math.max(14, 22 * zEff()) + 3; if (sc.right !== sb) { sc.left = -sb; sc.right = sb; sc.top = sb * .85; sc.bottom = -sb * .85; sc.updateProjectionMatrix(); renderer.shadowMap.needsUpdate = true; }
     const stx = Math.round(tx / 3) * 3, stz = Math.round(tz / 3) * 3;
     if (stx !== shX || stz !== shZ) { shX = stx; shZ = stz; sun.position.set(stx - 12, 17, stz - 6); sun.target.position.set(stx, 0, stz); sun.target.updateMatrixWorld(); renderer.shadowMap.needsUpdate = true; }
     // characters: bigger on big farms and when zoomed out, so the farmer never looks tiny
@@ -8307,7 +8401,7 @@ $id("achBtn_v8") && ($id("achBtn_v8").onclick = openAchModal);
 const cntAn = k => { try { return (S[ANIMALS[k].list] || []).length; } catch (e) { return 0; } };
 const ovenN = () => { try { return OVENS.filter(id => S[id]).length; } catch (e) { return 0; } };
 const ovenTop = () => { try { return Math.max(0, ...OVENS.map(id => (S.ovenLv && +S.ovenLv[id]) || 0)); } catch (e) { return 0; } };
-const friendCnt = () => { try { return (S.friends || []).filter(f => f !== BOT_UID).length; } catch (e) { return 0; } };
+const friendCnt = () => { try { return (S.friends || []).filter(f => f !== BOT_UID && !isBotUid(f)).length; } catch (e) { return 0; } };
 const ST = { level: () => S.level || 0, friends: friendCnt, chickens: () => cntAn("coop"), cows: () => cntAn("cowbarn"), ovenN, ovenTop, well: () => S.well || 0,
   spr: () => (S.spr || []).length, sprLv: () => S.sprLv || 0, depLv: () => S.depLv || 0, fences: () => S.fencesBought || 0, land: () => S.landBought || 0, decor: () => (S.decor || []).length };
 const ACH = [
