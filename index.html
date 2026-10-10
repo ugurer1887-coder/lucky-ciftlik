@@ -1310,7 +1310,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "124";
+const VERSION = "125";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1336,6 +1336,7 @@ const QUESTS = [
   { id: "sell", e: "💰", t: "Depoda sat", s: "Ürün sat", d: "<b>1.</b> Kırmızı <b>depoya</b> dokun.<br><b>2.</b> <b>Depo</b>'yu seç.<br><b>3.</b> Topladığın buğdayları sat. Altınla yeni tohum alırsın.", need: 6, gold: 6, xp: 3 },
   { id: "replant", ev: "plant", e: "🔁", t: "Tarlayı yenile", s: "Ekin ek", d: "Kazandığın altınla tekrar <b>Market &gt; Ekinler &gt; Buğday</b> al ve tarlayı yeniden ek. Ek, sula, topla, sat: çiftçiliğin döngüsü bu.", need: 6, gold: 6, xp: 3, go: "market", mk: { tab: "crops", card: "Buğday", msg: "👉 Yine <b>Buğday</b>'ı al ve tarlayı ek." } },
   { id: "oven", e: "🔥", t: "Taş fırın", s: "Fırın al", d: "<b>1.</b> <b>Market</b>'e gir.<br><b>2.</b> <b>Ocaklar</b> sekmesini aç.<br><b>3.</b> <b>Taş fırın</b>ı al, çiftliğinin önüne gelir. Sürükleyip istediğin yere koyabilirsin.", need: 1, gold: 8, xp: 4, go: "market", mk: { tab: "ovens", card: "Taş fırın", msg: "👉 <b>Taş fırın</b> kartındaki <b>Satın al</b>'a bas." }, chk: () => (S.oven && S.layout && S.layout.oven >= 0) ? 1 : 0 },
+  { id: "bakewheat", e: "🌾", t: "Ekmek için buğday", s: "Depoda buğday", d: "Ekmek 2 buğdaydan yapılır, depodaki buğdayları satmıştın. <b>Market &gt; Ekinler &gt; Buğday</b>'ı alıp tarlana yeniden ek, sula ve topla.", need: 2, gold: 4, xp: 2, go: "market", mk: { tab: "crops", card: "Buğday", msg: "👉 Yine <b>Buğday</b>'ı al, tarlayı ek, sula ve topla. Ekmek için 2 buğday lazım." }, chk: () => (S.tut.d.includes("bread") || S.tut.d.includes("bakestart") || bakeInfo(S, Date.now()).q > 0 || +S.store.bread > 0) ? 2 : (+S.store.wheat || 0) },
   { id: "bakestart", ev: "bakestart", e: "🔥", t: "İlk ekmek", s: "Ekmek pişir", d: "Fırına dokun, <b>Pişir</b>'e bas: 2 buğdaydan 1 ekmek olur (buğdayın yoksa tarlandan topla). Pişerken bekleme, sıradaki görevlere geç!", need: 1, gold: 6, xp: 3, chk: () => (S.tut.d.includes("bread") || bakeInfo(S, Date.now()).q > 0 || +S.store.bread > 0) ? 1 : 0 },
   { id: "tree", e: "🍎", t: "Elma ağacı", s: "Ağaç dik", d: "<b>1.</b> <b>Market &gt; Ekinler</b> sekmesine gir.<br><b>2.</b> Listenin sonundaki <b>Elma ağacı</b>'nı al.<br><b>3.</b> Boş bir yere dokunup dik. Ağaç kendi büyür, sulamaya gerek yok.", need: 1, gold: 8, xp: 4, go: "market", mk: { tab: "crops", card: "Elma ağacı", msg: "👉 Aşağıdaki <b>Elma ağacı</b>'nı al, sonra boş bir yere dokun." }, chk: () => (S.trees && S.trees.length) ? 1 : 0 },
   { id: "decor", e: "🌼", t: "Çiftliğini süsle", s: "Süs yerleştir", d: "<b>1.</b> <b>Market &gt; Dekor</b> sekmesine gir.<br><b>2.</b> <b>Ahşap çit</b> ya da bir süs al.<br><b>3.</b> Çiftliğinde boş bir yere dokun. Ziyarete gelenler görür.", need: 1, gold: 10, xp: 4, go: "market", mk: { tab: "decor", card: "Ahşap çit", msg: "👉 <b>Ahşap çit</b> ya da bir süs seç, sonra çiftliğine dokunarak koy." }, chk: () => ((S.fences && S.fences.length) || (S.decor && S.decor.length)) ? 1 : 0 },
@@ -1587,7 +1588,7 @@ function depotFullHint() { hint("Depo dolu! Ürün satarak yer aç ya da depoyu 
 const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
 const growMs = p => { const t = cropOf(p).ms / (typeof growMul === "function" ? growMul() : 1); return p.fw ? Math.min(t, 15000) : t; };   // the first crops of the tutorial grow in 15 s
-const tutFast = () => !!(S && S.tut && S.tut.i <= 4 && S.tut.i < QUESTS.length);
+const tutFast = () => !!(S && S.tut && S.tut.i < QUESTS.length && (S.tut.i <= 4 || QUESTS[S.tut.i].id === "bakewheat"));
 const ripe = p => !!(p && p.c && p.w && Date.now() - p.w >= growMs(p));
 // tools in the bottom bar: how many ripe crops one swing gathers
 const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 2500, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
@@ -5752,6 +5753,11 @@ function questTarget() {
     for (let r = Math.max(0, rowOf(m) - 8); r <= Math.min(ROWS - 1, rowOf(m) + 8); r++) for (let c = Math.max(0, colOf(m) - 8); c <= Math.min(COLS - 1, colOf(m) + 8); c++) { const i = idx(r, c); if (!freeCell(S, i, occ)) continue; const d = Math.hypot(r - rowOf(m) - 2, c - colOf(m)); if (d < bd) { bd = d; best = i; } }
     return best == null ? null : cell(best, .5, .5, .6, "Buraya dokun"); };
   if (q.id === "plant" || q.id === "replant") { if (mode !== "plant") return null; const p = plots.find(p => !p.c); return p ? cell(p.cell, .5, .5, .8, "Toprağa dokun") : null; }
+  if (q.id === "bakewheat") {
+    if (!plots.some(p => p.c)) { if (mode !== "plant") return null; const p = plots.find(p => !p.c); return p ? cell(p.cell, .5, .5, .8, "Toprağa dokun") : null; }
+    const dry = plots.find(p => p.c && !p.w); if (dry) return cell(dry.cell, .5, .5, .8, "Ekine dokun");
+    if (!HARVEST_TOOLS(S.slot)) return null; const rp = plots.find(p => ripe(p)) || plots.find(p => p.c); return rp ? cell(rp.cell, .5, .5, .9, ripe(rp) ? "Topla" : "Büyüyor...") : null;
+  }
   if (q.id === "water") { const p = plots.find(p => p.c && !p.w); return p ? cell(p.cell, .5, .5, .8, "Ekine dokun") : null; }
   if (q.id === "harvest") { if (!HARVEST_TOOLS(S.slot)) return null; const p = plots.find(p => ripe(p)) || plots.find(p => p.c); return p ? cell(p.cell, .5, .5, .9, ripe(p) ? "Topla" : "Büyüyor...") : null; }
   if (q.id === "sell") return L.barn >= 0 ? cell(L.barn, 1.5, 1, 2.2, "Depoya dokun") : null;
@@ -5774,7 +5780,7 @@ function questGuide() {
     }
     const q = tutOn() && S && entered ? questCur() : null, live = !!q && !questLocked(q) && !questReady(q) && !document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on");
     if (!live) return;
-    if (q.id === "harvest" && S.slot && !HARVEST_TOOLS(S.slot)) { const b = document.querySelector('#root_v8 .slot[data-slot]:not([data-slot=""])'); const sc = [...document.querySelectorAll("#root_v8 .slot[data-slot]")].find(e => HARVEST_TOOLS(e.getAttribute("data-slot"))); if (sc) sc.classList.add("qtarget"); }
+    if ((q.id === "harvest" || (q.id === "bakewheat" && S.plots.some(p => p.c && p.w))) && S.slot && !HARVEST_TOOLS(S.slot)) { const b = document.querySelector('#root_v8 .slot[data-slot]:not([data-slot=""])'); const sc = [...document.querySelectorAll("#root_v8 .slot[data-slot]")].find(e => HARVEST_TOOLS(e.getAttribute("data-slot"))); if (sc) sc.classList.add("qtarget"); }
     if (q.id === "daily") { const b = $("questBtn"); if (b) b.classList.add("qtarget"); }
     if (q.id === "sell" && false) return;
   } catch (e) {}
@@ -6220,6 +6226,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 125, d: "11 Ekim 2026", e: "🌾", t: "Ekmek için buğday", c: "#b9770e", b: "#fdf0d5", items: [
+    "Fırını aldıktan sonra depoda buğday yoksa yeni bir görev çıkıyor: tarlaya tekrar buğday ek, sula, topla. Depoda 2 buğday olunca ekmek görevi geliyor. Oklar bu adımları da gösteriyor.",
+  ] },
   { v: 124, d: "11 Ekim 2026", e: "📅", t: "Günlük görevler yolu", c: "#b9770e", b: "#fdf0d5", items: [
     "3. seviyeye ulaşınca günlük görevlerin yeri adım adım gösteriliyor: önce görev düğmesi, sonra Günlük sekmesi işaretleniyor.",
   ] },

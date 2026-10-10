@@ -219,3 +219,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v124
 - Seviye 3: `S.dg=1` -> `questGuide` önce #questBtn sonra Günlük sekmesini `.qtarget` ile işaretler, Günlük açılınca kapanır.
+
+## v125
+- Yeni görev `bakewheat` (oven sonrası): depoda <2 buğday varsa tekrar ek/sula/topla; ok mantığı questTarget içinde, tutFast bu görevde de açık. NOT: QUESTS sabitlerinde sonradan tanımlanan const kullanma (TDZ).
