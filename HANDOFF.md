@@ -177,3 +177,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v111
 - Meydan kamerası çarpanı 0.55; 3B isim etiketleri büyük/kalın çerçeveli, sis etkisiz.
+
+## v112
+- Rozetler çizilmiş simgeler: yumurta (kümes), süt kovası (ahır), yem çuvalı (ambar). `emojiBadge` içinde canvas ile çizilir (anahtar emo3).

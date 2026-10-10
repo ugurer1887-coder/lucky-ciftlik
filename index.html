@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "111";
+const VERSION = "112";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6019,6 +6019,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 112, d: "11 Ekim 2026", e: "🥛", t: "Yeni hayvan simgeleri", c: "#2e7a8a", b: "#dcf1f5", items: [
+    "İnek ahırının üstünde süt kovası, kümesin üstünde yumurta, ambarın üstünde yem çuvalı simgesi çıkıyor. Hepsi renkli ve belirgin.",
+  ] },
   { v: 111, d: "11 Ekim 2026", e: "🔍", t: "Daha yakın meydan, net isimler", c: "#2e6a8a", b: "#dceef7", items: [
     "Meydandaki kamera daha da yakınlaştı.",
     "Karakterlerin üstündeki isimler daha büyük, kalın ve koyu çerçeveli, uzaktan rahat okunuyor.",
@@ -6468,12 +6471,28 @@ function setup3D(T) {
     });
   }
   function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a" }[e] || "#ffd24a";
-    return canvasTex("emo2" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
+    return canvasTex("emo3" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
     x.fillStyle = "#3a2410"; x.beginPath(); x.arc(78, 78, 68, 0, 6.283); x.fill();
     x.fillStyle = "#fff"; x.beginPath(); x.arc(78, 78, 62, 0, 6.283); x.fill();
     x.fillStyle = col; x.beginPath(); x.arc(78, 78, 52, 0, 6.283); x.fill();
     x.fillStyle = "rgba(255,255,255,.35)"; x.beginPath(); x.ellipse(66, 52, 26, 12, -.5, 0, 6.283); x.fill();
-    x.font = "84px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(e, 78, 84);
+    x.lineJoin = "round"; x.lineCap = "round";
+    if (e === "🥚") {   // iki yumurta
+      const egg = (cx, cy, rx, ry, c1) => { x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, 6.283); x.fillStyle = c1; x.fill(); x.lineWidth = 5; x.strokeStyle = "#7a4a1c"; x.stroke(); x.fillStyle = "rgba(255,255,255,.7)"; x.beginPath(); x.ellipse(cx - rx * .35, cy - ry * .4, rx * .22, ry * .3, -.5, 0, 6.283); x.fill(); };
+      egg(94, 92, 20, 25, "#f4d9a8"); egg(62, 86, 23, 29, "#fff4dc");
+    } else if (e === "🥛") {   // süt kovası
+      x.beginPath(); x.arc(78, 62, 27, Math.PI, 0); x.lineWidth = 6; x.strokeStyle = "#4a4f55"; x.stroke();
+      x.beginPath(); x.moveTo(44, 62); x.lineTo(112, 62); x.lineTo(103, 108); x.quadraticCurveTo(78, 116, 53, 108); x.closePath(); x.fillStyle = "#b8c7d6"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#3d4650"; x.stroke();
+      x.beginPath(); x.ellipse(78, 62, 34, 9, 0, 0, 6.283); x.fillStyle = "#fffdf6"; x.fill(); x.stroke();
+      x.fillStyle = "#e0473a"; x.fillRect(50, 82, 56, 7); x.fillStyle = "rgba(255,255,255,.5)"; x.fillRect(56, 66, 6, 36);
+    } else if (e === "🌾") {   // yem çuvalı
+      x.beginPath(); x.moveTo(56, 50); x.quadraticCurveTo(78, 40, 100, 50); x.lineTo(112, 74); x.quadraticCurveTo(122, 100, 108, 112); x.quadraticCurveTo(78, 120, 48, 112); x.quadraticCurveTo(34, 100, 44, 74); x.closePath();
+      x.fillStyle = "#e0b968"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#6e4a1c"; x.stroke();
+      x.beginPath(); x.moveTo(50, 56); x.lineTo(44, 40); x.lineTo(60, 48); x.lineTo(70, 36); x.lineTo(80, 48); x.lineTo(92, 36); x.lineTo(98, 48); x.lineTo(112, 40); x.lineTo(106, 56); x.fillStyle = "#e0b968"; x.fill(); x.stroke();
+      x.beginPath(); x.moveTo(52, 60); x.quadraticCurveTo(78, 70, 104, 60); x.lineWidth = 7; x.strokeStyle = "#d23c2c"; x.stroke();
+      x.lineWidth = 4; x.strokeStyle = "#7a5a20"; x.beginPath(); x.moveTo(78, 108); x.lineTo(78, 78); x.stroke();
+      x.fillStyle = "#f2b400"; for (let k = 0; k < 3; k++) { x.beginPath(); x.ellipse(70, 94 - k * 9, 5, 8, -.6, 0, 6.283); x.fill(); x.beginPath(); x.ellipse(86, 94 - k * 9, 5, 8, .6, 0, 6.283); x.fill(); }
+    } else { x.font = "84px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(e, 78, 84); }
     if (n > 1) { x.fillStyle = "#3a2410"; x.beginPath(); x.arc(128, 30, 31, 0, 6.283); x.fill(); x.fillStyle = "#e0301f"; x.beginPath(); x.arc(128, 30, 26, 0, 6.283); x.fill(); x.fillStyle = "#fff"; x.font = "700 38px Fredoka, Nunito, sans-serif"; x.fillText(n > 99 ? "99" : String(n), 128, 32); } }); }
   function badgeTex(n, kind) {
     return canvasTex("bdg" + kind + n, 256, 128, (x, w, h) => {
