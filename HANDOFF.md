@@ -91,7 +91,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Kullanıcı isteğiyle pazar yerindeki bütün yazılar kaldırıldı (tente numarası/PAZAR, sabit boyutlu etiketler, sayaç, pankart yazısı). Pankartta sadece ürün emojileri var. Pazarda yazı eklemeyin.
 
 ## v96 (Lucky Farm)
-- Oyunun adı **Lucky Farm** (title, manifest, sw bildirim başlığı, yükleme ekranı "FARM", Android `app_name`; Android versionCode 8 / 1.0.7 – Play'e yeni paket yüklenmeli). Repo/site adı aynı.
+- Oyunun adı **Lucky Farm** (title, manifest, sw bildirim başlığı, yükleme ekranı "FARM", Android `app_name`; Android versionCode 9 / 1.0.8 (Play Billing açık) – Play'e yeni paket yüklenmeli). Repo/site adı aynı.
 - Tezgah üstünde yazısız sepet rozetleri (`stallBadge{n}`, sabit ekran boyutu).
 - Çimen: `scenery()` öbek öbek, yumuşak renkli kısa tutamlar; `paintGrass` açık/koyu yamalar ve kır çiçeği benekleri; detay dokusu daha hafif.
 - Dokunma parıltısı `R3.tapMark(x,z)` / `stepTap` (onCell'de çağrılır).
@@ -245,3 +245,4 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - HUD'da altının yanında Lucky parası (`S.lucky`) + "+" düğmesi; `#lucky_sh_v8` mağaza sayfası, 5 paket (`LUCKY_PKGS`: lucky_50/100/150/500/1000 = 19/37/49/179/349 TL).
 - `buyLucky`: Digital Goods API + PaymentRequest (Play Billing, TWA). Satın alma onaylanıp `consume` edilince `luckyGrant`; token `S.luckyTok` ile çift verilmeyi önler; `luckyRecover` açılışta tüketilmemiş alımları tamamlar.
 - Play Console'da aynı ID'lerle yönetilen ürünler oluşturulmalı. Sunucu doğrulaması YOK (client S.lucky yazılabilir) — para harcanan bir şey eklenmeden önce Netlify function ile doğrulama gerekir.
+- v131 Android: `android/` içine Play Billing köprüsü eklendi (`BillingDelegationService`, `billing:1.1.0`, PaymentActivity/PaymentService, BILLING izni); versionCode 9 / 1.0.8. GitHub Actions "Android paketi" yeni .aab derler; Play Console'a yüklenmeli. `billing` sürümü sandbox'ta derlenemedi, Actions hata verirse sürümü (1.0.1 / 1.0.0-alpha11) değiştir.

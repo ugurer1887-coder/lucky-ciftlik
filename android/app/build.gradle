@@ -13,8 +13,8 @@ android {
         applicationId "com.luckytr.ciftlik"
         minSdk 24
         targetSdk 36
-        versionCode 8
-        versionName "1.0.7"
+        versionCode 9
+        versionName "1.0.8"
     }
 
     signingConfigs {
@@ -44,4 +44,6 @@ android {
 dependencies {
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
     implementation 'androidx.browser:browser:1.8.0'
+    // Google Play Billing köprüsü (Digital Goods API)
+    implementation 'com.google.androidbrowserhelper:billing:1.1.0'
 }
