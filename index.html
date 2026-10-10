@@ -1310,7 +1310,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "123";
+const VERSION = "124";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1723,7 +1723,7 @@ const monthKey = () => { const d = new Date(); return d.getFullYear() + "-" + (d
 const lvlUnlockQueue = [];
 function unlocksAt(lv) {
   const u = [], add = (e, t) => u.push({ e, t });
-  if (lv === DAILY_LEVEL) add("📅", "Günlük görevler ve siparişler");
+  if (lv === DAILY_LEVEL) add("📅", "Günlük görevler ve siparişler (sağ üstteki görev düğmesinde)");
   if (lv === CHAT_LEVEL) { add("💬", "Genel sohbet"); add("⛲", "Dilek çeşmesi"); }
   if (lv === LAND_LEVEL) add("🟫", "Toprak satın alma (Market > Yükseltme)");
   if (lv === PAZAR_LEVEL) add("🛒", "Pazar: ürünlerini oyunculara sat");
@@ -1758,7 +1758,7 @@ function gainXp(n) {
   while (S.level < MAX_LEVEL && S.xp >= xpNeed(S.level)) {
     S.xp -= xpNeed(S.level); S.level++; SFX.play("levelup");
     toast("Seviye " + S.level);
-    renderChatFoot(); lvlUnlockQueue.push(S.level);
+    renderChatFoot(); lvlUnlockQueue.push(S.level); if (S.level === DAILY_LEVEL) S.dg = 1;
   }
   if (lvlUnlockQueue.length) setTimeout(showLevelUnlocks, 450);
   if (S.level >= MAX_LEVEL) { S.level = MAX_LEVEL; S.xp = 0; }
@@ -5764,8 +5764,15 @@ function questTarget() {
 function questGuide() {
   try {
     QG.t = questTarget();
-    const q = tutOn() && S && entered ? questCur() : null, live = !!q && !questLocked(q) && !questReady(q) && !document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on");
     document.querySelectorAll("#root_v8 .qtarget").forEach(e => e.classList.remove("qtarget"));
+    // new at level 3: show where the daily tasks live, step by step, until the player has opened them
+    if (S && entered && (S.dg || (tutOn() && questCur().id === "daily" && S.level >= DAILY_LEVEL))) {
+      const open = $("quests").classList.contains("on");
+      if (S.level < DAILY_LEVEL || (open && qtab === "daily")) { S.dg = 0; save(); }
+      else if (open) { const t = document.querySelector('#qtabs_v8 [data-qtab="daily"]'); if (t) t.classList.add("qtarget"); return; }
+      else if (!document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on")) { const b = $("questBtn"); if (b) b.classList.add("qtarget"); return; }
+    }
+    const q = tutOn() && S && entered ? questCur() : null, live = !!q && !questLocked(q) && !questReady(q) && !document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on");
     if (!live) return;
     if (q.id === "harvest" && S.slot && !HARVEST_TOOLS(S.slot)) { const b = document.querySelector('#root_v8 .slot[data-slot]:not([data-slot=""])'); const sc = [...document.querySelectorAll("#root_v8 .slot[data-slot]")].find(e => HARVEST_TOOLS(e.getAttribute("data-slot"))); if (sc) sc.classList.add("qtarget"); }
     if (q.id === "daily") { const b = $("questBtn"); if (b) b.classList.add("qtarget"); }
@@ -6213,6 +6220,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 124, d: "11 Ekim 2026", e: "📅", t: "Günlük görevler yolu", c: "#b9770e", b: "#fdf0d5", items: [
+    "3. seviyeye ulaşınca günlük görevlerin yeri adım adım gösteriliyor: önce görev düğmesi, sonra Günlük sekmesi işaretleniyor.",
+  ] },
   { v: 123, d: "11 Ekim 2026", e: "👇", t: "Görev okları", c: "#b9770e", b: "#fdf0d5", items: [
     "Başlangıç görevlerinde sıradaki adımı gösteren zıplayan ok geliyor: boş toprak, sulanacak ekin, depo, fırın, çeşme gibi dokunman gereken yerin üstünde ne yapacağın yazıyor.",
     "Tırpan seçmen, görev düğmesine basman gibi ekran düğmeleri sarı çerçeveyle işaretleniyor.",

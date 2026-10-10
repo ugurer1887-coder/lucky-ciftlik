@@ -216,3 +216,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v123
 - Görev oku: `questTarget()` dünya hedefi (QG.t), `drawNames` içinde `.qarrow` olarak çizilir; `questGuide()` 400ms'de `.qtarget` çerçevesi (tırpan slotu, görev düğmesi).
+
+## v124
+- Seviye 3: `S.dg=1` -> `questGuide` önce #questBtn sonra Günlük sekmesini `.qtarget` ile işaretler, Günlük açılınca kapanır.
