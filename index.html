@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "108";
+const VERSION = "109";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -3456,6 +3456,7 @@ function step() {
     me.bk = S && S.bucket > 0 && scene.kind === "home";
   }
   for (const st of peers.values()) {
+    if (st.bot && st.path.length && Math.hypot(st.tx - st.x, st.ty - st.y) < .01) { const n = st.path.shift(); st.tx = colOf(n); st.ty = rowOf(n); st.moving = true; }
     const dx = st.tx - st.x, dy = st.ty - st.y, d = Math.hypot(dx, dy);
     if (d > 3) { st.x = st.tx; st.y = st.ty; st.walking = false; }
     else if (d > .01) { const s2 = Math.max(SPEED * 1.15, d * 6) * dt; if (Math.abs(dx) > .01) st.face = dx < 0 ? -1 : 1; if (d <= s2) { st.x = st.tx; st.y = st.ty; } else { st.x += dx / d * s2; st.y += dy / d * s2; } st.walking = true; }
@@ -4452,28 +4453,36 @@ function designPlayerBot(b) {
 }
 const botRankRow = b => { const L = botLevel(b), wk = weekKey(), mk = monthKey(), frac = Math.min(1, (Date.now() % 604800000) / 604800000) * .8 + .2, w = Math.round(b.wxp * frac * (1 + (L % 5) / 20));
   return { id: b.id, name: b.name, g: b.g, level: L, xp: Math.round(xpNeed(L) * ((botIdx(b) * 37 % 80 + 10) / 100)), adm: false, w: { k: wk, v: w }, m: { k: mk, v: Math.round(w * 3.4) } }; };
-// bots walk around the plaza while the player is there
-const botPeers = new Map(); const BOT_SAY = ["Merhaba!", "Bugün hasat güzel", "Kimse dilek tuttu mu?", "Fırın harika", "Selam çiftçiler", "Ekinler olgunlaştı", "Pazar bugün canlı"];
+// bots spend their time around the wishing fountain and the market stalls; they stand still most of the time and make short, smooth walks
+const botPeers = new Map(); let botSpotsC = null;
+function botSpots() {
+  if (botSpotsC) return botSpotsC;
+  const bl = curBlockedPlaza, fo = [], st = [];
+  for (let r = 10 + SY - 2; r <= 12 + SY + 2; r++) for (let c = 18 + SX - 2; c <= 21 + SX + 2; c++) { const i = idx(r, c); if (!bl(i)) fo.push(i); }
+  for (const cc of [12, 16, 23, 27]) for (let r = 18 + SY - 2; r <= 18 + SY - 1; r++) for (let c = cc - 1; c <= cc + 1; c++) { const i = idx(r, c); if (!bl(i) && inPlaza(i)) st.push(i); }
+  return (botSpotsC = { fo, st });
+}
+const curBlockedPlaza = i => P_BLOCK.has(i) || !inPlaza(i);
 function botTick() {
-  if (!entered || scene.kind !== "plaza") { if (botPeers.size) botPeers.clear(); return; }
-  const blocked = curBlocked(), here = new Set();
+  if (!entered || scene.kind !== "plaza") return;
+  const here = new Set(), SP = botSpots();
   for (const b of BOT_DEFS) {
     if (botWhere(b) !== "plaza") continue; here.add(b.id);
+    const pool = botIdx(b) % 3 === 2 ? SP.st : botIdx(b) % 3 === 1 ? SP.fo : SP.fo.concat(SP.st);
     let st = peers.get("bot:" + b.id);
     if (!st) {
-      let c = null; for (let k = 0; k < 40 && c == null; k++) { const i = idx(SY + 2 + Math.floor(Math.random() * 18), SX + 2 + Math.floor(Math.random() * 36)); if (!blocked(i)) c = i; }
-      if (c == null) continue;
-      st = { id: "bot:" + b.id, bot: b, x: colOf(c), y: rowOf(c), tx: colOf(c), ty: rowOf(c), face: 1, g: b.g, name: b.name, uid: b.id, el: makeChar(b.g, b.name, false, b.id), path: [], wait: 0, lvl: botLevel(b), tool: "scythe" };
+      if (!pool.length) continue;
+      const c = pool[Math.floor(Math.random() * pool.length)];
+      st = { id: "bot:" + b.id, bot: b, x: colOf(c), y: rowOf(c), tx: colOf(c), ty: rowOf(c), face: Math.random() < .5 ? -1 : 1, g: b.g, name: b.name, uid: b.id, el: makeChar(b.g, b.name, false, b.id), path: [], wait: 15 + Math.floor(Math.random() * 120), lvl: botLevel(b), tool: "scythe" };
       peers.set(st.id, st);
     }
-    if (Math.abs(st.x - st.tx) < .02 && Math.abs(st.y - st.ty) < .02) {
-      if (st.path.length) { const n = st.path.shift(); st.tx = colOf(n); st.ty = rowOf(n); st.moving = true; }
-      else { st.moving = false; if (--st.wait <= 0) {
-        st.wait = 8 + Math.floor(Math.random() * 40);
-        if (Math.random() < .12) setBubble(st, BOT_SAY[Math.floor(Math.random() * BOT_SAY.length)]);
-        let g = null; for (let k = 0; k < 12 && g == null; k++) { const i = idx(SY + 1 + Math.floor(Math.random() * 20), SX + 1 + Math.floor(Math.random() * 38)); if (!blocked(i)) g = i; }
-        if (g != null) { const p = bfs(idx(Math.round(st.y), Math.round(st.x)), new Set([g]), blocked); if (p && p.length < 30) st.path = p; } } }
-    }
+    if (st.path.length || Math.hypot(st.tx - st.x, st.ty - st.y) > .02) continue;   // still walking
+    st.moving = false;
+    if (--st.wait > 0) continue;
+    st.wait = 60 + Math.floor(Math.random() * 160);   // 13 to 48 seconds of standing around
+    const g = pool[Math.floor(Math.random() * pool.length)];
+    const p = bfs(idx(Math.round(st.y), Math.round(st.x)), new Set([g]), curBlockedPlaza);
+    if (p && p.length && p.length < 16) { st.path = p; st.moving = true; }
   }
   for (const [k, st] of peers) if (st.bot && !here.has(st.bot.id)) { st.el.remove(); peers.delete(k); }
 }
@@ -6010,6 +6019,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 109, d: "11 Ekim 2026", e: "⛲", t: "Meydan düzeni", c: "#3a6a8a", b: "#e0eef7", items: [
+    "Meydandaki çiftçiler artık dilek çeşmesinin ve pazar tezgâhlarının çevresinde duruyor, daha az dolaşıyor ve akıcı yürüyor.",
+  ] },
   { v: 108, d: "11 Ekim 2026", e: "🏘️", t: "Daha canlı meydan", c: "#3a7a3e", b: "#e2f3dc", items: [
     "Meydandaki kamera biraz daha yakın, her şey daha net görünüyor.",
     "Çiftlikteki depo, kümes ve ahır gibi yapıların menüsü ve üstündeki bildirimler daha büyük.",
