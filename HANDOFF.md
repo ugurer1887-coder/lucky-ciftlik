@@ -247,3 +247,4 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Play Console'da aynı ID'lerle yönetilen ürünler oluşturulmalı. Sunucu doğrulaması YOK (client S.lucky yazılabilir) — para harcanan bir şey eklenmeden önce Netlify function ile doğrulama gerekir.
 - v131 Android: `android/` içine Play Billing köprüsü eklendi (`BillingDelegationService`, `billing:1.1.0`, PaymentActivity/PaymentService, BILLING izni); versionCode 9 / 1.0.8. GitHub Actions "Android paketi" yeni .aab derler; Play Console'a yüklenmeli. `billing` sürümü sandbox'ta derlenemedi, Actions hata verirse sürümü (1.0.1 / 1.0.0-alpha11) değiştir.
 - Android 1.0.9 (kod 10): Play, Billing Library 7.1.1'i reddetti (en az 8.0.0 istiyor) → `billing:1.2.0` + `com.android.billingclient:billing:8.0.0`.
+- Android 1.0.10 (kod 12): kod 10 Play'de zaten kullanılmıştı, atlandı.
