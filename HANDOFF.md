@@ -202,3 +202,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Fırın/araba "hazır" rozeti ürüne göre (🍞/🍟/🍦) `emojiBadge`.
 - Market: Toprak sekmesi kaldırıldı; `landPart()/landBind()` Geliştir sekmesinde (bölüm başlıkları `.msec`).
 - Sürüm/sunucu yazısı sadece admin; botlar `botWhere` ile 5-10 dk gelir/gider, daha az yürür.
+
+## v120
+- Balon y=2.6 (isim 1.72). Sulama XP yok; QUESTS'te `xp` + `mk` (market ipucu: `questMarketHint`, `marketOpenTab`). Odun %3.
+- `unlocksAt/showLevelUnlocks` (#lvlUp, her yere dokununca kapanır). `autoPlace(kind)`: satın alınan yapı oyuncunun önüne, move modunda seçili. `viewLayout()`: sürüklerken nesne parmakla gider.
+- Görev çubuğu: `[data-qarr]` oku, `.mini` = translateX ile sola çekilir.
