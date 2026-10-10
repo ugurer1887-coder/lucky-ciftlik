@@ -1181,7 +1181,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "100";
+const VERSION = "102";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1432,7 +1432,16 @@ const ANIMALS = {
   cowbarn: { list: "cows", one: "İnek", feed: "cowfeed", prod: "milk", prodName: "Süt", ms: MILK_MS, cap: COW_CAP, price: COW_PRICE, lv: COWBARN_LEVEL, cost: COWBARN_PRICE, emoji: "🐄", pe: "🥛" },
 };
 const BUILDINGS = ["coop", "cowbarn", "mill"];
-const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "chickfeed", "cowfeed"];
+const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "chickfeed", "cowfeed", "wood"];
+// depot: capacity per level (everything in the depot counts, one slot per item); level 2 costs gold + planks (tahta)
+const DEPOT_CAP = [100, 200], DEPOT_UP = [{ g: 600, wood: 4 }];
+const WOOD_CHANCE = 0.2, WOOD_CHANCE_LATE = 0.1, WOOD_LATE_LEVEL = 15, WOOD_MAX_PRICE = 400, WOOD_REF = 100;   // each harvested crop gives a plank with 20% chance, 10% once the farmer is above level 15; the plaza price is capped at 400 each
+const woodChance = f => (f && +f.level > WOOD_LATE_LEVEL ? WOOD_CHANCE_LATE : WOOD_CHANCE);
+const depLv = f => Math.max(1, Math.min(DEPOT_CAP.length, Math.floor(+(f && f.depLv) || 1)));
+const depCap = f => DEPOT_CAP[depLv(f) - 1];
+const depUsed = f => STORE_KEYS.reduce((a, k) => a + Math.max(0, Math.floor(+(f && f.store && f.store[k]) || 0)), 0);
+const depFree = f => Math.max(0, depCap(f) - depUsed(f));
+function depotFullHint() { hint("Depo dolu! Ürün satarak yer aç ya da depoyu geliştir."); }
 const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
 const growMs = p => cropOf(p).ms;
@@ -1476,7 +1485,7 @@ const $ = id => document.getElementById(id + "_v8");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 function newPlayer(name, g) {
-  return { name, g, gold: START_GOLD, xp: 0, level: 1, bucket: 0, fences: [], fencesBought: 0, friends: [], well: 1, store: Object.fromEntries(STORE_KEYS.map(k => [k, 0])), tools: ["scythe"], slot: "scythe",
+  return { name, g, gold: START_GOLD, xp: 0, level: 1, bucket: 0, fences: [], fencesBought: 0, friends: [], well: 1, depLv: 1, store: Object.fromEntries(STORE_KEYS.map(k => [k, 0])), tools: ["scythe"], slot: "scythe",
            plots: DEFAULT_SOIL.map(cell => ({ cell, c: null, p: 0, w: 0 })), landBought: 0, mapv: MAPV,
            layout: Object.assign({}, DEFAULT_LAYOUT), trees: [], size: 0,
            hire: { open: false, wage: 2 }, paidOut: 0, earned: {}, created: Date.now() };
@@ -1577,7 +1586,7 @@ function gainXp(n) {
   if (S.level >= MAX_LEVEL) { S.level = MAX_LEVEL; S.xp = 0; }
 }
 function checkBroke() {
-  if (S.gold < SEED_PRICE && S.plots.every(p => !p.c) && !(S.store && STORE_KEYS.some(k => k !== "bread" && +S.store[k] > 0)) && !(S.trees && S.trees.length)) { S.gold += 18; hint("Köy muhtarı sana 18 altın bıraktı."); }
+  if (S.gold < SEED_PRICE && S.plots.every(p => !p.c) && !(S.store && STORE_KEYS.some(k => k !== "bread" && k !== "wood" && +S.store[k] > 0)) && !(S.trees && S.trees.length)) { S.gold += 18; hint("Köy muhtarı sana 18 altın bıraktı."); }
 }
 
 // ---------- Characters ----------
@@ -1800,6 +1809,7 @@ function doAction(t) {
   }
   else if (t.k === "tree") {
     const tr = treeAt(S, t.cell); if (!treeRipe(tr)) return;
+    if (depFree(S) < 1) { depotFullHint(); return; }
     tr.t = now; S.store.apple = (+S.store.apple || 0) + 1; questEv("harvest", 1); dailyEv("harv:apple", 1); saveNow();
     try { gainXp(XP.apple); pop(t.cell, "+1 elma", "#ffb3a8"); } catch (e) { console.error(e); }
   }
@@ -1823,11 +1833,15 @@ function doAction(t) {
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
+      let full = false;
       taskCells(t).forEach(c => {
         const q = c == null ? null : plotAt(S, c); if (!ripe(q)) return;
+        if (depFree(S) < 1) { full = true; return; }
         const key = q.c; q.c = null; q.p = 0; q.w = 0; S.store[key] = (+S.store[key] || 0) + 1; questEv("harvest", 1); dailyEv("harv:" + key, 1);
         try { gainXp(XP[key] || XP.wheat); pop(c, "+1 " + CROPS[key].name.toLocaleLowerCase("tr"), "#ffe27a"); } catch (e) { console.error(e); }
+        if (depFree(S) >= 1 && Math.random() < woodChance(S)) { S.store.wood = (+S.store.wood || 0) + 1; setTimeout(() => { try { pop(c, "+1 tahta 🪵", "#f1c98a"); } catch (e) {} }, 450); }
       });
+      if (full) depotFullHint();
       saveNow();
     }
   }
@@ -2628,7 +2642,10 @@ function tapHome(i) {
     const q = queuedCells(); if (q.has(i)) return;
     const now = Date.now(), tasks = [current, ...queue].filter(Boolean);
     if (ripe(p)) {
-      const n = toolN(); if (!n) { needTool(); return; }
+      const tn = toolN(); if (!tn) { needTool(); return; }
+      const room = depFree(S) - tasks.filter(t => t.k === "harvest").reduce((a, t) => a + taskCells(t).length, 0);
+      if (room < 1) { depotFullHint(); return; }
+      const n = Math.min(tn, room);
       enqueue({ k: "harvest", cell: i, extras: pickExtras(S, i, c => ripe(plotAt(S, c)), n - 1) }); return;
     }
     if (!p.c) {
@@ -2674,7 +2691,9 @@ const ownedB = (farm, kind) => !!(farm && farm[kind]);
 const bLevel = kind => kind === "mill" ? MILL_LEVEL : ANIMALS[kind].lv, bPrice = kind => kind === "mill" ? MILL_PRICE : ANIMALS[kind].cost;
 function collectAnimals(kind) {
   const A = ANIMALS[kind], now = Date.now(); let n = 0;
-  animalsOf(S, kind).forEach(a => { if (a.f && now - a.f >= A.ms) { a.f = 0; n++; } });
+  let free = depFree(S), ready = 0;
+  animalsOf(S, kind).forEach(a => { if (a.f && now - a.f >= A.ms) { ready++; if (free > 0) { a.f = 0; n++; free--; } } });
+  if (ready && !n) { depotFullHint(); return 0; }
   if (!n) { const I = animalInfo(S, kind, now); hint(I.n ? (I.hungry === I.n ? "Hayvanların aç, önce yem ver." : A.prodName + " henüz hazır değil, " + fmt(I.next) + " kaldı.") : "Önce " + A.one.toLocaleLowerCase("tr") + " almalısın."); return 0; }
   S.store[A.prod] = (+S.store[A.prod] || 0) + n; gainXp(n * XP[A.prod]); dailyEv("prod:" + A.prod, n);
   popAt(colOf(S.layout[kind]) + 1, rowOf(S.layout[kind]), "+" + n + " " + A.prodName.toLocaleLowerCase("tr"), "#fff6c9");
@@ -2732,8 +2751,9 @@ $("farmbBody").addEventListener("click", e => {
     const n = Math.min(MILL_CAP, millAmt[k], ...Object.entries(F.need).map(([c, q]) => Math.floor((+S.store[c] || 0) / q))); if (n < 1) return;
     Object.entries(F.need).forEach(([c, q]) => S.store[c] -= n * q); S.millQ = { r: k, q: n, t0: Date.now() }; saveNow(); renderPlots(); toast(F.name + " yapılıyor ⚙️"); }
   else if (A("data-mtake")) { const I = millInfo(S, Date.now()); if (!I.done) return; const F = FEEDS[I.r];
-    S.store[I.r] = (+S.store[I.r] || 0) + I.done * F.out; S.millQ.q -= I.done; S.millQ.t0 += I.done * F.ms; if (S.millQ.q <= 0) S.millQ = null;
-    gainXp(I.done * XP.feed); dailyEv("feed", I.done * F.out); popAt(me.x, me.y - .3, "+" + I.done * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
+    const nb = Math.min(I.done, Math.floor(depFree(S) / F.out)); if (nb < 1) { depotFullHint(); return; }
+    S.store[I.r] = (+S.store[I.r] || 0) + nb * F.out; S.millQ.q -= nb; S.millQ.t0 += nb * F.ms; if (S.millQ.q <= 0) S.millQ = null;
+    gainXp(nb * XP.feed); dailyEv("feed", nb * F.out); popAt(me.x, me.y - .3, "+" + nb * F.out + " " + F.name.toLocaleLowerCase("tr"), "#fff6c9"); saveNow(); renderHud(); renderPlots(); }
   renderFarmB();
 });
 // ---------- Tap on a building / tree / decoration: a small action bar appears under it ----------
@@ -2845,14 +2865,30 @@ function needTool() { hint("Toplamak için alttaki çubuktan tırpanı ya da tra
 // the nearest other plots a multi-tool works on together with cell i
 function pickExtras(farm, i, okFn, n) {
   if (!(n > 0)) return [];
-  const q = queuedCells();
-  return farm.plots.filter(pl => pl.cell !== i && !q.has(pl.cell) && okFn(pl.cell))
-    .map(pl => [pl.cell, Math.abs(rowOf(pl.cell) - rowOf(i)) + Math.abs(colOf(pl.cell) - colOf(i))])
-    .sort((a, b) => a[1] - b[1]).slice(0, n).map(a => a[0]);
+  // only plots that touch cell i side by side (directly, or through other eligible plots) are worked together; a plot with a gap needs its own visit
+  const q = queuedCells(), plots = new Set(farm.plots.map(pl => pl.cell)), seen = new Set([i]), out = [], bq = [i];
+  while (bq.length && out.length < n) {
+    const c = bq.shift();
+    for (const [dr, dc] of DIRS) {
+      const r = rowOf(c) + dr, k = colOf(c) + dc; if (r < 0 || r >= ROWS || k < 0 || k >= COLS) continue;
+      const m = idx(r, k); if (seen.has(m)) continue; seen.add(m);
+      if (plots.has(m) && !q.has(m) && okFn(m)) { out.push(m); bq.push(m); if (out.length >= n) break; }
+    }
+  }
+  return out;
 }
 function selectTool(k) {
   if (!S.tools.includes(k) || scene.kind === "plaza") return;
+  const changed = S.slot !== k;
   S.slot = k; save(); renderHotbar(); sendPos(true);
+  if (changed) dropHarvestTasks();
+}
+// changing the tool in hand cancels harvests that were queued with the old tool (the one in progress has already been gathered)
+function dropHarvestTasks() {
+  if (![current, ...queue].some(t => t && t.k === "harvest")) return;
+  queue = queue.filter(t => t.k !== "harvest");
+  if (current && current.k === "harvest" && !me.busy) { me.onArrive = null; me.path = me.path.slice(0, 1); current = null; nextTask(); }
+  renderPlots(); hint("Toplama iptal edildi.");
 }
 function renderHotbar() {
   if (!S || !entered) return;
@@ -3820,9 +3856,9 @@ $("ovenBody").addEventListener("click", e => {
   if (A("data-oplus") !== null) { const k = +A("data-oplus"); ovenAmt[k]++; renderOven(); return; }
   if (A("data-omax") !== null) { const k = +A("data-omax"); ovenAmt[k] = 999; renderOven(); return; }
   if (A("data-oset")) { const [k, n] = A("data-oset").split(":").map(Number); ovenAmt[k] = n; renderOven(); return; }
-  if (A("data-otakeall")) { let got = 0; [0, 1].forEach(k => { const t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return; const key = I.r; S.store[key] = (+S.store[key] || 0) + I.done; t.q -= I.done; t.t0 += I.done * RECIPES[key].ms;
-      if (t.q <= 0) S.bakes[id][k] = null; gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done); dailyEv("bake:" + key, I.done); got += I.done; });
-    if (got) { popAt(me.x, me.y - .3, "+" + got + " depoya", "#ffe27a"); saveNow(); renderHud(); renderPlots(); } renderOven(); return; }
+  if (A("data-otakeall")) { let got = 0; [0, 1].forEach(k => { const t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return; const key = I.r, nb = Math.min(I.done, depFree(S)); if (nb < 1) return; S.store[key] = (+S.store[key] || 0) + nb; t.q -= nb; t.t0 += nb * RECIPES[key].ms;
+      if (t.q <= 0) S.bakes[id][k] = null; gainXp(nb * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", nb); dailyEv("bake:" + key, nb); got += nb; });
+    if (got) { popAt(me.x, me.y - .3, "+" + got + " depoya", "#ffe27a"); saveNow(); renderHud(); renderPlots(); } else depotFullHint(); renderOven(); return; }
   if (A("data-obake") !== null) {
     const k = +A("data-obake"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", R = RECIPES[rk]; if (trayOf(S, id, k)) return;
     if (rk === "fries" && !cropOpen("potato")) return;
@@ -3832,10 +3868,11 @@ $("ovenBody").addEventListener("click", e => {
   }
   if (A("data-otake") !== null) {
     const k = +A("data-otake"), t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return;
-    const key = I.r; S.store[key] = (+S.store[key] || 0) + I.done; t.q -= I.done; t.t0 += I.done * RECIPES[key].ms;
+    const key = I.r, nb = Math.min(I.done, depFree(S)); if (nb < 1) { depotFullHint(); return; }
+    S.store[key] = (+S.store[key] || 0) + nb; t.q -= nb; t.t0 += nb * RECIPES[key].ms;
     if (t.q <= 0) S.bakes[id][k] = null;
-    gainXp(I.done * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", I.done); dailyEv("bake:" + key, I.done);
-    popAt(me.x, me.y - .3, "+" + I.done + " " + RECIPES[key].name.toLocaleLowerCase("tr"), "#ffe27a");
+    gainXp(nb * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", nb); dailyEv("bake:" + key, nb);
+    popAt(me.x, me.y - .3, "+" + nb + " " + RECIPES[key].name.toLocaleLowerCase("tr"), "#ffe27a");
     saveNow(); renderHud(); renderPlots(); renderOven(); return;
   }
   if (A("data-oup")) {
@@ -3851,23 +3888,44 @@ const ovenIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-h
   <rect x="64" y="14" width="10" height="20" fill="#b5583d" stroke="#7d2f1c" stroke-width="2"/><rect x="62" y="11" width="14" height="5" rx="1.5" fill="#5e3226"/>
   <path d="M36 64v-12a14 14 0 0 1 28 0v12z" fill="#2a1a10" stroke="#e2dccf" stroke-width="4"/><path d="M42 64q2-10 6-12q-1 6 3 7q1-8 5-10q2 9 2 15z" fill="#ff8a1a"/><path d="M46 64q2-6 4-7q0 4 2 4q1-4 3-5q0 5 0 8z" fill="#ffe066"/>
   <circle cx="72" cy="6" r="4" fill="#e9e6e0" opacity=".7"/></svg>`;
-const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }];
+const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }, { key: "wood", name: "Tahta", price: 0, thumb: () => woodThumb() }];
 let dtab = "crops";
-const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "egg", "milk"] };
+const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "egg", "milk", "wood"] };
+const woodThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><g stroke="#6b4423" stroke-width="3" stroke-linejoin="round"><rect x="14" y="58" width="72" height="14" rx="2" fill="#c98f52"/><rect x="18" y="42" width="72" height="14" rx="2" fill="#d9a066"/><rect x="12" y="26" width="72" height="14" rx="2" fill="#bf8447"/></g><g stroke="#8a5a2e" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M24 33h30M60 31h16M28 49h22M62 51h20M22 65h26M58 66h18"/></g></svg>`;
+function depotHead() {
+  const cap = depCap(S), used = depUsed(S), lv = depLv(S), pct = Math.min(100, used / cap * 100).toFixed(0), full = used >= cap;
+  let h = `<div class="card"><div class="thumb" style="font-size:34px">📦</div><div><h3>Depo ${lv}. seviye</h3><p><span class="stock">${used}</span> / ${cap} yer dolu${full ? " · <b>DOLU</b>" : ""}</p><div style="height:8px;border-radius:6px;background:rgba(0,0,0,.18);overflow:hidden;margin:6px 0"><div style="height:100%;width:${pct}%;background:${full ? "#e0473a" : "#6cc04a"}"></div></div>`;
+  if (lv < DEPOT_CAP.length) {
+    const up = DEPOT_UP[lv - 1], haveW = +S.store.wood || 0, ok = S.gold >= up.g && haveW >= up.wood;
+    h += `<p class="keep">${lv + 1}. seviye: ${DEPOT_CAP[lv]} yer. Gerekenler: <b>${fmtG(up.g)} altın</b> ve <b>${up.wood} tahta</b> (sende ${haveW} tahta var). Tahta, ekinleri toplarken %${Math.round(woodChance(S) * 100)} şansla çıkar${S.level <= WOOD_LATE_LEVEL ? " (" + (WOOD_LATE_LEVEL + 1) + ". seviyeden sonra %" + Math.round(WOOD_CHANCE_LATE * 100) + ")" : ""}.</p><div class="row"><button class="big green sm" data-depup="1" ${ok ? "" : "disabled"}>${ok ? "Depoyu geliştir" : S.gold < up.g ? "Altının yetmiyor" : "Tahtan yetmiyor"}</button></div>`;
+  } else h += `<p class="keep">Depon en üst seviyede.</p>`;
+  return h + `</div></div>`;
+}
+function depotUpgrade() {
+  if (!S) return; adminTopUp();
+  const lv = depLv(S); if (lv >= DEPOT_CAP.length) return;
+  const up = DEPOT_UP[lv - 1];
+  if (S.gold < up.g) { hint("Depoyu geliştirmek için " + fmtG(up.g) + " altın gerekiyor."); return; }
+  if ((+S.store.wood || 0) < up.wood) { hint("Depoyu geliştirmek için " + up.wood + " tahta gerekiyor."); return; }
+  S.gold = round1(S.gold - up.g); S.store.wood -= up.wood; S.depLv = lv + 1;
+  saveNow(); renderHud(); renderDepot(); toast("Depon " + S.depLv + ". seviye oldu! Kapasite: " + depCap(S) + " 📦");
+}
 function renderDepot() {
   document.querySelectorAll("#depotTabs_v8 [data-dtab]").forEach(b => { const k = b.getAttribute("data-dtab"), n = DEPOT_TABS[k].reduce((a, x) => a + (+S.store[x] || 0), 0);
     b.setAttribute("aria-pressed", k === dtab); b.dataset.n = n; });
   const body = $("depotBody");
   if (dtab === "feeds") {
     const items = DEPOT_TABS.feeds.filter(k => (+S.store[k] || 0) > 0);
-    body.innerHTML = items.length ? items.map(k => `<div class="card"><div class="thumb">${feedThumb(k)}</div><div><h3>${FEEDS[k].name}</h3><p><span class="stock">${+S.store[k] || 0}</span> adet depoda</p>
+    body.innerHTML = depotHead() + (items.length ? items.map(k => `<div class="card"><div class="thumb">${feedThumb(k)}</div><div><h3>${FEEDS[k].name}</h3><p><span class="stock">${+S.store[k] || 0}</span> adet depoda</p>
       <p class="keep">Satılmaz, ${k === "chickfeed" ? "tavuklara" : "ineklere"} verilir. Bir yem bir hayvanı bir kez doyurur.</p></div></div>`).join("")
-      : `<p class="empty">Hiç yemin yok.<br>Yemi <b>Ambar</b>'da buğday ve mısırdan yaparsın, yapılan yemler buraya gelir.</p>`;
+      : `<p class="empty">Hiç yemin yok.<br>Yemi <b>Ambar</b>'da buğday ve mısırdan yaparsın, yapılan yemler buraya gelir.</p>`);
     return;
   }
   const items = PRODUCTS.filter(pr => DEPOT_TABS[dtab].includes(pr.key) && (+S.store[pr.key] || 0) > 0);
-  if (!items.length) { body.innerHTML = `<p class="empty">${dtab === "goods" ? "Burada ekmek, kızartma, yumurta ve süt gibi ürünler durur." : "Hasat ettiğin ekinler burada görünür, buradan satarsın."}</p>`; return; }
-  body.innerHTML = items.map(pr => { const n = +S.store[pr.key] || 0; return `<div class="card"><div class="thumb">${pr.thumb()}</div><div>
+  if (!items.length) { body.innerHTML = depotHead() + `<p class="empty">${dtab === "goods" ? "Burada ekmek, kızartma, yumurta, süt ve tahta gibi ürünler durur." : "Hasat ettiğin ekinler burada görünür, buradan satarsın."}</p>`; return; }
+  body.innerHTML = depotHead() + items.map(pr => { const n = +S.store[pr.key] || 0;
+    if (pr.key === "wood") return `<div class="card"><div class="thumb">${pr.thumb()}</div><div><h3>${pr.name}</h3><p><span class="stock">${n}</span> adet depoda</p><p class="keep">Depoya satılmaz. Pazar'da kendi koyduğun fiyatla satabilir ya da depoyu geliştirmek için kullanabilirsin.</p></div></div>`;
+    return `<div class="card"><div class="thumb">${pr.thumb()}</div><div>
     <h3>${pr.name}</h3>
     <p><span class="stock">${n}</span> adet depoda</p>
     <p>Tanesi <span class="price">${fmtG(pr.price)} altın</span>, hepsi ${fmtG(n * pr.price)} altın eder.</p>
@@ -3878,8 +3936,9 @@ const eggThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect 
 const milkThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M34 18h32v10l8 12v44a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V40l8-12z" fill="#fff" stroke="#5a7a9a" stroke-width="3" stroke-linejoin="round"/><path d="M26 54h48v16H26z" fill="#4f93d8"/><text x="50" y="66" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="12" fill="#fff">SÜT</text><rect x="32" y="12" width="36" height="8" rx="3" fill="#e0473a"/></svg>`;
 const feedThumb = k => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M28 30q22-10 44 0l6 52a6 6 0 0 1-6 6H28a6 6 0 0 1-6-6z" fill="${k === "cowfeed" ? "#e9d29a" : "#f3e2b4"}" stroke="#8a6a3a" stroke-width="3"/><path d="M30 30q20 8 40 0" fill="none" stroke="#8a6a3a" stroke-width="3"/><text x="50" y="68" text-anchor="middle" font-size="26">${FEEDS[k].emoji}</text></svg>`;
 $("depotBody").addEventListener("click", e => {
+  if (e.target.closest("[data-depup]")) { depotUpgrade(); return; }
   const b = e.target.closest("[data-sell]"); if (!b || !S) return;
-  const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr) return;
+  const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr || pr.key === "wood") return;
   const have = +S.store[pr.key] || 0, k = b.getAttribute("data-n") === "all" ? have : Math.min(1, have);
   if (!k) return;
   S.store[pr.key] = have - k; S.gold = round1(S.gold + k * pr.price); questEv("sell", k); dailyEv("sellg", k * pr.price);
@@ -3890,9 +3949,9 @@ $("depotBody").addEventListener("click", e => {
 // ---------- Pazar: players sell their products to each other on the plaza stalls ----------
 // market/{id}: { seller, sn: seller name, item, q, price, ts, buyer?, bn?: buyer name, bt? }
 // the seller's goods leave the depot when listed; the buyer marks the listing as bought (once), the seller's game collects the gold and removes it
-const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk"];
+const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "wood"];
 let pzShown = -1, pzAll = [], pzMine = [], pzTab = "buy", pzFilter = "all", pzForm = null, pzAllOn = false, pzMineOn = false, pzBusy = false, pzDenied = false;
-const pzVal = (k, q) => itemPrice(k) * q, pzMax = (k, q) => Math.max(10, Math.ceil(pzVal(k, q) * 3));
+const pzVal = (k, q) => itemPrice(k) * q, pzMax = (k, q) => k === "wood" ? WOOD_MAX_PRICE * q : Math.max(10, Math.ceil(pzVal(k, q) * 3));
 const pzThumb = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.thumb() : ""; };
 const pzAgo = ts => { const m = Math.max(0, Math.floor((Date.now() - (+ts || 0)) / 60000)); return m < 1 ? "az önce" : m < 60 ? m + " dk önce" : m < 1440 ? Math.floor(m / 60) + " sa önce" : Math.floor(m / 1440) + " gün önce"; };
 const pzOk = l => l && typeof l.seller === "string" && PAZAR_KEYS.includes(l.item) && +l.q > 0 && +l.price > 0;
@@ -3927,6 +3986,7 @@ async function pzBuy(id) {
     const cur = await db.doc("market/" + id).get(), d = cur.exists ? cur.data() : null;
     if (!pzOk(d) || d.buyer) { toast("Bu ürünü başka bir çiftçi aldı."); return; }
     if (S.gold < +d.price) { hint("Yeterli altının yok."); return; }
+    if (depFree(S) < Math.floor(+d.q)) { hint("Depoda yeterli yer yok. Önce yer aç ya da depoyu geliştir."); return; }
     await db.doc("market/" + id).update({ buyer: uid, bn: String(S.name || "Çiftçi").slice(0, 24), bt: Date.now() });
     S.gold = round1(S.gold - (+d.price)); S.store[d.item] = (+S.store[d.item] || 0) + Math.floor(+d.q);
     saveNow(); renderHud(); renderPlots(); coinBurst($("pazarBody"), 6);
@@ -3985,11 +4045,11 @@ function renderPazar() {
     if (!stock.length) h += `<p class="empty">Depoda satacak ürünün yok.</p><button class="big ghost" data-pzx="1">Vazgeç</button>`;
     else {
       if (!stock.includes(pzForm.k)) Object.assign(pzForm, { k: stock[0], q: Math.min(+S.store[stock[0]], 10), pe: false });
-      const f = pzForm, have = +S.store[f.k] || 0; f.q = Math.min(have, Math.max(1, f.q)); if (!f.pe) f.p = Math.max(1, Math.round(pzVal(f.k, f.q) * 1.2)); f.p = Math.min(pzMax(f.k, f.q), Math.max(1, f.p));
+      const f = pzForm, have = +S.store[f.k] || 0; f.q = Math.min(have, Math.max(1, f.q)); if (!f.pe) f.p = f.k === "wood" ? f.q * WOOD_REF : Math.max(1, Math.round(pzVal(f.k, f.q) * 1.2)); f.p = Math.min(pzMax(f.k, f.q), Math.max(1, f.p));
       h += `<div class="pzform"><b>Ne satacaksın?</b><div class="chips pzchips">${stock.map(k => `<button data-pzk="${k}" aria-pressed="${k === f.k}">${ITEM_EMO[k]} ${esc(itemName(k))} (${+S.store[k]})</button>`).join("")}</div>
         <b>Kaç tane?</b><div class="pzrow"><button class="big ghost sm" data-pzq="-10">-10</button><button class="big ghost sm" data-pzq="-1">-1</button><span class="pzval">${f.q}</span><button class="big ghost sm" data-pzq="1">+1</button><button class="big ghost sm" data-pzq="10">+10</button><button class="big ghost sm" data-pzq="max">Hepsi</button></div>
         <b>Fiyat (toplam altın)</b><div class="pzrow"><button class="big ghost sm" data-pzp="-10">-10</button><button class="big ghost sm" data-pzp="-1">-1</button><input id="pzPrice_v8" type="number" inputmode="numeric" min="1" max="${pzMax(f.k, f.q)}" value="${f.p}"><button class="big ghost sm" data-pzp="1">+1</button><button class="big ghost sm" data-pzp="10">+10</button></div>
-        <p class="note">Depoda satsan ${fmtG(pzVal(f.k, f.q))} altın eder. En fazla ${fmtG(pzMax(f.k, f.q))} altın isteyebilirsin.</p>
+        <p class="note">${f.k === "wood" ? "Tahtanın fiyatını sen belirlersin. Tanesi en fazla " + fmtG(WOOD_MAX_PRICE) + " altın, bu miktar için en fazla " + fmtG(pzMax(f.k, f.q)) + " altın isteyebilirsin." : "Depoda satsan " + fmtG(pzVal(f.k, f.q)) + " altın eder. En fazla " + fmtG(pzMax(f.k, f.q)) + " altın isteyebilirsin."}</p>
         <div class="row"><button class="big green" data-pzput="1" ${pzBusy ? "disabled" : ""}>Tezgaha koy</button><button class="big ghost" data-pzx="1">Vazgeç</button></div></div>`;
     }
   }
@@ -4507,7 +4567,7 @@ function enterGame() {
   S.size = farmSize(S);
   S.layout = cleanLayout(S.layout, mv);
   S.trees = cleanTrees(S.trees, mv, S.layout);
-  STORE_KEYS.forEach(k => { S.store[k] = Math.max(0, +S.store[k] || 0); });
+  STORE_KEYS.forEach(k => { S.store[k] = Math.max(0, +S.store[k] || 0); }); S.depLv = depLv(S);
   if (S.bake && +S.bake.q > 0) { S.bakes = S.bakes || {}; S.bakes.oven = S.bakes.oven || [null, null]; if (!S.bakes.oven[0]) S.bakes.oven[0] = { q: +S.bake.q, t0: +S.bake.t0, r: "bread" }; }
   delete S.bake;
   { const B = S.bakes && typeof S.bakes === "object" ? S.bakes : {}; S.bakes = {}; OVENS.forEach(id => { const a = toArr(B[id]); S.bakes[id] = [0, 1].map(k => a[k] && +a[k].q > 0 && RECIPES[a[k].r || "bread"] ? { q: Math.floor(+a[k].q), t0: +a[k].t0 || Date.now(), r: a[k].r || "bread" } : null); }); }
@@ -5029,8 +5089,8 @@ $("quests").addEventListener("click", e => {
 });
 // ---------- Daily tasks (3 new small jobs every day) and the order board (villagers ask for products) ----------
 const DAILY_LEVEL = 3, ORDER_LEVEL = 3, ORDER_SLOTS = 3, ORDER_NEXT = 5 * MIN, ORDER_SKIP = 15 * MIN;
-const ITEM_EMO = { wheat: "🌾", potato: "🥔", carrot: "🥕", lettuce: "🥬", corn: "🌽", eggplant: "🍆", pumpkin: "🎃", apple: "🍎", bread: "🍞", fries: "🍟", egg: "🥚", milk: "🥛", chickfeed: "🐔", cowfeed: "🐄" };
-const itemName = k => (CROPS[k] && CROPS[k].name) || (FEEDS[k] && FEEDS[k].name) || ({ apple: "Elma", bread: "Ekmek", fries: "Patates kızartması", egg: "Yumurta", milk: "Süt" })[k] || k;
+const ITEM_EMO = { wheat: "🌾", potato: "🥔", carrot: "🥕", lettuce: "🥬", corn: "🌽", eggplant: "🍆", pumpkin: "🎃", apple: "🍎", bread: "🍞", fries: "🍟", egg: "🥚", milk: "🥛", chickfeed: "🐔", cowfeed: "🐄", wood: "🪵" };
+const itemName = k => (CROPS[k] && CROPS[k].name) || (FEEDS[k] && FEEDS[k].name) || ({ apple: "Elma", bread: "Ekmek", fries: "Patates kızartması", egg: "Yumurta", milk: "Süt", wood: "Tahta" })[k] || k;
 const itemPrice = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.price : 0; };
 const hasOven = () => OVENS.some(id => S[id] && S.layout[id] >= 0);
 const lvl = () => S.level || 1;
@@ -5396,6 +5456,16 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 102, d: "10 Ekim 2026", e: "🪵", t: "Tahta şansı arttı", c: "#8a5a2e", b: "#f6e8d4", items: [
+    "Ekinleri toplarken tahta çıkma şansı <b>%20</b> oldu. 15. seviyeden sonra %10'a düşer.",
+  ] },
+  { v: 101, d: "10 Ekim 2026", e: "🪵", t: "Depo kapasitesi ve tahta", c: "#8a5a2e", b: "#f6e8d4", items: [
+    "Depo artık <b>100 ürün</b> alıyor. Dolunca ekin toplayamaz, ürünleri satarak yer açman gerekir.",
+    "Yeni ürün <b>tahta</b>: ekinleri toplarken %10 şansla çıkar ve doğrudan depoya gider.",
+    "Depoyu 2. seviyeye çıkarmak için <b>600 altın ve 4 tahta</b> gerekir. Tahtayı Pazar'da en fazla tanesi 400 altına satabilirsin.",
+    "Toplarken ve sularken traktör gibi çok yuvalı aletler artık sadece yan yana olan topraklara çalışır, uzaktaki toprağa ayrıca gitmen gerekir.",
+    "Toplama sırasında alet değiştirirsen bekleyen toplama iptal olur.",
+  ] },
   { v: 100, d: "10 Ekim 2026", e: "🍞", t: "Yeni fırın ekranı", c: "#c8702a", b: "#fff0dc", items: [
     "Fırın ekranı yenilendi: buğday başağı, ekmek, patates ve kızartma resimleri, tepside pişen ekmekler tek tek görünüyor.",
     "Kaydırarak miktar seç, 5 / 10 / Hepsi düğmeleri, bitiş saati ve iki tepsiyi birden depoya alma.",

@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 88). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 102). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -118,6 +118,14 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v100
 - Fırın ekranı (`renderOven`): çizilmiş SVG resimler (`wheatArt`, `breadArt`, `potatoArt`, `friesArt`, `RECIPE_ART`), tarif kartları, kaydırıcı (`data-orng`), 5/10/Hepsi (`data-oset`, `data-omax`), bitiş saati (`hhmm`), tepsi görünümü (`trayView`), "Hepsini depoya al" (`data-otakeall`).
 - Elmalar yaprak kümelerinin dış yüzeyinde (üst/ön taraf), sap+yaprak+parlama; yere düşen elma yok.
+
+## v101 depo kapasitesi ve tahta
+- Depo kapasitesi: `DEPOT_CAP = [100, 200]` (seviye 1 = 100, seviye 2 = 200; 200 varsayımdır, değiştirilebilir). Depodaki **her ürün** (ekin, elma, ekmek, yem, yumurta, süt, tahta) 1 yer sayar. `depUsed/depFree/depCap/depLv`, oyuncuda `S.depLv`.
+- Depo geliştirme: `DEPOT_UP = [{ g: 600, wood: 4 }]` (1 → 2). Depo penceresinin üstündeki kart (`depotHead`) ve `depotUpgrade()`.
+- Depo doluyken: ekin/elma toplanmaz, hayvan ürünü, ambar yemi ve fırın ürünleri depoya kısmen alınır (yer kadar), pazardan alım engellenir (`depotFullHint`). Pazardan geri alınan ürünler (tezgahtan iptal) kapasiteyi aşabilir. İşçinin topladığı ekin işverenin deposuna kapasiteye bakılmadan girer.
+- Tahta (`wood`, `STORE_KEYS` içinde): ekin toplarken her ekin için `woodChance(S)` şansla çıkar (`WOOD_CHANCE = 0.2`; seviye 15'ten büyükse `WOOD_CHANCE_LATE = 0.1`, eşik `WOOD_LATE_LEVEL = 15`), doğrudan depoya gider (yer varsa). Depoya satılmaz (`price: 0`), sadece Pazar'da satılır; Pazar'da tanesi en fazla `WOOD_MAX_PRICE = 400` altın (`pzMax`), önerilen fiyat `WOOD_REF = 100`. Fiyat sınırı sadece istemcide, Firebase kuralında yok. Köy muhtarı kontrolü (`checkBroke`) tahtayı saymaz.
+- Çok yuvalı aletler (traktör, elektrikli tırpan, ekim aleti) ve çok sulama (kuyu 3+): `pickExtras` artık sadece **yan yana** (4 yön) komşu toprakları seçer (BFS); aradan boşluk olan toprak ayrıca ziyaret edilmelidir.
+- Alet değiştirince (`selectTool` → `dropHarvestTasks`) sırada bekleyen/yürüyen toplama görevleri iptal olur.
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
