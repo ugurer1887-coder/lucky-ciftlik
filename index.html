@@ -6456,7 +6456,7 @@ function setup3D(T) {
   function labelTex(text, color) {
     return canvasTex("lbl2" + color + text, 512, 128, (x, w, h) => {
       x.font = "700 72px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-      x.lineWidth = 20; x.strokeStyle = "rgba(10,12,8,.96)"; x.lineJoin = "round"; x.strokeText(text, w / 2, h / 2); x.fillStyle = color; x.fillText(text, w / 2, h / 2);
+      x.lineWidth = 20; x.strokeStyle = "rgba(10,12,8,.96)"; x.lineJoin = "round"; x.strokeText(text, w / 2, h / 2, w - 30); x.fillStyle = color; x.fillText(text, w / 2, h / 2, w - 30);
     });
   }
   function bubbleTex(text) {
