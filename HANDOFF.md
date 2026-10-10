@@ -174,3 +174,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v110
 - Nesne menüsü eski boyuta döndü. 3B rozetler (`emojiBadge`) renkli dolgu + koyu/beyaz çerçeve, `fog:false, depthTest:false` ile her zaman net.
+
+## v111
+- Meydan kamerası çarpanı 0.55; 3B isim etiketleri büyük/kalın çerçeveli, sis etkisiz.

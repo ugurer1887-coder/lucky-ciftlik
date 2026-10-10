@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "110";
+const VERSION = "111";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -3261,7 +3261,7 @@ const ZOOM_MAX = 1.55;
 let ZOOM = 1; try { ZOOM = Math.max(.45, Math.min(ZOOM_MAX, +localStorage.getItem("lucky-zoom") || 1)); } catch (e) {}
 const cam = { x: 0, y: 0, w: 1600, h: 900, follow: true, lastDrag: 0, vx: 0, vy: 0 };
 const DRAG_GAIN = 1.6;
-const zEff = () => Math.max(.3, ZOOM * (typeof scene !== "undefined" && scene && scene.kind === "plaza" ? .7 : 1));   // meydanda kamera daha yakın
+const zEff = () => Math.max(.3, ZOOM * (typeof scene !== "undefined" && scene && scene.kind === "plaza" ? .55 : 1));   // meydanda kamera daha yakın
 const svgEl = $("stage"), svgReal = $("farm");
 const rotated = () => !!(window.matchMedia && window.matchMedia("(orientation: portrait)").matches);
 function viewSize() {
@@ -6019,6 +6019,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 111, d: "11 Ekim 2026", e: "🔍", t: "Daha yakın meydan, net isimler", c: "#2e6a8a", b: "#dceef7", items: [
+    "Meydandaki kamera daha da yakınlaştı.",
+    "Karakterlerin üstündeki isimler daha büyük, kalın ve koyu çerçeveli, uzaktan rahat okunuyor.",
+  ] },
   { v: 110, d: "11 Ekim 2026", e: "🔔", t: "Belirgin bildirimler", c: "#a8651e", b: "#fbeacc", items: [
     "Kümes, ahır, ambar ve sipariş tabelasının üstündeki bildirim simgeleri artık canlı renkli, kalın çerçeveli ve saydam değil, uzaktan bile net görünüyor.",
     "Yapıların dokununca açılan menüsü eski boyuta döndü.",
@@ -6450,9 +6454,9 @@ function setup3D(T) {
   }
   const rr = (x, a, b, w, h, r) => { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
   function labelTex(text, color) {
-    return canvasTex("lbl" + color + text, 512, 128, (x, w, h) => {
-      x.font = "600 64px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-      x.lineWidth = 14; x.strokeStyle = "rgba(20,24,16,.75)"; x.lineJoin = "round"; x.strokeText(text, w / 2, h / 2); x.fillStyle = color; x.fillText(text, w / 2, h / 2);
+    return canvasTex("lbl2" + color + text, 512, 128, (x, w, h) => {
+      x.font = "700 72px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.lineWidth = 20; x.strokeStyle = "rgba(10,12,8,.96)"; x.lineJoin = "round"; x.strokeText(text, w / 2, h / 2); x.fillStyle = color; x.fillText(text, w / 2, h / 2);
     });
   }
   function bubbleTex(text) {
@@ -7873,7 +7877,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   function charLabel(c, isMe) {
     if (c.m3.lbl && c.m3.lblText === c.name) return;
     if (c.m3.lbl) c.m3.root.remove(c.m3.lbl);
-    const s = sprite(labelTex(c.name || "Çiftçi", isMe ? "#ffe27a" : "#ffffff"), 1.3, .32); s.position.set(0, 1.28, 0); s.renderOrder = 6; c.m3.root.add(s); c.m3.lbl = s; c.m3.lblText = c.name;
+    const s = sprite(labelTex(c.name || "Çiftçi", isMe ? "#ffe27a" : "#ffffff"), 1.75, .44, { fog: false }); s.position.set(0, 1.36, 0); s.renderOrder = 6; c.m3.root.add(s); c.m3.lbl = s; c.m3.lblText = c.name;
   }
   function syncChar(c, isMe, t) {
     if (!c.el && !isMe) return;
