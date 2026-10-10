@@ -632,15 +632,14 @@ body{font-family:var(--body);letter-spacing:.1px}
 .card.qhl{outline:3px solid #f2b821;box-shadow:0 0 0 5px rgba(242,184,33,.3);animation:qhl 1.2s ease-in-out infinite}
 .tab.qhl{outline:3px solid #f2b821;animation:qhl 1.2s ease-in-out infinite}
 @keyframes qhl{50%{box-shadow:0 0 0 9px rgba(242,184,33,.12)}}
-#lvUp{display:none}
-#lvlUp{position:absolute;inset:0;z-index:9000;display:none;place-items:center;background:rgba(10,20,10,.6);padding:14px;touch-action:none}
-#lvlUp.on{display:grid}
-#lvlUp .lvbox{width:min(340px,100%);max-height:90%;overflow:auto;padding:16px 16px 12px;border-radius:22px;background:linear-gradient(160deg,#fff8dc,#ffe9a6);border:3px solid #f2b821;box-shadow:0 12px 40px rgba(0,0,0,.45);text-align:center;font-family:Nunito,sans-serif;color:#4a2e08}
-#lvlUp .lvbig{font:800 2rem Fredoka,Nunito,sans-serif;color:#c46a00}
-#lvlUp .lvsub{font-weight:800;margin:2px 0 10px;opacity:.75}
-#lvlUp .lvrow{display:flex;align-items:center;gap:10px;margin:6px 0;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.75);text-align:left}
-#lvlUp .lvrow span{font-size:1.5rem}#lvlUp .lvrow b{font-size:.98rem}
-#lvlUp .lvtap{margin-top:10px;font-size:.78rem;font-weight:800;opacity:.6}
+#lvlUp_v8{position:absolute;inset:0;z-index:9000;display:none;place-items:center;background:rgba(10,20,10,.6);padding:14px;touch-action:none}
+#lvlUp_v8.on{display:grid}
+#lvlUp_v8 .lvbox{width:min(340px,100%);max-height:90%;overflow:auto;padding:16px 16px 12px;border-radius:22px;background:linear-gradient(160deg,#fff8dc,#ffe9a6);border:3px solid #f2b821;box-shadow:0 12px 40px rgba(0,0,0,.45);text-align:center;font-family:Nunito,sans-serif;color:#4a2e08}
+#lvlUp_v8 .lvbig{font:800 2rem Fredoka,Nunito,sans-serif;color:#c46a00}
+#lvlUp_v8 .lvsub{font-weight:800;margin:2px 0 10px;opacity:.75}
+#lvlUp_v8 .lvrow{display:flex;align-items:center;gap:10px;margin:6px 0;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.75);text-align:left}
+#lvlUp_v8 .lvrow span{font-size:1.5rem}#lvlUp_v8 .lvrow b{font-size:.98rem}
+#lvlUp_v8 .lvtap{margin-top:10px;font-size:.78rem;font-weight:800;opacity:.6}
 .acctxp{margin:8px 0 10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.7);color:#4a2e08;font-family:Nunito,sans-serif}
 .acctxp .xr{display:flex;justify-content:space-between;font-weight:800}.acctxp .xb{height:12px;border-radius:9px;background:rgba(0,0,0,.14);overflow:hidden;margin:6px 0 4px}
 .acctxp .xb i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ffd45a,#f5a524)}.acctxp small{font-weight:700;opacity:.75}
@@ -1305,7 +1304,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "121";
+const VERSION = "122";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1327,13 +1326,14 @@ const fmtBig = v => Math.round(v).toLocaleString("tr-TR");
 const QUESTS = [
   { id: "plant", e: "🌱", t: "İlk tohumlar", s: "Buğday ek", d: "<b>1.</b> Sağ alttaki <b>Market</b>'e gir.<br><b>2.</b> <b>Ekinler</b> sekmesinde <b>Buğday</b>'ın <b>Satın al</b> düğmesine bas.<br><b>3.</b> Tarladaki boş topraklara dokunarak tohum ek (6 tane).", need: 6, gold: 3, xp: 2, go: "market", mk: { tab: "crops", card: "Buğday", msg: "👉 Buğday kartındaki <b>Satın al</b>'a bas, sonra boş topraklara dokun." } },
   { id: "water", e: "💧", t: "Ekinleri sula", s: "Ekin sula", d: "Ektiğin buğdaylara tek tek dokun, çiftçin sular. Kovan boşsa kendisi <b>su kuyusundan</b> doldurur.", need: 6, gold: 4, xp: 2 },
-  { id: "harvest", e: "🌾", t: "İlk hasat", s: "Ekin topla", d: "Sulanan buğday 1 dakikada olgunlaşır. Alttaki çubuktan <b>tırpanı</b> seç ve parlayan olgun buğdaylara dokun.", need: 6, gold: 5, xp: 2 },
+  { id: "harvest", e: "🌾", t: "İlk hasat", s: "Ekin topla", d: "Sulanan buğday ilk seferde 15 saniyede olgunlaşır. Alttaki çubuktan <b>tırpanı</b> seç ve parlayan olgun buğdaylara dokun.", need: 6, gold: 5, xp: 2 },
   { id: "sell", e: "💰", t: "Depoda sat", s: "Ürün sat", d: "<b>1.</b> Kırmızı <b>depoya</b> dokun.<br><b>2.</b> <b>Depo</b>'yu seç.<br><b>3.</b> Topladığın buğdayları sat. Altınla yeni tohum alırsın.", need: 6, gold: 6, xp: 3 },
-  { id: "replant", ev: "plant", e: "🔁", t: "Tarlayı yenile", s: "Ekin ek", d: "Kazandığın altınla tekrar <b>Market &gt; Ekinler &gt; Buğday</b> al ve tarlayı yeniden ek. Ek, sula, topla, sat: çiftçiliğin döngüsü bu.", need: 12, gold: 6, xp: 3, go: "market", mk: { tab: "crops", card: "Buğday", msg: "👉 Yine <b>Buğday</b>'ı al ve tarlayı ek." } },
+  { id: "replant", ev: "plant", e: "🔁", t: "Tarlayı yenile", s: "Ekin ek", d: "Kazandığın altınla tekrar <b>Market &gt; Ekinler &gt; Buğday</b> al ve tarlayı yeniden ek. Ek, sula, topla, sat: çiftçiliğin döngüsü bu.", need: 6, gold: 6, xp: 3, go: "market", mk: { tab: "crops", card: "Buğday", msg: "👉 Yine <b>Buğday</b>'ı al ve tarlayı ek." } },
   { id: "oven", e: "🔥", t: "Taş fırın", s: "Fırın al", d: "<b>1.</b> <b>Market</b>'e gir.<br><b>2.</b> <b>Ocaklar</b> sekmesini aç.<br><b>3.</b> <b>Taş fırın</b>ı al, çiftliğinin önüne gelir. Sürükleyip istediğin yere koyabilirsin.", need: 1, gold: 8, xp: 4, go: "market", mk: { tab: "ovens", card: "Taş fırın", msg: "👉 <b>Taş fırın</b> kartındaki <b>Satın al</b>'a bas." }, chk: () => (S.oven && S.layout && S.layout.oven >= 0) ? 1 : 0 },
-  { id: "bread", e: "🍞", t: "Fırıncı", s: "Ekmek pişir", d: "Fırına dokun, <b>Pişir</b>'e bas: 2 buğdaydan 1 ekmek olur. Pişen ekmekleri <b>depoya al</b>. Ekmek buğdaydan çok daha pahalı satılır.", need: 6, gold: 10, xp: 4 },
+  { id: "bakestart", ev: "bakestart", e: "🔥", t: "İlk ekmek", s: "Ekmek pişir", d: "Fırına dokun, <b>Pişir</b>'e bas: 2 buğdaydan 1 ekmek olur (buğdayın yoksa tarlandan topla). Pişerken bekleme, sıradaki görevlere geç!", need: 1, gold: 6, xp: 3, chk: () => (S.tut.d.includes("bread") || bakeInfo(S, Date.now()).q > 0 || +S.store.bread > 0) ? 1 : 0 },
   { id: "tree", e: "🍎", t: "Elma ağacı", s: "Ağaç dik", d: "<b>1.</b> <b>Market &gt; Ekinler</b> sekmesine gir.<br><b>2.</b> Listenin sonundaki <b>Elma ağacı</b>'nı al.<br><b>3.</b> Boş bir yere dokunup dik. Ağaç kendi büyür, sulamaya gerek yok.", need: 1, gold: 8, xp: 4, go: "market", mk: { tab: "crops", card: "Elma ağacı", msg: "👉 Aşağıdaki <b>Elma ağacı</b>'nı al, sonra boş bir yere dokun." }, chk: () => (S.trees && S.trees.length) ? 1 : 0 },
   { id: "decor", e: "🌼", t: "Çiftliğini süsle", s: "Süs yerleştir", d: "<b>1.</b> <b>Market &gt; Dekor</b> sekmesine gir.<br><b>2.</b> <b>Ahşap çit</b> ya da bir süs al.<br><b>3.</b> Çiftliğinde boş bir yere dokun. Ziyarete gelenler görür.", need: 1, gold: 10, xp: 4, go: "market", mk: { tab: "decor", card: "Ahşap çit", msg: "👉 <b>Ahşap çit</b> ya da bir süs seç, sonra çiftliğine dokunarak koy." }, chk: () => ((S.fences && S.fences.length) || (S.decor && S.decor.length)) ? 1 : 0 },
+  { id: "bread", e: "🍞", t: "Fırıncı", s: "Ekmek topla", d: "Fırının üstündeki ekmek hazır olunca fırına dokun, ekmekler direkt depoya girer. Ekmek buğdaydan çok daha pahalı satılır.", need: 2, gold: 10, xp: 4 },
   { id: "daily", e: "📅", t: "Günlük görevler", s: "Görevlere bak", d: "3. seviyede <b>günlük görevler</b> ve <b>siparişler</b> açılır. Soldaki görev düğmesine bas, <b>Günlük</b> sekmesine geç, görevleri yapıp altın ve sandık kazan.", need: 1, gold: 10, xp: 5, lv: 3 },
   { id: "lvl", e: "⭐", t: "5. seviyeye ulaş", s: "Seviye", d: "Ekin ekip toplayarak, ekmek pişirerek ve siparişleri teslim ederek XP kazan. <b>5. seviyede</b> sohbet, patates, toprak satın alma, dilek çeşmesi, pazar ve iş ilanları açılır.", need: 5, gold: 15, xp: 0, chk: () => S.level },
   { id: "wish", e: "⛲", t: "Dilek tut", s: "Dilek tut", d: "Alttan <b>Meydan</b>'a git, ortadaki dilek çeşmesine dokun ve altın atıp dilek tut.", need: 1, gold: 11, xp: 5, go: "plaza" },
@@ -1580,7 +1580,8 @@ const depFree = f => Math.max(0, depCap(f) - depUsed(f));
 function depotFullHint() { hint("Depo dolu! Ürün satarak yer aç ya da depoyu geliştir."); SFX.play("error"); }
 const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
-const growMs = p => cropOf(p).ms / (typeof growMul === "function" ? growMul() : 1);
+const growMs = p => { const t = cropOf(p).ms / (typeof growMul === "function" ? growMul() : 1); return p.fw ? Math.min(t, 15000) : t; };   // the first crops of the tutorial grow in 15 s
+const tutFast = () => !!(S && S.tut && S.tut.i <= 4 && S.tut.i < QUESTS.length);
 const ripe = p => !!(p && p.c && p.w && Date.now() - p.w >= growMs(p));
 // tools in the bottom bar: how many ripe crops one swing gathers
 const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 2500, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
@@ -1736,7 +1737,7 @@ function showLevelUnlocks() {
   const items = []; lvls.forEach(l => unlocksAt(l).forEach(x => items.push(x)));
   if (!items.length) return;
   let ov = $("lvlUp");
-  if (!ov) { ov = document.createElement("div"); ov.id = "lvlUp"; $("root").appendChild(ov); ov.addEventListener("pointerdown", e => { e.preventDefault(); ov.classList.remove("on"); }); }
+  if (!ov) { ov = document.createElement("div"); ov.id = "lvlUp_v8"; $("root").appendChild(ov); ov.addEventListener("pointerdown", e => { e.preventDefault(); ov.classList.remove("on"); }); }
   ov.innerHTML = `<div class="lvbox"><div class="lvbig">Seviye ${lvls[lvls.length - 1]}!</div><div class="lvsub">Yeni açılanlar</div>${items.map(x => `<div class="lvrow"><span>${x.e}</span><b>${esc(x.t)}</b></div>`).join("")}<div class="lvtap">Kapatmak için herhangi bir yere dokun</div></div>`;
   ov.classList.add("on"); try { SFX.play("levelup"); } catch (e) {}
 }
@@ -1973,7 +1974,7 @@ function doAction(t) {
     const near = new Set(sprCells(t.cell)), r0 = rowOf(t.cell), c0 = colOf(t.cell), done = [];
     const todo = S.plots.filter(pl => near.has(pl.cell) && pl.c && !pl.w)
       .sort((a, b) => Math.hypot(rowOf(a.cell) - r0, colOf(a.cell) - c0) - Math.hypot(rowOf(b.cell) - r0, colOf(b.cell) - c0)).slice(0, sprN());
-    for (const pl of todo) { if (sp.w <= 0) break; pl.w = now; sp.w--; done.push(pl.cell); }
+    for (const pl of todo) { if (sp.w <= 0) break; pl.w = now; pl.fw = tutFast() ? 1 : 0; sp.w--; done.push(pl.cell); }
     if (!done.length) { pop(t.cell, "Su: " + sp.w + "/" + sprCap(), "#bfe9ff"); hint("Fıskiyenin yakınında sulanacak ekin yok. İçinde " + sp.w + "/" + sprCap() + " su var."); return; }
     SFX.play("water"); questEv("water", done.length); dailyEv("water", done.length); pop(t.cell, done.length + " ekin sulandı, su " + sp.w + "/" + sprCap(), "#bfe9ff"); if (R3.glow) R3.glow(done.slice(0, 8), "#7fd6ff", 700);
     saveNow();
@@ -2000,7 +2001,7 @@ function doAction(t) {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || !q2.c || q2.w) continue;
         if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); SFX.play("error"); break; }
-        S.bucket--; q2.w = now; questEv("water", 1); dailyEv("water", 1); pop(c, "Sulandı", "#bfe9ff"); SFX.play("water");
+        S.bucket--; q2.w = now; q2.fw = tutFast() ? 1 : 0; questEv("water", 1); dailyEv("water", 1); pop(c, "Sulandı", "#bfe9ff"); SFX.play("water");
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
@@ -4130,7 +4131,7 @@ $("ovenBody").addEventListener("click", e => {
     const k = +A("data-obake"), rk = recFor(id, k), R = RECIPES[rk]; if (trayOf(S, id, k)) return;
     if (rk === "fries" && !cropOpen("potato")) return;
     const n = Math.min(OVEN_CAP[ovenLv(S, id)], ovenAmt[k], recStock(R)); if (n < 1) return;
-    S.store[R.from] -= n * R.n; if (R.from2) S.store[R.from2] -= n * R.n2; S.bakes[id][k] = { q: n, t0: now, r: rk };
+    S.store[R.from] -= n * R.n; if (R.from2) S.store[R.from2] -= n * R.n2; S.bakes[id][k] = { q: n, t0: now, r: rk }; questEv("bakestart", 1);
     saveNow(); renderPlots(); renderOven(); toast(n + " " + R.name.toLocaleLowerCase("tr") + (id === "icecart" ? " yapılıyor 🍦" : " fırına girdi 🔥")); return;
   }
   if (A("data-otake") !== null) {
@@ -4889,6 +4890,7 @@ document.querySelectorAll(".gpick button").forEach(b => b.onclick = () => setPic
 // Name and gender are chosen once, when the character is made, and never change after that.
 const charLocked = () => !!(S && S.g && S.name);
 function showCharFields(on) {
+  if (on) { $("startTitle").hidden = false; $("startText").hidden = false; }
   if (on) { const x = $("acctXp"); if (x) x.hidden = true; }
   $("nameIn").hidden = !on; document.querySelector("#root_v8 .gpick").hidden = !on; $("startBtn").hidden = !on;
 }
@@ -4910,10 +4912,9 @@ function openCharModal(m) {
 // character card: shows who you are and lets you tie the farm to a Google account
 function openAccount() {
   charMode = "account";
-  $("startTitle").textContent = S.name;
-  $("startText").textContent = "Seviye " + S.level + ", " + (S.g === "k" ? "kız" : "erkek") + " çiftçi. Adın ve cinsiyetin karakterine kayıtlı, değiştirilemez.";
+  $("startTitle").hidden = true; $("startText").hidden = true;
   showCharFields(false);
-  { let x = $("acctXp"); if (!x) { x = document.createElement("div"); x.id = "acctXp"; $("startText").insertAdjacentElement("afterend", x); }
+  { let x = $("acctXp"); if (!x) { x = document.createElement("div"); x.id = "acctXp_v8"; $("startText").insertAdjacentElement("afterend", x); }
     const mx = S.level >= MAX_LEVEL, need = xpNeed(S.level), have = Math.min(+S.xp || 0, need);
     x.className = "acctxp"; x.hidden = false;
     x.innerHTML = mx ? `<b>En yüksek seviyedesin 🏆</b>` : `<div class="xr"><b>Seviye ${S.level}</b><span>${fmtBig(have)} / ${fmtBig(need)} XP</span></div><div class="xb"><i style="width:${Math.min(100, have / need * 100).toFixed(1)}%"></i></div><small>${S.level + 1}. seviyeye ${fmtBig(Math.max(0, need - have))} XP kaldı</small>`; }
@@ -6167,6 +6168,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 122, d: "11 Ekim 2026", e: "🚜", t: "Akıcı başlangıç", c: "#3b7a4a", b: "#e3f3e6", items: [
+    "Profilde sadece XP barı görünüyor. Kapatıp açınca bar çoğalma hatası giderildi.",
+    "Başlangıç görevleri bekletmiyor: ilk ekinler 15 saniyede büyüyor, ekmek pişerken ağaç dikme ve süsleme görevleri yapılıyor, ekmek sayısı 2'ye indi.",
+  ] },
   { v: 121, d: "11 Ekim 2026", e: "⭐", t: "Kolay toplama", c: "#b9770e", b: "#fdf0d5", items: [
     "Sol üstten karakterine dokununca seviye atlamak için kaç XP gerektiği ve kaç XP kaldığı görünüyor.",
     "Geliştir sekmesinin adı Yükseltme oldu, başlıklar kaldırıldı. Toprak ile alan genişletme yan yana.",
@@ -6283,7 +6288,7 @@ $("setBtns").addEventListener("click", async e => {
 });
 function renderAccount() {
   const a = window.LUCKY_AUTH, box = $("acct");
-  if (!a || !online) { box.hidden = true; return; }
+  if (!a || !online || charMode === "account") { box.hidden = true; return; }
   box.hidden = false;
   const i = a.info();
   $("googleTxt").textContent = i.google ? "Google hesabından çık" : "Google ile giriş yap";

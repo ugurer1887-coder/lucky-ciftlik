@@ -210,3 +210,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v121
 - Profilde XP barı (`#acctXp` in openAccount). Market sekmesi "Yükseltme", başlıksız. `quickCollect(kind)`: hazır ürün varsa nesneye dokununca direkt toplar (`ovenTakeAll`, `millTake`).
+
+## v122
+- Hay Day tarzı akıcı FTUE: `p.fw` (tutorial ilk ekinler 15 sn, `tutFast()`), yeni `bakestart` görevi (ekmek pişirmeye başla) sonra ağaç/süs, sonra ekmek topla (2). Hata: `$(id)` otomatik `_v8` ekler; dinamik elemana id verirken `_v8` yaz (acctXp_v8, lvlUp_v8).
