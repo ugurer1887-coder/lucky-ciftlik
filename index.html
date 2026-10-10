@@ -626,12 +626,12 @@ body{font-family:var(--body);letter-spacing:.1px}
 .ovthumb{background:linear-gradient(160deg,#ffe2a8,#f6b25a)!important;display:grid;place-items:center}.ovthumb .rec{font-size:2.2rem}
 .obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
 .oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
-.objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:6px;padding:9px 12px 12px;border-radius:20px;pointer-events:auto;
+.objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
   background:rgba(30,24,16,.86);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:omIn .16s ease}
 .objmenu.on{display:flex}.objmenu::before{content:"";position:absolute;top:-7px;left:50%;margin-left:-7px;border:7px solid transparent;border-top:0;border-bottom-color:rgba(30,24,16,.86)}
-.objmenu b{color:#ffe9b8;font:700 1.05rem Fredoka,Nunito,sans-serif}.objmenu div{display:flex;gap:9px}
-.objmenu button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:80px;padding:8px 12px;border:0;border-radius:15px;color:#3a2410;font:700 .98rem Fredoka,Nunito,sans-serif;
-  background:linear-gradient(180deg,#fff6dc,#f3d79a);box-shadow:inset 0 -3px 0 rgba(120,70,10,.25)}.objmenu button span{font-size:1.7rem;line-height:1.1}.objmenu button:active{transform:scale(.94)}
+.objmenu b{color:#ffe9b8;font:700 .78rem Fredoka,Nunito,sans-serif}.objmenu div{display:flex;gap:6px}
+.objmenu button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px;padding:5px 8px;border:0;border-radius:12px;color:#3a2410;font:700 .72rem Fredoka,Nunito,sans-serif;
+  background:linear-gradient(180deg,#fff6dc,#f3d79a);box-shadow:inset 0 -3px 0 rgba(120,70,10,.25)}.objmenu button span{font-size:1.15rem;line-height:1.1}.objmenu button:active{transform:scale(.94)}
 @keyframes omIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 #root_v8,#root_v8 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 #root_v8 input,#root_v8 textarea,#root_v8 [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "109";
+const VERSION = "110";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6019,6 +6019,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 110, d: "11 Ekim 2026", e: "🔔", t: "Belirgin bildirimler", c: "#a8651e", b: "#fbeacc", items: [
+    "Kümes, ahır, ambar ve sipariş tabelasının üstündeki bildirim simgeleri artık canlı renkli, kalın çerçeveli ve saydam değil, uzaktan bile net görünüyor.",
+    "Yapıların dokununca açılan menüsü eski boyuta döndü.",
+  ] },
   { v: 109, d: "11 Ekim 2026", e: "⛲", t: "Meydan düzeni", c: "#3a6a8a", b: "#e0eef7", items: [
     "Meydandaki çiftçiler artık dilek çeşmesinin ve pazar tezgâhlarının çevresinde duruyor, daha az dolaşıyor ve akıcı yürüyor.",
   ] },
@@ -6459,10 +6463,14 @@ function setup3D(T) {
       x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 60);
     });
   }
-  function emojiBadge(e, n) { return canvasTex("emo" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.22)"; x.beginPath(); x.arc(82, 86, 64, 0, 6.283); x.fill();
-    x.fillStyle = "#fffdf4"; x.beginPath(); x.arc(78, 78, 64, 0, 6.283); x.fill(); x.lineWidth = 8; x.strokeStyle = "#e3a72f"; x.stroke();
+  function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a" }[e] || "#ffd24a";
+    return canvasTex("emo2" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
+    x.fillStyle = "#3a2410"; x.beginPath(); x.arc(78, 78, 68, 0, 6.283); x.fill();
+    x.fillStyle = "#fff"; x.beginPath(); x.arc(78, 78, 62, 0, 6.283); x.fill();
+    x.fillStyle = col; x.beginPath(); x.arc(78, 78, 52, 0, 6.283); x.fill();
+    x.fillStyle = "rgba(255,255,255,.35)"; x.beginPath(); x.ellipse(66, 52, 26, 12, -.5, 0, 6.283); x.fill();
     x.font = "84px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(e, 78, 84);
-    if (n > 1) { x.fillStyle = "#e0473a"; x.beginPath(); x.arc(128, 30, 28, 0, 6.283); x.fill(); x.fillStyle = "#fff"; x.font = "700 36px Fredoka, Nunito, sans-serif"; x.fillText(n > 99 ? "99" : String(n), 128, 32); } }); }
+    if (n > 1) { x.fillStyle = "#3a2410"; x.beginPath(); x.arc(128, 30, 31, 0, 6.283); x.fill(); x.fillStyle = "#e0301f"; x.beginPath(); x.arc(128, 30, 26, 0, 6.283); x.fill(); x.fillStyle = "#fff"; x.font = "700 38px Fredoka, Nunito, sans-serif"; x.fillText(n > 99 ? "99" : String(n), 128, 32); } }); }
   function badgeTex(n, kind) {
     return canvasTex("bdg" + kind + n, 256, 128, (x, w, h) => {
       x.fillStyle = "rgba(0,0,0,.2)"; rr(x, 10, 18, w - 20, h - 26, 50); x.fill();
@@ -7606,7 +7614,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     world.add(buildPazarBanner());
     world.add(buildJobBoard()); proxy(colOf(P_JOBS[1]), .7, rowOf(P_JOBS[0]) + .6, 2, 1.4, 1, P_JOBS[0]);
     const n = openJobs.filter(j => j.owner !== uid).length;
-    if (n) { const s = sprite(badgeTex(n, "jobs"), 1.05, .52); s.position.set(colOf(P_JOBS[1]) + .9, 1.65, rowOf(P_JOBS[0]) + .6); world.add(s); }
+    if (n) { const s = sprite(badgeTex(n, "jobs"), 1.05, .52, { fog: false }); s.position.set(colOf(P_JOBS[1]) + .9, 1.65, rowOf(P_JOBS[0]) + .6); world.add(s); }
   }
   function buildFarm(f, now, part) {
     const L = f.layout, home = scene.kind === "home", isMe = f === S;
@@ -7648,13 +7656,13 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     fog3(f);
   }
   function farmDyn(f, now, L, home, isMe) {
-    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), 1.05, .52); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
+    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), 1.05, .52, { fog: false }); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
     if (isMe) {
       [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
         const em = I.ready ? e : I.hungry && I.hungry === I.n ? "🍽️" : null; if (!em) return;
-        const sp = sprite(emojiBadge(em, I.ready || 0), 1.2, 1.2); sp.position.set(colOf(L[k]) + o.w / 2, 2.25 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
-      if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), 1.15, 1.15); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
-      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
+        const sp = sprite(emojiBadge(em, I.ready || 0), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L[k]) + o.w / 2, 2.25 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
+      if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), 1.15, 1.15, { fog: false, depthTest: false }); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
+      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
     }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });
