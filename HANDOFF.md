@@ -222,3 +222,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v125
 - Yeni görev `bakewheat` (oven sonrası): depoda <2 buğday varsa tekrar ek/sula/topla; ok mantığı questTarget içinde, tutFast bu görevde de açık. NOT: QUESTS sabitlerinde sonradan tanımlanan const kullanma (TDZ).
+
+## v126
+- Başlangıç görev altınları: 10,12,15,20,20,25,15,20,25,25,30,30,50,35,40 (toplam ~372).
