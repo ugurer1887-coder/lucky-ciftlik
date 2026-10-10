@@ -627,7 +627,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 .obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
 .oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
 .nlayer{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
-.nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 17px Roboto,'Segoe UI',Arial,Helvetica,sans-serif;color:#fff;letter-spacing:.2px;-webkit-text-stroke:5px #0b0d08;paint-order:stroke fill;text-shadow:0 1px 2px rgba(0,0,0,.6);will-change:transform;display:none}
+.nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 13px Roboto,'Segoe UI',Arial,Helvetica,sans-serif;color:#fff;letter-spacing:.1px;-webkit-text-stroke:4px #0b0d08;paint-order:stroke fill;text-shadow:0 1px 2px rgba(0,0,0,.6);will-change:transform;display:none}
 .nlab.me{color:#ffe27a}
 .objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
   background:rgba(30,24,16,.86);box-shadow:0 8px 22px rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:omIn .16s ease}
@@ -1288,7 +1288,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "116";
+const VERSION = "117";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6029,6 +6029,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 117, d: "11 Ekim 2026", e: "🔤", t: "İsim boyutu", c: "#4a5a7a", b: "#e2e8f3", items: [
+    "Karakter isimleri biraz küçüldü, hâlâ net ve okunaklı.",
+  ] },
   { v: 116, d: "11 Ekim 2026", e: "🔤", t: "Net isimler", c: "#4a5a7a", b: "#e2e8f3", items: [
     "Karakterlerin isimleri artık ekran yazısı olarak çiziliyor: her uzaklıkta keskin, kalın ve koyu çerçeveli, silik görünmüyor.",
   ] },
