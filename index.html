@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "112";
+const VERSION = "113";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6019,6 +6019,9 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 113, d: "11 Ekim 2026", e: "🔤", t: "Okunaklı isimler", c: "#4a5a7a", b: "#e2e8f3", items: [
+    "Karakter isimleri sade ve kalın bir yazı tipiyle, daha yüksek çözünürlükte çiziliyor; uzaktan net okunuyor.",
+  ] },
   { v: 112, d: "11 Ekim 2026", e: "🥛", t: "Yeni hayvan simgeleri", c: "#2e7a8a", b: "#dcf1f5", items: [
     "İnek ahırının üstünde süt kovası, kümesin üstünde yumurta, ambarın üstünde yem çuvalı simgesi çıkıyor. Hepsi renkli ve belirgin.",
   ] },
@@ -6457,9 +6460,9 @@ function setup3D(T) {
   }
   const rr = (x, a, b, w, h, r) => { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
   function labelTex(text, color) {
-    return canvasTex("lbl2" + color + text, 512, 128, (x, w, h) => {
-      x.font = "700 72px Fredoka, Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-      x.lineWidth = 20; x.strokeStyle = "rgba(10,12,8,.96)"; x.lineJoin = "round"; x.strokeText(text, w / 2, h / 2, w - 30); x.fillStyle = color; x.fillText(text, w / 2, h / 2, w - 30);
+    return canvasTex("lbl3" + color + text, 1024, 256, (x, w, h) => {
+      x.font = "800 132px Roboto, 'Segoe UI', Arial, Helvetica, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.lineWidth = 34; x.strokeStyle = "#0b0d08"; x.lineJoin = "round"; x.miterLimit = 2; x.strokeText(text, w / 2, h / 2 + 4, w - 50); x.fillStyle = color; x.fillText(text, w / 2, h / 2 + 4, w - 50);
     });
   }
   function bubbleTex(text) {
@@ -7896,7 +7899,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   function charLabel(c, isMe) {
     if (c.m3.lbl && c.m3.lblText === c.name) return;
     if (c.m3.lbl) c.m3.root.remove(c.m3.lbl);
-    const s = sprite(labelTex(c.name || "Çiftçi", isMe ? "#ffe27a" : "#ffffff"), 1.75, .44, { fog: false }); s.position.set(0, 1.36, 0); s.renderOrder = 6; c.m3.root.add(s); c.m3.lbl = s; c.m3.lblText = c.name;
+    const s = sprite(labelTex(c.name || "Çiftçi", isMe ? "#ffe27a" : "#ffffff"), 1.9, .475, { fog: false }); s.position.set(0, 1.36, 0); s.renderOrder = 6; c.m3.root.add(s); c.m3.lbl = s; c.m3.lblText = c.name;
   }
   function syncChar(c, isMe, t) {
     if (!c.el && !isMe) return;

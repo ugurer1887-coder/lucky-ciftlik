@@ -180,3 +180,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v112
 - Rozetler çizilmiş simgeler: yumurta (kümes), süt kovası (ahır), yem çuvalı (ambar). `emojiBadge` içinde canvas ile çizilir (anahtar emo3).
+
+## v113
+- İsim etiketi (`labelTex`): 1024x256, kalın sade sans yazı tipi (Roboto/Segoe/Arial), kalın koyu çerçeve.
