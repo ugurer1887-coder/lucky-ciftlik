@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "106";
+const VERSION = "107";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1308,10 +1308,15 @@ const QUESTS = [
   { id: "plant", e: "🌱", t: "İlk tohumlar", s: "Buğday ek", d: "Sağdaki <b>Market</b>'e gir, <b>Buğday</b>'ı seç ve tarladaki 6 boş toprağa dokunarak tohum ek.", need: 6, gold: 3, go: "market" },
   { id: "water", e: "💧", t: "Ekinleri sula", s: "Ekin sula", d: "Ektiğin buğdaylara dokun. Kovan boşsa çiftçin <b>su kuyusundan</b> su alıp kendisi sular.", need: 6, gold: 4 },
   { id: "harvest", e: "🌾", t: "İlk hasat", s: "Ekin topla", d: "Sulanan buğday 1 dakikada olgunlaşır. Alttaki çubuktan <b>tırpanı</b> seç ve olgun buğdaylara dokun.", need: 6, gold: 5 },
-  { id: "sell", e: "💰", t: "Depoda sat", s: "Ürün sat", d: "Kırmızı <b>depoya</b> dokun ve topladığın buğdayları sat. Altınla yeni tohum alırsın.", need: 6, gold: 6 },
-  { id: "oven", e: "🔥", t: "Taş fırın", s: "Fırın al", d: "Ek, sula, topla, sat ve altın biriktir. <b>Market &gt; Fırınlar</b> bölümünden <b>Taş fırın</b>ı al ve çiftliğine yerleştir.", need: 1, gold: 8, go: "market" },
+  { id: "sell", e: "💰", t: "Depoda sat", s: "Ürün sat", d: "Kırmızı <b>depoya</b> dokun, <b>Depo</b>'yu seç ve topladığın buğdayları sat. Altınla yeni tohum alırsın.", need: 6, gold: 6 },
+  { id: "replant", ev: "plant", e: "🔁", t: "Tarlayı yenile", s: "Ekin ek", d: "Kazandığın altınla tohum alıp tarlayı tekrar ek. Ek, sula, topla, sat: çiftçiliğin döngüsü bu. Her iş sana <b>tecrübe puanı</b> (XP) kazandırır.", need: 12, gold: 6, go: "market" },
+  { id: "oven", e: "🔥", t: "Taş fırın", s: "Fırın al", d: "<b>Market &gt; Ocaklar</b> bölümünden <b>Taş fırın</b>ı al ve çiftliğine yerleştir.", need: 1, gold: 8, go: "market", chk: () => (S.oven && S.layout && S.layout.oven >= 0) ? 1 : 0 },
   { id: "bread", e: "🍞", t: "Fırıncı", s: "Ekmek pişir", d: "Fırına dokun, 2 buğdaydan 1 ekmek pişir. Pişen ekmekleri <b>depoya al</b>. Ekmek buğdaydan çok daha pahalı satılır.", need: 6, gold: 10 },
-  { id: "wish", e: "⛲", t: "Dilek tut", s: "Dilek tut", d: "5. seviyeye ulaş, <b>Meydan</b>'a git ve dilek çeşmesine dokunup altın atarak dilek tut.", need: 1, gold: 11, lv: 5, go: "plaza" },
+  { id: "tree", e: "🍎", t: "Elma ağacı", s: "Ağaç dik", d: "<b>Market &gt; Ekinler</b> bölümünden <b>Elma ağacı</b> al ve boş bir yere dik. Ağaç kendi büyür, sulamaya gerek yok, olgunlaşınca elma toplarsın.", need: 1, gold: 8, go: "market", chk: () => (S.trees && S.trees.length) ? 1 : 0 },
+  { id: "decor", e: "🌼", t: "Çiftliğini süsle", s: "Süs yerleştir", d: "<b>Market &gt; Dekor</b> bölümünden bir <b>çit</b> ya da <b>süs</b> al ve çiftliğine koy. Çiftliğini ziyarete gelenler görür.", need: 1, gold: 10, go: "market", chk: () => ((S.fences && S.fences.length) || (S.decor && S.decor.length)) ? 1 : 0 },
+  { id: "daily", e: "📅", t: "Günlük görevler", s: "Görevlere bak", d: "3. seviyede <b>günlük görevler</b> ve <b>siparişler</b> açılır. Bu pencerede <b>Günlük</b> sekmesine geç, görevleri yapıp altın ve sandık kazan.", need: 1, gold: 10, lv: 3 },
+  { id: "lvl", e: "⭐", t: "5. seviyeye ulaş", s: "Seviye", d: "Ekin ekip toplayarak, ekmek pişirerek ve siparişleri teslim ederek XP kazan. <b>5. seviyede</b> sohbet, patates, toprak satın alma, dilek çeşmesi ve iş ilanları açılır.", need: 5, gold: 15, chk: () => S.level },
+  { id: "wish", e: "⛲", t: "Dilek tut", s: "Dilek tut", d: "<b>Meydan</b>'a git ve dilek çeşmesine dokunup altın atarak dilek tut.", need: 1, gold: 11, go: "plaza" },
   { id: "jobs", e: "📋", t: "İş ilanları", s: "İlanlara bak", d: "Meydandaki <b>İş ilanı</b> tabelasına bak. Başka çiftçilerin tarlasında çalışıp altın kazanabilirsin.", need: 1, gold: 12, go: "jobs" },
 ];
 const FRIES_PRICE = 60, OVEN_PRICE = 40, BREAD_MS = 150 * 1000, WHEAT_PER_BREAD = 2, BREAD_PRICE = 20, JOB_LEVEL = 5;
@@ -1551,9 +1556,9 @@ const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
 const growMs = p => cropOf(p).ms / (typeof growMul === "function" ? growMul() : 1);
 const ripe = p => !!(p && p.c && p.w && Date.now() - p.w >= growMs(p));
 // tools in the bottom bar: how many ripe crops one swing gathers
-const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 1000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
-  tractor: { name: "Traktör", n: 4, price: 10000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M6 25V17h8l3-8h10v16z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6" stroke-linejoin="round"/><path d="M18.5 11h7v7h-9z" fill="#bfe6f7" stroke="#7a1f14" stroke-width="1.3"/><path d="M27 17h8v8h-8z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6"/><path d="M31 17V9" stroke="#3b3b3b" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="28" r="8.5" fill="#2b2b2b"/><circle cx="12" cy="28" r="3.6" fill="#f2c14e"/><circle cx="32" cy="31" r="5" fill="#2b2b2b"/><circle cx="32" cy="31" r="2" fill="#f2c14e"/></svg>' },
-  seeder: { name: "Ekim aleti", n: 2, price: 500, kind: "plant", icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M33 4L22 19" stroke="#8a5a32" stroke-width="3.2" stroke-linecap="round"/><path d="M29 6.5h7" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M9 13h15l-3 12H12z" fill="#3fa34d" stroke="#1f5a28" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 17h11" stroke="#bfe9a8" stroke-width="1.6"/><circle cx="16.5" cy="30" r="6.5" fill="#3b3b3b"/><circle cx="16.5" cy="30" r="2.5" fill="#f2c14e"/><g fill="#e9d29a" stroke="#a8843f" stroke-width=".8"><ellipse cx="6" cy="36" rx="1.8" ry="1.2"/><ellipse cx="27" cy="36.5" rx="1.8" ry="1.2"/><ellipse cx="32" cy="34" rx="1.8" ry="1.2"/></g></svg>' } };
+const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 2500, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
+  tractor: { name: "Traktör", n: 4, price: 20000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M6 25V17h8l3-8h10v16z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6" stroke-linejoin="round"/><path d="M18.5 11h7v7h-9z" fill="#bfe6f7" stroke="#7a1f14" stroke-width="1.3"/><path d="M27 17h8v8h-8z" fill="#d9402c" stroke="#7a1f14" stroke-width="1.6"/><path d="M31 17V9" stroke="#3b3b3b" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="28" r="8.5" fill="#2b2b2b"/><circle cx="12" cy="28" r="3.6" fill="#f2c14e"/><circle cx="32" cy="31" r="5" fill="#2b2b2b"/><circle cx="32" cy="31" r="2" fill="#f2c14e"/></svg>' },
+  seeder: { name: "Ekim aleti", n: 2, price: 1000, kind: "plant", icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M33 4L22 19" stroke="#8a5a32" stroke-width="3.2" stroke-linecap="round"/><path d="M29 6.5h7" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/><path d="M9 13h15l-3 12H12z" fill="#3fa34d" stroke="#1f5a28" stroke-width="1.6" stroke-linejoin="round"/><path d="M11 17h11" stroke="#bfe9a8" stroke-width="1.6"/><circle cx="16.5" cy="30" r="6.5" fill="#3b3b3b"/><circle cx="16.5" cy="30" r="2.5" fill="#f2c14e"/><g fill="#e9d29a" stroke="#a8843f" stroke-width=".8"><ellipse cx="6" cy="36" rx="1.8" ry="1.2"/><ellipse cx="27" cy="36.5" rx="1.8" ry="1.2"/><ellipse cx="32" cy="34" rx="1.8" ry="1.2"/></g></svg>' } };
 const TOOL_LEVEL = { seeder: 10, escythe: 15, tractor: 30 };   // tools that unlock later
 const HARVEST_TOOLS = k => TOOLS[k] && TOOLS[k].kind !== "plant";
 const seederOn = () => !!(S && scene.kind !== "plaza" && S.slot === "seeder" && S.tools.includes("seeder"));
@@ -2897,7 +2902,7 @@ function objAct(kind, i) {
 const OBJ_ACTS = {
   oven: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
   oven2: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
-  barn: [["📦", "Depo", "use"], ["✋", "Taşı", "move"]],
+  barn: [["📦", "Depo", "use"], ["⬆️", "Yükselt", "depup"], ["✋", "Taşı", "move"]],
   well: [["🪣", "Su al", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
   house: [["🚪", "Eve git", "use"], ["✋", "Taşı", "move"]],
   spr: [["💦", "Sula", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
@@ -2905,7 +2910,7 @@ const OBJ_ACTS = {
   decor: [["✋", "Taşı", "move"]], scare: [["✋", "Taşı", "move"]], sign: [["📋", "Siparişler", "use"], ["✋", "Taşı", "move"]],
   coop: [["🥚", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐔", "Kümes", "use"], ["✋", "Taşı", "move"]],
   cowbarn: [["🥛", "Topla", "collect"], ["🌾", "Yem ver", "feed"], ["🐄", "Ahır", "use"], ["✋", "Taşı", "move"]],
-  mill: [["⚙️", "Yem yap", "use"], ["✋", "Taşı", "move"]],
+  mill: [["🌾", "Yem yap", "use"], ["✋", "Taşı", "move"]],
 };
 // buildings and decorations that can be turned (house and depot keep their door towards the yard)
 const ROTATABLE = new Set(["oven", "oven2", "well", "scare", "sign", "decor", "tree", "spr", "coop", "cowbarn", "mill"]);
@@ -2940,6 +2945,7 @@ $("objMenu").addEventListener("click", e => {
   if (a === "move") { setMode("move"); moveSel = { t: kind, from: kind in OBJ ? S.layout[kind] : i }; setMode("move"); return; }
   if (a === "up") { mtab = "up"; renderMarket(); openSheet($("market")); return; }
   if (a === "rot") { S.rot = S.rot && typeof S.rot === "object" ? S.rot : {}; const k = rotKey(kind, i); S.rot[k] = ((+S.rot[k] || 0) + 1) % 4; save(); R3.dirty = true; renderPlots(); objMenuShow(i, kind); return; }
+  if (a === "depup") { depotUpgrade(); return; }
   if (a === "collect") { collectAnimals(kind); return; }
   if (a === "feed") { feedAnimals(kind); return; }
   if (b.getAttribute("data-ot") === "Geliştir" && OVENS.includes(kind)) { openOven(kind); setTimeout(() => { const u = $("ovenBody").querySelector("[data-oup]"); if (u) scrollInSheet(u.closest(".card")); }, 80); return; }
@@ -3805,7 +3811,7 @@ function renderMarket0() {
     body.querySelectorAll("[data-oplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-oplace")));
   } else if (mtab === "animals") {
     const info = { coop: `${COOP_CAP} tavuk sığar. Tavuklar yem yiyince ${EGG_MS / MIN} dakikada yumurtlar.`, cowbarn: `${COW_CAP} inek sığar. İnekler yem yiyince ${MILK_MS / MIN} dakikada süt verir.`, mill: "Buğdaydan tavuk yemi, mısır ve buğdaydan inek yemi yapar." };
-    body.innerHTML = ["mill", "coop", "cowbarn"].map(k => { const own = ownedB(S, k), placed = S.layout[k] >= 0, lock = S.level < bLevel(k) && !isAdmin(), icon = { coop: "🐔", cowbarn: "🐄", mill: "⚙️" }[k];
+    body.innerHTML = ["mill", "coop", "cowbarn"].map(k => { const own = ownedB(S, k), placed = S.layout[k] >= 0, lock = S.level < bLevel(k) && !isAdmin(), icon = { coop: "🐔", cowbarn: "🐄", mill: `<svg viewBox="0 0 64 64" width="46" height="46" aria-hidden="true"><path d="M6 58V26L32 8l26 18v32z" fill="#c8483a" stroke="#6e1f14" stroke-width="3" stroke-linejoin="round"/><path d="M3 28L32 6l29 22" fill="none" stroke="#fff4e6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="18" y="32" width="28" height="26" fill="#8a5a32" stroke="#5a3a1e" stroke-width="2.5"/><path d="M18 32l28 26M46 32L18 58" stroke="#5a3a1e" stroke-width="2.2"/><circle cx="32" cy="22" r="4" fill="#ffe9a8" stroke="#6e1f14" stroke-width="2"/><path d="M26 6h12" stroke="#6e1f14" stroke-width="0"/></svg>` }[k];
       return `<div class="card${lock ? " locked" : ""}"><div class="thumb ovthumb"><span class="rec">${icon}</span></div><div><h3>${OBJ[k].name}</h3><p>${own ? "Sende var." : `<span class="price">${fmtG(bPrice(k))} altın</span>`}</p><p class="keep">${info[k]}</p>
         <div class="row">${lock ? `<button class="big sm" disabled>🔒 ${bLevel(k)}. seviyede açılır</button>` : !own ? `<button class="big green sm" data-bbuy="${k}" ${S.gold >= bPrice(k) ? "" : "disabled"}>${S.gold >= bPrice(k) ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
           : !placed ? `<button class="big green sm" data-bplace="${k}">Yerleştir</button>` : `<span class="pill">Çiftliğinde</span>`}</div></div></div>`; }).join("");
@@ -4011,20 +4017,17 @@ const woodThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect
 function depotHead() {
   const cap = depCap(S), used = depUsed(S), lv = depLv(S), pct = Math.min(100, used / cap * 100).toFixed(0), full = used >= cap;
   let h = `<div class="card"><div class="thumb" style="font-size:34px">📦</div><div><h3>Depo ${lv}. seviye</h3><p><span class="stock">${used}</span> / ${cap} yer dolu${full ? " · <b>DOLU</b>" : ""}</p><div style="height:8px;border-radius:6px;background:rgba(0,0,0,.18);overflow:hidden;margin:6px 0"><div style="height:100%;width:${pct}%;background:${full ? "#e0473a" : "#6cc04a"}"></div></div>`;
-  if (lv < DEPOT_CAP.length) {
-    const up = DEPOT_UP[lv - 1], haveW = +S.store.wood || 0, ok = S.gold >= up.g && haveW >= up.wood;
-    h += `<p class="keep">${lv + 1}. seviye: ${DEPOT_CAP[lv]} yer. Gerekenler: <b>${fmtG(up.g)} altın</b> ve <b>${up.wood} tahta</b> (sende ${haveW} tahta var). Tahta, ekinleri toplarken %${Math.round(woodChance(S) * 100)} şansla çıkar${S.level <= WOOD_LATE_LEVEL ? " (" + (WOOD_LATE_LEVEL + 1) + ". seviyeden sonra %" + Math.round(WOOD_CHANCE_LATE * 100) + ")" : ""}.</p><div class="row"><button class="big green sm" data-depup="1" ${ok ? "" : "disabled"}>${ok ? "Depoyu geliştir" : S.gold < up.g ? "Altının yetmiyor" : "Tahtan yetmiyor"}</button></div>`;
-  } else h += `<p class="keep">Depon en üst seviyede.</p>`;
   return h + `</div></div>`;
 }
 function depotUpgrade() {
   if (!S) return; adminTopUp();
-  const lv = depLv(S); if (lv >= DEPOT_CAP.length) return;
-  const up = DEPOT_UP[lv - 1];
-  if (S.gold < up.g) { hint("Depoyu geliştirmek için " + fmtG(up.g) + " altın gerekiyor."); return; }
-  if ((+S.store.wood || 0) < up.wood) { hint("Depoyu geliştirmek için " + up.wood + " tahta gerekiyor."); return; }
+  const lv = depLv(S); if (lv >= DEPOT_CAP.length) { hint("Depon en üst seviyede."); return; }
+  const up = DEPOT_UP[lv - 1], haveW = +S.store.wood || 0, miss = [];
+  if (S.gold < up.g) miss.push(fmtG(up.g) + " altın");
+  if (haveW < up.wood) miss.push(up.wood + " tahta");
+  if (miss.length) { hint("Depoyu yükseltmek için " + miss.join(" ve ") + " gerekiyor."); SFX.play("error"); return; }
   S.gold = round1(S.gold - up.g); SFX.play("buy"); S.store.wood -= up.wood; S.depLv = lv + 1;
-  saveNow(); renderHud(); renderDepot(); toast("Depon " + S.depLv + ". seviye oldu! Kapasite: " + depCap(S) + " 📦");
+  saveNow(); renderHud(); renderDepot(); toast("Depon " + S.depLv + ". seviye oldu! Kapasite: " + depCap(S));
 }
 function renderDepot() {
   document.querySelectorAll("#depotTabs_v8 [data-dtab]").forEach(b => { const k = b.getAttribute("data-dtab"), n = DEPOT_TABS[k].reduce((a, x) => a + (+S.store[x] || 0), 0);
@@ -5379,17 +5382,25 @@ $("notifSw").onclick = () => { if (NOTIF.on) notifDisable(); else notifEnable(fa
 $("notifYes").onclick = () => { $("notifAsk").classList.remove("on"); notifEnable(false); };
 $("notifNo").onclick = () => $("notifAsk").classList.remove("on");
 // ---------- Tutorial quests ----------
-// S.tut = { i: quests already claimed, c: { questId: progress }, o: window shown once }
+// S.tut = { i: index of the current quest, d: ids of claimed quests, c: { questId: progress }, v: 2, o: window shown once }
 // progress counts for every quest that is not claimed yet, so nothing done early is lost
 const tutOn = () => !!(S && S.tut && S.tut.i < QUESTS.length);
+const OLD_QUESTS = ["plant", "water", "harvest", "sell", "oven", "bread", "wish", "jobs"];
 function tutInit() {
   if (!S) return;
-  if (!S.tut || typeof S.tut !== "object") S.tut = { i: 0, c: {} };
-  S.tut.i = Math.max(0, Math.min(QUESTS.length, Math.floor(+S.tut.i || 0)));
+  if (!S.tut || typeof S.tut !== "object") S.tut = { i: 0, c: {}, d: [], v: 2 };
   if (!S.tut.c || typeof S.tut.c !== "object") S.tut.c = {};
+  if (S.tut.v !== 2) {   // older saves: the first i quests of the old list were claimed
+    const old = Math.max(0, Math.min(OLD_QUESTS.length, Math.floor(+S.tut.i || 0)));
+    S.tut.d = (old >= OLD_QUESTS.length || (+S.level || 1) >= 5) ? QUESTS.map(q => q.id) : OLD_QUESTS.slice(0, old);
+    S.tut.v = 2;
+  }
+  if (!Array.isArray(S.tut.d)) S.tut.d = [];
+  let k = 0; while (k < QUESTS.length && S.tut.d.includes(QUESTS[k].id)) k++;
+  S.tut.i = k;
 }
 function questProg(q) {
-  if (q.id === "oven") return S.oven && S.layout && S.layout.oven >= 0 ? 1 : 0;
+  if (q.chk) { try { return Math.min(q.need, Math.max(0, Math.floor(+q.chk() || 0))); } catch (e) { return 0; } }
   return Math.min(q.need, Math.max(0, Math.floor(+(S.tut.c[q.id]) || 0)));
 }
 const questLocked = q => !!(q.lv && S.level < q.lv);
@@ -5397,12 +5408,27 @@ const questReady = q => !questLocked(q) && questProg(q) >= q.need;
 const questCur = () => tutOn() ? QUESTS[S.tut.i] : null;
 function questEv(id, n) {
   if (!tutOn()) return;
-  const k = QUESTS.findIndex(q => q.id === id); if (k < S.tut.i) return;
-  const q = QUESTS[k], was = questReady(q);
-  S.tut.c[id] = Math.min(q.need, (+S.tut.c[id] || 0) + Math.max(0, +n || 0));
-  if (!was && questReady(q) && k === S.tut.i) questDone(q);
+  QUESTS.forEach((q, k) => {
+    if ((q.ev || q.id) !== id || q.chk || S.tut.d.includes(q.id)) return;
+    const was = questReady(q);
+    S.tut.c[q.id] = Math.min(q.need, (+S.tut.c[q.id] || 0) + Math.max(0, +n || 0));
+    if (!was && questReady(q) && k === S.tut.i) questDone(q);
+  });
   renderQuest();
 }
+// quests that look at the farm itself (tree planted, level reached ...) are checked on a timer
+let qPollSig = "", qPollOn = false;
+function questPoll() {
+  if (!S || !S.tut || !entered || !tutOn()) return;
+  const q = questCur(), sig = q.id + ":" + questProg(q) + ":" + questLocked(q);
+  if (sig === qPollSig) return;
+  const wasReady = qPollSig.startsWith(q.id + ":") && +qPollSig.split(":")[1] >= q.need;
+  qPollSig = sig;
+  if (q.chk && qPollOn && questReady(q) && !wasReady) questDone(q);
+  qPollOn = true;
+  renderQuest();
+}
+setInterval(() => { try { if (alive()) questPoll(); } catch (e) {} }, 1500);
 function questDone(q) {
   SFX.play("notify"); toast("Görev tamamlandı: " + q.t + "! Ödülünü al");
   const t = $("qtrack"); if (t) { t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); }
@@ -5410,6 +5436,7 @@ function questDone(q) {
 function questLine(q) {
   if (questLocked(q)) return q.lv + ". seviyede açılır (şu an " + S.level + ")";
   if (q.id === "oven") return questProg(q) ? "Fırın hazır" : "Altın " + fmtG(Math.min(S.gold, OVEN_PRICE)) + "/" + OVEN_PRICE;
+  if (q.chk && q.need === 1) return questProg(q) ? "Tamam" : q.s;
   return q.s + " " + questProg(q) + "/" + q.need;
 }
 function questPct(q) {
@@ -5458,6 +5485,7 @@ function questPulse(q) {
 }
 function renderQuestList() {
   renderQuestTabs();
+  if (qtab !== "tut" && S && S.level >= 3 && tutOn() && !S.tut.d.includes("daily") && (+S.tut.c.daily || 0) < 1) { S.tut.c.daily = 1; if (questCur() && questCur().id === "daily") questDone(questCur()); setTimeout(renderQuest, 0); }
   if (qtab === "tut") renderTutList();
   else { $("questList").innerHTML = qtab === "daily" ? renderDailyList() : renderOrderList(); $("questMore").textContent = ""; }
   tickUntil();
@@ -5483,11 +5511,12 @@ function openQuests(tab) { if (!S) return; tutInit(); S.tut.o = 1;
 function claimQuest(k) {
   if (!tutOn() || k !== S.tut.i) return;
   const q = QUESTS[k]; if (!questReady(q)) return;
-  S.tut.i++; S.gold = round1(S.gold + q.gold); saveNow(); renderHud();
+  if (!S.tut.d.includes(q.id)) S.tut.d.push(q.id); tutInit(); S.gold = round1(S.gold + q.gold); saveNow(); renderHud();
   coinBurst($("questList").querySelector(`[data-qclaim="${k}"]`) || $("qtrack"), q.gold); SFX.seq("quest", "coin");
   try { popAt(me.x, me.y - .3, "+" + q.gold + " altın", "#ffe27a"); } catch (e) {}
   if (S.tut.i >= QUESTS.length) toast("Tebrikler! Bütün görevleri bitirdin");
   else { const n = QUESTS[S.tut.i]; toast("+" + q.gold + " altın. Yeni görev: " + n.t); if (questReady(n)) questDone(n); }
+  qPollSig = "";
   renderQuestList(); renderQuest();
 }
 // little gold coins flying up from a button
@@ -5893,6 +5922,12 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 107, d: "11 Ekim 2026", e: "🎓", t: "Depo, araç fiyatları ve yeni görevler", c: "#8a3a2e", b: "#f9e3dc", items: [
+    "Depoyu yükseltmek için çiftlikteki <b>depoya dokun</b> ve <b>Yükselt</b>'i seç. Gerekenler eksikse sana söyler.",
+    "Araç fiyatları: Ekim aleti 1.000, Elektrikli tırpan 2.500, Traktör 20.000 altın.",
+    "Marketteki <b>Ambar</b> simgesi artık gerçek bir ambar.",
+    "Görevler artık seni 5. seviyeye kadar adım adım yönlendiriyor: ekim, sulama, hasat, satış, fırın, ağaç, süsleme, günlük görevler, dilek çeşmesi ve iş ilanları.",
+  ] },
   { v: 106, d: "11 Ekim 2026", e: "🗨️", t: "Baloncuk ve yazma düzeltmesi", c: "#2e6a8a", b: "#dceef7", items: [
     "Genel sohbette yazılan mesaj artık karakterin başında baloncuk çıkarmaz, yalnızca sohbet kutusunda görünür.",
     "Çiftlik ve meydan sohbeti baloncukları daha büyük ve uzaktan okunur.",
@@ -5998,7 +6033,7 @@ const UPDATES = [
     "Taş fırın artık 40 altın. <b>İkinci fırın</b> 20. seviyede açılıyor. Fırınlar 3 seviyeye geliştirilebiliyor: 7, 15 ve iki tepside 20+20 ürün.",
     "Fırında <b>patates kızartması</b> da yapılıyor: 2 patatese 1 kızartma, 5 dakika.",
     "Çiftlikteki binalara, ağaçlara ve süslere dokununca altında <b>Pişir, Geliştir, Taşı</b> gibi seçenekler çıkıyor.",
-    "Ekim aleti 10. seviyede 500 altın, elektrikli tırpan 15. seviyede 1.000 altın. Fıskiye 400 altın, 6 seviyeye kadar geliştirilebiliyor.",
+    "Ekim aleti 10. seviyede, elektrikli tırpan 15. seviyede açılır. Fıskiye 400 altın, 6 seviyeye kadar geliştirilebiliyor.",
     "Yeni oyuncular 50 altınla başlıyor, kuyu tarlanın hemen yanında. Açılmamış araziler bulutlu, oyun çiftliğin ortada açılıyor.",
     "Yazılara basılı tutunca artık kopyalama menüsü çıkmıyor.",
   ] },

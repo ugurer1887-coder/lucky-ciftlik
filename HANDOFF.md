@@ -160,3 +160,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Genel sohbet (tab "g") mesajları karakter başında baloncuk çıkarmaz; çiftlik/meydan çıkarır (`chatFresh`).
 - Baloncuklar büyütüldü (2B `.bt` 23px, 3B sprite 4.6x.72, font 68px).
 - Klavye açılınca oyun yeniden boyutlanmaz: `typing()` iken `fitScreen/refit` atlanır, `.sheet` `bottom:var(--kb)` ile klavyenin üstüne çıkar.
+
+## v107
+- Depo yükseltmesi depo penceresinden çıkarıldı; çiftlikteki depo menüsünde "⬆️ Yükselt" (`OBJ_ACTS.barn`, `depotUpgrade`). Eksikleri tek mesajda söyler.
+- Fiyatlar: ekim aleti 1000, elektrikli tırpan 2500, traktör 20000 (`TOOLS`). Ambar market simgesi SVG.
+- Öğretici görevler 13 adıma çıktı (5. seviyeye kadar). `S.tut = {i, d:[claimed ids], c, v:2}`; eski kayıtlar `tutInit` içinde geçirilir (seviye>=5 olanlar öğreticiyi bitmiş sayılır). `chk()` ile durum-tabanlı görevler `questPoll` (1.5 sn) ile izlenir; `ev` ile aynı olayı sayan görevler.
