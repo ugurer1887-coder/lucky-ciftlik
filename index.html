@@ -1254,7 +1254,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "102";
+const VERSION = "103";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -5798,6 +5798,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 103, d: "10 Ekim 2026", e: "⚡", t: "Daha akıcı oyun", c: "#8a5a2e", b: "#f6e8d4", items: [
+    "Gerçek zamanlı gölgeler kapatıldı, yerine yumuşak zemin gölgeleri kullanılıyor.",
+    "Çizim çözünürlüğü ve kenar yumuşatma hafifletildi, oyun telefonlarda daha akıcı çalışır.",
+  ] },
   { v: 102, d: "10 Ekim 2026", e: "🪵", t: "Tahta şansı arttı", c: "#8a5a2e", b: "#f6e8d4", items: [
     "Ekinleri toplarken tahta çıkma şansı <b>%20</b> oldu. 15. seviyeden sonra %10'a düşer.",
   ] },
@@ -6102,10 +6106,9 @@ async function start3D() {
 }
 function setup3D(T) {
   const cv = $("c3d");
-  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;   // real-time shadows off: every object has a soft ground shadow instead (much lighter for phones)
-  renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
+  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: false, powerPreference: "high-performance" });   // antialias off: lighter on the GPU
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.shadowMap.enabled = false; renderer.shadowMap.autoUpdate = false;   // real-time shadows are off at every quality level: every object has a soft ground shadow (blob) instead
   renderer.outputColorSpace = T.SRGBColorSpace;
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.06;
   const maxTex = Math.min(4096, renderer.capabilities.maxTextureSize || 4096);
@@ -7852,10 +7855,10 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   }
   R3.quality = lvl => {
     const dpr = window.devicePixelRatio || 1;
-    R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.7), Math.min(dpr, 2.25)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
+    R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.5), Math.min(dpr, 1.5)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
     if (lvl < 2) { R3.envT = 0; waterMats.forEach(m => { if (m.envMap) { m.envMap = null; m.needsUpdate = true; } }); }   // yansıma yalnızca seviye 2
-    sun.castShadow = lvl > 1;   // performans: gerçek gölge yalnızca seviye 2; diğerlerinde blob gölgeler
-    const ms = [0, 1024, 1024][lvl]; if (ms && sun.shadow.mapSize.x !== ms) { sun.shadow.mapSize.set(ms, ms); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+    sun.castShadow = false;   // performans: gerçek gölge tüm seviyelerde kapalı, her yerde blob gölgeler
+    if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
     scene3.background = lvl > 0 ? skyTex : skyFlat; skyG.visible = lvl > 0;
     if (lvl === 0) { sun.color.set("#ffe2b8"); hemi.groundColor.set("#5b6e3a"); }
     tuftCount = [2500, 5500, 7500][lvl]; R3.dirty = true; renderer.shadowMap.needsUpdate = true;
