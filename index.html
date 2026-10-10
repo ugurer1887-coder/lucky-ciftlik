@@ -627,6 +627,7 @@ body{font-family:var(--body);letter-spacing:.1px}
 .obar{height:9px;border-radius:99px;background:rgba(0,0,0,.12);overflow:hidden;margin:6px 0}.obar u{display:block;height:100%;background:linear-gradient(90deg,#ffb52a,#e0473a)}
 .oseg{margin:6px 0}.oseg button{font-size:.74rem!important;padding:6px 8px!important}
 .nlayer{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.msec{margin:14px 2px 6px;font:800 14px var(--body);color:var(--ink-soft,#6b5a3a);letter-spacing:.3px}.msec:first-child{margin-top:2px}
 .nlab{position:absolute;left:0;top:0;white-space:nowrap;font:800 13px var(--body),Nunito,Roboto,Arial,sans-serif;color:#fff;letter-spacing:.2px;text-shadow:-1.5px 0 #0b0d08,1.5px 0 #0b0d08,0 -1.5px #0b0d08,0 1.5px #0b0d08,-1.2px -1.2px #0b0d08,1.2px -1.2px #0b0d08,-1.2px 1.2px #0b0d08,1.2px 1.2px #0b0d08,0 2px 3px rgba(0,0,0,.55);will-change:transform;display:none;-webkit-font-smoothing:antialiased}
 .nlab.me{color:#ffe27a}
 .objmenu{position:absolute;z-index:20;display:none;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 8px;border-radius:16px;pointer-events:auto;
@@ -807,7 +808,6 @@ button:active{transform:scale(.96);filter:brightness(.96)}
       <button class="tab" role="tab" aria-selected="true" data-mtab="crops">Ekinler</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="tools">Araçlar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="ovens">Ocaklar</button>
-      <button class="tab" role="tab" aria-selected="false" data-mtab="land">Toprak</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="animals">Hayvanlar</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="decor">Dekor</button>
       <button class="tab" role="tab" aria-selected="false" data-mtab="up">Geliştir</button>
@@ -1288,7 +1288,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "118";
+const VERSION = "119";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1332,7 +1332,7 @@ const g4 = (r, c) => idx(r + SY, c + SX);           // a cell given in the previ
 const area = (r0, r1, c0, c1) => { const s = new Set(); for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) s.add(idx(r, c)); return s; };
 const coreArea = (r0, r1, c0, c1) => area(r0 + OY, r1 + OY, c0 + OX, c1 + OX);
 // Farm yard: flat land. Buildings belong to each player and can be moved; these are only the starting spots.
-const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, coop: { w: 3, h: 3, name: "Tavuk kümesi" }, cowbarn: { w: 4, h: 4, name: "İnek ahırı" }, mill: { w: 2, h: 2, name: "Ambar" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Sipariş tabelası" } };
+const OBJ = { oven: { w: 2, h: 2, name: "Taş fırın" }, oven2: { w: 2, h: 2, name: "2. Taş fırın" }, icecart: { w: 2, h: 2, name: "Dondurma arabası" }, coop: { w: 3, h: 3, name: "Tavuk kümesi" }, cowbarn: { w: 4, h: 4, name: "İnek ahırı" }, mill: { w: 2, h: 2, name: "Ambar" }, house: { w: 5, h: 3, name: "Ev" }, barn: { w: 3, h: 2, name: "Depo" }, well: { w: 1, h: 1, name: "Su kuyusu" }, scare: { w: 1, h: 1, name: "Korkuluk" }, sign: { w: 1, h: 1, name: "Sipariş tabelası" } };
 const DEFAULT_LAYOUT = { house: at(0,0), barn: at(0,11), well: at(4,9), scare: at(3,8), sign: at(3,0) };
 const DEFAULT_SOIL = [at(4,5), at(4,6), at(4,7), at(5,5), at(5,6), at(5,7)];
 const ROAD = area(ROWS - 1, ROWS - 1, 0, COLS - 1);
@@ -1363,7 +1363,7 @@ const SPAWN_PLAZA = g4(15, 20);
 const fencePrice = bought => FENCE_BASE + Math.floor(bought / 5);
 const MAX_LEVEL = 100;
 // XP for each job: wheat harvest is the base, potato and apples 10% more, watering same as wheat
-const XP = { egg: 2, milk: 4, feed: 1, fries: 5, wheat: 2, potato: 3, carrot: 4, lettuce: 5, corn: 6, eggplant: 7, pumpkin: 9, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
+const XP = { icecream: 12, egg: 2, milk: 4, feed: 1, fries: 5, wheat: 2, potato: 3, carrot: 4, lettuce: 5, corn: 6, eggplant: 7, pumpkin: 9, apple: 3, water: 2, bread: 3 };   // planting gives the same XP as harvesting that crop
 // every level needs 15% more than the one before; overall 30% slower than before (old need x 6 for the bigger XP numbers x 1.3)
 const XP_BASE = 15.6;
 // +15% every level, and from level 5 on an extra +10% that stacks again every 5 levels (5, 10, 15, ...)
@@ -1551,7 +1551,7 @@ const ANIMALS = {
   cowbarn: { list: "cows", one: "İnek", feed: "cowfeed", prod: "milk", prodName: "Süt", ms: MILK_MS, cap: COW_CAP, price: COW_PRICE, lv: COWBARN_LEVEL, cost: COWBARN_PRICE, emoji: "🐄", pe: "🥛" },
 };
 const BUILDINGS = ["coop", "cowbarn", "mill"];
-const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "chickfeed", "cowfeed", "wood"];
+const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "icecream", "chickfeed", "cowfeed", "wood"];
 // depot: capacity per level (everything in the depot counts, one slot per item); level 2 costs gold + planks (tahta)
 const DEPOT_CAP = [100, 200], DEPOT_UP = [{ g: 600, wood: 4 }];
 const WOOD_CHANCE = 0.2, WOOD_CHANCE_LATE = 0.1, WOOD_LATE_LEVEL = 15, WOOD_MAX_PRICE = 400, WOOD_REF = 100;   // each harvested crop gives a plank with 20% chance, 10% once the farmer is above level 15; the plaza price is capped at 400 each
@@ -2330,14 +2330,23 @@ const ovenInner = () => `<ellipse cx="100" cy="186" rx="94" ry="12" fill="rgba(0
   <path d="M58 124h84" stroke="#8f877b" stroke-width="6" stroke-linecap="round"/>`;
 // ---------- Ovens: up to two (the 2nd opens at level 20), 3 levels each ----------
 // Lv1: one tray of up to 7, Lv2: 15, Lv3: two trays of 20 baking side by side. Each tray bakes one recipe, item by item.
-const OVENS = ["oven", "oven2"], OVEN2_LEVEL = 20, OVEN_CAP = [0, 7, 15, 20], OVEN_UP = [0, 1000, 3000], OVEN_MAX = 3;
+const ICE_PRICE = 600, ICE_LEVEL = 15, ICECREAM_SELL = 150, ICECREAM_MS = 10 * 60 * 1000;   // dondurma: 1 süt (40) + 1 elma (45) = 85 altın girdi, 150 altına satılır
+const OVENS = ["oven", "oven2", "icecart"], OVEN2_LEVEL = 20, OVEN_CAP = [0, 7, 15, 20], OVEN_UP = [0, 1000, 3000], OVEN_MAX = 3;
 const RECIPES = {
   bread: { name: "Ekmek", from: "wheat", n: WHEAT_PER_BREAD, ms: BREAD_MS, emoji: "🍞" },
   fries: { name: "Patates kızartması", from: "potato", n: 2, ms: 5 * 60 * 1000, emoji: "🍟" },
+  icecream: { name: "Dondurma", from: "milk", n: 1, from2: "apple", n2: 1, ms: ICECREAM_MS, emoji: "🍦" },
 };
+const recipesOf = id => id === "icecart" ? ["icecream"] : ["bread", "fries"];
+const recFor = (id, k) => { const r = ovenRec[k]; return recipesOf(id).includes(r) ? r : recipesOf(id)[0]; };
+const ingName = k => (CROPS[k] ? CROPS[k].name : { apple: "Elma", milk: "Süt" }[k] || k).toLocaleLowerCase("tr");
+const recStock = R => Math.max(0, Math.min(Math.floor((+S.store[R.from] || 0) / R.n), R.from2 ? Math.floor((+S.store[R.from2] || 0) / R.n2) : Infinity));
+const recIn = (R, q) => `<b>${q * R.n}</b> ${ingName(R.from)}` + (R.from2 ? ` + <b>${q * R.n2}</b> ${ingName(R.from2)}` : "");
+const recMeta = R => R.from2 ? `${ingName(R.from)} ${+S.store[R.from] || 0} · ${ingName(R.from2)} ${+S.store[R.from2] || 0}` : `depoda ${+S.store[R.from] || 0}`;
+const ovenPrice = id => id === "icecart" ? ICE_PRICE : OVEN_PRICE, ovenLevelReq = id => id === "oven2" ? OVEN2_LEVEL : id === "icecart" ? ICE_LEVEL : 1;
 const ovenLv = (farm, id) => Math.max(1, Math.min(OVEN_MAX, Math.floor(+(farm && farm.ovenLv && farm.ovenLv[id]) || 1)));
 const ovenSlots = (farm, id) => ovenLv(farm, id) >= 3 ? 2 : 1;
-const ovenOwned = (farm, id) => !!(farm && (id === "oven" ? farm.oven : farm.oven2));
+const ovenOwned = (farm, id) => !!(farm && farm[id]);
 function trayOf(farm, id, k) { const b = farm && farm.bakes && farm.bakes[id]; return b && b[k] && +b[k].q > 0 ? b[k] : null; }
 function trayInfo(t, now) {
   if (!t) return { q: 0, done: 0, next: 0, r: null };
@@ -2345,6 +2354,7 @@ function trayInfo(t, now) {
   return { q: +t.q, done, next: done < t.q ? t.t0 + (done + 1) * ms - now : 0, r: t.r || "bread" };
 }
 // one oven (id) or every oven together
+function ovenDoneKey(farm, now, id) { for (const k of [0, 1]) { const I = trayInfo(trayOf(farm, id, k), now); if (I.done > 0) return I.r; } return "bread"; }
 function bakeInfo(farm, now, id) {
   const out = { q: 0, done: 0, next: 0 };
   (id ? [id] : OVENS).forEach(o => [0, 1].forEach(k => { const I = trayInfo(trayOf(farm, o, k), now); out.q += I.q; out.done += I.done; if (I.next > 0 && (!out.next || I.next < out.next)) out.next = I.next; }));
@@ -2358,7 +2368,8 @@ function objectsLayer(farm, now, queued) {
   items.push([rowOf(L.well) + 1, `<g transform="translate(${X(L.well) - 800} ${Y(L.well)})">${wellSvg(farm.well || 1)}</g>`]);
   for (const oid of OVENS) if (L[oid] >= 0) {
     const ox = X(L[oid]), oy = Y(L[oid]), B = farm === S ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
-    let o = sprite("oven", ovenInner(), 0, 0, 200, 200, ox, oy);
+    let o = oid === "icecart" ? sprite("icecart", iceCartInner(), 0, 0, 200, 200, ox, oy) : sprite("oven", ovenInner(), 0, 0, 200, 200, ox, oy);
+    if (oid === "icecart") { if (B.done > 0) o += `<g transform="translate(${ox + 158} ${oy + 26})"><circle r="24" fill="#fffdf6" stroke="#e3a72f" stroke-width="3"/><text y="10" text-anchor="middle" font-size="28">🍦</text></g>`; items.push([rowOf(L[oid]) + 2, o]); continue; }
     if (B.q > B.done) o += `<g transform="translate(${ox + 100} ${oy + 118})"><path d="M-22 0q4-26 14-30q-2 14 8 18q2-20 12-28q4 22 10 40z" fill="#f2a12e"/><path d="M-12 0q4-14 10-16q0 10 6 10q4-10 8-12q0 12 0 18z" fill="#ffe27a"/></g>
       <circle cx="${ox + 139}" cy="${oy - 2}" r="9" fill="#e9e6e0" opacity=".7"/><circle cx="${ox + 146}" cy="${oy - 20}" r="12" fill="#e9e6e0" opacity=".5"/>`;
     if (B.done > 0) o += `<g transform="translate(${ox + 158} ${oy + 26})"><circle r="24" fill="#fffdf6" stroke="#e3a72f" stroke-width="3"/><path d="M-15 6q0-17 15-17t15 17z" fill="#d48a3a" stroke="#8a4f1c" stroke-width="2"/><path d="M-6 -4l3 5M3 -6l2 6" stroke="#f3c27a" stroke-width="2.4" stroke-linecap="round"/><text y="20" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="#3e2a17">${B.done}</text></g>`;
@@ -2915,6 +2926,7 @@ function objAct(kind, i) {
 const OBJ_ACTS = {
   oven: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
   oven2: [["🔥", "Pişir", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
+  icecart: [["🍦", "Dondurma", "use"], ["⬆️", "Geliştir", "use"], ["✋", "Taşı", "move"]],
   barn: [["📦", "Depo", "use"], ["⬆️", "Yükselt", "depup"], ["✋", "Taşı", "move"]],
   well: [["🪣", "Su al", "use"], ["⬆️", "Geliştir", "up"], ["✋", "Taşı", "move"]],
   house: [["🚪", "Eve git", "use"], ["✋", "Taşı", "move"]],
@@ -2926,7 +2938,7 @@ const OBJ_ACTS = {
   mill: [["🌾", "Yem yap", "use"], ["✋", "Taşı", "move"]],
 };
 // buildings and decorations that can be turned (house and depot keep their door towards the yard)
-const ROTATABLE = new Set(["oven", "oven2", "well", "scare", "sign", "decor", "tree", "spr", "coop", "cowbarn", "mill"]);
+const ROTATABLE = new Set(["oven", "oven2", "icecart", "well", "scare", "sign", "decor", "tree", "spr", "coop", "cowbarn", "mill"]);
 const rotKey = (kind, i) => kind in OBJ ? kind : "c" + i;
 const rotOf = (farm, kind, i) => ((farm && farm.rot && +farm.rot[rotKey(kind, i)]) || 0) % 4;
 let objMenu = null;   // { i, kind, x, z }
@@ -3040,7 +3052,7 @@ $("hotbar").addEventListener("click", e => {
 function scrollInSheet(el) { const box = el && el.closest(".sheet-body"); if (box) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - (box.clientHeight - el.offsetHeight) / 2); }
 function offerExpand() {
   hint(S.level < expandLevel(S) ? "Burası sisli bölge. " + expandLevel(S) + ". seviyede " + fmtBig(expandPrice(S)) + " altına açılır." : "Burası sisli bölge. " + fmtBig(expandPrice(S)) + " altına satın alabilirsin.");
-  mtab = "land"; renderMarket(); openSheet($("market"));
+  mtab = "up"; renderMarket(); openSheet($("market"));
   const b = $("expand"); if (b) { scrollInSheet(b.closest(".card")); b.closest(".card").style.borderColor = "var(--gold)"; }
 }
 function sprTap(i) {
@@ -3126,7 +3138,7 @@ function sellInfo(sel) {
   if (sel.t === "decor") { const d = (S.decor || []).find(x => x.cell === sel.from); return d && DECOR[d.t] ? { name: DECOR[d.t].name, price: DECOR[d.t].price } : null; }
   if (sel.t === "tree") return { name: "Elma ağacı", price: TREE_PRICE };
   if (sel.t === "spr") return { name: "Fıskiye", price: SPR_PRICE };
-  if (OVENS.includes(sel.t)) return S.layout[sel.t] >= 0 ? { name: OBJ[sel.t].name, price: OVEN_PRICE } : null;
+  if (OVENS.includes(sel.t)) return S.layout[sel.t] >= 0 ? { name: OBJ[sel.t].name, price: ovenPrice(sel.t) } : null;
   if (sel.t === "fence") return { name: "Çit", price: fencePrice(Math.max(0, (S.fencesBought || 1) - 1)) };
   if (sel.t === "plot") { const pl = plotAt(S, sel.from); return pl && !pl.c ? { name: "Toprak", price: landPrice(Math.max(0, (S.landBought || 0) - 1)) } : null; }
   return null;
@@ -3610,8 +3622,10 @@ let onlineCount = 1;
 let onlineHtml = "";
 function renderOnline() {
   const shown = saveState === "Kaydedilemedi" ? "" : saveState;
-  const h = `<i class="dot ${online ? "on" : ""}"></i>Sunucu 1${isAdmin() ? ", " + onlineCount + " çevrimiçi" : ""}<br><small>Sürüm ${VERSION}${shown ? ", " + shown : ""}${isAdmin() && fpsNow ? ", " + fpsNow + " FPS" : ""}</small>`;
-  if (h !== onlineHtml) { onlineHtml = h; $("online").innerHTML = h; }
+  // sürüm ve sunucu bilgisi sadece yöneticide görünür; oyuncular sadece kayıt hatasını görür
+  const adm = isAdmin();
+  const h = adm ? `<i class="dot ${online ? "on" : ""}"></i>Sunucu 1, ${onlineCount} çevrimiçi<br><small>Sürüm ${VERSION}${shown ? ", " + shown : ""}${fpsNow ? ", " + fpsNow + " FPS" : ""}</small>` : saveState === "Kaydedilemedi" ? `<i class="dot"></i>Kaydedilemedi` : "";
+  if (h !== onlineHtml) { onlineHtml = h; $("online").innerHTML = h; $("online").style.display = h ? "" : "none"; }
 }
 function whereIs(fuid) {
   if (isBotUid(fuid)) { const b = botDef(fuid); return b ? botWhere(b) : null; }
@@ -3763,18 +3777,19 @@ const MARKET_INDEX = () => [
   { n: "Traktör", tab: "tools", k: "arac hasat traktor motorlu dort arac binmek", price: TOOLS.tractor.price, th: () => TOOLS.tractor.icon },
   { n: "Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma", price: OVEN_PRICE, th: () => ovenIcon() },
   { n: "2. Taş fırın", tab: "ovens", k: "ocak ekmek pisir firin kizartma ikinci", price: OVEN_PRICE, th: () => ovenIcon() },
+  { n: "Dondurma arabası", tab: "ovens", k: "ocak dondurma araba sut elma tatli", price: ICE_PRICE, th: () => iceCartIcon() },
   { n: "Tavuk kümesi", tab: "animals", k: "hayvan tavuk kumes yumurta", price: COOP_PRICE },
   { n: "İnek ahırı", tab: "animals", k: "hayvan inek ahir sut", price: COWBARN_PRICE },
   { n: "Ambar", tab: "animals", k: "yem tavuk inek degirmen ambar", price: MILL_PRICE },
-  { n: "Tarla toprağı", tab: "land", k: "toprak tarla arazi", price: landPrice(S.landBought) },
-  { n: "Alan genişletme", tab: "land", k: "arazi sis bolge genislet buyut", price: expandPrice(S) },
+  { n: "Tarla toprağı", tab: "up", k: "toprak tarla arazi", price: landPrice(S.landBought) },
+  { n: "Alan genişletme", tab: "up", k: "arazi sis bolge genislet buyut", price: expandPrice(S) },
   { n: "Ahşap çit", tab: "decor", k: "cit dekor sus", price: fencePrice(S.fencesBought), th: fenceThumb },
   ...Object.keys(DECOR).map(k => ({ n: DECOR[k].name, tab: "decor", k: "dekor sus susleme", price: DECOR[k].price, th: () => decorThumb(k) })),
   { n: "Fıskiye", tab: "up", k: "fiskiye sulama su otomatik", price: SPR_PRICE, th: () => sprThumb() },
   { n: "Su kuyusu", tab: "up", k: "kuyu su kova gelistir depo", price: wellCost(Math.min(wellLv(S), WELL_MAX - 1)) },
   { n: "Fıskiye geliştir", tab: "up", k: "fiskiye gelistir seviye yukselt", price: SPR_UP[Math.min(sprLv(S), SPR_MAX - 1)], th: () => sprThumb() }
 ];
-const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", animals: "Hayvanlar", land: "Toprak", decor: "Dekor", up: "Geliştir" };
+const TAB_NAME = { crops: "Ekinler", tools: "Araçlar", ovens: "Ocaklar", animals: "Hayvanlar", decor: "Dekor", up: "Geliştir" };
 const fold = s => String(s).toLocaleLowerCase("tr").replace(/[çğıöşüâî]/g, c => ({ "ç": "c", "ğ": "g", "ı": "i", "ö": "o", "ş": "s", "ü": "u", "â": "a", "î": "i" }[c]));
 let mq = "";
 function renderSearch() {
@@ -3792,6 +3807,28 @@ $("marketBody").addEventListener("click", e => {
   const card = [...$("marketBody").querySelectorAll(".card")].find(c => (c.querySelector("h3") || {}).textContent === name);
   if (card) { scrollInSheet(card); card.style.borderColor = "var(--gold)"; card.style.boxShadow = "0 0 0 3px rgba(227,167,47,.45)"; setTimeout(() => { card.style.borderColor = ""; card.style.boxShadow = ""; }, 1600); }
 });
+function landPart() {
+    const n = S.landBought || 0, locked = S.level < LAND_LEVEL, full = n >= landMax(S), sz = farmSize(S), canEx = sz < EXPAND_MAX && S.gold >= expandPrice(S) && S.level >= expandLevel(S), exLock = sz < EXPAND_MAX && S.level < expandLevel(S);
+  return `<div class="card"><div class="thumb"><svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><rect x="10" y="10" width="80" height="80" rx="13" fill="#8b5a33" stroke="#5a3a1e" stroke-width="3"/><path d="M18 34h64M18 52h64M18 70h64" stroke="#74482a" stroke-width="4" stroke-linecap="round"/></svg></div><div>
+      <h3>Tarla toprağı</h3>
+      <p><span class="price">${landPrice(S.landBought)} altın</span> tanesi. Boş bir çimen karesini toprağa çevirir. Her 10 toprakta fiyat %10 artar.</p>
+      <p class="keep">${locked ? LAND_LEVEL + ". seviyede açılır" : n + "/" + landMax(S) + " toprak, çiftlikte en fazla " + PLOT_CAP}</p>
+      <div class="row"><button class="big green sm" id="buyLand_v8" ${locked || full ? "disabled" : ""}>${locked ? LAND_LEVEL + ". seviyede açılır" : full ? "Hepsini aldın" : "Satın al ve yerleştir"}</button></div></div></div>
+      <div class="card"><div class="thumb"><svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#6f9e3c"/><rect x="22" y="22" width="56" height="56" rx="8" fill="#8fc456"/><path d="M14 14h72v72h-72z" fill="none" stroke="#fff6d6" stroke-width="4" stroke-dasharray="9 7"/><path d="M50 4v16M44 10l6-6 6 6M50 96v-16M44 90l6 6 6-6M4 50h16M10 44l-6 6 6 6M96 50h-16M90 44l6 6-6 6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>
+      <h3>Alan genişletme</h3>
+      <p>${sz >= EXPAND_MAX ? "Bütün araziyi aldın." : `<span class="price">${fmtBig(expandPrice(S))} altın</span>. Sisin içindeki yeni bölge senin olur, çiftliğin her yöne büyür.`}</p>
+      <p class="keep">${sz}/${EXPAND_MAX} genişleme</p>
+      <div class="row"><button class="big green sm" id="expand_v8" ${canEx ? "" : "disabled"}>${sz >= EXPAND_MAX ? "En büyük hali" : exLock ? "🔒 " + expandLevel(S) + ". seviyede açılır" : S.gold >= expandPrice(S) ? "Genişlet" : "Altının yetmiyor"}</button></div></div></div>`;
+}
+function landBind() {
+    $("buyLand").onclick = () => { if (S.level < LAND_LEVEL || (S.landBought || 0) >= landMax(S)) return; closeAll(); setMode("land"); };
+    $("expand").onclick = () => {
+      adminTopUp(); if (farmSize(S) >= EXPAND_MAX || S.gold < expandPrice(S) || S.level < expandLevel(S)) return;
+      S.gold = round1(S.gold - expandPrice(S)); SFX.play("buy"); S.size = farmSize(S) + 1;
+      renderHud(); renderPlots(); renderFences(); spawnHens(); saveNow(); renderMarket();
+      toast(farmSize(S) < EXPAND_MAX ? "Yeni bölge açıldı. Sisin ardında bir bölge daha var." : "Bütün arazi artık senin");
+    };
+}
 function renderMarket() { renderMarket0(); compactMarket(); }
 // keep only the name, the price and the buttons on each card
 function compactMarket() {
@@ -3815,15 +3852,16 @@ function renderMarket0() {
     body.querySelectorAll("[data-crop]").forEach(b => b.onclick = () => { const k = b.getAttribute("data-crop"); if (!cropOpen(k)) return; plantCrop = k; closeAll(); setMode("plant"); });
     $("buyTree").onclick = () => { if (S.gold < TREE_PRICE) return; closeAll(); setMode("tree"); };
   } else if (mtab === "ovens") {
-    body.innerHTML = OVENS.map((id, k) => { const own = ovenOwned(S, id), placed = S.layout[id] >= 0, lock = id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin();
-      return `<div class="card${lock ? " locked" : ""}"><div class="thumb ovthumb">${ovenIcon()}</div><div>
+    const oInfo = { oven: "Ekmek ve patates kızartması pişirir.", oven2: "Ekmek ve patates kızartması pişirir.", icecart: "Süt ve elmadan dondurma yapar. 10 dakikada bir dondurma, tanesi " + ICECREAM_SELL + " altın." };
+    body.innerHTML = OVENS.map(id => { const own = ovenOwned(S, id), placed = S.layout[id] >= 0, req = ovenLevelReq(id), lock = S.level < req && !isAdmin(), pr = ovenPrice(id);
+      return `<div class="card${lock ? " locked" : ""}"><div class="thumb ovthumb">${id === "icecart" ? iceCartIcon() : ovenIcon()}</div><div>
       <h3>${OBJ[id].name}</h3>
-      <p>${own ? "Sende var." : `<span class="price">${fmtG(OVEN_PRICE)} altın</span>`}</p><p class="keep">Ekmek ve patates kızartması pişirir.</p>
-      <div class="row">${lock ? `<button class="big sm" disabled>🔒 ${OVEN2_LEVEL}. seviyede açılır</button>` : !own ? `<button class="big green sm" data-obuy="${id}" ${S.gold >= OVEN_PRICE ? "" : "disabled"}>${S.gold >= OVEN_PRICE ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
+      <p>${own ? "Sende var." : `<span class="price">${fmtG(pr)} altın</span>`}</p><p class="keep">${oInfo[id]}</p>
+      <div class="row">${lock ? `<button class="big sm" disabled>🔒 ${req}. seviyede açılır</button>` : !own ? `<button class="big green sm" data-obuy="${id}" ${S.gold >= pr ? "" : "disabled"}>${S.gold >= pr ? "Satın al ve yerleştir" : "Altının yetmiyor"}</button>`
         : !placed ? `<button class="big green sm" data-oplace="${id}">Yerleştir</button>` : `<span class="pill">Çiftliğinde · ${ovenLv(S, id)}. seviye</span>`}</div></div></div>`; }).join("");
     const go = id => { closeAll(); placeKind = id; setMode("place"); };
-    body.querySelectorAll("[data-obuy]").forEach(b => b.onclick = () => { const id = b.getAttribute("data-obuy"); if (ovenOwned(S, id) || S.gold < OVEN_PRICE || (id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin())) return;
-      S.gold = round1(S.gold - OVEN_PRICE); SFX.play("buy"); S[id] = true; renderHud(); saveNow(); go(id); });
+    body.querySelectorAll("[data-obuy]").forEach(b => b.onclick = () => { const id = b.getAttribute("data-obuy"); if (ovenOwned(S, id) || S.gold < ovenPrice(id) || (S.level < ovenLevelReq(id) && !isAdmin())) return;
+      S.gold = round1(S.gold - ovenPrice(id)); SFX.play("buy"); S[id] = true; renderHud(); saveNow(); go(id); });
     body.querySelectorAll("[data-oplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-oplace")));
   } else if (mtab === "animals") {
     const info = { coop: `${COOP_CAP} tavuk sığar. Tavuklar yem yiyince ${EGG_MS / MIN} dakikada yumurtlar.`, cowbarn: `${COW_CAP} inek sığar. İnekler yem yiyince ${MILK_MS / MIN} dakikada süt verir.`, mill: "Buğdaydan tavuk yemi, mısır ve buğdaydan inek yemi yapar." };
@@ -3851,37 +3889,19 @@ function renderMarket0() {
       S.gold = round1(S.gold - T.price); SFX.play("buy"); S.tools.push(k); renderHud(); saveNow(); selectTool(k); renderMarket();
       toast(T.name + " alındı, alttaki çubukta");
     });
-  } else if (mtab === "land") {
-    const n = S.landBought || 0, locked = S.level < LAND_LEVEL, full = n >= landMax(S), sz = farmSize(S), canEx = sz < EXPAND_MAX && S.gold >= expandPrice(S) && S.level >= expandLevel(S), exLock = sz < EXPAND_MAX && S.level < expandLevel(S);
-    body.innerHTML = `<div class="card"><div class="thumb"><svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><rect x="10" y="10" width="80" height="80" rx="13" fill="#8b5a33" stroke="#5a3a1e" stroke-width="3"/><path d="M18 34h64M18 52h64M18 70h64" stroke="#74482a" stroke-width="4" stroke-linecap="round"/></svg></div><div>
-      <h3>Tarla toprağı</h3>
-      <p><span class="price">${landPrice(S.landBought)} altın</span> tanesi. Boş bir çimen karesini toprağa çevirir. Her 10 toprakta fiyat %10 artar.</p>
-      <p class="keep">${locked ? LAND_LEVEL + ". seviyede açılır" : n + "/" + landMax(S) + " toprak, çiftlikte en fazla " + PLOT_CAP}</p>
-      <div class="row"><button class="big green sm" id="buyLand_v8" ${locked || full ? "disabled" : ""}>${locked ? LAND_LEVEL + ". seviyede açılır" : full ? "Hepsini aldın" : "Satın al ve yerleştir"}</button></div></div></div>
-      <div class="card"><div class="thumb"><svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#6f9e3c"/><rect x="22" y="22" width="56" height="56" rx="8" fill="#8fc456"/><path d="M14 14h72v72h-72z" fill="none" stroke="#fff6d6" stroke-width="4" stroke-dasharray="9 7"/><path d="M50 4v16M44 10l6-6 6 6M50 96v-16M44 90l6 6 6-6M4 50h16M10 44l-6 6 6 6M96 50h-16M90 44l6 6-6 6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>
-      <h3>Alan genişletme</h3>
-      <p>${sz >= EXPAND_MAX ? "Bütün araziyi aldın." : `<span class="price">${fmtBig(expandPrice(S))} altın</span>. Sisin içindeki yeni bölge senin olur, çiftliğin her yöne büyür.`}</p>
-      <p class="keep">${sz}/${EXPAND_MAX} genişleme</p>
-      <div class="row"><button class="big green sm" id="expand_v8" ${canEx ? "" : "disabled"}>${sz >= EXPAND_MAX ? "En büyük hali" : exLock ? "🔒 " + expandLevel(S) + ". seviyede açılır" : S.gold >= expandPrice(S) ? "Genişlet" : "Altının yetmiyor"}</button></div></div></div>`;
-    $("buyLand").onclick = () => { if (S.level < LAND_LEVEL || (S.landBought || 0) >= landMax(S)) return; closeAll(); setMode("land"); };
-    $("expand").onclick = () => {
-      adminTopUp(); if (farmSize(S) >= EXPAND_MAX || S.gold < expandPrice(S) || S.level < expandLevel(S)) return;
-      S.gold = round1(S.gold - expandPrice(S)); SFX.play("buy"); S.size = farmSize(S) + 1;
-      renderHud(); renderPlots(); renderFences(); spawnHens(); saveNow(); renderMarket();
-      toast(farmSize(S) < EXPAND_MAX ? "Yeni bölge açıldı. Sisin ardında bir bölge daha var." : "Bütün arazi artık senin");
-    };
   } else if (mtab === "up") {
     const lv = wellLv(S), cost = wellCost(lv);
-    body.innerHTML = `<div class="card"><div class="thumb"><svg viewBox="800 0 100 100" width="70" height="70"><rect x="800" width="100" height="100" fill="#8cbf4f"/>${wellSvg(2)}</svg></div><div>
+    body.innerHTML = `<h4 class="msec">🌱 Toprak ve alan</h4>` + landPart() + `<h4 class="msec">💧 Su ve sulama</h4><div class="card"><div class="thumb"><svg viewBox="800 0 100 100" width="70" height="70"><rect x="800" width="100" height="100" fill="#8cbf4f"/>${wellSvg(2)}</svg></div><div>
       <h3>Su kuyusu</h3>
       <p class="keep">${lv}. seviye, kova ${bucketMax()}${lv >= 5 ? ", 4'er sular" : lv >= 3 ? ", 2'şer sular" : ""}</p>
       ${lv >= WELL_MAX ? `<p>Kuyun en üst seviyede.</p>` : `<p><span class="price">${cost} altın</span> ile ${lv + 1}. seviyeye çıkar: ${lv === 2 ? "kova 20 ekin sular ve topraklar ikişer ikişer sulanır." : lv === 4 ? "kova 50 ekin sular ve topraklar dörder dörder sulanır." : "kova bir dolumda " + WELL_BUCKET[lv + 1] + " ekin sular."}</p>
       <div class="row"><button class="big green sm" id="upWell_v8" ${S.gold >= cost ? "" : "disabled"}>${S.gold >= cost ? "Geliştir" : "Altının yetmiyor"}</button></div>`}</div></div>
-      <div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye</h3><p><span class="price">${SPR_PRICE} altın</span></p><p class="keep">${sprCap()} su, ${sprN()} ekin sular</p>
+      <h4 class="msec">⛲ Fıskiye</h4><div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye</h3><p><span class="price">${SPR_PRICE} altın</span></p><p class="keep">${sprCap()} su, ${sprN()} ekin sular</p>
       <div class="row"><button class="big green sm" id="buySpr_v8" ${S.gold >= SPR_PRICE ? "" : "disabled"}>${S.gold >= SPR_PRICE ? "Satın al" : "Altının yetmiyor"}</button></div></div></div>
       <div class="card"><div class="thumb">${sprThumb()}</div><div><h3>Fıskiye geliştir</h3><p class="keep">${sprLv(S)}. seviye: ${sprCap()} su, ${sprN()} ekin</p>
       ${sprLv(S) >= SPR_MAX ? `<p>Fıskiyelerin en üst seviyede.</p>` : `<p><span class="price">${SPR_UP[sprLv(S)]} altın</span> ile ${sprLv(S) + 1}. seviye: ${SPR_CAPS[sprLv(S) + 1]} su, ${SPR_NS[sprLv(S) + 1]} ekin</p>
       <div class="row"><button class="big green sm" id="upSpr_v8" ${S.gold >= SPR_UP[sprLv(S)] ? "" : "disabled"}>${S.gold >= SPR_UP[sprLv(S)] ? "Geliştir" : "Altının yetmiyor"}</button></div>`}</div></div>`;
+    landBind();
     { const us = $("upSpr"); if (us) us.onclick = () => { adminTopUp(); const l = sprLv(S), c = SPR_UP[l]; if (l >= SPR_MAX || S.gold < c) return;
       S.gold = round1(S.gold - c); SFX.play("buy"); S.sprLv = l + 1; (S.spr || []).forEach(sp => sp.w = sprCap()); saveNow(); toast("Fıskiyeler " + S.sprLv + ". seviye oldu ve suları doldu"); renderHud(); renderPlots(); save(); renderMarket(); }; }
     $("buySpr").onclick = () => { adminTopUp(); if (S.gold < SPR_PRICE) return; closeAll(); setMode("spr"); };
@@ -3937,7 +3957,23 @@ function friesArt(sz = 64) { const u = "fa" + (++artN);
   return `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><defs><linearGradient id="${u}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#ffd040"/><stop offset="1" stop-color="#e8a82a"/></linearGradient>
     <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8463a"/><stop offset="1" stop-color="#a8261c"/></linearGradient></defs>
     <ellipse cx="32" cy="58" rx="17" ry="3" fill="rgba(0,0,0,.18)"/>${f}<path d="M17 32h30l-4 25H21z" fill="url(#${u}b)" stroke="#7a1a12" stroke-width="1.2"/><path d="M24 44a8 5 0 0 0 16 0" fill="#ffd34d"/><path d="M19 34h26" stroke="#ff8a7a" stroke-width="1.4" opacity=".6"/></svg>`; }
-const RECIPE_ART = { bread: { out: breadArt, inp: wheatArt }, fries: { out: friesArt, inp: potatoArt } };
+// dondurma: iki top dondurmalı külah, süt şişesi ve elma (fırın/araba ekranı ve depo için), bir de dondurma arabası simgesi
+const iceInner = () => `<ellipse cx="32" cy="60" rx="13" ry="3" fill="rgba(0,0,0,.18)"/><path d="M21 34h22L32 60z" fill="#e6ae62" stroke="#8a5a1c" stroke-width="1.6" stroke-linejoin="round"/><path d="M25 39l11 13M31 36l9 11M39 39l-11 13M33 36l-9 11" stroke="#b8793a" stroke-width="1"/>
+  <path d="M19 31a13 11 0 0 1 26 0q-3 4-6.5 1.5Q35 36 32 33q-3 3-6.5-.5Q22 35 19 31z" fill="#ff9fc6" stroke="#c2557f" stroke-width="1.6" stroke-linejoin="round"/><path d="M24 25q2-3 5-3" stroke="#ffd0e3" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="32" cy="19" r="10" fill="#fff3d2" stroke="#c9a56a" stroke-width="1.6"/><path d="M26 15q2-3 5-3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="33" cy="8" r="3.2" fill="#e0301f" stroke="#8a1a10" stroke-width="1"/><path d="M33 5q1-3 4-4" stroke="#4f8a2f" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+const iceArt = (sz = 64) => `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true">${iceInner()}</svg>`;
+const milkArt = (sz = 64) => `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><ellipse cx="32" cy="60" rx="15" ry="3" fill="rgba(0,0,0,.18)"/><path d="M25 8h14v8l7 9v29a5 5 0 0 1-5 5H23a5 5 0 0 1-5-5V25l7-9z" fill="#fff" stroke="#5a7a9a" stroke-width="2" stroke-linejoin="round"/><path d="M18 36h28v14H18z" fill="#4f93d8"/><rect x="24" y="4" width="16" height="6" rx="2" fill="#4f93d8" stroke="#5a7a9a" stroke-width="1.5"/><path d="M23 20v14" stroke="#dfeaf5" stroke-width="3" stroke-linecap="round"/></svg>`;
+const appleArt = (sz = 64) => `<svg viewBox="0 0 64 64" width="${sz}" height="${sz}" aria-hidden="true"><ellipse cx="32" cy="58" rx="16" ry="3" fill="rgba(0,0,0,.18)"/><path d="M32 18c-8-6-22-2-22 14 0 14 8 24 14 24 3 0 6-2 8-2s5 2 8 2c6 0 14-10 14-24 0-16-14-20-22-14z" fill="#e8402f" stroke="#8a1a10" stroke-width="2" stroke-linejoin="round"/><path d="M32 18c0-6 2-10 5-12" stroke="#6b4423" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M36 10c6-4 12-2 14 2-6 4-12 2-14-2z" fill="#58a83a" stroke="#2f6a1c" stroke-width="1.4"/><path d="M19 28q2-6 8-8" stroke="#ff9a8a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+const iceThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><svg x="14" y="8" width="72" height="72" viewBox="0 0 64 64">${iceInner()}</svg></svg>`;
+const iceCartBody = `
+  <ellipse cx="50" cy="90" rx="36" ry="5" fill="rgba(0,0,0,.18)"/><rect x="18" y="52" width="64" height="28" rx="5" fill="#7fd6c2" stroke="#2f7a6a" stroke-width="3"/><rect x="18" y="66" width="64" height="5" fill="#c99a5a"/><rect x="14" y="48" width="72" height="6" rx="2" fill="#fff4dc" stroke="#b89a6a" stroke-width="2"/>
+  <path d="M18 30h64l6 14H12z" fill="#fff" stroke="#9a4a64" stroke-width="2.5" stroke-linejoin="round"/><path d="M18 30h10l-3 14H12zM38 30h10l-1 14H35zM58 30h10l2 14H60zM78 30l6 14H72z" fill="#f06a98"/>
+  <path d="M22 44a4.5 4.5 0 0 0 9 0a4.5 4.5 0 0 0 9 0a4.5 4.5 0 0 0 9 0a4.5 4.5 0 0 0 9 0a4.5 4.5 0 0 0 9 0a4.5 4.5 0 0 0 9 0" fill="none" stroke="#9a4a64" stroke-width="2"/>
+  <circle cx="30" cy="82" r="8" fill="#4a3a2e"/><circle cx="30" cy="82" r="3" fill="#f2c14e"/><circle cx="70" cy="82" r="8" fill="#4a3a2e"/><circle cx="70" cy="82" r="3" fill="#f2c14e"/>
+  <path d="M42 30l8-14 8 14z" fill="#e6ae62" stroke="#8a5a1c" stroke-width="1.6" transform="rotate(180 50 23)"/><circle cx="50" cy="12" r="7" fill="#ff9fc6" stroke="#c2557f" stroke-width="1.6"/><circle cx="50" cy="5" r="4.5" fill="#fff3d2" stroke="#c9a56a" stroke-width="1.4"/>`;
+const iceCartIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-hidden="true"><rect width="100" height="100" rx="14" fill="#f3d9a6"/>${iceCartBody}</svg>`;
+const iceCartInner = () => `<g transform="scale(2)">${iceCartBody}</g>`;
+const RECIPE_ART = { bread: { out: breadArt, inp: wheatArt }, fries: { out: friesArt, inp: potatoArt }, icecream: { out: iceArt, inp: sz => `<span style="display:inline-flex;gap:1px">${milkArt(Math.round(sz * .8))}${appleArt(Math.round(sz * .8))}</span>` } };
 const hhmm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 // the tray: what is on it (done ones golden, the rest still baking)
 function trayView(rk, q, done) {
@@ -3961,19 +3997,19 @@ function renderOven() {
         <div class="obar"><u style="width:${(I.done / I.q * 100).toFixed(0)}%"></u></div>
         ${I.done ? `<button class="big green" data-otake="${k}">${I.done} ${R.name.toLocaleLowerCase("tr")} depoya al</button>` : ""}</div>`;
     } else {
-      const rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], have = +S.store[Rr.from] || 0, maxN = Math.min(cap, Math.floor(have / Rr.n)), lockR = rk === "fries" && S.level < CROPS.potato.lv && !isAdmin();
+      const rk = recFor(id, k), Rr = RECIPES[rk], maxN = Math.min(cap, recStock(Rr)), lockR = rk === "fries" && S.level < CROPS.potato.lv && !isAdmin();
       ovenAmt[k] = Math.max(1, Math.min(maxN || 1, ovenAmt[k] || maxN || 1));
-      const amt = ovenAmt[k], A = RECIPE_ART[rk], inName = CROPS[Rr.from].name.toLocaleLowerCase("tr");
-      h += `<div class="ovcard"><h3 class="ovt">${slots > 1 ? (k + 1) + ". tepsi boş" : "Fırın boş"}</h3>
-        <div class="recs">${Object.keys(RECIPES).map(r => { const RR = RECIPES[r], hv = +S.store[RR.from] || 0; return `<button class="rec ${r === rk ? "on" : ""}" data-orec="${k}:${r}">
+      const amt = ovenAmt[k], A = RECIPE_ART[rk];
+      h += `<div class="ovcard"><h3 class="ovt">${slots > 1 ? (k + 1) + ". tepsi boş" : id === "icecart" ? "Araba boş" : "Fırın boş"}</h3>
+        <div class="recs">${recipesOf(id).map(r => { const RR = RECIPES[r]; return `<button class="rec ${r === rk ? "on" : ""}" data-orec="${k}:${r}">
           <span class="rin">${RECIPE_ART[r].inp(34)}<em>×${RR.n}</em></span><span class="rarr">➜</span><span class="rout">${RECIPE_ART[r].out(40)}</span>
-          <span class="rname">${RR.name}</span><span class="rmeta">${fmtDurS(RR.ms)} · depoda ${hv}</span></button>`; }).join("")}</div>
+          <span class="rname">${RR.name}</span><span class="rmeta">${fmtDurS(RR.ms)} · ${recMeta(RR)}</span></button>`; }).join("")}</div>
         ${lockR ? `<p class="keep">Patates ${CROPS.potato.lv}. seviyede açılır.</p>` : maxN ? `
         <div class="amt"><div class="amtTop"><span class="big1" id="oAmtL${k}">${amt}</span><span>${Rr.name.toLocaleLowerCase("tr")}</span></div>
           <input type="range" class="orange" data-orng="${k}" min="1" max="${maxN}" value="${amt}" style="--p:${maxN > 1 ? ((amt - 1) / (maxN - 1) * 100).toFixed(0) : 100}%">
           <div class="qbtns"><button data-ominus="${k}">−</button>${[5, 10].filter(n => n < maxN).map(n => `<button data-oset="${k}:${n}">${n}</button>`).join("")}<button data-omax="${k}">Hepsi (${maxN})</button><button data-oplus="${k}">+</button></div>
-          <p class="need" id="oNeed${k}"><span class="ni">${A.inp(22)}</span><b>${amt * Rr.n}</b> ${inName} · <b>${fmtDurS(amt * Rr.ms)}</b> · bitiş <b>${hhmm(now + amt * Rr.ms)}</b></p></div>
-        <button class="big green obake" data-obake="${k}">Pişir</button>` : `<p class="keep">Pişirmek için en az ${Rr.n} ${inName} gerekir. Depoda ${have} var.</p>`}</div>`;
+          <p class="need" id="oNeed${k}"><span class="ni">${A.inp(22)}</span>${recIn(Rr, amt)} · <b>${fmtDurS(amt * Rr.ms)}</b> · bitiş <b>${hhmm(now + amt * Rr.ms)}</b></p></div>
+        <button class="big green obake" data-obake="${k}">${id === "icecart" ? "Yap" : "Pişir"}</button>` : `<p class="keep">${id === "icecart" ? "Yapmak" : "Pişirmek"} için ${recIn(Rr, 1)} gerekir. ${recMeta(Rr)}.</p>`}</div>`;
     }
   }
   if (lv < OVEN_MAX) h += `<div class="ovcard up"><div class="ovtop"><div class="ovart upart">⬆</div><div class="ovinfo"><h3>Fırını geliştir</h3>
@@ -3981,9 +4017,9 @@ function renderOven() {
       <button class="big green" data-oup="1" ${S.gold >= OVEN_UP[lv] ? "" : "disabled"}>${fmtG(OVEN_UP[lv])} altın · Geliştir</button></div>`;
   body.innerHTML = h;
 }
-$("ovenBody").addEventListener("input", e => { const r = e.target.closest("[data-orng]"); if (!r) return; const k = +r.getAttribute("data-orng"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", Rr = RECIPES[rk], v = +r.value;
+$("ovenBody").addEventListener("input", e => { const r = e.target.closest("[data-orng]"); if (!r) return; const k = +r.getAttribute("data-orng"), rk = recFor(ovenSel, k), Rr = RECIPES[rk], v = +r.value;
   ovenAmt[k] = v; const L = $("oAmtL" + k + "") || document.getElementById("oAmtL" + k); if (L) L.textContent = v; r.style.setProperty("--p", (r.max > 1 ? (v - 1) / (r.max - 1) * 100 : 100).toFixed(0) + "%");
-  const N = document.getElementById("oNeed" + k); if (N) N.innerHTML = `<span class="ni">${RECIPE_ART[rk].inp(22)}</span><b>${v * Rr.n}</b> ${CROPS[Rr.from].name.toLocaleLowerCase("tr")} · <b>${fmtDurS(v * Rr.ms)}</b> · bitiş <b>${hhmm(Date.now() + v * Rr.ms)}</b>`; });
+  const N = document.getElementById("oNeed" + k); if (N) N.innerHTML = `<span class="ni">${RECIPE_ART[rk].inp(22)}</span>${recIn(Rr, v)} · <b>${fmtDurS(v * Rr.ms)}</b> · bitiş <b>${hhmm(Date.now() + v * Rr.ms)}</b>`; });
 const fmtDurS = ms => ms >= 60000 ? (ms % 60000 ? (ms / 60000).toFixed(1).replace(".", ",") : ms / 60000) + " dk" : Math.round(ms / 1000) + " sn";
 $("ovenBody").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || !S) return;
@@ -3998,11 +4034,11 @@ $("ovenBody").addEventListener("click", e => {
       if (t.q <= 0) S.bakes[id][k] = null; gainXp(nb * (XP[key] || XP.bread)); if (key === "bread") questEv("bread", nb); dailyEv("bake:" + key, nb); got += nb; });
     if (got) { popAt(me.x, me.y - .3, "+" + got + " depoya", "#ffe27a"); saveNow(); renderHud(); renderPlots(); } else depotFullHint(); renderOven(); return; }
   if (A("data-obake") !== null) {
-    const k = +A("data-obake"), rk = ovenRec[k] in RECIPES ? ovenRec[k] : "bread", R = RECIPES[rk]; if (trayOf(S, id, k)) return;
+    const k = +A("data-obake"), rk = recFor(id, k), R = RECIPES[rk]; if (trayOf(S, id, k)) return;
     if (rk === "fries" && !cropOpen("potato")) return;
-    const n = Math.min(OVEN_CAP[ovenLv(S, id)], ovenAmt[k], Math.floor((+S.store[R.from] || 0) / R.n)); if (n < 1) return;
-    S.store[R.from] -= n * R.n; S.bakes[id][k] = { q: n, t0: now, r: rk };
-    saveNow(); renderPlots(); renderOven(); toast(n + " " + R.name.toLocaleLowerCase("tr") + " fırına girdi 🔥"); return;
+    const n = Math.min(OVEN_CAP[ovenLv(S, id)], ovenAmt[k], recStock(R)); if (n < 1) return;
+    S.store[R.from] -= n * R.n; if (R.from2) S.store[R.from2] -= n * R.n2; S.bakes[id][k] = { q: n, t0: now, r: rk };
+    saveNow(); renderPlots(); renderOven(); toast(n + " " + R.name.toLocaleLowerCase("tr") + (id === "icecart" ? " yapılıyor 🍦" : " fırına girdi 🔥")); return;
   }
   if (A("data-otake") !== null) {
     const k = +A("data-otake"), t = trayOf(S, id, k), I = trayInfo(t, now); if (!I.done) return;
@@ -4026,9 +4062,9 @@ const ovenIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-h
   <rect x="64" y="14" width="10" height="20" fill="#b5583d" stroke="#7d2f1c" stroke-width="2"/><rect x="62" y="11" width="14" height="5" rx="1.5" fill="#5e3226"/>
   <path d="M36 64v-12a14 14 0 0 1 28 0v12z" fill="#2a1a10" stroke="#e2dccf" stroke-width="4"/><path d="M42 64q2-10 6-12q-1 6 3 7q1-8 5-10q2 9 2 15z" fill="#ff8a1a"/><path d="M46 64q2-6 4-7q0 4 2 4q1-4 3-5q0 5 0 8z" fill="#ffe066"/>
   <circle cx="72" cy="6" r="4" fill="#e9e6e0" opacity=".7"/></svg>`;
-const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }, { key: "wood", name: "Tahta", price: 0, thumb: () => woodThumb() }];
+const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }, { key: "icecream", name: "Dondurma", price: ICECREAM_SELL, thumb: () => iceThumb() }, { key: "wood", name: "Tahta", price: 0, thumb: () => woodThumb() }];
 let dtab = "crops";
-const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "egg", "milk", "wood"] };
+const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "icecream", "egg", "milk", "wood"] };
 const woodThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><g stroke="#6b4423" stroke-width="3" stroke-linejoin="round"><rect x="14" y="58" width="72" height="14" rx="2" fill="#c98f52"/><rect x="18" y="42" width="72" height="14" rx="2" fill="#d9a066"/><rect x="12" y="26" width="72" height="14" rx="2" fill="#bf8447"/></g><g stroke="#8a5a2e" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M24 33h30M60 31h16M28 49h22M62 51h20M22 65h26M58 66h18"/></g></svg>`;
 function depotHead() {
   const cap = depCap(S), used = depUsed(S), lv = depLv(S), pct = Math.min(100, used / cap * 100).toFixed(0), full = used >= cap;
@@ -4084,7 +4120,7 @@ $("depotBody").addEventListener("click", e => {
 // ---------- Pazar: players sell their products to each other on the plaza stalls ----------
 // market/{id}: { seller, sn: seller name, item, q, price, ts, buyer?, bn?: buyer name, bt? }
 // the seller's goods leave the depot when listed; the buyer marks the listing as bought (once), the seller's game collects the gold and removes it
-const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "wood"];
+const PAZAR_LEVEL = 5, PAZAR_SLOTS = 4, PAZAR_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "icecream", "egg", "milk", "wood"];
 let pzShown = -1, pzAll = [], pzMine = [], pzTab = "buy", pzFilter = "all", pzForm = null, pzAllOn = false, pzMineOn = false, pzBusy = false, pzDenied = false;
 const pzVal = (k, q) => itemPrice(k) * q, pzMax = (k, q) => k === "wood" ? WOOD_MAX_PRICE * q : Math.max(10, Math.ceil(pzVal(k, q) * 3));
 const pzThumb = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.thumb() : ""; };
@@ -4423,8 +4459,11 @@ const botDef = u => BOT_DEFS.find(b => b.id === u) || null;
 const botLevel = b => Math.min(MAX_LEVEL, b.lv + Math.floor(Math.max(0, Date.now() - BOT_T0) / (86400000 * b.days)));
 const botIdx = b => BOT_DEFS.indexOf(b);
 // who is where: every bot spends part of the time in the plaza, part on its own farm and part away
-const botSlot = b => (Math.floor(Date.now() / (12 * 60000)) + botIdx(b) * 3) % 5;
-const botWhere = b => { const k = botSlot(b); return k < 2 ? "plaza" : k === 2 ? "farm:" + b.id : null; };
+// each bot is in the plaza for 5 to 10 minutes, then away for 5 to 10 minutes (own farm or offline)
+function botWhere(b) {
+  const i = botIdx(b), on = (5 + (i * 7) % 6) * 60000, off = (5 + (i * 5) % 6) * 60000, t = (Date.now() + i * 137000) % (on + off);
+  return t < on ? "plaza" : (Math.floor((Date.now() + i * 137000) / (on + off)) % 2 ? "farm:" + b.id : null);
+}
 const botInfo = b => ({ name: b.name, g: b.g, level: botLevel(b), plots: [], trees: [], fences: [], decor: [], spr: [], store: {}, layout: {} });
 function botRng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const botFarmCacheMap = new Map();
@@ -4483,13 +4522,13 @@ function botTick() {
     if (!st) {
       if (!pool.length) continue;
       const c = pool[Math.floor(Math.random() * pool.length)];
-      st = { id: "bot:" + b.id, bot: b, x: colOf(c), y: rowOf(c), tx: colOf(c), ty: rowOf(c), face: Math.random() < .5 ? -1 : 1, g: b.g, name: b.name, uid: b.id, el: makeChar(b.g, b.name, false, b.id), path: [], wait: 15 + Math.floor(Math.random() * 120), lvl: botLevel(b), tool: "scythe" };
+      st = { id: "bot:" + b.id, bot: b, x: colOf(c), y: rowOf(c), tx: colOf(c), ty: rowOf(c), face: Math.random() < .5 ? -1 : 1, g: b.g, name: b.name, uid: b.id, el: makeChar(b.g, b.name, false, b.id), path: [], wait: 200 + Math.floor(Math.random() * 400), lvl: botLevel(b), tool: "scythe" };
       peers.set(st.id, st);
     }
     if (st.path.length || Math.hypot(st.tx - st.x, st.ty - st.y) > .02) continue;   // still walking
     st.moving = false;
     if (--st.wait > 0) continue;
-    st.wait = 60 + Math.floor(Math.random() * 160);   // 13 to 48 seconds of standing around
+    st.wait = 400 + Math.floor(Math.random() * 800);   // 1,5 to 4,5 minutes of standing around
     const g = pool[Math.floor(Math.random() * pool.length)];
     const p = bfs(idx(Math.round(st.y), Math.round(st.x)), new Set([g]), curBlockedPlaza);
     if (p && p.length && p.length < 16) { st.path = p; st.moving = true; }
@@ -5661,7 +5700,7 @@ const DAILY_LEVEL = 3, ORDER_LEVEL = 3, ORDER_SLOTS = 3, ORDER_NEXT = 5 * MIN, O
 const ITEM_EMO = { wheat: "🌾", potato: "🥔", carrot: "🥕", lettuce: "🥬", corn: "🌽", eggplant: "🍆", pumpkin: "🎃", apple: "🍎", bread: "🍞", fries: "🍟", egg: "🥚", milk: "🥛", chickfeed: "🐔", cowfeed: "🐄", wood: "🪵" };
 const itemName = k => (CROPS[k] && CROPS[k].name) || (FEEDS[k] && FEEDS[k].name) || ({ apple: "Elma", bread: "Ekmek", fries: "Patates kızartması", egg: "Yumurta", milk: "Süt", wood: "Tahta" })[k] || k;
 const itemPrice = k => { const pr = PRODUCTS.find(x => x.key === k); return pr ? pr.price : 0; };
-const hasOven = () => OVENS.some(id => S[id] && S.layout[id] >= 0);
+const hasOven = () => ["oven", "oven2"].some(id => S[id] && S.layout[id] >= 0);
 const lvl = () => S.level || 1;
 // every task: key of the event it counts, emoji, text, when it can show up, how many are needed
 const DAILY = [
@@ -6029,6 +6068,12 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 119, d: "11 Ekim 2026", e: "🍦", t: "Dondurma arabası", c: "#2f8f7a", b: "#e0f5ef", items: [
+    "Yeni Dondurma Arabası: Market > Ocaklar'dan 600 altına alınır (15. seviye). 1 süt + 1 elmadan dondurma yapar, tanesi 10 dakika sürer, satışı 150 altın.",
+    "Fırın ve arabanın üstündeki bildirim artık ne piştiyse onun resmini gösteriyor.",
+    "Market toparlandı: Toprak sekmesi Geliştir'in içine taşındı, bölümlere ayrıldı.",
+    "Botlar daha az hareket ediyor, 5-10 dakikada bir meydandan gidip geliyor. Sürüm ve sunucu yazısı sadece adminde görünür.",
+  ] },
   { v: 118, d: "11 Ekim 2026", e: "🔤", t: "İsim yazısı", c: "#4a5a7a", b: "#e2e8f3", items: [
     "Karakter isimleri biraz küçüldü ve yazıdaki mürekkep kayması giderildi, daha net okunuyor.",
   ] },
@@ -6291,8 +6336,8 @@ function setup3D(T) {
       x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 60);
     });
   }
-  function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a", "🐔🌾": "#ff9a3c", "🐄🌾": "#9bd65a" }[e] || "#ffd24a";
-    return canvasTex("emo4" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
+  function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a", "🐔🌾": "#ff9a3c", "🐄🌾": "#9bd65a", "🍞": "#f6b95c", "🍟": "#8fd0ff", "🍦": "#9fe6d4" }[e] || "#ffd24a";
+    return canvasTex("emo5" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
     x.fillStyle = "#3a2410"; x.beginPath(); x.arc(78, 78, 68, 0, 6.283); x.fill();
     x.fillStyle = "#fff"; x.beginPath(); x.arc(78, 78, 62, 0, 6.283); x.fill();
     x.fillStyle = col; x.beginPath(); x.arc(78, 78, 52, 0, 6.283); x.fill();
@@ -6306,6 +6351,20 @@ function setup3D(T) {
       x.beginPath(); x.moveTo(44, 62); x.lineTo(112, 62); x.lineTo(103, 108); x.quadraticCurveTo(78, 116, 53, 108); x.closePath(); x.fillStyle = "#b8c7d6"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#3d4650"; x.stroke();
       x.beginPath(); x.ellipse(78, 62, 34, 9, 0, 0, 6.283); x.fillStyle = "#fffdf6"; x.fill(); x.stroke();
       x.fillStyle = "#e0473a"; x.fillRect(50, 82, 56, 7); x.fillStyle = "rgba(255,255,255,.5)"; x.fillRect(56, 66, 6, 36);
+    } else if (e === "🍞") {   // somun
+      x.beginPath(); x.moveTo(36, 96); x.quadraticCurveTo(30, 52, 78, 52); x.quadraticCurveTo(126, 52, 120, 96); x.quadraticCurveTo(78, 112, 36, 96); x.closePath(); x.fillStyle = "#d98a3a"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#7a4010"; x.stroke();
+      x.strokeStyle = "#ffe3ad"; x.lineWidth = 7; [[58, 66, 66, 84], [78, 62, 86, 82], [98, 66, 106, 84]].forEach(([a, b, c, d]) => { x.beginPath(); x.moveTo(a, b); x.lineTo(c, d); x.stroke(); });
+    } else if (e === "🍟") {   // kızartma
+      x.lineWidth = 3; x.strokeStyle = "#b8780f"; x.fillStyle = "#ffd34d";
+      [[50, -.25], [60, -.1], [72, -.2], [84, 0], [96, .12], [106, .25]].forEach(([px, r], i) => { x.save(); x.translate(px, 82); x.rotate(r); x.beginPath(); x.rect(-5, -42 - (i % 3) * 5, 10, 56); x.fill(); x.stroke(); x.restore(); });
+      x.beginPath(); x.moveTo(44, 76); x.lineTo(112, 76); x.lineTo(104, 120); x.lineTo(52, 120); x.closePath(); x.fillStyle = "#e8463a"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#7a1a12"; x.stroke();
+      x.fillStyle = "#fff"; x.beginPath(); x.ellipse(78, 98, 17, 12, 0, 0, 6.283); x.fill();
+    } else if (e === "🍦") {   // dondurma
+      x.beginPath(); x.moveTo(56, 80); x.lineTo(100, 80); x.lineTo(78, 128); x.closePath(); x.fillStyle = "#e6ae62"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#7a4a10"; x.stroke();
+      x.lineWidth = 2.5; x.beginPath(); x.moveTo(62, 86); x.lineTo(84, 116); x.moveTo(94, 86); x.lineTo(72, 116); x.stroke();
+      x.beginPath(); x.arc(78, 66, 26, 0, 6.283); x.fillStyle = "#ff9fc6"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#a83f6a"; x.stroke();
+      x.beginPath(); x.arc(78, 44, 19, 0, 6.283); x.fillStyle = "#fff3d2"; x.fill(); x.strokeStyle = "#a8864a"; x.stroke();
+      x.beginPath(); x.arc(84, 28, 6, 0, 6.283); x.fillStyle = "#e0301f"; x.fill(); x.lineWidth = 3; x.strokeStyle = "#7a1a10"; x.stroke();
     } else if (e === "🐔🌾" || e === "🐄🌾") {   // hayvan resimli yem çuvalı
       const a = SACK[e === "🐔🌾" ? "chickfeed" : "cowfeed"]; x.lineWidth = 5; x.strokeStyle = "#6e4a1c";
       const body = new Path2D(SACK.body), flap = new Path2D(SACK.flap); x.fillStyle = a.fill; x.fill(body); x.stroke(body); x.fill(flap); x.stroke(flap);
@@ -6883,6 +6942,25 @@ function setup3D(T) {
     [-.95, .95].forEach(px => { g.add(mesh(G.box, M("#2a2a2a"), x + px, 1.2, bz + .08, .02, .02, .1, false)); g.add(mesh(G.box, M("#2a2a2a"), x + px, 1.14, bz + .13, .07, .1, .07, false)); g.add(mesh(G.sph, new T.MeshBasicMaterial({ color: "#ffd27a" }), x + px, 1.14, bz + .13, .028, .04, .028, false)); });
     if (baking) ovenGlowFx(g, O, x, .62, dz + .65, true);
     Object.assign(O, { x, z, cx: x, cy: 1.78, cz: dz - .1 });
+    return g;
+  }
+  // dondurma arabası: nane yeşili gövde, pembe-beyaz şerit tente, tepede büyük dondurma, önünde tabela ve külahlar
+  function buildIceCart(a, baking) {
+    const g = new T.Group(), x = colOf(a) + 1, z = rowOf(a) + 1;
+    blob(g, x, z + .05, 2.4, 1.8);
+    g.add(mesh(G.box, M("#7fd6c2"), x, .5, z, 1.42, .52, .82)); g.add(mesh(G.box, M("#c99a5a"), x, .2, z, 1.46, .14, .86)); g.add(mesh(G.box, M("#fff4dc"), x, .8, z, 1.54, .06, .94));
+    g.add(mesh(G.box, M("#5fb8a4"), x, .5, z + .42, 1.3, .36, .02, false));
+    [[-.5], [.5]].forEach(([dx]) => { const w = mesh(G.cyl, M("#4a3a2e"), x + dx, .24, z + .46, .24, .07, .24); w.rotation.x = Math.PI / 2; g.add(w); const h = mesh(G.cyl, M("#f2c14e"), x + dx, .24, z + .5, .08, .02, .08, false); h.rotation.x = Math.PI / 2; g.add(h); const w2 = mesh(G.cyl, M("#4a3a2e"), x + dx, .24, z - .46, .24, .07, .24); w2.rotation.x = Math.PI / 2; g.add(w2); });
+    g.add(mesh(G.box, M("#7a5a3a"), x - .86, .34, z, .34, .04, .06)); g.add(mesh(G.box, M("#7a5a3a"), x - 1.02, .34, z, .02, .02, .5, false));
+    [[-.68, -.4], [.68, -.4], [-.68, .4], [.68, .4]].forEach(([dx, dz]) => g.add(mesh(G.box, M("#fffaf0"), x + dx, 1.12, z + dz, .045, .68, .045)));
+    for (let k = 0; k < 6; k++) { const st = mesh(G.box, M(k % 2 ? "#ffffff" : "#f06a98"), x - .6 + k * .24, 1.5 - .02, z, .24, .05, 1.1); st.rotation.x = -.1; g.add(st); }
+    for (let k = 0; k < 6; k++) g.add(mesh(G.sph, M(k % 2 ? "#ffffff" : "#f06a98"), x - .6 + k * .24, 1.42, z + .55, .12, .08, .08, false));
+    { const sb = boardMesh(.92, .26, boardTex("dondurmaSign", "🍦 DONDURMA", "#fff0f5", "#c2185b", "#8a4a2e")); sb.position.set(x, .52, z + .435); g.add(sb); }
+    const cone = mesh(G.cone, M("#e6ae62"), x, 1.86, z, .2, .38, .2); cone.rotation.x = Math.PI; g.add(cone);
+    g.add(mesh(G.sph, M("#ff9fc6"), x, 2.12, z, .2, .17, .2)); g.add(mesh(G.sph, M("#fff3d2"), x, 2.31, z, .15, .13, .15)); g.add(mesh(G.sph, M("#e0301f"), x + .03, 2.45, z, .05, .05, .05, false));
+    [[-.45, "#ff9fc6"], [-.1, "#fff3d2"], [.25, "#c9a56a"]].forEach(([dx, c]) => { g.add(mesh(G.cyl, M("#ffffff"), x + dx, .87, z + .1, .09, .07, .09, false)); g.add(mesh(G.sph, M(c), x + dx, .95, z + .1, .09, .07, .09, false)); });
+    [[.5, "#ffd34d"]].forEach(([dx, c]) => { g.add(mesh(G.cone, M("#e6ae62"), x + dx, .9, z + .12, .05, .12, .05, false)); g.add(mesh(G.sph, M(c), x + dx, .99, z + .12, .06, .06, .06, false)); });
+    if (baking) { const lamp = mesh(G.sph, new T.MeshBasicMaterial({ color: "#bfefff" }), x + .68, 1.5, z + .4, .06, .06, .06, false); g.add(lamp); }
     return g;
   }
   function buildOven(a, baking, lv) {
@@ -7478,7 +7556,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     world.add(RO(buildSign(L.sign, String(f.name || "Çiftçi")), "sign")); proxy(colOf(L.sign) + .5, .5, rowOf(L.sign) + .5, 1, 1, 1, L.sign);
     for (const oid of OVENS) if (L[oid] >= 0) {
       const B = isMe ? bakeInfo(S, now, oid) : { q: 0, done: 0 };
-      const o = buildOven(L[oid], B.q > B.done, ovenLv(f, oid)); world.add(RO(o, oid));
+      const o = oid === "icecart" ? buildIceCart(L[oid], B.q > B.done) : buildOven(L[oid], B.q > B.done, ovenLv(f, oid)); world.add(RO(o, oid));
       proxy(colOf(L[oid]) + 1, .7, rowOf(L[oid]) + 1, 2, 1.4, 2, L[oid]);
     }
     // animals and the feed mill
@@ -7505,7 +7583,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     fog3(f);
   }
   function farmDyn(f, now, L, home, isMe) {
-    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), 1.05, .52, { fog: false }); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
+    if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const em = { fries: "🍟", icecream: "🍦" }[ovenDoneKey(S, now, oid)] || "🍞", s = sprite(emojiBadge(em, B.done), 1.2, 1.2, { fog: false, depthTest: false }); s.position.set(colOf(L[oid]) + 1, oid === "icecart" ? 2.85 : 2.3, rowOf(L[oid]) + 1); s.renderOrder = 7; s.userData.bob = Math.random() * 6; fx.dstars.push(s); dyn.add(s); } }
     if (isMe) {
       [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
         const em = I.ready ? e : I.hungry && I.hungry === I.n ? (k === "coop" ? "🐔🌾" : "🐄🌾") : null; if (!em) return;
@@ -8322,7 +8400,7 @@ function renderAchDot() { const r = ACH.filter(a => !S.ach.unlocked.includes(a.i
 
 /* ---- olay bağlantıları (mevcut fonksiyonlar sarılır, oyun koduna dokunulmaz) ---- */
 const QMAP = { harvest: "harvest", plant: "plant", water: "water", sell: "sell", wish: "wishN", jobs: "job" };
-const DMAP = { "harv:apple": "apple", "prod:egg": "egg", "prod:milk": "milk", "bake:bread": "bread", "bake:fries": "fries", feed: "feed" };
+const DMAP = { "harv:apple": "apple", "prod:egg": "egg", "prod:milk": "milk", "bake:bread": "bread", "bake:fries": "fries", "bake:icecream": "icecream", feed: "feed" };
 try { const _q = questEv; questEv = function (id, n) { try { if (QMAP[id]) achEvent(QMAP[id], n === undefined ? 1 : n);
     if (id === "sell" && !S.ach.progress.firstSale) { S.ach.progress.firstSale = 1; ANALYTICS.log("first_sale"); } if (id === "wish") ANALYTICS.log("wish_spin"); } catch (e) {} return _q.apply(this, arguments); }; } catch (e) {}
 try { const _d = dailyEv; dailyEv = function (k, n) { try { if (DMAP[k]) achEvent(DMAP[k], n === undefined ? 1 : n); } catch (e) {} return _d.apply(this, arguments); }; } catch (e) {}

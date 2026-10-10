@@ -196,3 +196,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v118
 - `.nlab` isim yazısı: -webkit-text-stroke kaldırıldı (Android'de paint-order desteklenmediği için harfler bozuluyordu), text-shadow ile 8 yönlü ince çerçeve, oyunun --body (Nunito) yazı tipi.
+
+## v119
+- Dondurma arabası (`icecart`, OVENS içinde): 600 altın, sv15, 1 süt + 1 elma (`from2`), 10 dk/adet, satış 150. 3B `buildIceCart`, SVG `iceCartIcon`.
+- Fırın/araba "hazır" rozeti ürüne göre (🍞/🍟/🍦) `emojiBadge`.
+- Market: Toprak sekmesi kaldırıldı; `landPart()/landBind()` Geliştir sekmesinde (bölüm başlıkları `.msec`).
+- Sürüm/sunucu yazısı sadece admin; botlar `botWhere` ile 5-10 dk gelir/gider, daha az yürür.
