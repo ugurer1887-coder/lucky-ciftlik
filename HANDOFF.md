@@ -186,3 +186,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v114
 - Hayvan resimli yem çuvalları: `SACK` (SVG yol verisi) hem `feedThumb` (2B) hem `emojiBadge` (3B, "🐔🌾"/"🐄🌾") tarafından kullanılır. Aç hayvan ve ambar rozeti bunu gösterir.
+
+## v115
+- Güncelleme kartları (`UPDATES`) sıfırlandı; yeni sürümlerde en üste kart eklenir. Eski kartlar git geçmişinde.
+- İsim etiketleri kameraya göre ölçeklenir (uzaktan da aynı okunaklılıkta).

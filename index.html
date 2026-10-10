@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "114";
+const VERSION = "115";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6025,216 +6025,13 @@ function renderRank() {
 }
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
-const UPDATES = [
-  { v: 114, d: "11 Ekim 2026", e: "🐔", t: "Hayvan resimli yem çuvalları", c: "#8a5a1e", b: "#faead0", items: [
-    "Tavuk ya da inekler acıkınca kümesin ve ahırın üstünde, kendi resimli yem çuvalı çıkıyor.",
-    "Ambardaki tavuk yemi tavuk resimli, inek yemi inek resimli çuval oldu. Depoda ve ambar ekranında da aynı çuvalları görürsün.",
-  ] },
-  { v: 113, d: "11 Ekim 2026", e: "🔤", t: "Okunaklı isimler", c: "#4a5a7a", b: "#e2e8f3", items: [
-    "Karakter isimleri sade ve kalın bir yazı tipiyle, daha yüksek çözünürlükte çiziliyor; uzaktan net okunuyor.",
-  ] },
-  { v: 112, d: "11 Ekim 2026", e: "🥛", t: "Yeni hayvan simgeleri", c: "#2e7a8a", b: "#dcf1f5", items: [
-    "İnek ahırının üstünde süt kovası, kümesin üstünde yumurta, ambarın üstünde yem çuvalı simgesi çıkıyor. Hepsi renkli ve belirgin.",
-  ] },
-  { v: 111, d: "11 Ekim 2026", e: "🔍", t: "Daha yakın meydan, net isimler", c: "#2e6a8a", b: "#dceef7", items: [
-    "Meydandaki kamera daha da yakınlaştı.",
-    "Karakterlerin üstündeki isimler daha büyük, kalın ve koyu çerçeveli, uzaktan rahat okunuyor.",
-  ] },
-  { v: 110, d: "11 Ekim 2026", e: "🔔", t: "Belirgin bildirimler", c: "#a8651e", b: "#fbeacc", items: [
-    "Kümes, ahır, ambar ve sipariş tabelasının üstündeki bildirim simgeleri artık canlı renkli, kalın çerçeveli ve saydam değil, uzaktan bile net görünüyor.",
-    "Yapıların dokununca açılan menüsü eski boyuta döndü.",
-  ] },
-  { v: 109, d: "11 Ekim 2026", e: "⛲", t: "Meydan düzeni", c: "#3a6a8a", b: "#e0eef7", items: [
-    "Meydandaki çiftçiler artık dilek çeşmesinin ve pazar tezgâhlarının çevresinde duruyor, daha az dolaşıyor ve akıcı yürüyor.",
-  ] },
-  { v: 108, d: "11 Ekim 2026", e: "🏘️", t: "Daha canlı meydan", c: "#3a7a3e", b: "#e2f3dc", items: [
-    "Meydandaki kamera biraz daha yakın, her şey daha net görünüyor.",
-    "Çiftlikteki depo, kümes ve ahır gibi yapıların menüsü ve üstündeki bildirimler daha büyük.",
-    "Meydan ve çiftlikler yeni çiftçilerle daha kalabalık: onların çiftliklerini ziyaret edebilir, arkadaş ekleyebilir, sıralamada görebilirsin.",
-  ] },
-  { v: 107, d: "11 Ekim 2026", e: "🎓", t: "Depo, araç fiyatları ve yeni görevler", c: "#8a3a2e", b: "#f9e3dc", items: [
-    "Depoyu yükseltmek için çiftlikteki <b>depoya dokun</b> ve <b>Yükselt</b>'i seç. Gerekenler eksikse sana söyler.",
-    "Araç fiyatları: Ekim aleti 1.000, Elektrikli tırpan 2.500, Traktör 20.000 altın.",
-    "Marketteki <b>Ambar</b> simgesi artık gerçek bir ambar.",
-    "Görevler artık seni 5. seviyeye kadar adım adım yönlendiriyor: ekim, sulama, hasat, satış, fırın, ağaç, süsleme, günlük görevler, dilek çeşmesi ve iş ilanları.",
-  ] },
-  { v: 106, d: "11 Ekim 2026", e: "🗨️", t: "Baloncuk ve yazma düzeltmesi", c: "#2e6a8a", b: "#dceef7", items: [
-    "Genel sohbette yazılan mesaj artık karakterin başında baloncuk çıkarmaz, yalnızca sohbet kutusunda görünür.",
-    "Çiftlik ve meydan sohbeti baloncukları daha büyük ve uzaktan okunur.",
-    "Mesaj yazarken ekran artık küçülmüyor, sadece sohbet kutusu klavyenin üstüne çıkıyor.",
-  ] },
-  { v: 105, d: "10 Ekim 2026", e: "💬", t: "Giriş, sohbet ve günlük ödül", c: "#8a5a2e", b: "#f6e8d4", items: [
-    "Oyuna girerken <b>Google ile giriş</b> ya da <b>misafir</b> olarak devam etmeyi seçebilirsin.",
-    "<b>Genel sohbet</b> herkese açık. Çiftlikte <b>Çiftlik sohbeti</b>, meydanda <b>Meydan sohbeti</b> eklendi, sadece orada olanlar görür.",
-    "Günlük ödül takvimi tarihe bağlı: girmediğin günün ödülü atlanır, girdiğin günün ödülünü alırsın.",
-    "Mesaj kutularının dışına dokununca kapanır.",
-    "Dekorlar yenilendi.",
-  ] },
-  { v: 104, d: "10 Ekim 2026", e: "✨", t: "Daha net görüntü", c: "#8a5a2e", b: "#f6e8d4", items: [
-    "Kenar yumuşatma geri açıldı, çizim netliği artırıldı.",
-    "Otomatik grafik modu artık her açılışta en iyi seviyeden başlar.",
-  ] },
-  { v: 103, d: "10 Ekim 2026", e: "⚡", t: "Daha akıcı oyun", c: "#8a5a2e", b: "#f6e8d4", items: [
-    "Gerçek zamanlı gölgeler kapatıldı, yerine yumuşak zemin gölgeleri kullanılıyor.",
-    "Çizim çözünürlüğü ve kenar yumuşatma hafifletildi, oyun telefonlarda daha akıcı çalışır.",
-  ] },
-  { v: 102, d: "10 Ekim 2026", e: "🪵", t: "Tahta şansı arttı", c: "#8a5a2e", b: "#f6e8d4", items: [
-    "Ekinleri toplarken tahta çıkma şansı <b>%20</b> oldu. 15. seviyeden sonra %10'a düşer.",
-  ] },
-  { v: 101, d: "10 Ekim 2026", e: "🪵", t: "Depo kapasitesi ve tahta", c: "#8a5a2e", b: "#f6e8d4", items: [
-    "Depo artık <b>100 ürün</b> alıyor. Dolunca ekin toplayamaz, ürünleri satarak yer açman gerekir.",
-    "Yeni ürün <b>tahta</b>: ekinleri toplarken %10 şansla çıkar ve doğrudan depoya gider.",
-    "Depoyu 2. seviyeye çıkarmak için <b>600 altın ve 4 tahta</b> gerekir. Tahtayı Pazar'da en fazla tanesi 400 altına satabilirsin.",
-    "Toplarken ve sularken traktör gibi çok yuvalı aletler artık sadece yan yana olan topraklara çalışır, uzaktaki toprağa ayrıca gitmen gerekir.",
-    "Toplama sırasında alet değiştirirsen bekleyen toplama iptal olur.",
-  ] },
-  { v: 100, d: "10 Ekim 2026", e: "🍞", t: "Yeni fırın ekranı", c: "#c8702a", b: "#fff0dc", items: [
-    "Fırın ekranı yenilendi: buğday başağı, ekmek, patates ve kızartma resimleri, tepside pişen ekmekler tek tek görünüyor.",
-    "Kaydırarak miktar seç, 5 / 10 / Hepsi düğmeleri, bitiş saati ve iki tepsiyi birden depoya alma.",
-    "Elmalar artık ağacın üstünde, saplı ve yapraklı; olgunlaşınca parlak kırmızı.",
-  ] },
-  { v: 99, d: "10 Ekim 2026", e: "🌽", t: "Ekinler daha erken", c: "#e0a01a", b: "#fff4d6", items: [
-    "Yeni açılış seviyeleri: havuç 6, salata 8, <b>mısır 10</b>, patlıcan 14, kabak 18.",
-    "Siparişler artık sadece senin seviyende açık olan ürünleri istiyor.",
-  ] },
-  { v: 98, d: "9 Ekim 2026", e: "🐄", t: "Yeni yükleme ekranı ve inekler", c: "#2f6fc4", b: "#e2f0ff", items: [
-    "Yepyeni yükleme ekranı: gün batımında çiftlik, sallanan başaklar ve parlayan Lucky Farm logosu.",
-    "İnekler baştan yapıldı: tek parça yumuşak gövde, gerçek benekler, gerçekçi baş ve bacaklar.",
-  ] },
-  { v: 97, d: "9 Ekim 2026", e: "✨", t: "Daha güzel Lucky Farm", c: "#2f9a43", b: "#e3f7dc", items: [
-    "Görüntü daha keskin ve canlı; çimenler rüzgârda sallanıyor.",
-    "Yeni gerçekçi inekler, dolgun yapraklı elma ağaçları: elmalar dalda büyüyüp kızarıyor.",
-    "Traktör büyüdü: camlı kabin, krom ızgara, farlar ve tepe lambası.",
-    "Su kuyusu ve fıskiyeler geliştirdikçe büyüyüp güzelleşiyor.",
-    "LuckyTr'nin çiftliği yeni binalarla süslendi.",
-    "Görev ve sipariş ödülleri yeniden dengelendi.",
-  ] },
-  { v: 96, d: "9 Ekim 2026", e: "🦋", t: "Lucky Farm canlanıyor", c: "#e0702a", b: "#fff0dc", items: [
-    "Oyunumuzun adı artık <b>Lucky Farm</b>!",
-    "Yeni inekler ve tavuklar: yürürken bacakları oynuyor, ineklerin kuyruğu sallanıyor, tavuklar başını sallayarak yürüyor.",
-    "Dokunduğun yerde parıltı çıkıyor, karakterin nereye gideceğini kolayca görürsün.",
-    "Çimenler daha doğal, çayırda kır çiçekleri ve uçuşan kelebekler var.",
-    "Pazar tezgahlarının üstündeki sepet işaretleri geri geldi.",
-  ] },
-  { v: 95, d: "9 Ekim 2026", e: "🧺", t: "Sade pazar yeri", c: "#2f9a43", b: "#e3f7dc", items: [
-    "Pazar yerindeki yazılar kaldırıldı; tezgahlar renkli tenteleri ve halılarıyla, pankart da meyve resimleriyle sade bir görünümde.",
-  ] },
-  { v: 94, d: "9 Ekim 2026", e: "🔎", t: "Uzaktan okunan pazar yazıları", c: "#2f9a43", b: "#e3f7dc", items: [
-    "Pazar tezgahlarının üstündeki numaralar ve PAZAR YERİ yazısı artık uzaklaşınca küçülmüyor, kuş bakışında da okunuyor.",
-  ] },
-  { v: 93, d: "9 Ekim 2026", e: "🏪", t: "Pazar yeri tepeden belli", c: "#3f8fd0", b: "#e2f0ff", items: [
-    "Her tezgahın tentesinde büyük numara ve PAZAR yazısı var (1, 2, 3, 4); tepeden bakınca hemen görünüyor.",
-    "Tezgahların altında renkli halılar var, pazar yeri zeminde de belli oluyor.",
-    "Pankartın üstünde kaç tezgah olduğu ve kaç ürünün satışta olduğu yazıyor.",
-  ] },
-  { v: 92, d: "9 Ekim 2026", e: "🎪", t: "Pazar yeri ve köy fırınları", c: "#c8453a", b: "#ffe6df", items: [
-    "Meydanda <b>PAZAR YERİ</b> pankartı ve rengârenk bayrak süsleri var.",
-    "Tezgahlar yenilendi: küçük meyve kasaları, fiyat etiketleri, terazi, kavanoz ve ekmek rafı.",
-    "Fırınlar çiftliğe uygun hâle geldi: 2. seviye büyük tuğla kubbeli fırın ve odunluk, 3. seviye çift kubbeli köy fırını.",
-  ] },
-  { v: 91, d: "9 Ekim 2026", e: "🧺", t: "Düzeltmeler", c: "#b8402c", b: "#ffe9dc", items: [
-    "Kümes ve ahırın zemini artık titremiyor; kümeste saman, ahırda çimen zemin var.",
-    "Görev şeridi hep açık kalıyor. Dokununca sola doğru küçülüp kutucuk oluyor, yeniden dokununca açılıyor. Başlangıç görevleri bitince günlük görevleri gösteriyor.",
-    "Meydandaki pazar tezgahları daha büyük ve meyve sepetli.",
-  ] },
-  { v: 90, d: "9 Ekim 2026", e: "🛒", t: "Pazar ve yeni binalar", c: "#2f9a43", b: "#e3f7dc", items: [
-    "<b>Pazar</b> (5. sv): Meydandaki tezgahlarda oyuncular birbirine ürün satıyor. Ürününü kendi fiyatınla tezgaha koy, biri alınca altın kendiliğinden sana gelir. En fazla 4 tezgah.",
-    "Yeni <b>tavuk kümesi</b> ve <b>inek ahırı</b>, daha sevimli tavuklar ve inekler.",
-    "<b>Depo</b> artık kemerli çatılı, büyük DEPO tabelalı bir ambar binası. <b>Ambar</b> yel değirmenli, parlak silolu lüks bir bina oldu.",
-    "<b>Fırınlar</b> geliştirdikçe değişiyor: 2. seviye tuğla fırın, 3. seviye modern fırın.",
-    "Görev çubuğuna dokununca küçülüyor, yeniden dokununca açılıyor.",
-  ] },
-  { v: 89, d: "9 Ekim 2026", e: "📋", t: "Siparişler ve günlük görevler", c: "#2f7fbf", b: "#dcefff", items: [
-    "<b>Sipariş tabelası</b> (3. sv): Köylüler ürün istiyor. Depodan teslim et, normal satıştan daha çok altın ve XP kazan. Çiftliğindeki tabelaya dokunarak da bakabilirsin.",
-    "<b>Günlük görevler</b> (3. sv): Her gün 3 yeni görev. Üçünü de bitirirsen <b>günün sandığı</b> açılır.",
-    "Görevler penceresinde artık sekmeler var: Görevler, Günlük ve Siparişler.",
-    "Yeni fiyatlar: <b>yumurta 15</b>, <b>süt 40</b> altın.",
-  ] },
-  { v: 88, d: "9 Ekim 2026", e: "🐔", t: "Tavuklar, inekler ve ambar", c: "#c8453a", b: "#ffe3dc", items: [
-    "<b>Tavuk kümesi</b> (10. sv, 500 altın): 10 tavuk sığar, tavuğu 100 altın. Yem yiyen tavuk 5 dakikada yumurtlar, yumurta 10 altın.",
-    "<b>İnek ahırı</b> (13. sv, 750 altın): 4 inek sığar, ineği 200 altın. Yem yiyen inek 8 dakikada süt verir, süt 25 altın.",
-    "<b>Ambar</b> (10. sv, 300 altın): 2 buğdaydan 1 tavuk yemi (2 dk), 1 mısır + 1 buğdaydan 3 inek yemi (3 dk). Yemler depoya gelir.",
-    "Hayvanlar açık kümeste ve ahırda dolaşıyor. Yumurta, süt ya da yem hazır olunca binanın üstünde işaret çıkıyor.",
-    "Depo artık <b>Ekinler, Yemler ve Malzemeler</b> diye ayrılıyor. Depo binasında DEPO tabelası, kasalar ve çuvallar var.",
-    "Binaları ve süsleri <b>döndürebilirsin</b>: dokun, altındaki menüden Döndür'e bas.",
-  ] },
-  { v: 87, d: "9 Ekim 2026", e: "🥕", t: "Yeni ekinler ve iki fırın", c: "#e0762a", b: "#ffe9cf", items: [
-    "Yeni ekinler: <b>havuç</b> (7. sv), <b>salata</b> (9), <b>mısır</b> (12), <b>patlıcan</b> (15) ve <b>kabak</b> (20). Patates artık 5. seviyede açılıyor ve 4 dakikada yetişiyor.",
-    "Taş fırın artık 40 altın. <b>İkinci fırın</b> 20. seviyede açılıyor. Fırınlar 3 seviyeye geliştirilebiliyor: 7, 15 ve iki tepside 20+20 ürün.",
-    "Fırında <b>patates kızartması</b> da yapılıyor: 2 patatese 1 kızartma, 5 dakika.",
-    "Çiftlikteki binalara, ağaçlara ve süslere dokununca altında <b>Pişir, Geliştir, Taşı</b> gibi seçenekler çıkıyor.",
-    "Ekim aleti 10. seviyede, elektrikli tırpan 15. seviyede açılır. Fıskiye 400 altın, 6 seviyeye kadar geliştirilebiliyor.",
-    "Yeni oyuncular 50 altınla başlıyor, kuyu tarlanın hemen yanında. Açılmamış araziler bulutlu, oyun çiftliğin ortada açılıyor.",
-    "Yazılara basılı tutunca artık kopyalama menüsü çıkmıyor.",
-  ] },
-  { v: 86, d: "9 Ekim 2026", e: "🌾", t: "Altın başaklar ve yanan fırın", c: "#d9961a", b: "#fff3d0", items: [
-    "Buğday yeniden tasarlandı: her tarlada daha gür sap, gerçek yaprak ve taneli, kılçıklı başaklar var. Olgunlaşınca altın sarısına dönüyor ve rüzgârda hafifçe sallanıyor.",
-    "Taş fırın yenilendi: tuğla kubbe, taş kemerli ağız, tuğla baca, odun yığını ve ekmek küreği.",
-    "Ekmek pişerken fırının içinde <b>ateş yanıyor</b>: alevler dans ediyor, ağzı parlıyor, bacadan kıvılcım ve duman çıkıyor.",
-  ] },
-  { v: 84, d: "9 Ekim 2026", e: "🔔", t: "Hasat bildirimleri", c: "#e0762a", b: "#fff0d9", items: [
-    "Ekinlerin, elma ağaçların ya da ekmeklerin hazır olunca oyun kapalıyken bile telefonuna <b>bildirim</b> gelir.",
-    "Oyuna ilk girişinde bir kez sorulur. İstediğin zaman <b>Ayarlar &gt; Hasat bildirimleri</b>'nden açıp kapatabilirsin.",
-  ] },
-  { v: 83, d: "9 Ekim 2026", e: "🔄", t: "Yeni bir başlangıç", c: "#7650dc", b: "#ece4ff", items: [
-    "Bütün çiftlikler sıfırlandı. Herkes görevlerle birlikte yeniden başlıyor, iyi şanslar!",
-    "Görevler penceresinde sadece sıradaki görev görünüyor. Ödülü alınan görev listeden kalkıyor.",
-    "Görev düğmesindeki kırmızı nokta sadece ödülü alınacak bir görev olduğunda yanıyor.",
-    "Dilek çarkı: 2x ihtimali %20, boş %45 oldu. \"Geri\" yazısı artık \"Tekrar\".",
-  ] },
-  { v: 82, d: "9 Ekim 2026", e: "💧", t: "Daha sade bir çiftlik", c: "#2b8fd0", b: "#dcf0ff", items: [
-    "Ekilen ama sulanmamış topraklarda artık büyük, zıplayan bir <b>su damlası</b> var. Neyin sulanacağı hemen belli.",
-    "1. seviye su kuyusu artık gerçek bir taş kuyu.",
-    "Bulutlar sadece bir sonraki genişletmenin üstünde. Fiyatı bulutun üstünde küçük bir yazıyla görünüyor.",
-    "Görevler tek tek açılıyor ve oyuna girer girmez karşına çıkmıyor.",
-    "Dilek çeşmesinde ihtimaller çarkın altında kısaca yazıyor. Deponun üstündeki sayı kaldırıldı.",
-  ] },
-  { v: 81, d: "9 Ekim 2026", e: "📜", t: "Görevler geldi!", c: "#e0762a", b: "#ffe9cf", items: [
-    "Yeni başlayan çiftçiler için <b>görevler</b>: ekim, sulama, hasat, depoda satış, taş fırın ve ekmek adım adım öğretiliyor.",
-    "Her görevin ödülü altın. Ödülleri mektupların yanındaki yeni <b>Görevler</b> düğmesinden alabilirsin.",
-    "<b>Dilek çeşmesi</b> canlandı: suyun içinde altınlar, balıklar ve nilüferler var. Kazanınca büyük bir kutlama seni bekliyor!",
-    "Dilek çeşmesi artık <b>5. seviyede</b> açılıyor.",
-    "Sağdaki Market, Meydan, İşçi gibi düğmeler çiftliğe yakışan ahşap tabelalara dönüştü.",
-    "Güncellemeler penceresi daha renkli. Uzun pencerelerin üstü artık ekranın dışında kalmıyor.",
-  ] },
-  { v: 80, d: "9 Ekim 2026", e: "📱", t: "Uygulama doğrudan tam ekran", c: "#2f6fb0", b: "#dcebf8", items: [
-    "Play Store uygulaması artık açılır açılmaz tam ekran başlıyor, ekrana dokunmana gerek yok.",
-    "\"Tam ekrandan çıkmak için...\" uyarısı artık çıkmıyor.",
-    "Açılıştaki simge kaldırıldı, oyun doğrudan yükleme ekranıyla açılıyor.",
-  ] },
-  { v: 79, d: "9 Ekim 2026", e: "⚡", t: "Daha hızlı açılış", c: "#3f7a26", b: "#e3f0c8", items: [
-    "Oyun açılırken ortada beliren ilk görüntü artık çok daha kısa sürüyor, yükleme ekranı hemen geliyor.",
-  ] },
-  { v: 78, d: "9 Ekim 2026", e: "🎡", t: "Şans çarkı yenilendi!", c: "#e0473a", b: "#ffe1d9", items: [
-    "Meydandaki dilek çeşmesinde artık <b>%1 ihtimalle 100 kat</b> kazanma şansı var!",
-    "%25 ihtimalle attığın altının 2 katı, %34 ihtimalle altının geri geliyor.",
-    "Bir seferde en fazla 20.000 altın atabilirsin, günde 3 hakkın var.",
-    "Bu <b>Güncellemeler</b> bölümü eklendi. Yenilikleri artık buradan takip edebilirsin." ] },
-  { v: 77, d: "9 Ekim 2026", e: "⚡", t: "Oyun çok daha akıcı", c: "#7650dc", b: "#ece4ff", items: [
-    "Görüntü motoru hafifletildi, telefonlarda saniyedeki kare sayısı belirgin şekilde arttı.",
-    "Uygulama tam ekran açılıyor, bildirimlere bakarken oyun kaymıyor." ] },
-  { v: 76, d: "9 Ekim 2026", e: "🛒", t: "Daha derli toplu market", c: "#2b7fc4", b: "#dcefff", items: [
-    "Market kartları küçüldü, bir bakışta daha çok ürün görünüyor.",
-    "Kuş bakışı görünüm biraz yakınlaştı, çiftliğin daha net görünüyor." ] },
-  { v: 75, d: "9 Ekim 2026", e: "🌿", t: "Daha doğal bir çiftlik", c: "#2f8a3c", b: "#dff3dc", items: [
-    "Çimen, ağaçlar ve gökyüzü daha doğal renklere kavuştu, uzaklarda hafif pus var.",
-    "Gölgeler sadeleşti, oyun daha hafif ve hızlı çalışıyor.",
-    "Oyunumuzun adı artık <b>Lucky Çiftlik</b>!" ] },
-  { v: 72, d: "9 Ekim 2026", e: "🚜", t: "Yeni açılış ekranı", c: "#f0861a", b: "#fff0d6", items: [
-    "Oyun açılırken renkli yükleme ekranı ve ipuçları geliyor.",
-    "Oyun ikinci açılıştan itibaren çok daha hızlı yükleniyor.",
-    "Lucky Çiftlik artık Google Play'de!" ] },
-  { v: 69, d: "9 Ekim 2026", e: "💧", t: "Su kuyusu ve fıskiyeler güçlendi", c: "#1f8fb3", b: "#d9f3fb", items: [
-    "Su kuyusu 5. seviyeye kadar geliştirilebiliyor: 35 ve 50 kovalık yeni seviyeler.",
-    "5. seviye kuyu ile ekinler dörder dörder sulanıyor.",
-    "Fıskiyeler 5 seviyeye kadar geliştirilebiliyor: 200 su, tek dokunuşta 12 ekin!" ] }
-];
+const UPDATES = [];   // her yeni sürümde buraya kart eklenir (en yenisi en üstte): { v, d, e, t, c, b, items }
 const updSeen = () => { try { return +localStorage.getItem("lucky-upd-seen") || 0; } catch (e) { return 0; } };
-function renderUpdDot() { $("updDot").style.display = UPDATES[0].v > updSeen() ? "block" : "none"; }
+function renderUpdDot() { $("updDot").style.display = UPDATES.length && UPDATES[0].v > updSeen() ? "block" : "none"; }
 function openUpd() {
   const seen = updSeen();
-  $("updList").innerHTML = UPDATES.map(u => `<div class="updcard${u.v > seen ? " new" : ""}" style="--uc:${u.c};--ub:${u.b}"><span class="ue">${u.e}</span><h3>${u.t}</h3><div class="um"><b>Sürüm ${u.v}</b>${u.d}</div><ul>${u.items.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("");
-  try { localStorage.setItem("lucky-upd-seen", String(UPDATES[0].v)); } catch (e) {}
+  $("updList").innerHTML = !UPDATES.length ? `<p class="empty">Henüz yenilik yok.</p>` : UPDATES.map(u => `<div class="updcard${u.v > seen ? " new" : ""}" style="--uc:${u.c};--ub:${u.b}"><span class="ue">${u.e}</span><h3>${u.t}</h3><div class="um"><b>Sürüm ${u.v}</b>${u.d}</div><ul>${u.items.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("");
+  try { if (UPDATES.length) localStorage.setItem("lucky-upd-seen", String(UPDATES[0].v)); } catch (e) {}
   renderUpdDot(); $("upd").classList.add("on");
 }
 $("updBtn").onclick = openUpd;
@@ -6467,7 +6264,7 @@ function setup3D(T) {
   function canvasTex(key, w, h, draw) {
     if (texCache[key]) return texCache[key];
     const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h);
-    const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; return (texCache[key] = t);
+    const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; t.anisotropy = 8; return (texCache[key] = t);
   }
   const rr = (x, a, b, w, h, r) => { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); };
   function labelTex(text, color) {
@@ -8171,6 +7968,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     // camera follows the same camera box the 2D view uses
     const tx = (cam.x + cam.w / 2) / CELL, tz = (cam.y + cam.h / 2) / CELL;
     const ZE = zEff(); if (ZE !== lastZE) { lastZE = ZE; try { fitCam(); } catch (e) {} }
+    { const lk = Math.max(.9, ZE) * 1.15; for (const c of [me, ...peers.values()]) if (c.m3 && c.m3.lbl) { c.m3.lbl.scale.set(1.9 * lk, .475 * lk, 1); c.m3.lbl.position.y = 1.3 + .1 * lk; } }   // isimler uzaktan da aynı büyüklükte okunur
     const D = D0 * ZE;
     const tilt = TILT + Math.max(-.5, Math.min(.5, ZE - 1)) * .06;   // uzaklaşınca kamera hafif yükselir
     camera.position.set(tx, Math.sin(tilt) * D, tz + Math.cos(tilt) * D); camera.lookAt(tx, 0, tz - .3);
