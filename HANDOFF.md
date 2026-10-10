@@ -235,3 +235,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v129
 - Yeni görevler: sellbread, plazavisit, friend, pazar (ev: pzput). Yerleştirme modlarında kırmızı İptal.
+
+## v130 Maden
+- Sabitler: MINE_LEVEL 10, DYN_PRICE 150, GOLDORE_SELL 250, MINE_DROPS (goldore x1, axe x3, drill x3, eşit şans), MINE_CELL (sanal hücre, proxy ile tıklanır). Depo "goods" (Malzemeler) sekmesinde dynamite/goldore/axe/drill, NOSELL.
+- Maden 3B: `buildMine` yolun altında (z>ROWS), zemin RH +600 uzatıldı, mapBox home için +500 aşağı. 2B yedekte maden YOK.
+- Engeller: S.obst {cell:"t"|"r"}, `genObstacles` (genişletmede), `clearObst` (balta/matkap harcar), occMap/solidOf'a dahil. 3B `buildRock`, buildTree. UYARI: 3B doğrulanmadı.

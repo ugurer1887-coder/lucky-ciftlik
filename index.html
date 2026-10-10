@@ -849,6 +849,10 @@ button:active{transform:scale(.96);filter:brightness(.96)}
     <div class="sheet-head"><h2>Fırın</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
     <div class="sheet-body" id="ovenBody_v8"></div>
   </section>
+  <section class="sheet" id="mine_v8" aria-label="Maden">
+    <div class="sheet-head"><h2>⛏️ Maden</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="sheet-body" id="mineBody_v8"></div>
+  </section>
   <section class="sheet" id="farmb_v8" aria-label="Bina">
     <div class="sheet-head"><h2 id="farmbTitle_v8">Kümes</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
     <div class="sheet-body" id="farmbBody_v8"></div>
@@ -1315,7 +1319,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "129";
+const VERSION = "130";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1474,6 +1478,7 @@ function occMap(farm) {
   (farm.spr || []).forEach(s => { if (!m.has(s.cell)) m.set(s.cell, { t: "spr" }); });
   (farm.plots || []).forEach(p => { if (!m.has(p.cell)) m.set(p.cell, { t: "plot" }); });
   (farm.fences || []).forEach(f => { if (!m.has(f)) m.set(f, { t: "fence" }); });
+  for (const c in (farm.obst || {})) if (!m.has(+c)) m.set(+c, { t: "obst", k: farm.obst[c] });
   return m;
 }
 function solidOf(farm) {
@@ -1482,6 +1487,7 @@ function solidOf(farm) {
   (farm.trees || []).forEach(tr => s.add(tr.cell));
   (farm.decor || []).forEach(d => s.add(d.cell));
   (farm.spr || []).forEach(x => s.add(x.cell));
+  for (const c in (farm.obst || {})) s.add(+c);
   return s;
 }
 const blockedOf = farm => { const s = solidOf(farm); return i => s.has(i) || !inOwned(farm, i); };
@@ -1584,7 +1590,10 @@ const ANIMALS = {
   cowbarn: { list: "cows", one: "İnek", feed: "cowfeed", prod: "milk", prodName: "Süt", ms: MILK_MS, cap: COW_CAP, price: COW_PRICE, lv: COWBARN_LEVEL, cost: COWBARN_PRICE, emoji: "🐄", pe: "🥛" },
 };
 const BUILDINGS = ["coop", "cowbarn", "mill"];
-const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "icecream", "chickfeed", "cowfeed", "wood"];
+const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "icecream", "chickfeed", "cowfeed", "wood", "dynamite", "goldore", "axe", "drill"];
+// mine (across the road, level 10): a stick of dynamite (bought at the stall) brings out one of three finds, 1/3 each
+const MINE_LEVEL = 10, DYN_PRICE = 150, GOLDORE_SELL = 250, MINE_DROPS = [["goldore", 1], ["axe", 3], ["drill", 3]], MINE_CELL = COLS * ROWS + 1;
+const NOSELL = { wood: "Depoya satılmaz. Pazar'da kendi koyduğun fiyatla satabilir ya da depoyu geliştirmek için kullanabilirsin.", dynamite: "Madene atılır. Maden yolun karşısında, dinamit tezgahı yanında.", axe: "Genişlettiğin arazideki ağaçları keser. Ağaca dokun, her kesişte 1 balta gider.", drill: "Genişlettiğin arazideki taşları kırar. Taşa dokun, her kırışta 1 matkap gider." };
 // depot: capacity per level (everything in the depot counts, one slot per item); level 2 costs gold + planks (tahta)
 const DEPOT_CAP = [100, 200], DEPOT_UP = [{ g: 600, wood: 4 }];
 const WOOD_CHANCE = 0.03, WOOD_CHANCE_LATE = 0.03, WOOD_LATE_LEVEL = 15, WOOD_MAX_PRICE = 400, WOOD_REF = 100;   // each harvested crop gives a plank with 20% chance, 10% once the farmer is above level 15; the plaza price is capped at 400 each
@@ -2462,6 +2471,7 @@ function objectsLayer(farm, now, queued) {
   });
   (farm.spr || []).forEach(s => items.push([rowOf(s.cell) + 1, `<g transform="translate(${X(s.cell)} ${Y(s.cell)})">${SPR_SVG}${s.w <= 0 ? `<circle cx="78" cy="14" r="13" fill="#e23b2e" stroke="#fff" stroke-width="3"/><text x="78" y="21" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="20" fill="#fff">!</text>` : ""}</g>`]));
   (farm.decor || []).forEach(d => { if (DECOR[d.t]) items.push([rowOf(d.cell) + 1, `<g transform="translate(${X(d.cell)} ${Y(d.cell)})">${DECOR[d.t].svg}</g>`]); });
+  for (const c in (farm.obst || {})) items.push([rowOf(+c) + 1, `<text x="${X(+c) + 50}" y="${Y(+c) + 70}" text-anchor="middle" font-size="76">${farm.obst[c] === "t" ? "🌲" : "🪨"}</text>`]);
   items.sort((a, b) => a[0] - b[0]);
   let g = items.map(i => i[1]).join("");
   if (farm === S && (mode === "move" || mode === "place") && moveSel && moveSel.ghost != null) {
@@ -2541,7 +2551,7 @@ function renderPlots() {
 }
 function renderFences() { R3.dirty = true; if (R3.on) return; const f = farmData(); $("gFence").innerHTML = f ? fencesLayer(f, scene.kind === "home" ? mode : "none") : ""; }
 // The scenery never changes, so it is drawn once into a picture; moving one picture is far cheaper for phones than redrawing hundreds of shapes every frame.
-const rasterCache = {}, RX = -200, RY = -200, RW = COLS * CELL + 400, RH = ROWS * CELL + 400;
+const rasterCache = {}, RX = -200, RY = -200, RW = COLS * CELL + 400, RH = ROWS * CELL + 1000;   // 6 extra rows of grass below the road for the mine
 const sceneKind = () => scene.kind === "plaza" ? "plaza" : "farm";
 function rasterLayer(url) { return DEFS + `<rect x="-1600" y="-900" width="4800" height="2700" fill="#7fb04a"/><image href="${url}" x="${RX}" y="${RY}" width="${RW}" height="${RH}" preserveAspectRatio="none"/>`; }
 function paintGrass(ctx, W, H, kind) {
@@ -2831,7 +2841,7 @@ function visitFriend(fuid) { if (S && S.friends.includes(fuid)) visitFarm(fuid, 
 // ---------- Taps ----------
 function onCell(i) {
   if (!S || !entered || !alive()) return;
-  try { if (R3.on && R3.tapMark && Number.isInteger(i) && i >= 0) R3.tapMark(colOf(i) + .5, rowOf(i) + .5); } catch (e) {}
+  try { if (R3.on && R3.tapMark && Number.isInteger(i) && i >= 0 && i < COLS * ROWS) R3.tapMark(colOf(i) + .5, rowOf(i) + .5); } catch (e) {}
   if (scene.kind === "home") return tapHome(i);
   if (scene.kind === "visit") return tapVisit(i);
   return tapPlaza(i);
@@ -2839,6 +2849,7 @@ function onCell(i) {
 function walkPlain(i) { cancelAll(); if (!walkTo(new Set([i]), null)) hint("Oraya giden bir yol yok."); }
 
 function tapHome(i) {
+  if (i === MINE_CELL) { if (mode === "none") openMine(); return; }
   if (mode === "move") return moveTap(i);
   if (mode === "place") return placeTap(i);
   if (mode === "tree") return treeTap(i);
@@ -2848,6 +2859,7 @@ function tapHome(i) {
   if (mode === "land") return landTap(i);
   if (isFog(S, i)) { offerExpand(); return; }
   const o = occMap(S).get(i), kind = o && o.t;
+  if (kind === "obst") { clearObst(i); return; }
   if (kind && kind !== "plot" && kind !== "fence") { if (quickCollect(kind)) return; objMenuShow(i, kind); return; }
   const p = plotAt(S, i);
   if (p) {
@@ -3212,7 +3224,7 @@ function placeSel(sel, i) {
   return true;
 }
 function moveTap(i) {
-  const o = occMap(S).get(i);
+  let o = occMap(S).get(i); if (o && o.t === "obst") { hint("Önce balta ya da matkapla temizle."); return; }
   if (!moveSel) {
     if (!o) return;
     moveSel = { t: o.t, from: o.t in OBJ ? S.layout[o.t] : i };
@@ -3407,7 +3419,7 @@ function viewSize() {
   const w = svgEl.clientWidth || 1600, h = svgEl.clientHeight || 900;
   return { w, h };
 }
-function mapBox() { return scene.kind === "plaza" ? { x: SX * CELL, y: SY * CELL, w: 40 * CELL, h: 22 * CELL } : { x: 0, y: 0, w: COLS * CELL, h: ROWS * CELL }; }
+function mapBox() { return scene.kind === "plaza" ? { x: SX * CELL, y: SY * CELL, w: 40 * CELL, h: 22 * CELL } : { x: 0, y: 0, w: COLS * CELL, h: ROWS * CELL + (scene.kind === "home" ? 500 : 0) }; }
 function fitCam() {
   const v = viewSize();
   cam.h = 9.4 * CELL * zEff(); cam.w = cam.h * (v.w / Math.max(1, v.h));
@@ -3449,7 +3461,7 @@ svgEl.addEventListener("pointerdown", e => {
   if (e.button !== undefined && e.button !== 0) return;
   if (mode === "move" && scene.kind === "home" && entered) {
     const i = cellUnder(e.clientX, e.clientY), o = i == null ? null : occMap(S).get(i);
-    if (o) { objDrag = { id: e.pointerId, i, sx: e.clientX, sy: e.clientY, moved: false }; dragMoved = false; return; }
+    if (o && o.t !== "obst") { objDrag = { id: e.pointerId, i, sx: e.clientX, sy: e.clientY, moved: false }; dragMoved = false; return; }
   }
   if (mode === "place" && moveSel && moveSel.from === -1 && scene.kind === "home" && entered) {
     const i = cellUnder(e.clientX, e.clientY);
@@ -3850,7 +3862,7 @@ $("dock").addEventListener("click", e => {
   else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; tabDot[chatTab] = false; renderBadges(); try { watchRoom(); } catch (e) {} renderChat(); renderChatFoot(); scrollChat(); }
 });
 function openSheet(el) { closeAll(); $("scrim").classList.add("on"); el.classList.add("on"); }
-function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "farmb", "jobs", "pazar", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
+function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "mine", "farmb", "jobs", "pazar", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
 $("scrim").onclick = closeAll;
 document.querySelectorAll("#root_v8 [data-close]").forEach(b => b.onclick = closeAll);
 
@@ -3952,7 +3964,7 @@ function landBind() {
     $("buyLand").onclick = () => { if (S.level < LAND_LEVEL || (S.landBought || 0) >= landMax(S)) return; closeAll(); setMode("land"); };
     $("expand").onclick = () => {
       adminTopUp(); if (farmSize(S) >= EXPAND_MAX || S.gold < expandPrice(S) || S.level < expandLevel(S)) return;
-      S.gold = round1(S.gold - expandPrice(S)); SFX.play("buy"); S.size = farmSize(S) + 1;
+      S.gold = round1(S.gold - expandPrice(S)); SFX.play("buy"); { const o0 = farmSize(S); S.size = o0 + 1; genObstacles(o0, farmSize(S)); }
       renderHud(); renderPlots(); renderFences(); spawnHens(); saveNow(); renderMarket();
       toast(farmSize(S) < EXPAND_MAX ? "Yeni bölge açıldı. Sisin ardında bir bölge daha var." : "Bütün arazi artık senin");
     };
@@ -4083,6 +4095,62 @@ function ovenUpgrade(id) {
   S.gold = round1(S.gold - OVEN_UP[lv]); SFX.play("buy"); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderPlots();
   toast(OBJ[id].name + " " + (lv + 1) + ". seviye oldu, tepsiye " + OVEN_CAP[lv + 1] + " ürün sığar" + (lv + 1 >= 3 ? ", ikinci tepsi açıldı" : "")); try { popAt(colOf(S.layout[id]) + 1, rowOf(S.layout[id]), "⬆ " + (lv + 1) + ". seviye", "#ffe27a"); } catch (e) {}
 }
+// ---------- Obstacles: trees and rocks that wait on newly opened land (axe for trees, drill for rocks) ----------
+function genObstacles(oldSize, newSize) {
+  if (newSize <= oldSize) return;
+  const [r0, r1, c0, c1] = OWN[newSize], [a0, a1, b0, b1] = OWN[oldSize], rng = seededRng((uid || S.name || "x") + "|obst|" + newSize), occ = occMap(S), mine = cellAt(me), made = [];
+  S.obst = S.obst && typeof S.obst === "object" ? S.obst : {};
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+    if (r >= a0 && r <= a1 && c >= b0 && c <= b1) continue;
+    const i = idx(r, c); if (!canBase(i) || occ.has(i) || S.obst[i]) continue;
+    if (rng() < .11) { S.obst[i] = rng() < .5 ? "t" : "r"; made.push(i); }
+  }
+  // never wall anything in: drop obstacles until everything is reachable again
+  while (made.length && !layoutOk(S, mine)) { const i = made.pop(); delete S.obst[i]; }
+}
+function clearObst(i) {
+  const k = S.obst && S.obst[i]; if (!k) return;
+  const need = k === "t" ? "axe" : "drill";
+  if (!(+S.store[need] > 0) && !isAdmin()) { hint(k === "t" ? "Ağacı kesmek için balta lazım. Balta madenden çıkar (yolun karşısı, " + MINE_LEVEL + ". seviye)." : "Taşı kırmak için matkap lazım. Matkap madenden çıkar (yolun karşısı, " + MINE_LEVEL + ". seviye)."); SFX.play("error"); return; }
+  if (!isAdmin()) S.store[need] -= 1;
+  delete S.obst[i]; SFX.play("harvest"); gainXp(2); pop(i, k === "t" ? "Ağaç kesildi" : "Taş kırıldı", "#ffe27a");
+  saveNow(); renderHud(); renderPlots(); R3.dirty = true;
+}
+// ---------- Mine ----------
+let mineBusy = false;
+function openMine() {
+  if (!S || scene.kind !== "home") return;
+  if (S.level < MINE_LEVEL && !isAdmin()) { hint("Maden " + MINE_LEVEL + ". seviyede açılır."); SFX.play("error"); return; }
+  renderMine(); openSheet($("mine"));
+}
+function renderMine() {
+  const body = $("mineBody"), d = +S.store.dynamite || 0;
+  body.innerHTML = `<div class="card"><div class="thumb">${mineThumb("dynamite")}</div><div><h3>Dinamit al</h3><p><span class="price">${DYN_PRICE} altın</span> tanesi</p><p class="keep">Depoda ${d} dinamit var</p>
+      <div class="row"><button class="big green sm" data-dbuy="1" ${S.gold >= DYN_PRICE ? "" : "disabled"}>1 al</button><button class="big green sm" data-dbuy="5" ${S.gold >= DYN_PRICE * 5 ? "" : "disabled"}>5 al</button></div></div></div>
+    <div class="card"><div class="thumb">${mineThumb("goldore")}</div><div><h3>Madene dinamit at</h3>
+      <p class="keep">Her dinamitten bir şey çıkar: altın külçe (satış ${GOLDORE_SELL} altın), 3 balta ya da 3 matkap. Üçünün şansı eşit.</p>
+      <div class="row"><button class="big green sm" id="mineBlast_v8" ${d > 0 && !mineBusy ? "" : "disabled"}>${d > 0 ? "💥 Dinamit at" : "Dinamitin yok"}</button></div></div></div>
+    <div class="card"><div class="thumb">${mineThumb("axe")}</div><div><h3>Baltan ve matkabın</h3><p class="keep">Balta: ${+S.store.axe || 0} · Matkap: ${+S.store.drill || 0} · Altın külçe: ${+S.store.goldore || 0}</p><p class="keep">Çıkanlar depoda Malzemeler sekmesine gider. Baltayla ağaçları, matkapla taşları temizlersin.</p></div></div>`;
+}
+$("mineBody").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !S) return;
+  if (b.getAttribute("data-dbuy")) { const n = +b.getAttribute("data-dbuy"), room = depFree(S); adminTopUp();
+    if (S.gold < DYN_PRICE * n) return; if (room < n) { depotFullHint(); return; }
+    S.gold = round1(S.gold - DYN_PRICE * n); S.store.dynamite = (+S.store.dynamite || 0) + n; SFX.play("buy"); saveNow(); renderHud(); renderMine(); toast(n + " dinamit alındı"); return; }
+  if (b.id === "mineBlast_v8") mineBlast();
+});
+function mineBlast() {
+  if (mineBusy || !(+S.store.dynamite > 0)) return;
+  const drop = MINE_DROPS[Math.floor(Math.random() * MINE_DROPS.length)], [key, n] = drop;
+  if (depFree(S) + 1 < n) { depotFullHint(); return; }   // the dynamite itself frees one slot
+  mineBusy = true; S.store.dynamite -= 1; SFX.play("error"); HAPTIC && HAPTIC.buzz && HAPTIC.buzz("success");
+  renderMine(); try { R3.shake && R3.shake(); } catch (e) {}
+  setTimeout(() => { mineBusy = false;
+    const room = depFree(S), got = Math.min(n, room); S.store[key] = (+S.store[key] || 0) + got;
+    SFX.seq("quest", "coin"); saveNow(); renderHud(); renderPlots();
+    const nm = { goldore: "altın külçe", axe: "balta", drill: "matkap" }[key];
+    toast("💥 Madenden " + got + " " + nm + " çıktı!"); if ($("mine").classList.contains("on")) renderMine(); }, 900);
+}
 function openOven(id) { ovenSel = id; renderOven(); openSheet($("oven")); }
 // hand-drawn ingredient and product pictures for the oven (no emoji): a tied wheat sheaf, a crusty loaf, potatoes, fries in a carton
 let artN = 0;
@@ -4203,9 +4271,10 @@ const ovenIcon = () => `<svg viewBox="0 0 100 100" width="70" height="70" aria-h
   <rect x="64" y="14" width="10" height="20" fill="#b5583d" stroke="#7d2f1c" stroke-width="2"/><rect x="62" y="11" width="14" height="5" rx="1.5" fill="#5e3226"/>
   <path d="M36 64v-12a14 14 0 0 1 28 0v12z" fill="#2a1a10" stroke="#e2dccf" stroke-width="4"/><path d="M42 64q2-10 6-12q-1 6 3 7q1-8 5-10q2 9 2 15z" fill="#ff8a1a"/><path d="M46 64q2-6 4-7q0 4 2 4q1-4 3-5q0 5 0 8z" fill="#ffe066"/>
   <circle cx="72" cy="6" r="4" fill="#e9e6e0" opacity=".7"/></svg>`;
-const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }, { key: "icecream", name: "Dondurma", price: ICECREAM_SELL, thumb: () => iceThumb() }, { key: "wood", name: "Tahta", price: 0, thumb: () => woodThumb() }];
+const PRODUCTS = [...CROP_KEYS.map(k => ({ key: k, name: CROPS[k].name, price: CROPS[k].sell, thumb: () => cropThumb(k) })), { key: "apple", name: "Elma", price: APPLE_PRICE, thumb: appleThumb }, { key: "bread", name: "Ekmek", price: BREAD_PRICE, thumb: breadThumb }, { key: "fries", name: "Patates kızartması", price: FRIES_PRICE, thumb: friesThumb }, { key: "egg", name: "Yumurta", price: EGG_PRICE, thumb: () => eggThumb() }, { key: "milk", name: "Süt", price: MILK_PRICE, thumb: () => milkThumb() }, { key: "icecream", name: "Dondurma", price: ICECREAM_SELL, thumb: () => iceThumb() }, { key: "wood", name: "Tahta", price: 0, thumb: () => woodThumb() }, { key: "goldore", name: "Altın külçe", price: GOLDORE_SELL, thumb: () => mineThumb("goldore") }, { key: "dynamite", name: "Dinamit", price: 0, thumb: () => mineThumb("dynamite") }, { key: "axe", name: "Balta", price: 0, thumb: () => mineThumb("axe") }, { key: "drill", name: "Matkap", price: 0, thumb: () => mineThumb("drill") }];
 let dtab = "crops";
-const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "icecream", "egg", "milk", "wood"] };
+const DEPOT_TABS = { crops: [...CROP_KEYS, "apple"], feeds: ["chickfeed", "cowfeed"], goods: ["bread", "fries", "icecream", "egg", "milk", "wood", "goldore", "dynamite", "axe", "drill"] };
+const mineThumb = k => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><rect x="12" y="12" width="76" height="76" rx="16" fill="${{ goldore: "#fff1c2", dynamite: "#ffe0d6", axe: "#e8f0e0", drill: "#e6ecf2" }[k]}" stroke="#7b5128" stroke-width="3"/><text x="50" y="66" text-anchor="middle" font-size="46">${{ goldore: "🪙", dynamite: "🧨", axe: "🪓", drill: "⛏️" }[k]}</text></svg>`;
 const woodThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><g stroke="#6b4423" stroke-width="3" stroke-linejoin="round"><rect x="14" y="58" width="72" height="14" rx="2" fill="#c98f52"/><rect x="18" y="42" width="72" height="14" rx="2" fill="#d9a066"/><rect x="12" y="26" width="72" height="14" rx="2" fill="#bf8447"/></g><g stroke="#8a5a2e" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M24 33h30M60 31h16M28 49h22M62 51h20M22 65h26M58 66h18"/></g></svg>`;
 function depotHead() {
   const cap = depCap(S), used = depUsed(S), lv = depLv(S), pct = Math.min(100, used / cap * 100).toFixed(0), full = used >= cap;
@@ -4236,7 +4305,7 @@ function renderDepot() {
   const items = PRODUCTS.filter(pr => DEPOT_TABS[dtab].includes(pr.key) && (+S.store[pr.key] || 0) > 0);
   if (!items.length) { body.innerHTML = depotHead() + `<p class="empty">${dtab === "goods" ? "Burada ekmek, kızartma, yumurta, süt ve tahta gibi ürünler durur." : "Hasat ettiğin ekinler burada görünür, buradan satarsın."}</p>`; return; }
   body.innerHTML = depotHead() + items.map(pr => { const n = +S.store[pr.key] || 0;
-    if (pr.key === "wood") return `<div class="card"><div class="thumb">${pr.thumb()}</div><div><h3>${pr.name}</h3><p><span class="stock">${n}</span> adet depoda</p><p class="keep">Depoya satılmaz. Pazar'da kendi koyduğun fiyatla satabilir ya da depoyu geliştirmek için kullanabilirsin.</p></div></div>`;
+    if (NOSELL[pr.key]) return `<div class="card"><div class="thumb">${pr.thumb()}</div><div><h3>${pr.name}</h3><p><span class="stock">${n}</span> adet depoda</p><p class="keep">${NOSELL[pr.key]}</p></div></div>`;
     return `<div class="card"><div class="thumb">${pr.thumb()}</div><div>
     <h3>${pr.name}</h3>
     <p><span class="stock">${n}</span> adet depoda</p>
@@ -4250,7 +4319,7 @@ const feedThumb = k => `<svg viewBox="22 22 112 104" width="70" height="70" aria
 $("depotBody").addEventListener("click", e => {
   if (e.target.closest("[data-depup]")) { depotUpgrade(); return; }
   const b = e.target.closest("[data-sell]"); if (!b || !S) return;
-  const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr || pr.key === "wood") return;
+  const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr || NOSELL[pr.key]) return;
   const have = +S.store[pr.key] || 0, k = b.getAttribute("data-n") === "all" ? have : Math.min(1, have);
   if (!k) return;
   S.store[pr.key] = have - k; const gv = k * pr.price * (typeof goldMul === "function" ? goldMul() : 1); S.gold = round1(S.gold + gv); questEv("sell", k); if (pr.key === "bread") questEv("sellbread", k); dailyEv("sellg", gv); try { achEvent("earn", gv); } catch (e) {} SFX.seq("sell", "coin");
@@ -5023,6 +5092,7 @@ function enterGame() {
   S.size = farmSize(S);
   S.layout = cleanLayout(S.layout, mv);
   S.trees = cleanTrees(S.trees, mv, S.layout);
+  { const ob = S.obst && typeof S.obst === "object" ? S.obst : {}, clean = {}; for (const c in ob) { const i = +c; if ((ob[c] === "t" || ob[c] === "r") && canBase(i) && inOwned(S, i)) clean[i] = ob[c]; } S.obst = clean; }
   STORE_KEYS.forEach(k => { S.store[k] = Math.max(0, +S.store[k] || 0); }); S.depLv = depLv(S);
   if (S.bake && +S.bake.q > 0) { S.bakes = S.bakes || {}; S.bakes.oven = S.bakes.oven || [null, null]; if (!S.bakes.oven[0]) S.bakes.oven[0] = { q: +S.bake.q, t0: +S.bake.t0, r: "bread" }; }
   delete S.bake;
@@ -6278,6 +6348,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 130, d: "11 Ekim 2026", e: "⛏️", t: "Maden ve engeller", c: "#6b5a44", b: "#efe7da", items: [
+    "Yolun karşısında Maden açıldı (10. seviye). Yanındaki tezgahtan dinamit al (150 altın), madene at: altın külçe, 3 balta ya da 3 matkap çıkar, şansları eşit. Çıkanlar depoda Malzemeler sekmesine gider.",
+    "Alanı genişletince yeni bölgede ağaçlar ve taşlar çıkıyor. Ağaçları baltayla, taşları matkapla temizlersin, her kullanımda 1 balta ya da matkap gider.",
+  ] },
   { v: 129, d: "11 Ekim 2026", e: "🛒", t: "Yeni görevler", c: "#b9770e", b: "#fdf0d5", items: [
     "Ağaç, süs, çit, fıskiye ve toprak yerleştirirken de kırmızı İptal düğmesi var.",
     "Başlangıç görevlerine ekmek satma, meydanı gezme, arkadaş edinme ve pazarda satış eklendi. Oyuncu 5. seviyeye kadar hep yapacak bir şey buluyor.",
@@ -7718,7 +7792,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     const B = { q: 0, done: 0 }; const oSig = (f === S ? OVENS.map(id => { const I = bakeInfo(S, now, id); return I.q > I.done ? 1 : 0; }).join("") + (millInfo(S, now).q > millInfo(S, now).done ? "m" : "") : "")
       + "|" + animalsOf(f, "coop").length + "." + animalsOf(f, "cowbarn").length + "|" + JSON.stringify(f.rot || {});
     return [scene.kind, oSig, scene.owner || "", tuftCount, JSON.stringify(f.layout), (f.fences || []).join(","), (f.trees || []).map(t => t.cell + (now - t.t >= TREE_MS ? "r" : ":" + Math.floor((now - t.t) / TREE_MS * 4))).join(","),
-      f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), farmSize(f), f.name, f.well, sprLv(f), B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
+      f.plots.map(p => p.cell).join(","), (f.decor || []).map(d => d.t + d.cell).join(","), (f.spr || []).map(s => s.cell).join(","), Object.keys(f.obst || {}).join(","), (f === S && S.level >= MINE_LEVEL ? "m" : "l"), farmSize(f), f.name, f.well, sprLv(f), B.q > B.done ? 1 : 0, Object.keys(fogTex).length, fogImage(farmSize(f)) ? 1 : 0].join("|");
   }
   // Yol kenarı detayları: küçük taşlar ve çiçekler (InstancedMesh, statik, çok ucuz; seviye 1-2)
   function roadsideDetails() {
@@ -7833,6 +7907,40 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     ghostO.x += (tx - ghostO.x) * k; ghostO.z += (tz - ghostO.z) * k; ghostO.y = .18 + Math.sin(performance.now() / 260) * .05;
     ghostG.position.set(ghostO.x, ghostO.y, ghostO.z);
   }
+  function buildRock(x, z, k) {
+    const g = new T.Group();
+    [[0, .24, 0, .44, .32, .4, "#8d8a84"], [.27, .15, .14, .27, .2, .25, "#a09b92"], [-.24, .13, -.12, .23, .18, .21, "#7b7872"], [-.02, .1, .3, .2, .14, .18, "#9a968e"]].forEach(([dx, y, dz, sx, sy, sz, col], i) => { const m = mesh(G.ico, M(col), x + dx, y, z + dz, sx, sy, sz); m.rotation.set(k * .3 + i, k + i * 1.7, 0); g.add(m); });
+    return g;
+  }
+  // the mine across the road and the dynamite stall beside it
+  function buildMine(open) {
+    const g = new T.Group(), zc = ROWS + 2.7, cx = 25;
+    const WD = TM("#7a5230", "wood", 1, 2), DK = M("#17110c");
+    [[0, 0, -.7, 2.7, 2.1, 1.9, "#8a8478"], [-1.9, 0, -.4, 1.7, 1.35, 1.5, "#7d776b"], [1.9, 0, -.3, 1.8, 1.45, 1.5, "#948d80"], [-.9, 0, -1.4, 2, 1.7, 1.4, "#807a6e"], [1, 0, -1.3, 1.9, 1.6, 1.4, "#8f887b"]].forEach(([dx, y, dz, rx, ry, rz, col], i) => { const m = mesh(G.half, M(col), cx + dx, y, zc + dz, rx, ry, rz); m.rotation.y = i * .8; g.add(m); });
+    g.add(mesh(G.box, DK, cx, .62, zc + .95, 1.35, 1.24, .5));                 // dark opening
+    g.add(mesh(G.box, WD, cx - .76, .66, zc + 1.02, .16, 1.34, .2)); g.add(mesh(G.box, WD, cx + .76, .66, zc + 1.02, .16, 1.34, .2)); g.add(mesh(G.box, WD, cx, 1.36, zc + 1.02, 1.8, .17, .22));
+    const st = canvasTex("minesign", 512, 150, (x, w, h) => { x.fillStyle = "#4a3018"; x.fillRect(0, 0, w, h); x.strokeStyle = "#e0b46a"; x.lineWidth = 10; x.strokeRect(8, 8, w - 16, h - 16); x.fillStyle = "#ffe08a"; x.font = "800 82px Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("⛏ MADEN", w / 2, h / 2 + 4); });
+    const sg = boardMesh(1.5, .44, st); sg.position.set(cx, 1.78, zc + 1.16); g.add(sg);
+    [-.28, .28].forEach(dx => g.add(mesh(G.box, WD, cx + dx, 1.55, zc + 1.1, .05, .3, .05)));
+    // rails and a cart
+    [-.22, .22].forEach(dx => g.add(mesh(G.box, M("#6d6f73"), cx + dx, .04, zc + 1.9, .05, .04, 2)));
+    for (let k = 0; k < 6; k++) g.add(mesh(G.box, WD, cx, .02, zc + 1.0 + k * .32, .72, .04, .1));
+    g.add(mesh(G.box, M("#b0561f"), cx + .05, .27, zc + 2.15, .6, .3, .7)); [[-.25, -.3], [.25, -.3], [-.25, .3], [.25, .3]].forEach(([dx, dz]) => g.add(mesh(G.cyl8, M("#222"), cx + .05 + dx, .1, zc + 2.15 + dz, .09, .06, .09)));
+    g.add(mesh(G.ico, M("#e9c64a"), cx + .02, .47, zc + 2.1, .2, .12, .2)); g.add(mesh(G.ico, M("#f4d86a"), cx + .15, .45, zc + 2.25, .13, .09, .13));
+    // boulders around
+    [[-3.1, .3], [3.2, .4], [-2.2, 1.6], [2.5, 1.7]].forEach(([dx, dz], i) => g.add(buildRock(cx + dx, zc + dz, i + 3)));
+    // dynamite stall
+    const sx = cx + 5.4, sz = ROWS + 2.3;
+    g.add(mesh(G.box, WD, sx, .33, sz, 1.7, .66, .8));
+    [[-.8, -.38], [.8, -.38], [-.8, .38], [.8, .38]].forEach(([dx, dz]) => g.add(mesh(G.box, WD, sx + dx, 1.05, sz + dz, .08, 1.5, .08)));
+    const aw = mesh(G.box, M("#d6382d"), sx, 1.82, sz + .05, 2.05, .09, 1.15); aw.rotation.x = -.18; g.add(aw);
+    for (let k = 0; k < 5; k++) { const w2 = mesh(G.box, M("#fff3d6"), sx - .82 + k * .41 + .2, 1.83, sz + .06, .2, .095, 1.16); w2.rotation.x = -.18; g.add(w2); }
+    for (let k = 0; k < 6; k++) g.add(mesh(G.cyl8, M(k % 2 ? "#e0402f" : "#c9301f"), sx - .55 + (k % 3) * .26, .78, sz - .12 + Math.floor(k / 3) * .2, .06, .22, .06));
+    g.add(mesh(G.box, M("#a8743f"), sx + .55, .75, sz + .1, .42, .3, .4));
+    const dt = canvasTex("dynsign", 512, 150, (x, w, h) => { x.fillStyle = "#2b2b2b"; x.fillRect(0, 0, w, h); x.strokeStyle = "#ff7a4a"; x.lineWidth = 10; x.strokeRect(8, 8, w - 16, h - 16); x.fillStyle = "#ffd34d"; x.font = "800 62px Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("🧨 DİNAMİT " + DYN_PRICE, w / 2, h / 2 + 4); });
+    const ds = boardMesh(1.5, .44, dt); ds.position.set(sx, 1.28, sz + .62); g.add(ds);
+    return g;
+  }
   function buildFarm(f, now, part) {
     const L = f.layout, home = scene.kind === "home", isMe = f === S;
     if (part === "d") { farmDyn(f, now, L, home, isMe); return; }
@@ -7863,6 +7971,12 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     (f.trees || []).forEach((tr, k) => { const rp = now - tr.t >= TREE_MS, x = colOf(tr.cell) + .5, z = rowOf(tr.cell) + .5;
       world.add(R1(buildTree(x, z, rp, k, Math.floor((now - tr.t) / TREE_MS * 4) / 4), "tree", tr.cell)); proxy(x, .7, z, 1, 1.4, 1, tr.cell);
       if (rp) { const s = sprite(starTex, .42, .42); s.position.set(x + .38, 1.45, z); s.userData.bob = Math.random() * 6; fx.stars.push(s); world.add(s); } });
+    // obstacles (trees and rocks on freshly opened land)
+    for (const c in (f.obst || {})) { const i = +c, x = colOf(i) + .5, z = rowOf(i) + .5;
+      world.add(f.obst[c] === "t" ? buildTree(x, z, false, i % 11, 0) : buildRock(x, z, i % 13)); proxy(x, .6, z, 1, 1.3, 1, i); }
+    // the mine across the road (only on my own farm)
+    if (f === S && scene.kind === "home") { world.add(buildMine(S.level >= MINE_LEVEL));
+      proxy(25, 1, ROWS + 3.4, 6.4, 2.6, 3.4, MINE_CELL); proxy(30.4, .9, ROWS + 2.3, 2.2, 1.9, 1.5, MINE_CELL); }
     // fences
     const F = new Set(f.fences || []);
     (f.fences || []).forEach(i => { const x = colOf(i) + .5, z = rowOf(i) + .5;
@@ -7882,6 +7996,10 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
         const sp = sprite(emojiBadge(em, I.ready || 0), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L[k]) + o.w / 2, 2.25 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
       if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), 1.15, 1.15, { fog: false, depthTest: false }); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
       if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge(M0.r === "cowfeed" ? "🐄🌾" : "🐔🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
+    }
+    if (isMe && home) {
+      for (const c in (f.obst || {})) { const i = +c, sp = sprite(emojiBadge(f.obst[c] === "t" ? "🪓" : "⛏️", 0), .7, .7, { fog: false, depthTest: false }); sp.position.set(colOf(i) + .5, f.obst[c] === "t" ? 2.2 : 1, rowOf(i) + .5); sp.renderOrder = 7; sp.userData.bob = i % 6; dyn.add(sp); fx.dstars.push(sp); }
+      { const sp = sprite(emojiBadge(S.level >= MINE_LEVEL ? "🧨" : "🔒", 0), 1, 1, { fog: false, depthTest: false }); sp.position.set(25, 2.6, ROWS + 3.9); sp.renderOrder = 7; sp.userData.bob = 1; dyn.add(sp); fx.dstars.push(sp); }
     }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });
