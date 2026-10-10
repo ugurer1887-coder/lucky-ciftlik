@@ -155,3 +155,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Google yazı tipleri engellemeden yüklenir (`media="print" onload`), sayfa ilk anda çizilir.
 - Herkese açık yayın için Play Console'da kapalı test, gizlilik politikası, veri güvenliği formu ve mağaza görselleri (1024x500 kapak, ekran görüntüleri) gerekiyor.
 - Firebase ücretsiz planı aynı anda ~100 bağlantı sınırı – oyuncu artarsa Blaze plana geçilmeli.
+
+## v106
+- Genel sohbet (tab "g") mesajları karakter başında baloncuk çıkarmaz; çiftlik/meydan çıkarır (`chatFresh`).
+- Baloncuklar büyütüldü (2B `.bt` 23px, 3B sprite 4.6x.72, font 68px).
+- Klavye açılınca oyun yeniden boyutlanmaz: `typing()` iken `fitScreen/refit` atlanır, `.sheet` `bottom:var(--kb)` ile klavyenin üstüne çıkar.

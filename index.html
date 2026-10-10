@@ -130,7 +130,7 @@ html,body{background:#000!important}
 @keyframes act{50%{transform:translateY(4px) scaleY(.93)}}
 .nm{font:800 19px var(--body);fill:#fff;stroke:rgba(40,25,10,.8);stroke-width:5;paint-order:stroke;stroke-linejoin:round}
 .ch.me .nm{fill:#ffe27a}
-.bt{font:700 17px var(--body);fill:#3e2a17}
+.bt{font:800 23px var(--body);fill:#3e2a17}
 .hen,.air{pointer-events:none}
 .hen .hb{transform-box:fill-box;transform-origin:70% 100%}
 .hen.peck .hb{animation:peck .55s infinite ease-in-out}
@@ -141,7 +141,7 @@ html,body{background:#000!important}
 /* Sheets (slide in from the right) */
 .scrim{position:absolute;inset:0;background:rgba(30,20,10,.45);display:none;z-index:20}
 .scrim.on{display:block}
-.sheet{position:absolute;top:0;right:0;bottom:0;width:min(440px,94%);z-index:30;background:var(--panel);border-left:3px solid var(--line);
+.sheet{position:absolute;top:0;right:0;bottom:var(--kb,0px);width:min(440px,94%);z-index:30;background:var(--panel);border-left:3px solid var(--line);
   display:flex;flex-direction:column;transform:translateX(105%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s;padding-right:env(safe-area-inset-right,0px)}
 .sheet.on{transform:none;visibility:visible;transition:transform .25s ease}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px}
@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "105";
+const VERSION = "106";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1780,8 +1780,8 @@ function ensureMe() {
 function setBubble(st, text) {
   const bb = st.el.querySelector(".bb");
   const t = text.length > 34 ? text.slice(0, 33) + "…" : text;
-  const w = Math.min(380, t.length * 9.6 + 30), y = st.y < 1.1 ? 14 : -136;
-  bb.innerHTML = `<rect x="${-w/2}" y="${y}" width="${w}" height="34" rx="14" fill="#fffdf6" stroke="#6b4423" stroke-width="2.5"/><text class="bt" y="${y + 23}" text-anchor="middle"></text>`;
+  const w = Math.min(520, t.length * 12.5 + 40), y = st.y < 1.1 ? 14 : -150;
+  bb.innerHTML = `<rect x="${-w/2}" y="${y}" width="${w}" height="44" rx="18" fill="#fffdf6" stroke="#6b4423" stroke-width="2.5"/><text class="bt" y="${y + 31}" text-anchor="middle"></text>`;
   bb.querySelector("text").textContent = t;
   st.bubbleText = t; st.bubbleUntil = Date.now() + 5500;
   clearTimeout(st.bt); st.bt = setTimeout(() => { bb.innerHTML = ""; }, 5500);
@@ -3223,16 +3223,20 @@ function fitScreen() {
   try { fitCam(); applyCam(); } catch (e) {}   // camera not set up yet on the very first call
 }
 let refitT = 0;
-const refit = () => { if (!alive()) return; clearTimeout(refitT); refitT = setTimeout(() => { fitW = window.innerWidth; fitH = window.innerHeight; fitScreen(); }, 450); };
+// while typing the on-screen keyboard shrinks the window: keep the game size, only lift the chat sheet above the keyboard
+const typing = () => { const a = document.activeElement; return !!(a && /INPUT|TEXTAREA/.test(a.tagName)); };
+const kbLift = () => { const kb = typing() ? Math.max(0, Math.round((fitH || window.innerHeight) - (window.visualViewport ? window.visualViewport.height : window.innerHeight))) : 0; document.documentElement.style.setProperty("--kb", (kb > 60 ? kb : 0) + "px"); };
+const refit = () => { if (!alive()) return; if (typing()) { kbLift(); return; } clearTimeout(refitT); refitT = setTimeout(() => { if (typing()) return; fitW = window.innerWidth; fitH = window.innerHeight; fitScreen(); }, 450); };
 ["resize", "orientationchange"].forEach(ev => window.addEventListener(ev, refit));
 if (window.visualViewport) window.visualViewport.addEventListener("resize", refit);
 document.addEventListener("fullscreenchange", refit); document.addEventListener("webkitfullscreenchange", refit);
 const unscroll = () => { const r = $("root"); if (r && (r.scrollLeft || r.scrollTop)) { r.scrollLeft = 0; r.scrollTop = 0; } if (window.scrollX || window.scrollY) window.scrollTo(0, 0); };
 $("root").addEventListener("scroll", unscroll); window.addEventListener("scroll", unscroll);
-document.addEventListener("focusout", () => setTimeout(() => { unscroll(); fitScreen(); }, 350));
+document.addEventListener("focusout", () => setTimeout(() => { if (typing()) return; document.documentElement.style.setProperty("--kb", "0px"); unscroll(); fitScreen(); }, 350));
+document.addEventListener("focusin", () => setTimeout(kbLift, 300));
 let fitW = 0, fitH = 0;
 let pendW = 0, pendH = 0, pendT = 0;
-setInterval(() => { if (!alive()) return; unscroll(); const w = window.innerWidth, h = window.innerHeight;
+setInterval(() => { if (!alive()) return; if (typing()) { kbLift(); return; } unscroll(); const w = window.innerWidth, h = window.innerHeight;
   if (w === fitW && h === fitH) return;
   if (w !== pendW || h !== pendH) { pendW = w; pendH = h; pendT = Date.now(); return; }   // wait until the size stays the same
   if (Date.now() - pendT > 500) { fitW = w; fitH = h; fitScreen(); } }, 300);
@@ -3370,7 +3374,7 @@ svgEl.addEventListener("wheel", e => {
   cam.x += (e.shiftKey ? e.deltaY : e.deltaX) * 1.2; cam.y += (e.shiftKey ? 0 : e.deltaY) * 1.2;
   clampCam(); applyCam(); cam.lastDrag = performance.now();
 }, { passive: false });
-window.addEventListener("resize", () => { if (!alive()) return; fitCam(); applyCam(); });
+window.addEventListener("resize", () => { if (!alive() || typing()) return; fitCam(); applyCam(); });
 fitScreen();
 
 // ---------- Animation loop ----------
@@ -4590,7 +4594,7 @@ function renderChat() {
 }
 // new messages: speech bubble over the speaker, a soft sound, and the unread badge / tab dot
 function chatFresh(list, tab) {
-  list.forEach(m => bubbleFor(m.uid, censor(String(m.text || ""))));
+  if (tab !== "g") list.forEach(m => bubbleFor(m.uid, censor(String(m.text || ""))));
   const others = list.filter(m => m.uid !== uid).length; if (!others) return;
   if (!chatOpen) unread += others; else if (chatTab !== tab) tabDot[tab] = true;
   if (!chatOpen) renderBadges(); SFX.play("chat");
@@ -5889,6 +5893,11 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 106, d: "11 Ekim 2026", e: "🗨️", t: "Baloncuk ve yazma düzeltmesi", c: "#2e6a8a", b: "#dceef7", items: [
+    "Genel sohbette yazılan mesaj artık karakterin başında baloncuk çıkarmaz, yalnızca sohbet kutusunda görünür.",
+    "Çiftlik ve meydan sohbeti baloncukları daha büyük ve uzaktan okunur.",
+    "Mesaj yazarken ekran artık küçülmüyor, sadece sohbet kutusu klavyenin üstüne çıkıyor.",
+  ] },
   { v: 105, d: "10 Ekim 2026", e: "💬", t: "Giriş, sohbet ve günlük ödül", c: "#8a5a2e", b: "#f6e8d4", items: [
     "Oyuna girerken <b>Google ile giriş</b> ya da <b>misafir</b> olarak devam etmeyi seçebilirsin.",
     "<b>Genel sohbet</b> herkese açık. Çiftlikte <b>Çiftlik sohbeti</b>, meydanda <b>Meydan sohbeti</b> eklendi, sadece orada olanlar görür.",
@@ -6304,10 +6313,10 @@ function setup3D(T) {
   }
   function bubbleTex(text) {
     return canvasTex("bub" + text, 1024, 160, (x, w, h) => {
-      x.font = "700 52px Nunito, sans-serif"; const tw = Math.min(w - 40, x.measureText(text).width + 70);
+      x.font = "800 68px Nunito, sans-serif"; const tw = Math.min(w - 20, x.measureText(text).width + 80);
       x.fillStyle = "rgba(0,0,0,.18)"; rr(x, (w - tw) / 2 + 4, 22, tw, 112, 40); x.fill();
       x.fillStyle = "#fff"; rr(x, (w - tw) / 2, 16, tw, 112, 40); x.fill();
-      x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 80);
+      x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 60);
     });
   }
   function emojiBadge(e, n) { return canvasTex("emo" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.22)"; x.beginPath(); x.arc(82, 86, 64, 0, 6.283); x.fill();
@@ -7752,7 +7761,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     m.root.visible = true;
     // chat bubble
     const bt = c.bubbleText && Date.now() < c.bubbleUntil ? c.bubbleText : "";
-    if (bt !== m.bubbleShown) { if (m.bub) { m.root.remove(m.bub); m.bub = null; } m.bubbleShown = bt; if (bt) { m.bub = sprite(bubbleTex(bt), 2.6, .41); m.bub.position.set(0, 1.62, 0); m.bub.renderOrder = 7; m.root.add(m.bub); } }
+    if (bt !== m.bubbleShown) { if (m.bub) { m.root.remove(m.bub); m.bub = null; } m.bubbleShown = bt; if (bt) { m.bub = sprite(bubbleTex(bt), 4.6, .72); m.bub.position.set(0, 1.95, 0); m.bub.renderOrder = 7; m.root.add(m.bub); } }
   }
   const progBg = sprite(canvasTex("pbg", 64, 16, (x) => { x.fillStyle = "rgba(30,20,10,.8)"; rr(x, 0, 0, 64, 16, 8); x.fill(); }), .62, .14), progFg = sprite(canvasTex("pfg", 64, 16, (x) => { x.fillStyle = "#f5b324"; rr(x, 0, 0, 64, 16, 8); x.fill(); }), .58, .1);
   progFg.center.set(0, .5); progBg.renderOrder = 8; progFg.renderOrder = 9; scene3.add(progBg); scene3.add(progFg);
