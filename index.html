@@ -723,6 +723,8 @@ body{font-family:var(--body);letter-spacing:.1px}
 .lg-card b{display:block;font-family:var(--body);font-weight:800;font-size:.74rem;color:var(--ink)}
 .lg-card span{display:block;font-size:.68rem;font-weight:800;color:var(--ink2);line-height:1.25;overflow-wrap:anywhere}
 .lg-card .st{position:absolute;top:2px;right:4px;font-size:.8rem;font-style:normal}
+.lg-card.missed{opacity:.4;background:repeating-linear-gradient(135deg,var(--panel2),var(--panel2) 6px,rgba(0,0,0,.06) 6px,rgba(0,0,0,.06) 12px)}
+.lg-card.missed .ic{filter:grayscale(1)}
 .lg-card.today{opacity:1;border-color:#38a84a;background:linear-gradient(180deg,#eaffd9,#c9f2a8);box-shadow:0 0 0 3px rgba(56,168,74,.35),0 0 18px rgba(88,220,96,.7);animation:lgGlow 1.4s ease-in-out infinite}
 .lg-card.today b,.lg-card.today span{color:#23401a}
 .lg-card .tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#2f9a43;color:#fff;font-style:normal;font-weight:800;font-size:.62rem;padding:2px 7px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.25)}
@@ -844,11 +846,24 @@ button:active{transform:scale(.96);filter:brightness(.96)}
     </div>
     <div class="sheet-body" id="friendsBody_v8"></div>
   </section>
-  <section class="sheet" id="chat_v8" aria-label="Global sohbet">
-    <div class="sheet-head"><h2>Global sohbet</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+  <section class="sheet" id="chat_v8" aria-label="Sohbet">
+    <div class="sheet-head"><h2>Sohbet</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="tabs" role="tablist" id="chatTabs_v8"></div>
     <div class="msgs" id="msgs_v8"><div class="empty">Sohbet yükleniyor</div></div>
     <div id="chatFoot_v8"></div>
   </section>
+
+  <div class="modal" id="gate_v8" style="z-index:120">
+    <div class="box">
+      <h1>Lucky Farm'a hoş geldin</h1>
+      <p>Nasıl devam etmek istersin?</p>
+      <button class="big ghost" id="gateGoogle_v8" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.8-2.1 5.1-4.4 6.7v5.5h7.1C42.7 36.9 45 31.2 45 24.5z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.3c-.4-1.3-.7-2.8-.7-4.3s.3-3 .7-4.3V14H4.5C3 17 2 20.4 2 24s1 7 2.5 10l7.3-5.7z"/><path fill="#EA4335" d="M24 10.7c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg> Google ile giriş yap</button>
+      <p class="note">Oyunun Google hesabına kaydedilir. Telefonunu değiştirsen de aynı çiftlikle devam edersin.</p>
+      <button class="big green" id="gateGuest_v8" type="button" style="margin-top:6px">Misafir olarak oyna</button>
+      <p class="note">Oyun bu cihazda kayıtlı kalır, tarayıcı verilerini silersen kaybolur. İstersen sonra Ayarlar'dan Google hesabına bağlarsın.</p>
+      <p class="note" id="gateErr_v8" hidden style="color:#b3261e;font-weight:800"></p>
+    </div>
+  </div>
 
   <div class="modal" id="start_v8">
     <div class="box">
@@ -1114,15 +1129,31 @@ window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
     const fb = window.firebase, app = fb.apps.length ? fb.app() : fb.initializeApp(cfg), auth = fb.auth(), rtdb = fb.database();
     try { await auth.setPersistence(fb.auth.Auth.Persistence.LOCAL); } catch (e) {}
     const timed = (p, ms) => Promise.race([p, new Promise((_, no) => setTimeout(() => no({ code: "timeout" }), ms || 10000))]);
-    const me = await timed(new Promise((ok, no) => {
-      // wait until Firebase has restored the saved sign-in (Google stays signed in on this device);
-      // only when nobody was signed in before, start a guest account
-      let first = true;
+    // nobody signed in on this device yet: the player chooses Google or guest (the page shows the choice)
+    const chooseLogin = async () => {
+      let msg = "";
+      for (;;) {
+        const pick = window.LUCKY_LOGIN_CHOICE ? await window.LUCKY_LOGIN_CHOICE(msg) : "guest";
+        try {
+          if (pick === "google") {
+            if (window.LUCKY_INAPP) throw { code: "in-app-browser" };
+            const prov = new fb.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: "select_account" });
+            try { await auth.signInWithPopup(prov); }
+            catch (e) { if (/popup-blocked|operation-not-supported|web-storage-unsupported/.test(e && e.code || "")) { await auth.signInWithRedirect(prov); return; } throw e; }
+          } else await timed(auth.signInAnonymously(), 15000);
+          return;
+        } catch (e) { console.error(e); msg = window.LUCKY_LOGIN_ERR ? window.LUCKY_LOGIN_ERR(pick, e) : "Giriş yapılamadı, tekrar dene."; }
+      }
+    };
+    // wait until Firebase has restored the saved sign-in (Google or guest stays signed in on this device)
+    const me = await new Promise((ok, no) => {
+      let first = true; const lim = setTimeout(() => no({ code: "timeout" }), 15000);
       const off = auth.onAuthStateChanged(u => {
-        if (u) { off(); ok(u); return; }
-        if (first) { first = false; auth.signInAnonymously().catch(e => { off(); no(e); }); }
+        if (u) { clearTimeout(lim); off(); ok(u); return; }
+        if (first) { first = false; clearTimeout(lim); chooseLogin().catch(e => { off(); no(e); }); }
       });
-    }), 15000);
+    });
+    if (window.LUCKY_LOGIN_DONE) window.LUCKY_LOGIN_DONE();
     // a Google account keeps the same character on every device; the anonymous account is linked to it
     try { await auth.getRedirectResult(); } catch (e) {
       const cred = e && (e.credential || (fb.auth.GoogleAuthProvider.credentialFromError && fb.auth.GoogleAuthProvider.credentialFromError(e)));
@@ -1254,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "103";
+const VERSION = "105";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1457,17 +1488,17 @@ function cleanTrees(raw, mapv, layout) {
 }
 // decorations players can buy and place (prices are a first guess, easy to change here)
 const DECOR = {
-  pot: { name: "Çiçek saksısı", price: 40, svg: `<path d="M34 58h32l-5 30H39z" fill="#c8693a" stroke="#7a3a1a" stroke-width="3"/><rect x="31" y="52" width="38" height="9" rx="3" fill="#d97a48" stroke="#7a3a1a" stroke-width="3"/><circle cx="50" cy="40" r="16" fill="#4f9a2f"/><circle cx="40" cy="36" r="6" fill="#f6a6c1"/><circle cx="58" cy="32" r="6" fill="#fff6d6"/><circle cx="52" cy="46" r="6" fill="#ffd34d"/>` },
-  sunflower: { name: "Ayçiçekleri", price: 60, svg: `<path d="M34 90V50M52 90V36M68 90V56" stroke="#3f7a26" stroke-width="4"/><g fill="#ffcc2e" stroke="#c98a12" stroke-width="2"><circle cx="34" cy="48" r="11"/><circle cx="52" cy="34" r="13"/><circle cx="68" cy="54" r="10"/></g><g fill="#6b3f1f"><circle cx="34" cy="48" r="5"/><circle cx="52" cy="34" r="6"/><circle cx="68" cy="54" r="4.5"/></g>` },
-  bed: { name: "Çiçek tarhı", price: 80, svg: `<rect x="10" y="50" width="80" height="30" rx="6" fill="#8b5a33" stroke="#5a3a1e" stroke-width="3"/><g fill="#f6a6c1"><circle cx="24" cy="50" r="7"/><circle cx="56" cy="48" r="7"/></g><g fill="#fff6d6"><circle cx="40" cy="46" r="7"/><circle cx="72" cy="50" r="7"/></g>` },
-  hay: { name: "Saman balyası", price: 50, svg: `<rect x="16" y="40" width="68" height="40" rx="7" fill="#e8c46a" stroke="#a8843f" stroke-width="3"/><path d="M34 40v40M66 40v40" stroke="#8a5a32" stroke-width="4"/><path d="M22 52h56M22 66h56" stroke="#c9a24a" stroke-width="2"/>` },
-  bench: { name: "Bahçe bankı", price: 120, svg: `<rect x="14" y="44" width="72" height="10" rx="3" fill="#a8743f" stroke="#6b4423" stroke-width="3"/><rect x="14" y="60" width="72" height="10" rx="3" fill="#c08a4f" stroke="#6b4423" stroke-width="3"/><path d="M22 70v16M78 70v16" stroke="#3e3a36" stroke-width="5"/>` },
-  lamp: { name: "Bahçe lambası", price: 150, svg: `<path d="M50 90V30" stroke="#2f3a42" stroke-width="6"/><rect x="40" y="16" width="20" height="20" rx="4" fill="#ffe9a8" stroke="#2f3a42" stroke-width="3"/><path d="M36 16l14-10 14 10z" fill="#2f3a42"/>` },
-  birdhouse: { name: "Kuş evi", price: 180, svg: `<path d="M50 92V54" stroke="#6b4423" stroke-width="6"/><rect x="34" y="30" width="32" height="28" fill="#5b8fd0" stroke="#2f4f7a" stroke-width="3"/><path d="M28 32l22-18 22 18z" fill="#c8453a" stroke="#7a1f14" stroke-width="3"/><circle cx="50" cy="44" r="5" fill="#2a2420"/>` },
-  gnome: { name: "Bahçe cücesi", price: 200, svg: `<path d="M36 88l4-30h20l4 30z" fill="#3f6fa0" stroke="#24456a" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="#f1c9a0"/><path d="M40 52q10 22 20 0z" fill="#fff"/><path d="M38 46l12-34 12 34z" fill="#d9483a" stroke="#8a2a20" stroke-width="3"/>` },
-  flag: { name: "Lucky bayrağı", price: 300, svg: `<path d="M30 92V12" stroke="#5a5f66" stroke-width="5"/><path d="M32 14h44l-8 14 8 14H32z" fill="#38a84a" stroke="#1f5a28" stroke-width="3"/><text x="52" y="33" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="13" fill="#ffe27a">L</text>` },
-  fountain: { name: "Küçük çeşme", price: 750, svg: `<ellipse cx="50" cy="72" rx="38" ry="16" fill="#cfc8bb" stroke="#8f877b" stroke-width="3"/><ellipse cx="50" cy="70" rx="30" ry="10" fill="#5ab0d6"/><rect x="45" y="36" width="10" height="34" fill="#cfc8bb" stroke="#8f877b" stroke-width="2"/><path d="M50 34q-14 4-18 24M50 34q14 4 18 24" stroke="#bfe9ff" stroke-width="3" fill="none"/>` },
-  windmill: { name: "Minik yel değirmeni", price: 1500, svg: `<path d="M38 92l6-50h12l6 50z" fill="#f6efe0" stroke="#9c8a6a" stroke-width="3"/><path d="M40 44l10-14 10 14z" fill="#c8453a" stroke="#7a1f14" stroke-width="2"/><g stroke="#6b4423" stroke-width="5" stroke-linecap="round"><path d="M50 38L26 16M50 38L74 16M50 38L28 62M50 38L72 62"/></g><circle cx="50" cy="38" r="5" fill="#3e2a17"/>` }
+  pot: { name: "Çiçek saksısı", price: 40, svg: `<ellipse cx="50" cy="90" rx="24" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgPot" x1="0" x2="1"><stop offset="0" stop-color="#ec9460"/><stop offset=".55" stop-color="#c8693a"/><stop offset="1" stop-color="#9c4a26"/></linearGradient></defs><path d="M34 60h32l-4.5 28q-.3 2-2.5 2H41q-2.2 0-2.5-2z" fill="url(#dgPot)" stroke="#7a3a1a" stroke-width="2.5" stroke-linejoin="round"/><rect x="30" y="53" width="40" height="10" rx="3.5" fill="#e07e4a" stroke="#7a3a1a" stroke-width="2.5"/><path d="M34 56.5h32" stroke="#f6bb91" stroke-width="2" stroke-linecap="round" opacity=".85"/><g fill="#58a834" stroke="#2f6a1c" stroke-width="1.5"><ellipse cx="36" cy="46" rx="10" ry="5" transform="rotate(-28 36 46)"/><ellipse cx="64" cy="46" rx="10" ry="5" transform="rotate(28 64 46)"/><ellipse cx="50" cy="44" rx="13" ry="8"/></g><circle cx="44.2" cy="33.0" r="3.3" fill="#f68fb0"/><circle cx="41.3" cy="37.0" r="3.3" fill="#f68fb0"/><circle cx="36.6" cy="35.5" r="3.3" fill="#f68fb0"/><circle cx="36.6" cy="30.5" r="3.3" fill="#f68fb0"/><circle cx="41.3" cy="29.0" r="3.3" fill="#f68fb0"/><circle cx="40" cy="33" r="2.6" fill="#ffd34d"/><circle cx="64.4" cy="30.0" r="3.4" fill="#fff6d6"/><circle cx="61.4" cy="34.2" r="3.4" fill="#fff6d6"/><circle cx="56.4" cy="32.6" r="3.4" fill="#fff6d6"/><circle cx="56.4" cy="27.4" r="3.4" fill="#fff6d6"/><circle cx="61.4" cy="25.8" r="3.4" fill="#fff6d6"/><circle cx="60" cy="30" r="2.7" fill="#f6b21a"/><circle cx="53.8" cy="40.0" r="3.0" fill="#b99af0"/><circle cx="51.2" cy="43.6" r="3.0" fill="#b99af0"/><circle cx="46.9" cy="42.2" r="3.0" fill="#b99af0"/><circle cx="46.9" cy="37.8" r="3.0" fill="#b99af0"/><circle cx="51.2" cy="36.4" r="3.0" fill="#b99af0"/><circle cx="50" cy="40" r="2.4" fill="#ffe27a"/>` },
+  sunflower: { name: "Ayçiçekleri", price: 60, svg: `<ellipse cx="50" cy="90" rx="30" ry="5.5" fill="rgba(0,0,0,.2)"/><g stroke="#3f7a26" stroke-width="4" stroke-linecap="round"><path d="M32 90V52M52 90V38M70 90V56"/></g><g fill="#58a834" stroke="#2f6a1c" stroke-width="1.5"><ellipse cx="24" cy="74" rx="9" ry="4.5" transform="rotate(-30 24 74)"/><ellipse cx="40" cy="70" rx="9" ry="4.5" transform="rotate(25 40 70)"/><ellipse cx="62" cy="76" rx="9" ry="4.5" transform="rotate(-25 62 76)"/><ellipse cx="78" cy="72" rx="9" ry="4.5" transform="rotate(30 78 72)"/></g><g transform="rotate(-8 32 46)"><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(0 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(26 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(51 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(77 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(103 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(129 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(154 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(180 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(206 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(231 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(257 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(283 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(309 32 46)"/><ellipse cx="32" cy="34.5" rx="3.3" ry="6.1" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(334 32 46)"/><circle cx="32" cy="46" r="6.8" fill="#6b3f1f" stroke="#4a2a12" stroke-width="1.5"/><circle cx="32" cy="46" r="4.0" fill="#8a5428"/><circle cx="37.1" cy="46.0" r="0.8" fill="#3a2010"/><circle cx="35.2" cy="50.0" r="0.8" fill="#3a2010"/><circle cx="30.9" cy="50.9" r="0.8" fill="#3a2010"/><circle cx="27.4" cy="48.2" r="0.8" fill="#3a2010"/><circle cx="27.4" cy="43.8" r="0.8" fill="#3a2010"/><circle cx="30.9" cy="41.1" r="0.8" fill="#3a2010"/><circle cx="35.2" cy="42.0" r="0.8" fill="#3a2010"/></g><g transform="rotate(6 52 30)"><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(0 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(26 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(51 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(77 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(103 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(129 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(154 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(180 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(206 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(231 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(257 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(283 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(309 52 30)"/><ellipse cx="52" cy="15.3" rx="4.2" ry="7.7" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(334 52 30)"/><circle cx="52" cy="30" r="8.7" fill="#6b3f1f" stroke="#4a2a12" stroke-width="1.5"/><circle cx="52" cy="30" r="5.0" fill="#8a5428"/><circle cx="58.4" cy="30.0" r="1.0" fill="#3a2010"/><circle cx="56.0" cy="35.0" r="1.0" fill="#3a2010"/><circle cx="50.6" cy="36.3" r="1.0" fill="#3a2010"/><circle cx="46.2" cy="32.8" r="1.0" fill="#3a2010"/><circle cx="46.2" cy="27.2" r="1.0" fill="#3a2010"/><circle cx="50.6" cy="23.7" r="1.0" fill="#3a2010"/><circle cx="56.0" cy="25.0" r="1.0" fill="#3a2010"/></g><g transform="rotate(10 70 50)"><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(0 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(26 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(51 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(77 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(103 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(129 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(154 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(180 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(206 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(231 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(257 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(283 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffc21a" stroke="#c98a12" stroke-width="1" transform="rotate(309 70 50)"/><ellipse cx="70" cy="39.5" rx="3.0" ry="5.5" fill="#ffd23a" stroke="#c98a12" stroke-width="1" transform="rotate(334 70 50)"/><circle cx="70" cy="50" r="6.2" fill="#6b3f1f" stroke="#4a2a12" stroke-width="1.5"/><circle cx="70" cy="50" r="3.6" fill="#8a5428"/><circle cx="74.6" cy="50.0" r="0.7" fill="#3a2010"/><circle cx="72.9" cy="53.6" r="0.7" fill="#3a2010"/><circle cx="69.0" cy="54.5" r="0.7" fill="#3a2010"/><circle cx="65.9" cy="52.0" r="0.7" fill="#3a2010"/><circle cx="65.9" cy="48.0" r="0.7" fill="#3a2010"/><circle cx="69.0" cy="45.5" r="0.7" fill="#3a2010"/><circle cx="72.9" cy="46.4" r="0.7" fill="#3a2010"/></g>` },
+  bed: { name: "Çiçek tarhı", price: 80, svg: `<ellipse cx="50" cy="84" rx="40" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgBed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a06a3c"/><stop offset="1" stop-color="#7a4a26"/></linearGradient></defs><rect x="9" y="56" width="82" height="28" rx="5" fill="url(#dgBed)" stroke="#4e3018" stroke-width="3"/><path d="M11 66h78M11 75h78" stroke="#5a3a1e" stroke-width="1.6" opacity=".7"/><rect x="9" y="56" width="82" height="9" rx="4" fill="#b87d48" stroke="#4e3018" stroke-width="3"/><rect x="13" y="52" width="74" height="9" rx="4" fill="#5b3a20"/><g stroke="#3f7a26" stroke-width="2.5" stroke-linecap="round"><path d="M22 54V40M38 54V34M54 54V38M70 54V32M82 54V42"/></g><g fill="#58a834"><ellipse cx="30" cy="48" rx="7" ry="3.2" transform="rotate(-20 30 48)"/><ellipse cx="62" cy="47" rx="7" ry="3.2" transform="rotate(20 62 47)"/></g><circle cx="26.2" cy="38.0" r="3.3" fill="#f68fb0"/><circle cx="23.3" cy="42.0" r="3.3" fill="#f68fb0"/><circle cx="18.6" cy="40.5" r="3.3" fill="#f68fb0"/><circle cx="18.6" cy="35.5" r="3.3" fill="#f68fb0"/><circle cx="23.3" cy="34.0" r="3.3" fill="#f68fb0"/><circle cx="22" cy="38" r="2.6" fill="#ffd34d"/><circle cx="42.4" cy="32.0" r="3.4" fill="#fff6d6"/><circle cx="39.4" cy="36.2" r="3.4" fill="#fff6d6"/><circle cx="34.4" cy="34.6" r="3.4" fill="#fff6d6"/><circle cx="34.4" cy="29.4" r="3.4" fill="#fff6d6"/><circle cx="39.4" cy="27.8" r="3.4" fill="#fff6d6"/><circle cx="38" cy="32" r="2.7" fill="#f6b21a"/><circle cx="58.0" cy="36.0" r="3.1" fill="#b99af0"/><circle cx="55.2" cy="39.8" r="3.1" fill="#b99af0"/><circle cx="50.8" cy="38.4" r="3.1" fill="#b99af0"/><circle cx="50.8" cy="33.6" r="3.1" fill="#b99af0"/><circle cx="55.2" cy="32.2" r="3.1" fill="#b99af0"/><circle cx="54" cy="36" r="2.5" fill="#ffe27a"/><circle cx="74.4" cy="30.0" r="3.4" fill="#ff9a62"/><circle cx="71.4" cy="34.2" r="3.4" fill="#ff9a62"/><circle cx="66.4" cy="32.6" r="3.4" fill="#ff9a62"/><circle cx="66.4" cy="27.4" r="3.4" fill="#ff9a62"/><circle cx="71.4" cy="25.8" r="3.4" fill="#ff9a62"/><circle cx="70" cy="30" r="2.7" fill="#fff2a8"/><circle cx="85.8" cy="40.0" r="3.0" fill="#f68fb0"/><circle cx="83.2" cy="43.6" r="3.0" fill="#f68fb0"/><circle cx="78.9" cy="42.2" r="3.0" fill="#f68fb0"/><circle cx="78.9" cy="37.8" r="3.0" fill="#f68fb0"/><circle cx="83.2" cy="36.4" r="3.0" fill="#f68fb0"/><circle cx="82" cy="40" r="2.4" fill="#ffd34d"/>` },
+  hay: { name: "Saman balyası", price: 50, svg: `<ellipse cx="50" cy="85" rx="36" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgHay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d27c"/><stop offset="1" stop-color="#d4a94a"/></linearGradient></defs><rect x="14" y="38" width="72" height="46" rx="9" fill="url(#dgHay)" stroke="#a8843f" stroke-width="3"/><g stroke="#c49a3c" stroke-width="2" stroke-linecap="round" opacity=".9"><path d="M20 50h22M52 48h28M22 60h30M58 62h22M20 72h26M54 74h26"/></g><g stroke="#fbe6a0" stroke-width="1.6" stroke-linecap="round" opacity=".9"><path d="M26 45h18M60 44h20M24 66h18M56 68h20"/></g><path d="M34 38v46M66 38v46" stroke="#7a4a26" stroke-width="4.5"/><path d="M34 38v46M66 38v46" stroke="#a8683a" stroke-width="1.6"/><path d="M18 38q-4-8 2-12M26 38q-1-10 5-14M78 38q3-9-2-13M70 38q0-7 5-10" stroke="#d9b14e" stroke-width="2" fill="none" stroke-linecap="round"/>` },
+  bench: { name: "Bahçe bankı", price: 120, svg: `<ellipse cx="50" cy="90" rx="38" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgBenW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cf9a5e"/><stop offset="1" stop-color="#a8743f"/></linearGradient></defs><path d="M20 70q-2 10-1 18M80 70q2 10 1 18" stroke="#2f3a42" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M16 46v26M84 46v26" stroke="#2f3a42" stroke-width="5" stroke-linecap="round"/><g fill="url(#dgBenW)" stroke="#6b4423" stroke-width="2.5"><rect x="14" y="30" width="72" height="8" rx="3"/><rect x="14" y="41" width="72" height="8" rx="3"/><rect x="12" y="56" width="76" height="9" rx="3.5"/><rect x="12" y="67" width="76" height="8" rx="3.5"/></g><g stroke="#e8be88" stroke-width="1.4" stroke-linecap="round" opacity=".8"><path d="M18 33h30M18 44h26M16 59h34M16 70h28"/></g><circle cx="16" cy="34" r="2" fill="#2f3a42"/><circle cx="84" cy="34" r="2" fill="#2f3a42"/>` },
+  lamp: { name: "Bahçe lambası", price: 150, svg: `<ellipse cx="50" cy="90" rx="20" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><radialGradient id="dgLamp"><stop offset="0" stop-color="#fff3b8" stop-opacity=".95"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="26" r="26" fill="url(#dgLamp)"/><path d="M43 90h14l-2-8H45z" fill="#3a4650" stroke="#232c33" stroke-width="2"/><rect x="47" y="34" width="6" height="50" rx="2" fill="#3f4c57" stroke="#232c33" stroke-width="2"/><rect x="42" y="78" width="16" height="6" rx="2" fill="#2f3a42" stroke="#232c33" stroke-width="1.5"/><path d="M38 36h24l-3 -4H41z" fill="#2f3a42"/><rect x="40" y="16" width="20" height="19" rx="3" fill="#ffe9a8" stroke="#2f3a42" stroke-width="3"/><path d="M50 16v19M40 25.5h20" stroke="#2f3a42" stroke-width="1.6"/><ellipse cx="50" cy="26" rx="4" ry="5" fill="#fffbe0"/><path d="M35 17l15-11 15 11z" fill="#3a4650" stroke="#232c33" stroke-width="2.5" stroke-linejoin="round"/><circle cx="50" cy="5" r="2.6" fill="#ffd34d" stroke="#232c33" stroke-width="1.2"/>` },
+  birdhouse: { name: "Kuş evi", price: 180, svg: `<ellipse cx="50" cy="91" rx="18" ry="5.5" fill="rgba(0,0,0,.2)"/><rect x="47" y="56" width="6" height="35" rx="2" fill="#8a5a32" stroke="#5a3a1e" stroke-width="2"/><path d="M42 91h16" stroke="#5a3a1e" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="dgBird" x1="0" x2="1"><stop offset="0" stop-color="#6fa3de"/><stop offset="1" stop-color="#4c7fc0"/></linearGradient></defs><rect x="32" y="30" width="36" height="30" rx="2" fill="url(#dgBird)" stroke="#2f4f7a" stroke-width="3"/><path d="M32 38h36" stroke="#8fbbea" stroke-width="2" opacity=".7"/><circle cx="50" cy="44" r="6" fill="#2a2420"/><circle cx="50" cy="44" r="6" fill="none" stroke="#f2d27a" stroke-width="2"/><rect x="46" y="55" width="8" height="3" rx="1.5" fill="#8a5a32"/><path d="M25 33l25-20 25 20z" fill="#d1503f" stroke="#7a1f14" stroke-width="3" stroke-linejoin="round"/><path d="M33 29l17-13" stroke="#ec7a68" stroke-width="2" stroke-linecap="round"/><g transform="translate(66 16)"><ellipse cx="0" cy="3" rx="6" ry="4.4" fill="#e8463a"/><circle cx="-4" cy="-1" r="3.6" fill="#e8463a"/><path d="M-8 -1l-3 1 3 1z" fill="#ffb02a"/><circle cx="-4.6" cy="-1.6" r=".9" fill="#222"/><path d="M5 3l6 2-5 1z" fill="#c4372c"/></g>` },
+  gnome: { name: "Bahçe cücesi", price: 200, svg: `<ellipse cx="50" cy="90" rx="20" ry="5.5" fill="rgba(0,0,0,.2)"/><path d="M38 86q-2 4 1 4h8q2 0 1-4zM53 86q-1 4 1 4h8q3 0 1-4z" fill="#4a3320" stroke="#2a1c10" stroke-width="2"/><path d="M36 88l3-30q1-4 5-4h12q4 0 5 4l3 30z" fill="#3f6fa0" stroke="#24456a" stroke-width="2.5" stroke-linejoin="round"/><rect x="37" y="68" width="26" height="5" fill="#4a3320"/><rect x="47" y="67" width="6" height="7" rx="1" fill="#f2c230" stroke="#8a6a10" stroke-width="1"/><circle cx="35" cy="66" r="5" fill="#f1c9a0" stroke="#a87b52" stroke-width="1.5"/><circle cx="65" cy="66" r="5" fill="#f1c9a0" stroke="#a87b52" stroke-width="1.5"/><circle cx="50" cy="48" r="11" fill="#f4cfa6" stroke="#a87b52" stroke-width="1.5"/><path d="M38 50q12 32 24 0q-4 6-12 6t-12-6z" fill="#fafafa" stroke="#c8c8c8" stroke-width="1.5" stroke-linejoin="round"/><circle cx="50" cy="50" r="3.6" fill="#f08a8a"/><circle cx="45" cy="45" r="1.4" fill="#222"/><circle cx="55" cy="45" r="1.4" fill="#222"/><path d="M37 44q13-4 26 0l-3-5q-10-3-20 0z" fill="#b3352b"/><path d="M37 44L50 8l13 36z" fill="#d9483a" stroke="#8a2a20" stroke-width="2.5" stroke-linejoin="round"/><path d="M45 28l5-17" stroke="#f2766a" stroke-width="2" stroke-linecap="round"/>` },
+  flag: { name: "Lucky bayrağı", price: 300, svg: `<ellipse cx="50" cy="91" rx="18" ry="5.5" fill="rgba(0,0,0,.2)"/><ellipse cx="30" cy="90" rx="9" ry="3.2" fill="#8f877b" stroke="#6b645a" stroke-width="1.5"/><rect x="28" y="12" width="4.5" height="78" rx="2" fill="#aeb4ba" stroke="#5a5f66" stroke-width="2"/><circle cx="30" cy="10" r="4" fill="#ffd34d" stroke="#a87a12" stroke-width="1.5"/><defs><linearGradient id="dgFlag" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46b858"/><stop offset=".5" stop-color="#38a84a"/><stop offset="1" stop-color="#2e9440"/></linearGradient></defs><path d="M33 16q14-6 22 0t22 0l-6 14 6 14q-11 6-22 0t-22 0z" fill="url(#dgFlag)" stroke="#1f5a28" stroke-width="2.5" stroke-linejoin="round"/><path d="M36 18q13-4 20 0" stroke="#7fe08c" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/><text x="54" y="35" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#ffe27a" stroke="#1f5a28" stroke-width=".6">L</text>` },
+  fountain: { name: "Küçük çeşme", price: 750, svg: `<ellipse cx="50" cy="86" rx="40" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgFnW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc8ea"/><stop offset="1" stop-color="#3f98c4"/></linearGradient><linearGradient id="dgFnS" x1="0" x2="1"><stop offset="0" stop-color="#e2dccf"/><stop offset="1" stop-color="#b8b0a2"/></linearGradient></defs><path d="M12 70q0 17 38 17t38-17z" fill="url(#dgFnS)" stroke="#8f877b" stroke-width="3" stroke-linejoin="round"/><ellipse cx="50" cy="68" rx="38" ry="14" fill="url(#dgFnS)" stroke="#8f877b" stroke-width="3"/><ellipse cx="50" cy="68" rx="31" ry="10" fill="url(#dgFnW)"/><path d="M26 69q9 4 20 0M54 71q10 3 20-1" stroke="#d4f1ff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".85"/><rect x="45" y="40" width="10" height="28" rx="2" fill="url(#dgFnS)" stroke="#8f877b" stroke-width="2"/><ellipse cx="50" cy="42" rx="17" ry="6" fill="url(#dgFnS)" stroke="#8f877b" stroke-width="2.5"/><ellipse cx="50" cy="41" rx="13" ry="4" fill="url(#dgFnW)"/><rect x="47" y="26" width="6" height="14" rx="2" fill="url(#dgFnS)" stroke="#8f877b" stroke-width="2"/><circle cx="50" cy="24" r="4.5" fill="#d8d2c4" stroke="#8f877b" stroke-width="2"/><g stroke="#bfe9ff" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M50 20q-4 -10 -14 -2q-8 8 -8 24M50 20q4 -10 14 -2q8 8 8 24M50 20V8"/></g><g fill="#e8f8ff"><circle cx="50" cy="6" r="2"/><circle cx="34" cy="14" r="1.6"/><circle cx="66" cy="14" r="1.6"/><circle cx="26" cy="48" r="1.8"/><circle cx="74" cy="48" r="1.8"/></g>` },
+  windmill: { name: "Minik yel değirmeni", price: 1500, svg: `<ellipse cx="50" cy="91" rx="26" ry="5.5" fill="rgba(0,0,0,.2)"/><defs><linearGradient id="dgWm" x1="0" x2="1"><stop offset="0" stop-color="#fbf5e8"/><stop offset="1" stop-color="#ddd0b4"/></linearGradient></defs><path d="M33 91l7-50h20l7 50z" fill="url(#dgWm)" stroke="#9c8a6a" stroke-width="3" stroke-linejoin="round"/><path d="M36 78h28M38 64h24M40 52h20" stroke="#c9b78f" stroke-width="1.4" opacity=".8"/><path d="M45 91v-14q0-5 5-5t5 5v14z" fill="#8a5a32" stroke="#5a3a1e" stroke-width="2"/><rect x="45" y="52" width="10" height="9" rx="4.5" fill="#bfe3f6" stroke="#6b4423" stroke-width="2"/><path d="M50 52v9M45 56.5h10" stroke="#6b4423" stroke-width="1.2"/><path d="M37 43l13-17 13 17z" fill="#d1503f" stroke="#7a1f14" stroke-width="2.5" stroke-linejoin="round"/><path d="M42 40l8-10" stroke="#ec7a68" stroke-width="2" stroke-linecap="round"/><g transform="translate(50 36)"><g stroke="#6b4423" stroke-width="3.5" stroke-linecap="round"><path d="M0 0L-24 -22M0 0L24 -22M0 0L-22 24M0 0L24 22"/></g><g fill="#fffaf0" stroke="#9c8a6a" stroke-width="1.4" stroke-linejoin="round"><path d="M-8 -9l-13-12-4 6 12 12z"/><path d="M8 -9l13-12 4 6-12 12z"/><path d="M-9 9l-12 13 6 4 12-12z"/><path d="M9 9l13 12-6 4-12-12z"/></g></g><circle cx="50" cy="36" r="5" fill="#3e2a17" stroke="#24180c" stroke-width="1.5"/><circle cx="50" cy="36" r="1.8" fill="#8a6a42"/>` }
 };
 const STALL_SVG = `<rect x="14" y="52" width="72" height="32" rx="4" fill="#c08a4f" stroke="#6b4423" stroke-width="3"/><path d="M18 52V20M82 52V20" stroke="#6b4423" stroke-width="4"/><path d="M10 22h80l-6 14H16z" fill="#e05a3a"/><path d="M26 22l-3 14M42 22l-1 14M58 22l1 14M74 22l3 14" stroke="#fff" stroke-width="6"/><circle cx="34" cy="48" r="6" fill="#d9483a"/><circle cx="50" cy="48" r="6" fill="#f2c14e"/><circle cx="66" cy="48" r="6" fill="#7bbf4a"/>`;
 const SPR_SVG = `<ellipse cx="50" cy="84" rx="26" ry="7" fill="rgba(0,0,0,.18)"/><rect x="34" y="62" width="32" height="22" rx="6" fill="#6f7a84" stroke="#3f4850" stroke-width="3"/><rect x="46" y="34" width="8" height="30" fill="#9aa5ad" stroke="#56606a" stroke-width="2"/><ellipse cx="50" cy="32" rx="12" ry="5" fill="#3f8fb5" stroke="#24566e" stroke-width="2"/><path d="M50 28q-20-14-34 6M50 28q20-14 34 6M50 28q-8-18-20-16M50 28q8-18 20-16" stroke="#7fd6ff" stroke-width="3" fill="none" stroke-linecap="round"/>`;
@@ -1547,6 +1578,9 @@ const peers = new Map();
 let lastPeers = [];
 let queue = [], current = null;
 let msgs = [], unread = 0, chatOpen = false, lastSend = 0;
+// chats: "Genel sohbet" (everyone, everywhere) + the chat of the place the player stands in (a farm or the plaza)
+let roomMsgs = [], chatTab = "g", roomWatchKey = null, roomUnsub = null, roomSeen = false, roomSubTs = 0;
+const tabDot = { g: false, r: false };
 let reqIn = [], reqOut = [];
 let workJob = null;               // {employer, wage, name} while working on someone's farm
 const pending = new Map();        // cells harvested as a worker, waiting for the employer to apply
@@ -3345,7 +3379,7 @@ const TOUCH = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").mat
 // graphics quality: 0 low, 1 medium, 2 high; "auto" watches the frame rate and adapts
 const GFX = { mode: 2, level: 2, frameMs: 0, win: [], good: 0, t0: 0 };
 try { const g = JSON.parse(localStorage.getItem("lucky-gfx2") || "{}"); if (["auto", 0, 1, 2].includes(g.mode)) GFX.mode = g.mode; if ([0, 1, 2].includes(g.level)) GFX.level = g.level; } catch (e) {}
-if (GFX.mode !== "auto") GFX.level = GFX.mode;
+if (GFX.mode !== "auto") GFX.level = GFX.mode; else GFX.level = 2;   // auto starts from the best level at every launch (it still drops by itself if the phone struggles) instead of staying stuck on a lowered level
 function setGfx(mode) {
   GFX.mode = mode; if (mode !== "auto") { GFX.level = mode; GFX.frameMs = 0; }
   try { localStorage.setItem("lucky-gfx2", JSON.stringify({ mode: GFX.mode, level: GFX.level })); } catch (e) {}
@@ -3645,7 +3679,7 @@ $("dock").addEventListener("click", e => {
   else if (a === "jobs") { renderJobs(); openSheet($("jobs")); }
   else if (a === "pazar") openPazar();
   else if (a === "friends") { renderFriends(); openSheet($("friends")); }
-  else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; renderBadges(); scrollChat(); }
+  else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; tabDot[chatTab] = false; renderBadges(); try { watchRoom(); } catch (e) {} renderChat(); renderChatFoot(); scrollChat(); }
 });
 function openSheet(el) { closeAll(); $("scrim").classList.add("on"); el.classList.add("on"); }
 function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "farmb", "jobs", "pazar", "friends", "chat"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
@@ -4520,11 +4554,26 @@ $("profile").addEventListener("click", e => { if (e.target === $("profile")) clo
 // ---------- Chat ----------
 const desktop = () => window.matchMedia("(min-width:900px)").matches;
 function scrollChat() { const m = $("msgs"); m.scrollTop = m.scrollHeight; }
+// every farm has its own chat room (everyone standing in that farm sees it), the plaza has one too: chatx/{room}/{id}
+const roomOf = () => sceneKey().replace(/[^A-Za-z0-9_-]/g, "_");
+const roomPath = k => "chatx/" + (k || roomOf());
+const roomLabel = () => scene.kind === "plaza" ? "Meydan sohbeti" : "Çiftlik sohbeti";
+const roomHint = () => scene.kind === "plaza" ? "Meydandakilere yaz" : "Bu çiftlikteki herkese yaz";
+function renderChatTabs() {
+  const t = $("chatTabs"); if (!t) return;
+  t.innerHTML = `<button class="tab" role="tab" data-ctab="g" aria-selected="${chatTab === "g"}">Genel sohbet${tabDot.g ? " •" : ""}</button><button class="tab" role="tab" data-ctab="r" aria-selected="${chatTab === "r"}">${roomLabel()}${tabDot.r ? " •" : ""}</button>`;
+}
+$("chatTabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-ctab]"); if (!b) return;
+  chatTab = b.getAttribute("data-ctab"); tabDot[chatTab] = false; if (chatTab === "r") watchRoom();
+  renderChat(); renderChatFoot();
+});
 function renderChat() {
-  const box = $("msgs"); box.innerHTML = "";
+  const box = $("msgs"); box.innerHTML = ""; renderChatTabs();
   if (!db) { box.innerHTML = `<div class="empty">Sohbet sunucusuna bağlanılamadı.<br>${esc(connError || "Sayfayı yenileyip tekrar dene.")}</div>`; return; }
-  if (!msgs.length) { box.innerHTML = `<div class="empty">Henüz mesaj yok. İlk selamı sen ver.</div>`; return; }
-  msgs.forEach(m => {
+  const list = chatTab === "g" ? msgs : roomMsgs;
+  if (!list.length) { box.innerHTML = `<div class="empty">${chatTab === "g" ? "Henüz mesaj yok. İlk selamı sen ver." : "Burada henüz mesaj yok. " + (scene.kind === "plaza" ? "Meydandakilere" : "Bu çiftlikteki herkese") + " selam ver."}</div>`; return; }
+  list.forEach(m => {
     const d = document.createElement("div"); d.className = "msg" + (m.uid === uid ? " me" : "");
     const meta = document.createElement("div"); meta.className = "meta";
     const l = document.createElement("span"); l.className = "l"; l.textContent = "Sv." + (+m.lvl || "?");
@@ -4539,26 +4588,51 @@ function renderChat() {
   });
   scrollChat();
 }
+// new messages: speech bubble over the speaker, a soft sound, and the unread badge / tab dot
+function chatFresh(list, tab) {
+  list.forEach(m => bubbleFor(m.uid, censor(String(m.text || ""))));
+  const others = list.filter(m => m.uid !== uid).length; if (!others) return;
+  if (!chatOpen) unread += others; else if (chatTab !== tab) tabDot[tab] = true;
+  if (!chatOpen) renderBadges(); SFX.play("chat");
+}
+function watchRoom() {
+  if (!db || !uid) return;
+  const k = roomOf(); if (k === roomWatchKey) return;
+  if (roomUnsub) { try { roomUnsub(); } catch (e) {} roomUnsub = null; }
+  roomWatchKey = k; roomMsgs = []; roomSeen = false; roomSubTs = Date.now() - 5000; tabDot.r = false;
+  try {
+    roomUnsub = db.collection(roomPath(k)).orderBy("ts", "desc").limit(60).onSnapshot(snap => {
+      if (roomWatchKey !== k) return;
+      const lastTs = roomMsgs.length ? roomMsgs[roomMsgs.length - 1].ts : roomSubTs;
+      roomMsgs = snap.docs.map(d => Object.assign({ id: d.id }, d.data())).reverse();
+      const fresh = roomSeen ? roomMsgs.filter(m => m.ts > lastTs) : []; roomSeen = true;
+      chatFresh(fresh, "r"); if (chatOpen) renderChat(); else renderChatTabs();
+    }, () => { roomMsgs = []; });
+  } catch (e) { roomUnsub = null; }
+  if (chatOpen) renderChat();
+}
+setInterval(() => { if (alive() && entered && db) { try { watchRoom(); } catch (e) {} } }, 700);
 function renderChatFoot() {
   const f = $("chatFoot"); if (!S) return;
   if (!db || !online) { f.innerHTML = ""; return; }
   if (S.level < CHAT_LEVEL) { f.innerHTML = `<div class="lock">Sohbete yazmak için ${CHAT_LEVEL}. seviyeye ulaş. Şu an ${S.level}. seviyedesin.</div>`; return; }
-  if (f.querySelector("input")) return;
-  f.innerHTML = `<form class="composer" id="chatForm_v8"><input id="chatIn_v8" maxlength="200" placeholder="Herkese yaz" autocomplete="off"><button class="big green sm" id="sendBtn_v8">Gönder</button></form>`;
+  if (f.querySelector("input")) { $("chatIn").placeholder = chatTab === "g" ? "Herkese yaz" : roomHint(); return; }
+  f.innerHTML = `<form class="composer" id="chatForm_v8"><input id="chatIn_v8" maxlength="200" placeholder="${chatTab === "g" ? "Herkese yaz" : roomHint()}" autocomplete="off"><button class="big green sm" id="sendBtn_v8">Gönder</button></form>`;
   $("chatForm").addEventListener("submit", async e => {
     e.preventDefault();
     const inp = $("chatIn"), text = inp.value.trim();
     if (!text) return;
     if (Date.now() - lastSend < 2000) { toast("Biraz yavaş, 2 saniye bekle"); return; }
     lastSend = Date.now(); inp.value = "";
+    const toRoom = chatTab === "r", path = toRoom ? roomPath() : "chat";
     try {
-      await db.collection("chat").add({ uid, name: S.name, lvl: S.level, text: censor(text).slice(0, 200), ts: Date.now() });
-      if (Math.random() < 0.25) prune();
+      await db.collection(path).add({ uid, name: S.name, lvl: S.level, text: censor(text).slice(0, 200), ts: Date.now() });
+      if (Math.random() < 0.25) prune(path);
     } catch (e2) { toast(e2 && e2.code === "quota_exceeded" ? "Sohbet dolu, biraz sonra tekrar dene" : "Mesaj gönderilemedi"); inp.value = text; }
   });
 }
-async function prune() {
-  try { const old = await db.collection("chat").where("ts", "<", Date.now() - 2 * 864e5).limit(20).get(); for (const d of old.docs) await db.doc("chat/" + d.id).delete(); } catch (e) {}
+async function prune(path) {
+  try { const old = await db.collection(path || "chat").where("ts", "<", Date.now() - 2 * 864e5).limit(20).get(); for (const d of old.docs) await db.doc((path || "chat") + "/" + d.id).delete(); } catch (e) {}
 }
 
 // ---------- Character picker ----------
@@ -5146,27 +5220,43 @@ const LOGIN_CHEST = [[.50, 500], [.30, 1500], [.15, 3000], [.04, 5000], [.01, 10
 let loginBusy = false;
 // takvim günü bazlı anahtar (24 saat değil): off = -1 dün; today() ile aynı biçim
 const loginKey = off => { const d = new Date(); d.setDate(d.getDate() + off); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+// Takvim: ödül günleri tarihe bağlıdır (7 günlük döngü). Girilmeyen gün atlanır ve ödülü verilmez; oyuncu girince o günün ödülünü alır.
+const dayNum = key => { const q = String(key).split("-").map(Number); return Math.round(Date.UTC(q[0], q[1] - 1, q[2]) / 864e5); };
+const todayNum = () => dayNum(loginKey(0));
 function loginEnsure() {
   const L = S.login && typeof S.login === "object" ? S.login : {};
-  S.login = { streak: Math.max(0, Math.floor(+L.streak) || 0), lastDay: typeof L.lastDay === "string" ? L.lastDay : null, totalClaims: Math.max(0, Math.floor(+L.totalClaims) || 0) };
-  return S.login;
+  const o = { streak: Math.max(0, Math.floor(+L.streak) || 0), lastDay: typeof L.lastDay === "string" ? L.lastDay : null, totalClaims: Math.max(0, Math.floor(+L.totalClaims) || 0),
+    base: Number.isFinite(+L.base) && L.base !== null && L.base !== undefined ? Math.floor(+L.base) : null,
+    claims: Array.isArray(L.claims) ? L.claims.map(x => Math.floor(+x)).filter(x => Number.isFinite(x)).slice(-14) : [] };
+  if (o.base === null) {
+    // older save (before the calendar): continue where the player was, or start a fresh cycle today
+    const t = todayNum(); o.base = t;
+    if (o.lastDay && o.streak > 0) {
+      const ld = dayNum(o.lastDay), idx = ((o.streak - 1) % 7) + 1;
+      if (ld === t) { o.base = t - (idx - 1); for (let k = 0; k < idx; k++) o.claims.push(ld - k); }
+      else if (ld === t - 1) { o.base = t - idx; for (let k = 0; k < idx; k++) o.claims.push(ld - k); }
+    }
+  }
+  S.login = o;
+  return o;
 }
-// bugünkü durum: seri (dün gelmediyse sıfır), bugünün ödül günü (1-7) ve ödül alınabilir mi
+// bugünkü durum: döngünün kaçıncı günü (1-7), ödül alınabilir mi, üst üste kaç gün geldi
 function loginInfo() {
-  const L = loginEnsure(), t = today(), claimed = L.lastDay === t;
-  let streak = L.streak;
-  if (!claimed && L.lastDay !== loginKey(-1)) streak = 0;
-  return { streak, day: (streak % 7) + 1, can: !claimed || isAdmin() };
+  const L = loginEnsure(), t = todayNum(), n = (((t - L.base) % 7) + 7) % 7 + 1, claimed = L.claims.includes(t);
+  let streak = 0, d = claimed ? t : t - 1; while (L.claims.includes(d) && streak < 400) { streak++; d--; }
+  return { streak, day: n, can: !claimed || isAdmin(), claimed, winStart: t - (n - 1), claims: L.claims, today: t };
 }
 function loginRewardText(R) {
   return fmtBig(R.gold) + " altın" + (R.apple ? "<br>+ " + R.apple + " elma" : "") + (R.bread ? "<br>+ " + R.bread + " ekmek" : "") + (R.chest ? "<br>+ Gizemli Sandık" : "");
 }
 function renderLogin() {
   const I = loginInfo();
-  $("loginStreak").textContent = (I.streak + 1) + " gün üst üste geliyorsun!";
+  const run = I.claimed ? I.streak : I.streak + 1;
+  $("loginStreak").textContent = I.claimed ? "Bugünkü ödülünü aldın." : run > 1 ? run + " gün üst üste geliyorsun!" : "Bugünün ödülü seni bekliyor!";
   $("loginGrid").innerHTML = LOGIN_REWARDS.map((R, k) => {
-    const d = k + 1, cls = d < I.day ? "done" : d === I.day ? "today" : "future";
-    return `<div class="lg-card ${cls}${d === 7 ? " d7" : ""}">${cls === "today" ? `<i class="tag">BUGÜN</i>` : ""}${cls === "done" ? `<i class="st">✅</i>` : cls === "future" ? `<i class="st">🔒</i>` : ""}<div class="ic">${R.e}</div><b>${d}. gün</b><span>${loginRewardText(R)}</span></div>`;
+    const d = k + 1, date = I.winStart + k, got = I.claims.includes(date);
+    const cls = date === I.today ? "today" : got ? "done" : date < I.today ? "missed" : "future";
+    return `<div class="lg-card ${cls}${d === 7 ? " d7" : ""}">${cls === "today" ? `<i class="tag">BUGÜN</i>` : ""}${cls === "done" ? `<i class="st">✅</i>` : cls === "future" ? `<i class="st">🔒</i>` : cls === "missed" ? `<i class="st">❌</i>` : ""}<div class="ic">${R.e}</div><b>${d}. gün</b><span>${cls === "missed" ? "Girmedin" : loginRewardText(R)}</span></div>`;
   }).join("");
   $("loginBtn").disabled = !I.can;
 }
@@ -5191,7 +5281,8 @@ function loginClaim() {
     const I = loginInfo(); if (!I.can) return;
     loginBusy = true;
     const R = LOGIN_REWARDS[I.day - 1], L = loginEnsure();
-    S.login = { streak: I.streak + 1, lastDay: today(), totalClaims: L.totalClaims + 1 };   // 7. günden sonra (streak % 7) tekrar 1. güne döner
+    const cl = L.claims.filter(x => x > I.today - 14); if (!cl.includes(I.today)) cl.push(I.today);
+    S.login = { streak: I.claimed ? I.streak : I.streak + 1, lastDay: today(), totalClaims: L.totalClaims + 1, base: L.base, claims: cl };   // 7 günlük döngü tarihe bağlı: girilmeyen günün ödülü atlanır
     if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
     S.gold = round1(S.gold + R.gold);
     if (R.apple) S.store.apple = (+S.store.apple || 0) + R.apple;
@@ -5798,6 +5889,17 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 105, d: "10 Ekim 2026", e: "💬", t: "Giriş, sohbet ve günlük ödül", c: "#8a5a2e", b: "#f6e8d4", items: [
+    "Oyuna girerken <b>Google ile giriş</b> ya da <b>misafir</b> olarak devam etmeyi seçebilirsin.",
+    "<b>Genel sohbet</b> herkese açık. Çiftlikte <b>Çiftlik sohbeti</b>, meydanda <b>Meydan sohbeti</b> eklendi, sadece orada olanlar görür.",
+    "Günlük ödül takvimi tarihe bağlı: girmediğin günün ödülü atlanır, girdiğin günün ödülünü alırsın.",
+    "Mesaj kutularının dışına dokununca kapanır.",
+    "Dekorlar yenilendi.",
+  ] },
+  { v: 104, d: "10 Ekim 2026", e: "✨", t: "Daha net görüntü", c: "#8a5a2e", b: "#f6e8d4", items: [
+    "Kenar yumuşatma geri açıldı, çizim netliği artırıldı.",
+    "Otomatik grafik modu artık her açılışta en iyi seviyeden başlar.",
+  ] },
   { v: 103, d: "10 Ekim 2026", e: "⚡", t: "Daha akıcı oyun", c: "#8a5a2e", b: "#f6e8d4", items: [
     "Gerçek zamanlı gölgeler kapatıldı, yerine yumuşak zemin gölgeleri kullanılıyor.",
     "Çizim çözünürlüğü ve kenar yumuşatma hafifletildi, oyun telefonlarda daha akıcı çalışır.",
@@ -6023,7 +6125,7 @@ $("setBtns").addEventListener("click", async e => {
   const k = b.getAttribute("data-acc"), i = a.info();
   try {
     if (k === "logout") {
-      if (!confirm("Google hesabından çıkarsan bu cihazda misafir olarak yeni bir oyun başlar. Karakterin Google hesabında kalır. Çıkılsın mı?")) return;
+      if (!confirm("Google hesabından çıkarsan giriş ekranına dönersin. Karakterin Google hesabında kalır. Çıkılsın mı?")) return;
       await a.logout(); location.reload(); return;
     }
     if (k === "switch") {
@@ -6058,11 +6160,25 @@ const googleErr = c => /in-app-browser/.test(c) ? "Google girişi bu uygulamanı
   : /popup-blocked/.test(c) ? "Tarayıcı giriş penceresini engelledi. Açılır pencerelere izin verip tekrar dene."
   : /network/.test(c) ? "İnternet bağlantısı yok, tekrar dene."
   : "Google girişi yapılamadı (" + c.slice(0, 60) + ")";
+// ---------- Giriş ekranı: Google ya da misafir (hesap yoksa oyun açılırken sorulur) ----------
+window.LUCKY_LOGIN_CHOICE = msg => new Promise(res => {
+  window.LUCKY_WAITING_LOGIN = true;
+  const g = $("gate"), eb = $("gateErr"), gb = $("gateGoogle"), sb = $("gateGuest");
+  eb.textContent = msg || ""; eb.hidden = !msg; gb.disabled = sb.disabled = false; g.classList.add("on");
+  const pick = k => { gb.disabled = sb.disabled = true; eb.hidden = false; eb.style.color = ""; eb.textContent = k === "google" ? "Google ile giriş yapılıyor..." : "Misafir hesabı hazırlanıyor..."; res(k); };
+  gb.onclick = () => pick("google"); sb.onclick = () => pick("guest");
+});
+window.LUCKY_LOGIN_DONE = () => { window.LUCKY_WAITING_LOGIN = false; $("gate").classList.remove("on"); };
+window.LUCKY_LOGIN_ERR = (pick, e) => {
+  const c = String((e && (e.code || e.message)) || e);
+  if (pick === "google") return googleErr(c) + " İstersen misafir olarak da oynayabilirsin.";
+  return /network|timeout/.test(c) ? "İnternet bağlantısı yok, tekrar dene." : "Misafir girişi yapılamadı (" + c.slice(0, 60) + "). Tekrar dene.";
+};
 $("googleBtn").onclick = async () => {
   const a = window.LUCKY_AUTH; if (!a) return;
   const b = $("googleBtn"); b.disabled = true;
   try {
-    if (a.info().google) { if (!confirm("Google hesabından çıkarsan bu cihazda yeni bir oyun başlar. Karakterin Google hesabında kalır. Çıkılsın mı?")) { b.disabled = false; return; } await a.logout(); location.reload(); return; }
+    if (a.info().google) { if (!confirm("Google hesabından çıkarsan giriş ekranına dönersin. Karakterin Google hesabında kalır. Çıkılsın mı?")) { b.disabled = false; return; } await a.logout(); location.reload(); return; }
     const r = await a.google();
     if (r && (r.switched || r.redirect)) { if (r.switched) location.reload(); return; }
     renderAccount(); $("startText").textContent = "Google hesabın bağlandı. Karakterin ve çiftliğin artık bu hesaba kayıtlı.";
@@ -6106,8 +6222,8 @@ async function start3D() {
 }
 function setup3D(T) {
   const cv = $("c3d");
-  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: false, powerPreference: "high-performance" });   // antialias off: lighter on the GPU
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: "high-performance" });   // edge smoothing back on (cheap on phone GPUs, removes the jagged edges)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.shadowMap.enabled = false; renderer.shadowMap.autoUpdate = false;   // real-time shadows are off at every quality level: every object has a soft ground shadow (blob) instead
   renderer.outputColorSpace = T.SRGBColorSpace;
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.06;
@@ -6928,9 +7044,9 @@ function setup3D(T) {
     F.sparks.forEach(sp => { const v = Math.max(0, Math.sin(sec * 2.4 + sp.userData.ph)); sp.material.opacity = v * v; const sc = .12 + v * .16; sp.scale.set(sc, sc, 1); });
     if (F.caus) { F.caus.rotation.y = sec * .05; F.caus.material.opacity = .2 + Math.sin(sec * 1.3) * .06; }
   }
-  function buildBench(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.box, M("#c08a4f"), x, .32, z, .85, .06, .3)); g.add(mesh(G.box, M("#a8743f"), x, .52, z - .14, .85, .2, .05));
+  function buildBenchBasic(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.box, M("#c08a4f"), x, .32, z, .85, .06, .3)); g.add(mesh(G.box, M("#a8743f"), x, .52, z - .14, .85, .2, .05));
     [-.35, .35].forEach(dx => g.add(mesh(G.box, M("#3e3a36"), x + dx, .16, z, .05, .32, .26))); return g; }
-  function buildLamp(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.cyl8, M("#2f3a42"), x, .7, z, .04, 1.4, .04)); g.add(mesh(G.box, new T.MeshBasicMaterial({ color: "#ffe9a8" }), x, 1.45, z, .2, .26, .2));
+  function buildLampBasic(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.cyl8, M("#2f3a42"), x, .7, z, .04, 1.4, .04)); g.add(mesh(G.box, new T.MeshBasicMaterial({ color: "#ffe9a8" }), x, 1.45, z, .2, .26, .2));
     g.add(mesh(G.cone, M("#2f3a42"), x, 1.66, z, .17, .16, .17)); return g; }
   function boardMesh(w, h, tex) { return new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshLambertMaterial({ map: tex, transparent: true })); }
   function buildTitle() { const g = new T.Group(), x = colOf(P_TITLE[1]), z = rowOf(P_TITLE[0]) + .5;
@@ -6943,7 +7059,7 @@ function setup3D(T) {
     [[-.5, .95, "#fffdf6", -.08], [0, .92, "#fff3c4", .05], [.5, .97, "#fffdf6", -.04]].forEach(([dx, y, col, rot]) => { const n = mesh(G.box, M(col), x + dx, y, z + .05, .36, .3, .01, false); n.rotation.z = rot; g.add(n); });
     const t = canvasTex("jobs", 512, 128, (c, w, h) => { c.fillStyle = "#efdcb5"; rr(c, 0, 0, w, h, 24); c.fill(); c.fillStyle = "#6b4423"; c.font = "600 64px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("İş İlanları", w / 2, h / 2); });
     const b = boardMesh(1.1, .27, t); b.position.set(x, .45, z + .06); g.add(b); return g; }
-  function buildFlowerBed(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.box, M("#8b5a33"), x, .06, z, .86, .12, .66));
+  function buildFlowerBedBasic(i) { const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5; g.add(mesh(G.box, M("#8b5a33"), x, .06, z, .86, .12, .66));
     for (let k = 0; k < 7; k++) g.add(mesh(G.sph, M(k % 2 ? "#f6a6c1" : "#fff6d6"), x - .3 + (k % 4) * .2, .17, z - .15 + Math.floor(k / 4) * .3, .07, .07, .07, false)); return g; }
   // sprinklers change with their level: taller, more nozzles, from grey steel to blue, brass, copper and gold, with a small tank from level 4
   function buildSprinkler(i, lv = 1) {
@@ -7018,11 +7134,129 @@ function setup3D(T) {
         if (k > 0 && k < n) { const f = new T.Mesh(tri, LAM({ color: FLAGC[k % FLAGC.length], side: T.DoubleSide })); f.position.set(fxp, fy, z); g.add(f); } } });
     return g;
   }
-  function buildDecor(t, i, k) {
+  // ---------- nicer 3D decorations: every part is made of simple shapes; if anything fails the older plain version is used ----------
+  function petals(g, x, y, z, n, r, len, col) { for (let q = 0; q < n; q++) { const a = q / n * Math.PI * 2, p = mesh(G.sph, M(col), x + Math.cos(a) * r, y, z + Math.sin(a) * r, len, len * .35, len * .5, false); p.rotation.y = -a; g.add(p); } }
+  function flower3(g, x, z, h, col, mid) { g.add(mesh(G.cyl8, M("#3f7a26"), x, h / 2, z, .012, h, .012, false)); petals(g, x, h, z, 5, .035, .05, col); g.add(mesh(G.sph, M(mid), x, h + .012, z, .03, .03, .03, false)); }
+  function leafAt(g, x, y, z, ang, sc, col) { const l = mesh(G.sph, M(col || "#4f9a2f"), x, y, z, .09 * sc, .022 * sc, .04 * sc, false); l.rotation.y = ang; l.rotation.z = .25; g.add(l); }
+  function buildBenchNice(i) {
+    const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5, W1 = M("#c08a4f"), W2 = M("#a8743f"), IR = M("#2f3a42");
+    blob(g, x, z, .95, .5, .5);
+    [-.09, 0, .09].forEach((dz, q) => g.add(mesh(G.box, q === 1 ? W2 : W1, x, .32, z + dz + .02, .88, .035, .075)));
+    [.46, .55, .64].forEach((y, q) => { const s = mesh(G.box, q === 1 ? W2 : W1, x, y, z - .16 - (y - .4) * .12, .88, .07, .025); s.rotation.x = -.14; g.add(s); });
+    [-.39, .39].forEach(dx => {
+      g.add(mesh(G.box, IR, x + dx, .16, z + .1, .04, .32, .04)); g.add(mesh(G.box, IR, x + dx, .3, z - .15, .04, .6, .04));
+      g.add(mesh(G.box, IR, x + dx, .45, z - .02, .04, .035, .34)); g.add(mesh(G.box, IR, x + dx, .39, z + .1, .035, .12, .035));
+    });
+    return g;
+  }
+  function buildLampNice(i) {
+    const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5, IR = M("#2f3a42");
+    blob(g, x, z, .5, .5, .45);
+    g.add(mesh(G.cyl, IR, x, .05, z, .13, .1, .13)); g.add(mesh(G.cyl, IR, x, .14, z, .08, .08, .08)); g.add(mesh(G.cyl8, IR, x, .75, z, .035, 1.2, .035));
+    g.add(mesh(G.box, IR, x, 1.38, z, .24, .04, .24));
+    g.add(mesh(G.box, new T.MeshBasicMaterial({ color: "#ffe9a8" }), x, 1.52, z, .17, .24, .17));
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => g.add(mesh(G.box, IR, x + a * .09, 1.52, z + b * .09, .02, .26, .02, false)));
+    g.add(mesh(G.cone, IR, x, 1.72, z, .21, .17, .21)); g.add(mesh(G.sph, M("#ffd34d"), x, 1.83, z, .035, .035, .035, false));
+    return g;
+  }
+  function buildFlowerBedNice(i) {
+    const g = new T.Group(), x = colOf(i) + .5, z = rowOf(i) + .5, WD = M("#a8743f");
+    blob(g, x, z, 1.05, .8, .5);
+    g.add(mesh(G.box, WD, x, .1, z - .31, .92, .2, .06)); g.add(mesh(G.box, WD, x, .1, z + .31, .92, .2, .06));
+    g.add(mesh(G.box, WD, x - .43, .1, z, .06, .2, .6)); g.add(mesh(G.box, WD, x + .43, .1, z, .06, .2, .6));
+    g.add(mesh(G.box, M("#4a3322"), x, .12, z, .8, .16, .56, false));
+    [[-.28, -.12, "#f68fb0", "#ffd34d", .34], [0, -.14, "#fff6d6", "#f6b21a", .4], [.28, -.1, "#b99af0", "#ffe27a", .32], [-.15, .13, "#ff9a62", "#fff2a8", .36], [.14, .14, "#f68fb0", "#ffd34d", .3], [.32, .15, "#fff6d6", "#f6b21a", .38], [-.34, .12, "#b99af0", "#ffe27a", .3]]
+      .forEach(([dx, dz, c1, c2, h]) => { flower3(g, x + dx, z + dz, h + .1, c1, c2); leafAt(g, x + dx + .05, .25, z + dz, dx * 5, 1); });
+    return g;
+  }
+  function buildDecorNice(t, i, k) {
     const x = colOf(i) + .5, z = rowOf(i) + .5;
-    if (t === "bench") return buildBench(i);
-    if (t === "lamp") return buildLamp(i);
-    if (t === "bed") return buildFlowerBed(i);
+    if (t === "bench") return buildBenchNice(i);
+    if (t === "lamp") return buildLampNice(i);
+    if (t === "bed") return buildFlowerBedNice(i);
+    const g = new T.Group();
+    if (t === "pot") {
+      blob(g, x, z, .7, .6, .5);
+      const pb = mesh(G.cyl, TM("#c8693a", "stone", 1, 1), x, .17, z, .2, .34, .2); pb.geometry = potGeo; g.add(pb);
+      g.add(mesh(G.cyl, M("#dd7d49"), x, .35, z, .235, .06, .235)); g.add(mesh(G.cyl, M("#4a3322"), x, .385, z, .2, .02, .2, false));
+      for (let q = 0; q < 6; q++) { const a = q / 6 * Math.PI * 2; leafAt(g, x + Math.cos(a) * .1, .44, z + Math.sin(a) * .1, -a, 1.1); }
+      g.add(mesh(leafGeo, M("#4f9a2f"), x, .47, z, .15, .13, .15));
+      flower3(g, x - .08, z + .03, .62, "#f68fb0", "#ffd34d"); flower3(g, x + .09, z - .04, .68, "#fff6d6", "#f6b21a"); flower3(g, x + .01, z + .1, .56, "#b99af0", "#ffe27a");
+    } else if (t === "sunflower") {
+      blob(g, x, z, 1, .8, .5);
+      [[-.22, .1, .75], [.05, -.12, 1.0], [.25, .15, .65]].forEach(([dx, dz, h]) => {
+        g.add(mesh(G.cyl8, M("#3f7a26"), x + dx, h / 2, z + dz, .025, h, .025));
+        leafAt(g, x + dx + .09, h * .38, z + dz, 0, 1.1); leafAt(g, x + dx - .09, h * .55, z + dz, Math.PI, 1);
+        const hd = new T.Group(); hd.position.set(x + dx, h, z + dz); hd.rotation.x = -.7;
+        petals(hd, 0, 0, 0, 12, .115, .07, "#ffcc2e"); petals(hd, 0, -.005, 0, 12, .1, .065, "#ffb81a");
+        hd.add(mesh(G.cyl, M("#6b3f1f"), 0, .02, 0, .1, .03, .1, false)); hd.add(mesh(G.cyl, M("#8a5428"), 0, .035, 0, .055, .02, .055, false)); g.add(hd);
+      });
+    } else if (t === "hay") {
+      blob(g, x, z, 1, .8, .6);
+      g.add(mesh(G.box, M("#e8c46a"), x, .2, z, .74, .4, .48)); g.add(mesh(G.box, M("#f0d27e"), x, .41, z, .7, .03, .44, false));
+      [-.18, .18].forEach(dx => g.add(mesh(G.box, M("#8a5a32"), x + dx, .2, z, .03, .42, .5, false)));
+      [[-.3, .2], [.3, .22], [-.1, -.26], [.2, -.25], [.38, -.1]].forEach(([dx, dz], q) => { const s = mesh(G.cone, M("#d9b14e"), x + dx, .43, z + dz, .02, .12, .02, false); s.rotation.z = (q - 2) * .25; g.add(s); });
+    } else if (t === "birdhouse") {
+      blob(g, x, z, .6, .6, .45);
+      g.add(mesh(G.box, TM(COL.wood, "wood"), x, .5, z, .06, 1.0, .06)); g.add(mesh(G.box, M("#5b8fd0"), x, 1.08, z, .26, .26, .24)); g.add(mesh(prism, M("#c8453a"), x, 1.21, z, .36, .17, .32));
+      const hole = mesh(G.cyl, M("#2a2420"), x, 1.1, z + .121, .048, .01, .048, false); hole.rotation.x = Math.PI / 2; g.add(hole);
+      const ring = mesh(G.cyl, M("#f2d27a"), x, 1.1, z + .118, .066, .008, .066, false); ring.rotation.x = Math.PI / 2; g.add(ring);
+      const perch = mesh(G.cyl8, M("#8a5a32"), x, 1.0, z + .15, .012, .08, .012, false); perch.rotation.x = Math.PI / 2; g.add(perch);
+      g.add(mesh(G.sph, M("#e8463a"), x + .1, 1.36, z, .05, .04, .035, false)); g.add(mesh(G.sph, M("#e8463a"), x + .145, 1.4, z, .03, .03, .03, false)); g.add(mesh(G.cone, M("#ffb02a"), x + .185, 1.4, z, .012, .03, .012, false));
+    } else if (t === "gnome") {
+      blob(g, x, z, .8, .7, .5);
+      const gg = new T.Group(); gg.position.set(x, 0, z); gg.scale.setScalar(1.7); g.add(gg);
+      gg.add(mesh(G.sph, M("#4a3320"), -.045, .015, .02, .045, .03, .06, false)); gg.add(mesh(G.sph, M("#4a3320"), .045, .015, .02, .045, .03, .06, false));
+      gg.add(mesh(G.cone, M("#3f6fa0"), 0, .16, 0, .13, .32, .13)); gg.add(mesh(G.cyl, M("#4a3320"), 0, .17, 0, .1, .025, .1, false));
+      gg.add(mesh(G.sph, M("#f1c9a0"), -.1, .2, .04, .03, .03, .03, false)); gg.add(mesh(G.sph, M("#f1c9a0"), .1, .2, .04, .03, .03, .03, false));
+      gg.add(mesh(G.sph, M(COL.skin), 0, .36, 0, .08, .08, .08));
+      gg.add(mesh(G.cone, M("#ffffff"), 0, .27, .05, .085, -.2, .06, false)); gg.add(mesh(G.cyl, M("#b3352b"), 0, .405, 0, .095, .02, .095, false));
+      gg.add(mesh(G.cone, M("#d9483a"), 0, .53, 0, .09, .27, .09)); gg.add(mesh(G.sph, M("#f08a8a"), 0, .36, .08, .024, .024, .024, false));
+      gg.add(mesh(G.sph, M("#222222"), -.03, .385, .07, .009, .009, .009, false)); gg.add(mesh(G.sph, M("#222222"), .03, .385, .07, .009, .009, .009, false));
+      const st = mesh(G.cyl, M("#f6efe0"), x + .28, .06, z + .12, .02, .12, .02, false); g.add(st);
+      g.add(mesh(G.half, M("#d9483a"), x + .28, .12, z + .12, .07, .06, .07, false));
+      [[-.03, .15, .03], [.03, .16, -.02]].forEach(([dx, dy, dz]) => g.add(mesh(G.sph, M("#ffffff"), x + .28 + dx, dy, z + .12 + dz, .012, .012, .012, false)));
+    } else if (t === "flag") {
+      blob(g, x - .25, z, .5, .5, .45);
+      g.add(mesh(G.cyl, TM("#a89b88", "stone", 1, 1), x - .25, .05, z, .13, .1, .13));
+      g.add(mesh(G.cyl8, MS("#9aa3ab", { metalness: .6, roughness: .3 }), x - .25, .9, z, .03, 1.8, .03)); g.add(mesh(G.sph, M("#ffd34d"), x - .25, 1.82, z, .05, .05, .05, false));
+      const tx = canvasTex("flagL", 256, 160, (c, w, h) => { c.fillStyle = "#38a84a"; c.fillRect(0, 0, w, h); c.fillStyle = "#2f8a3c"; c.fillRect(0, h - 26, w, 26); c.fillStyle = "#ffe27a"; c.font = "700 74px Fredoka, Nunito, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("Lucky", w / 2, h / 2 - 8); });
+      const fl = new T.Mesh(new T.PlaneGeometry(.62, .4), LAM({ map: tx, side: T.DoubleSide })); fl.position.set(x + .07, 1.56, z); g.add(fl);
+      g.userData.nf = fl;
+    } else if (t === "fountain") {
+      blob(g, x, z, 1.15, 1.15, .5);
+      g.add(mesh(G.cyl, TM("#c9c2b5", "stone", 3, 1), x, .03, z, .52, .06, .52));
+      g.add(mesh(G.cyl, TM("#d8d2c6", "stone", 3, 1), x, .15, z, .42, .24, .42)); g.add(mesh(G.cyl, MS("#3594c0", { roughness: .05, metalness: .1 }), x, .275, z, .36, .02, .36, false));
+      g.add(mesh(G.cyl, M("#c9c2b5"), x, .47, z, .06, .45, .06)); g.add(mesh(G.cyl, M("#d8d2c6"), x, .68, z, .2, .05, .2)); g.add(mesh(G.cyl, MS("#3594c0", { roughness: .05, metalness: .1 }), x, .71, z, .16, .015, .16, false));
+      g.add(mesh(G.cyl, M("#c9c2b5"), x, .8, z, .035, .18, .035)); g.add(mesh(G.sph, M("#d8d2c6"), x, .92, z, .06, .06, .06));
+      const wm = MS("#e6f7ff", { transparent: true, opacity: .6, roughness: .1 });
+      g.add(mesh(G.sph, wm, x, 1.0, z, .04, .1, .04, false));
+      for (let q = 0; q < 8; q++) { const a = q / 8 * Math.PI * 2; g.add(mesh(G.sph, wm, x + Math.cos(a) * .16, .8, z + Math.sin(a) * .16, .028, .05, .028, false)); g.add(mesh(G.sph, wm, x + Math.cos(a) * .27, .42, z + Math.sin(a) * .27, .025, .04, .025, false)); }
+    } else if (t === "windmill") {
+      blob(g, x, z, 1.2, 1.2, .6);
+      g.add(mesh(G.cyl8, TM("#a89b88", "stone", 1, 1), x, .06, z, .37, .12, .37));
+      g.add(mesh(windGeo, TM("#f6efe0", "siding", 1, 2), x, .6, z, .3, 1.2, .3)); g.add(mesh(G.cone, M("#c8453a"), x, 1.38, z, .31, .38, .31));
+      g.add(mesh(G.box, M("#8a5a32"), x, .24, z + .285, .15, .28, .03, false)); g.add(mesh(G.box, M("#bfe3f6"), x, .7, z + .235, .1, .12, .02, false));
+      g.add(mesh(G.box, M("#6b4423"), x, .7, z + .24, .12, .014, .02, false)); g.add(mesh(G.box, M("#6b4423"), x, .7, z + .24, .014, .14, .02, false));
+      const hub = new T.Group(); hub.position.set(x, 1.12, z + .33); g.add(hub); hub.add(mesh(G.sph, M("#3e2a17"), 0, 0, 0, .06, .06, .06));
+      for (let q = 0; q < 4; q++) { const arm = new T.Group(); arm.rotation.z = q * Math.PI / 2; arm.add(mesh(G.box, TM(COL.wood, "wood"), 0, .32, 0, .05, .64, .03)); arm.add(mesh(G.box, M("#fffaf0"), .07, .38, 0, .12, .46, .015));
+        [.2, .34, .48].forEach(yy => arm.add(mesh(G.box, M("#d9cdb2"), .07, yy, .004, .125, .012, .018, false))); hub.add(arm); }
+      hub.userData.spin = .6 + (k % 3) * .15; g.userData.nm = hub;
+    } else return null;
+    // register animated parts only now, so a failed build leaves nothing behind
+    if (g.userData.nf) fx.flags.push(g.userData.nf);
+    if (g.userData.nm) fx.mills.push(g.userData.nm);
+    return g;
+  }
+  function buildBench(i) { try { return buildBenchNice(i); } catch (e) { console.warn("bench", e); return buildBenchBasic(i); } }
+  function buildLamp(i) { try { return buildLampNice(i); } catch (e) { console.warn("lamp", e); return buildLampBasic(i); } }
+  function buildFlowerBed(i) { try { return buildFlowerBedNice(i); } catch (e) { console.warn("bed", e); return buildFlowerBedBasic(i); } }
+  function buildDecor(t, i, k) { try { const o = buildDecorNice(t, i, k); if (o) return o; if (t === "stall") return buildDecorBasic(t, i, k); return null; } catch (e) { console.warn("decor", t, e); return buildDecorBasic(t, i, k); } }
+  function buildDecorBasic(t, i, k) {
+    const x = colOf(i) + .5, z = rowOf(i) + .5;
+    if (t === "bench") return buildBenchBasic(i);
+    if (t === "lamp") return buildLampBasic(i);
+    if (t === "bed") return buildFlowerBedBasic(i);
     const g = new T.Group();
     if (t === "pot") { blob(g, x, z, .7, .6, .5); g.add(mesh(G.cyl, TM("#c8693a", "stone", 1, 1), x, .17, z, .2, .34, .2)); g.children[g.children.length - 1].geometry = potGeo;
       g.add(mesh(leafGeo, M("#4f9a2f"), x, .45, z, .22, .2, .22)); [["#f6a6c1", -.1, .05], ["#fff6d6", .1, -.02], ["#ffd34d", .02, .14]].forEach(([c, dx, dz]) => g.add(mesh(G.sph, M(c), x + dx, .58, z + dz, .05, .05, .05, false))); }
@@ -7855,7 +8089,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   }
   R3.quality = lvl => {
     const dpr = window.devicePixelRatio || 1;
-    R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.5), Math.min(dpr, 1.5)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
+    R3.baseDpr = [Math.min(dpr, 1.3), Math.min(dpr, 1.5), Math.min(dpr, 1.75)][lvl]; renderer.setPixelRatio(Math.max(1, R3.baseDpr * (R3.res || 1))); lastW = 0;
     if (lvl < 2) { R3.envT = 0; waterMats.forEach(m => { if (m.envMap) { m.envMap = null; m.needsUpdate = true; } }); }   // yansıma yalnızca seviye 2
     sun.castShadow = false;   // performans: gerçek gölge tüm seviyelerde kapalı, her yerde blob gölgeler
     if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
@@ -7871,7 +8105,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
 
 async function init() {
   showLoader("Oyun yükleniyor", 4000, true);
-  setTimeout(() => { if (bootLd && !entered) { endBootLoader(); $("start").classList.add("on"); } }, 30000);
+  setTimeout(() => { if (bootLd && !entered && !window.LUCKY_WAITING_LOGIN) { endBootLoader(); $("start").classList.add("on"); } }, 30000);
   start3D();
   const claude = await getClaude();
   if (claude) [db, user, room] = await Promise.all(["db", "user", "room"].map(n => claude.use(n).catch(() => null)));
@@ -7901,12 +8135,10 @@ async function init() {
       const before = msgs.length ? msgs[msgs.length - 1].ts : 0;
       msgs = snap.docs.map(d => Object.assign({ id: d.id }, d.data())).reverse();
       const fresh = before ? msgs.filter(m => m.ts > before) : [];
-      fresh.forEach(m => bubbleFor(m.uid, censor(String(m.text || ""))));
-      const others = fresh.filter(m => m.uid !== uid).length;
-      if (others && !chatOpen) { unread += others; renderBadges(); }
-      if (others) SFX.play("chat");
+      chatFresh(fresh, "g");
       renderChat();
     }, () => { $("msgs").innerHTML = `<div class="empty">Sohbete bağlanılamadı. Sayfayı yenile.</div>`; });
+    watchRoom();
   } else renderChat();
   if (room) { try { room.onPeers(ch => { syncPeers(ch.peers, true); }); } catch (e) {} }
   listenFriends();
@@ -8103,6 +8335,10 @@ $id("dmForm_v8").addEventListener("submit", async e => { e.preventDefault(); con
     await db.doc("dmbox/" + to + "_" + uid).set({ to, from: uid, fromName: S.name, text: t.slice(0, 60), ts, unread: true }); inp.value = ""; achEvent("chat"); ANALYTICS.log("chat_send", { dm: 1 }); }
   catch (er) { toast(friendlyError(er)); SFX.play("error"); } btn.classList.remove("loading"); });
 $id("dmList_v8").addEventListener("click", e => { const b = e.target.closest("[data-dmopen]"); if (b) openDm(b.dataset.dmopen); });
+$id("dm_v8").addEventListener("click", e => { if (e.target === $id("dm_v8")) closeDm(); });
+$id("gift_v8").addEventListener("click", e => { if (e.target === $id("gift_v8")) closeGift(); });
+$id("ach_v8").addEventListener("click", e => { if (e.target === $id("ach_v8")) closeAch(); });
+$id("weekly_v8").addEventListener("click", e => { if (e.target === $id("weekly_v8")) closeWeekly(); });
 $id("dmBadge_v8").onclick = () => { (closeAll(), $id("dm_v8").classList.add("on")); renderDmInbox(); };
 function listenGifts() { initSocial(); }
 function checkUnreadDM() { try { const u = dmBoxes.filter(b => b.unread).length; if (u) { toast("📬 " + u + " okunmamış mesajın var"); HAPTIC.buzz("notify"); } } catch (e) {} }

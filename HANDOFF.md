@@ -22,7 +22,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `assetlinks.json`, `.well-known/assetlinks.json`, `_redirects`, `_headers` – Play uygulaması bağlantısı.
 
 ## Oyun içinde önemli sabitler / yapılar (index.html)
-- `VERSION` – her güncellemede artırın (şu an 102). Ayarlar ve sol üst kutuda görünür.
+- `VERSION` – her güncellemede artırın (şu an 105). Ayarlar ve sol üst kutuda görünür.
 - `UPDATES` dizisi – oyundaki **Güncellemeler** penceresi. Her yeni sürümde başa bir kart ekleyin (v, d, e, t, c, b, items).
 - Harita: `COLS=56, ROWS=30`, `MAPV=5`. 15 harita genişletmesi (`EXPAND_STEPS`, 80. seviyeye kadar). Toprak sınırı 500 (`PLOT_CAP`), seviyeye göre `landMax`.
 - Seviye: 100 seviye, `xpNeed` formülü; XP: buğday 2, patates 3, elma 3, sulama 2, ekmek 3.
@@ -126,6 +126,16 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Tahta (`wood`, `STORE_KEYS` içinde): ekin toplarken her ekin için `woodChance(S)` şansla çıkar (`WOOD_CHANCE = 0.2`; seviye 15'ten büyükse `WOOD_CHANCE_LATE = 0.1`, eşik `WOOD_LATE_LEVEL = 15`), doğrudan depoya gider (yer varsa). Depoya satılmaz (`price: 0`), sadece Pazar'da satılır; Pazar'da tanesi en fazla `WOOD_MAX_PRICE = 400` altın (`pzMax`), önerilen fiyat `WOOD_REF = 100`. Fiyat sınırı sadece istemcide, Firebase kuralında yok. Köy muhtarı kontrolü (`checkBroke`) tahtayı saymaz.
 - Çok yuvalı aletler (traktör, elektrikli tırpan, ekim aleti) ve çok sulama (kuyu 3+): `pickExtras` artık sadece **yan yana** (4 yön) komşu toprakları seçer (BFS); aradan boşluk olan toprak ayrıca ziyaret edilmelidir.
 - Alet değiştirince (`selectTool` → `dropHarvestTasks`) sırada bekleyen/yürüyen toplama görevleri iptal olur.
+
+## v102-v105
+- v102: tahta şansı `woodChance(S)` = %20, seviye 15'ten büyükse %10 (`WOOD_CHANCE`, `WOOD_CHANCE_LATE`, `WOOD_LATE_LEVEL`).
+- v103/v104 (performans): gerçek zamanlı gölge her seviyede kapalı (blob gölgeler), kenar yumuşatma açık, piksel oranı üst sınırı seviye 2'de 1.75 / seviye 1'de 1.5 / seviye 0'da 1.3. Otomatik grafik modu her açılışta seviye 2'den başlar (eskiden düşürülen seviye kaydedilip takılı kalıyordu).
+- v105 giriş: oyun açılırken hesap yoksa `#gate_v8` ekranı çıkar (Google ile giriş / Misafir). `LUCKY_CONNECT` artık sessizce anonim hesap açmaz; seçimi `window.LUCKY_LOGIN_CHOICE` ister (ana betikte tanımlı). Misafir hesabı sonradan Ayarlar'dan Google'a bağlanır (`linkWithPopup`, eski akış). Çıkış yapınca giriş ekranına dönülür.
+- v105 sohbet: "Genel sohbet" (`chat`) + bulunulan yerin sohbeti (`chatx/{oda}`): oda = `sceneKey()` (çiftlik: `farm:{sahip uid}`, meydan: `plaza`). Çiftliği ziyaret eden, sahibiyle aynı odada olur. Sekmeler `#chatTabs_v8`, odayı `watchRoom()` izler. Firebase'de `chatx` kuralı gerekir.
+- v105 günlük ödül: takvim tarihe bağlı (`S.login = {streak,lastDay,totalClaims,base,claims[]}`). `base` döngü başlangıç günü, `claims` son 14 gün alınan günler. Girilmeyen günün ödülü verilmez (takvimde ❌), girilen günün ödülü verilir. Eski kayıtlar `loginEnsure()` içinde dönüştürülür.
+- v105 mesaj kutuları: `dm_v8`, `gift_v8`, `ach_v8`, `weekly_v8` boşluğa dokununca kapanır (mektup kutusu zaten kapanıyordu).
+- v105 dekor: 11 dekorun 2D çizimleri (`DECOR[...].svg`) yenilendi; 3D için `buildDecorNice`, `buildBenchNice`, `buildLampNice`, `buildFlowerBedNice` eklendi. Hata olursa eski sade `...Basic` sürümlere döner. 3D görünümü geliştirme ortamında görülemedi, telefonda kontrol edin.
+- Firebase kuralları (Ekim 2026): üstteki genel `.read` kaldırıldı, her yola kendi okuma kuralı eklendi. `dm`, `dmbox`, `gifts`, `analytics`, `chatx` yolları eklendi. `dmbox` okuması `where("to","==",uid)` sorgusuna bağlıdır; sorguyu değiştirirseniz kuralı da değiştirin.
 
 ## Performans kararları
 - Gerçek zamanlı gölgeler **kapalı**; nesnelerin altında yumuşak "blob" gölge var.
