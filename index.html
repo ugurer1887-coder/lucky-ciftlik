@@ -1,4 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="theme-color" content="#8fc456"></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+.big.loading{pointer-events:none;opacity:.8;position:relative}.big.loading::after{content:"";display:inline-block;width:14px;height:14px;margin-left:8px;border:3px solid #fff8;border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:spn .7s linear infinite}@keyframes spn{to{transform:rotate(360deg)}}
+.ach-tabs{display:flex;gap:6px;overflow-x:auto;margin:8px 0}.ach-tabs button{border:2px solid var(--line);background:var(--panel2);border-radius:12px;padding:4px 10px;font-weight:800;white-space:nowrap}.ach-tabs .on{background:var(--leaf);color:#fff}
+.ach-c{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:14px;padding:8px;margin:6px 0;background:var(--panel)}.ach-c.lock{opacity:.6}.ach-c.done{border-color:var(--leaf)}.ach-c .ic{font-size:1.6rem}.ach-c .bar{height:7px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:4px 0}.ach-c .bar i{display:block;height:100%;background:var(--leaf)}
+.ach-c button.claim{border:0;border-radius:10px;background:var(--gold);color:#3e2a17;font-weight:900;padding:6px 10px;animation:glw 1s infinite alternate}@keyframes glw{to{box-shadow:0 0 12px var(--gold)}}
+.empty-v8{text-align:center;padding:24px 8px;color:var(--ink2);font-weight:800}.empty-v8 b{display:block;font-size:2rem}
+</style><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="theme-color" content="#8fc456"></head><body>
 <title>Lucky Farm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -706,6 +712,23 @@ body{font-family:var(--body);letter-spacing:.1px}
 @media (prefers-reduced-motion: reduce){.wbub i,.wrays,.wbig,.wcoin,.wconf,#wish_v8 h1 .h1e{animation:none!important}.wcoin,.wconf{display:none}}
 /* sunlight from the top left, soft shade at the edges */
 .vig{background:linear-gradient(140deg,rgba(255,236,190,.16),rgba(255,236,190,0) 40%,rgba(10,30,50,0) 70%,rgba(10,30,50,.12)),radial-gradient(ellipse at 50% 46%,rgba(20,40,10,0) 62%,rgba(20,40,10,.2) 100%)}
+/* ---- günlük giriş ödülü (7 günlük takvim) ---- */
+#login_v8 .box{position:relative;max-width:640px}
+#login_v8 .lg-x{position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:var(--panel2);color:var(--ink);font-size:1.3rem;font-weight:800;line-height:1;padding:0}
+#login_v8 .lg-streak{font-weight:800;margin:0 0 14px}
+.lg-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:0 0 12px}
+.lg-card{position:relative;border-radius:14px;background:var(--panel2);border:2px solid transparent;padding:14px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;opacity:.5}
+.lg-card .ic{font-size:1.5rem;line-height:1.1}
+.lg-card b{display:block;font-family:var(--body);font-weight:800;font-size:.74rem;color:var(--ink)}
+.lg-card span{display:block;font-size:.68rem;font-weight:800;color:var(--ink2);line-height:1.25;overflow-wrap:anywhere}
+.lg-card .st{position:absolute;top:2px;right:4px;font-size:.8rem;font-style:normal}
+.lg-card.today{opacity:1;border-color:#38a84a;background:linear-gradient(180deg,#eaffd9,#c9f2a8);box-shadow:0 0 0 3px rgba(56,168,74,.35),0 0 18px rgba(88,220,96,.7);animation:lgGlow 1.4s ease-in-out infinite}
+.lg-card.today b,.lg-card.today span{color:#23401a}
+.lg-card .tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#2f9a43;color:#fff;font-style:normal;font-weight:800;font-size:.62rem;padding:2px 7px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+@keyframes lgGlow{50%{box-shadow:0 0 0 3px rgba(56,168,74,.5),0 0 28px rgba(88,220,96,.95)}}
+@media (max-width:640px){.lg-grid{grid-template-columns:repeat(4,1fr)}.lg-card.d7{grid-column:span 2}}
+@media (max-height:520px){#login_v8 .box{padding:10px 14px}#login_v8 h1{font-size:1.2rem;margin:0}#login_v8 .lg-streak{margin:0 0 10px;font-size:.84rem}.lg-card{padding:12px 2px 6px}.lg-card .ic{font-size:1.2rem}#login_v8 .linkbtn{margin-top:0;min-height:30px;padding:4px}}
+@media (prefers-reduced-motion: reduce){.lg-card.today{animation:none}}
 </style>
 
 <div id="root_v8">
@@ -833,6 +856,7 @@ body{font-family:var(--body);letter-spacing:.1px}
   </div>
   <button class="gear adminbtn" id="adminBtn_v8" aria-label="Yönetim paneli" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.1 8.4-7.5 9.8-4.4-1.4-7.5-5.2-7.5-9.8V5.8z" fill="none" stroke="#ffd34d" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.4 2.4 4.6-4.8" fill="none" stroke="#ffd34d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <button class="gear updbtn" id="updBtn_v8" aria-label="Güncellemeler"><i class="gdot" id="updDot_v8"></i><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.5l2.3 5.6 6 .5-4.6 3.9 1.4 5.9L12 15.3l-5.1 3.1 1.4-5.9-4.6-3.9 6-.5z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
+<button class="gear achbtn" id="achBtn_v8" aria-label="Başarılar"><i class="gdot" id="achDot_v8"></i><span style="font-size:20px">🏆</span></button>
 <button class="gear rankbtn" id="rankBtn_v8" aria-label="Sıralama"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M7 4h10v4.5a5 5 0 0 1-10 0z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M7 6H4.5v1.2A3 3 0 0 0 7.4 10M17 6h2.5v1.2a3 3 0 0 1-2.9 2.8M12 13.5V17M8.5 20h7M9.5 17h5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="gear questbtn" id="questBtn_v8" aria-label="Görevler"><i class="gdot" id="questDot_v8"></i><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><rect x="4.5" y="4" width="15" height="17.5" rx="2.6" fill="#fff8e6" style="stroke:#8a5a1c" stroke-width="1.6"/><rect x="8.5" y="2.4" width="7" height="3.6" rx="1.3" fill="#e0473a" style="stroke:#8a5a1c" stroke-width="1.2"/><path d="M7.6 10.4l1.5 1.5 2.6-2.8M7.6 15.6l1.5 1.5 2.6-2.8" fill="none" style="stroke:#2f9a43" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.4 10.6h3.4M13.4 15.8h3.4" style="stroke:#8a5a1c" stroke-width="1.6" stroke-linecap="round"/></svg></button>
   <button class="gear mailbtn" id="mailBtn_v8" aria-label="Mektuplar"><i class="gdot" id="mailDot_v8"></i><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M4 7.5l8 6 8-6" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
@@ -865,6 +889,7 @@ body{font-family:var(--body);letter-spacing:.1px}
       </div>
       <div class="admbar"><input id="admQ_v8" placeholder="Oyuncu ara" autocomplete="off"><div class="seg" id="admSeg_v8"><button data-af="all" aria-pressed="true">Hepsi</button><button data-af="on" aria-pressed="false">Çevrimiçi</button><button data-af="pun" aria-pressed="false">Cezalı</button></div></div>
       <div id="admList_v8"></div>
+      <button class="big sm" id="admAnaBtn_v8">📊 Analytics</button>
       <button class="big ghost" id="admClose_v8">Kapat</button>
     </div>
   </div>
@@ -920,7 +945,22 @@ body{font-family:var(--body);letter-spacing:.1px}
       <button class="big ghost" id="mailClose_v8">Kapat</button>
     </div>
   </div>
-  <div class="modal" id="settings_v8">
+  <div class="modal" id="login_v8">
+    <div class="box">
+      <button class="lg-x" id="loginX_v8" type="button" aria-label="Kapat">×</button>
+      <h1>🎁 Günlük Ödül</h1>
+      <p class="lg-streak" id="loginStreak_v8"></p>
+      <div class="lg-grid" id="loginGrid_v8"></div>
+      <button class="big green" id="loginBtn_v8" type="button">Bugünkü ödülünü al</button>
+      <button class="linkbtn" id="loginLater_v8" type="button">Daha sonra</button>
+    </div>
+  </div>
+  <div class="modal" id="ach_v8"><div class="box"><button class="lg-x" onclick="closeAch()" aria-label="Kapat" style="position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:var(--panel2)">×</button><h1>🏆 Başarılar</h1><div id="achCnt_v8" style="font-weight:800"></div><div class="ach-tabs" id="achTabs_v8"></div><div id="achList_v8" style="max-height:55vh;overflow:auto"></div></div></div>
+<div class="modal" id="weekly_v8"><div class="box"><button onclick="closeWeekly()" aria-label="Kapat" style="position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:var(--panel2)">×</button><div id="weeklyBody_v8"></div></div></div>
+<div class="modal" id="dm_v8"><div class="box"><button onclick="closeDm()" aria-label="Kapat" style="position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:var(--panel2)">×</button><h1 id="dmTitle_v8">💬 Mesajlar</h1><div id="dmList_v8" style="max-height:45vh;overflow:auto"></div><form id="dmForm_v8" class="composer" hidden><input id="dmIn_v8" maxlength="200" placeholder="Mesaj yaz" autocomplete="off"><button class="big green sm" id="dmSend_v8">Gönder</button></form></div></div>
+<div class="modal" id="gift_v8"><div class="box"><button onclick="closeGift()" aria-label="Kapat" style="position:absolute;top:8px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:var(--panel2)">×</button><div id="giftBody_v8"></div></div></div>
+<div class="modal" id="analytics_v8"><div class="box"><h1>📊 Analytics</h1><div id="anaBody_v8" style="max-height:55vh;overflow:auto"></div><button class="big ghost" id="anaClose_v8">Kapat</button></div></div>
+<div class="modal" id="settings_v8">
     <div class="box set">
       <h1>Ayarlar</h1>
       <div class="sgroup">
@@ -929,6 +969,12 @@ body{font-family:var(--body);letter-spacing:.1px}
       </div>
       <div class="sgroup">
         <div class="srow"><div><b>Hasat bildirimleri</b><span id="notifNow_v8">Ekinlerin hazır olunca telefonuna haber gelir</span></div><button class="switch" id="notifSw_v8" role="switch" aria-checked="false"><i></i></button></div>
+      </div>
+      <div class="sgroup">
+        <div class="srow"><div><b>Titreşim</b><span>Dokunma ve ödül titreşimi</span></div><button class="switch" id="hapSw_v8" role="switch" aria-checked="true"><i></i></button></div>
+        <div class="srow"><div><b>Anonim kullanım verisi</b><span>Oyunu geliştirmek için basit kullanım kaydı</span></div><button class="switch" id="anaSw_v8" role="switch" aria-checked="true"><i></i></button></div>
+        <div class="srow"><div><b>Ses efektleri</b><span>Ekme, hasat, altın ve düğme sesleri</span></div><button class="switch" id="sfxSw_v8" role="switch" aria-checked="true"><i></i></button></div>
+        <div class="srow"><div><b>Ses efekti seviyesi</b></div><input type="range" id="sfxVol_v8" min="0" max="100" value="70" aria-label="Ses efekti seviyesi"></div>
       </div>
       <div class="sgroup">
         <div class="srow"><div><b>Grafik kalitesi</b><span id="gfxNow_v8"></span></div></div>
@@ -1012,7 +1058,9 @@ body{font-family:var(--body);letter-spacing:.1px}
     <div class="ld-tip" id="ldTip_v8"></div>
     <div class="ld-foot"><b id="ldText_v8">Oyun yükleniyor</b><div class="ld-bar"><i id="ldFill_v8"></i></div><span class="ld-pct" id="ldPct_v8">0%</span></div>
   </div>
-  <div class="toast" id="toast_v8"></div>
+  <button id="wkBadge_v8" style="position:absolute;left:8px;bottom:8px;z-index:30;border:2px solid var(--line);background:var(--panel);border-radius:14px;padding:4px 10px;font-weight:800" hidden></button>
+<button id="dmBadge_v8" aria-label="Mesajlar" style="position:absolute;left:8px;bottom:46px;z-index:30;border:2px solid var(--line);background:var(--panel);border-radius:14px;padding:4px 10px;font-weight:800;font-size:1.05rem">💬<i id="dmCnt_v8" style="display:none;margin-left:4px;min-width:18px;padding:0 5px;border-radius:9px;background:#e0473a;color:#fff;font-size:.75rem;font-style:normal"></i></button><button id="giftBadge_v8" style="position:absolute;left:8px;bottom:84px;z-index:30;border:2px solid var(--line);background:var(--panel);border-radius:14px;padding:4px 10px;font-weight:800" hidden></button>
+<div class="toast" id="toast_v8"></div>
 </div>
 
 <script>
@@ -1441,10 +1489,10 @@ const depLv = f => Math.max(1, Math.min(DEPOT_CAP.length, Math.floor(+(f && f.de
 const depCap = f => DEPOT_CAP[depLv(f) - 1];
 const depUsed = f => STORE_KEYS.reduce((a, k) => a + Math.max(0, Math.floor(+(f && f.store && f.store[k]) || 0)), 0);
 const depFree = f => Math.max(0, depCap(f) - depUsed(f));
-function depotFullHint() { hint("Depo dolu! Ürün satarak yer aç ya da depoyu geliştir."); }
+function depotFullHint() { hint("Depo dolu! Ürün satarak yer aç ya da depoyu geliştir."); SFX.play("error"); }
 const cropOpen = k => !!(CROPS[k] && S && (S.level >= CROPS[k].lv || isAdmin()));
 const cropOf = p => CROPS[p && p.c] || CROPS.wheat;
-const growMs = p => cropOf(p).ms;
+const growMs = p => cropOf(p).ms / (typeof growMul === "function" ? growMul() : 1);
 const ripe = p => !!(p && p.c && p.w && Date.now() - p.w >= growMs(p));
 // tools in the bottom bar: how many ripe crops one swing gathers
 const TOOLS = { scythe: { name: "Tırpan", n: 1, price: 0, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M31 4L12 37" stroke="#8a5a32" stroke-width="3.6" stroke-linecap="round"/><path d="M29.5 7c-8-6-21-5-26.5 3.5 7.5-3 16-3 23.5 1.5z" fill="#d3d8dc" stroke="#5c6670" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 10q10-4 21 0" stroke="#fff" stroke-width="1" opacity=".7" fill="none"/><path d="M19 23l7 3.5" stroke="#6b4423" stroke-width="3.2" stroke-linecap="round"/></svg>' }, escythe: { name: "Elektrikli tırpan", n: 2, price: 1000, icon: '<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><path d="M29 7L11 33" stroke="#4a4f55" stroke-width="3.6" stroke-linecap="round"/><rect x="24" y="1.5" width="12" height="8.5" rx="2.5" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5" transform="rotate(35 30 6)"/><path d="M17 20l7.5 3.5" stroke="#2f3338" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="10" cy="33.5" rx="7.5" ry="3.6" fill="#e3742f" stroke="#7a3a12" stroke-width="1.5"/><path d="M2.5 36l15-2.5" stroke="#ffe27a" stroke-width="1.8"/><path d="M34 15l-4.5 6.5h4.5l-3.5 6.5" stroke="#f2b400" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>' },
@@ -1538,11 +1586,14 @@ function saveOnExit() {
 setInterval(() => { if (alive() && entered && S) { dirty = true; flush(); } }, 8000);
 document.addEventListener("visibilitychange", () => { if (document.hidden && alive()) saveOnExit(); });
 window.addEventListener("pagehide", () => { if (alive()) saveOnExit(); });
-window.addEventListener("beforeunload", () => { if (alive()) saveOnExit(); });
+window.addEventListener("beforeunload", () => { try { ANALYTICS.log("session_end"); ANALYTICS.flush(); } catch (e) {} if (alive()) saveOnExit(); });
 
 // ---------- UI helpers ----------
 let toastT, hintT;
-function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("on"), 2600); }
+let toastQ = [], toastBusy = false;
+let lastToastT = "", lastToastAt = 0;
+function toast(t) { const nw = Date.now(); if (t === lastToastT && nw - lastToastAt < 4000) { lastToastAt = nw; return; } lastToastT = t; lastToastAt = nw; if (toastQ.length >= 5) return; toastQ.push(t); if (!toastBusy) toastNext(); }
+function toastNext() { const t = toastQ.shift(); if (t === undefined) { toastBusy = false; return; } toastBusy = true; const el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => { el.classList.remove("on"); setTimeout(toastNext, 220); }, 2200); }
 function hint(t, ms) { $("hint").textContent = t; clearTimeout(hintT); hintT = setTimeout(() => $("hint").textContent = "", ms || 3800); }
 function popAt(x, y, text, color) {
   R3.pops.push({ x, y, text, color: color || "#fff", t0: performance.now() });
@@ -1571,7 +1622,7 @@ function renderHud() {
 const weekKey = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
 const monthKey = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1); };
 function gainXp(n) {
-  n = Math.max(0, Math.round(+n || 0));
+  n = Math.max(0, Math.round(+n || 0)); try { n = Math.round(n * weeklyXpMul()); weeklyEvent("xp", n); } catch (e) {}
   if (n) { const wk = weekKey(), mk = monthKey();
     S.xpTotal = (+S.xpTotal || 0) + n;
     S.xpW = S.xpW && S.xpW.k === wk ? { k: wk, v: (+S.xpW.v || 0) + n } : { k: wk, v: n };
@@ -1579,7 +1630,7 @@ function gainXp(n) {
   if (S.level >= MAX_LEVEL) { S.level = MAX_LEVEL; S.xp = 0; return; }
   S.xp += n;
   while (S.level < MAX_LEVEL && S.xp >= xpNeed(S.level)) {
-    S.xp -= xpNeed(S.level); S.level++;
+    S.xp -= xpNeed(S.level); S.level++; SFX.play("levelup");
     toast(S.level === CHAT_LEVEL ? "Seviye " + S.level + ": sohbet, toprak satın alma ve dilek çeşmesi açıldı" : "Seviye " + S.level);
     renderChatFoot();
   }
@@ -1804,13 +1855,13 @@ function doAction(t) {
       .sort((a, b) => Math.hypot(rowOf(a.cell) - r0, colOf(a.cell) - c0) - Math.hypot(rowOf(b.cell) - r0, colOf(b.cell) - c0)).slice(0, sprN());
     for (const pl of todo) { if (sp.w <= 0) break; pl.w = now; sp.w--; done.push(pl.cell); }
     if (!done.length) { pop(t.cell, "Su: " + sp.w + "/" + sprCap(), "#bfe9ff"); hint("Fıskiyenin yakınında sulanacak ekin yok. İçinde " + sp.w + "/" + sprCap() + " su var."); return; }
-    gainXp(done.length * XP.water); questEv("water", done.length); dailyEv("water", done.length); pop(t.cell, done.length + " ekin sulandı, su " + sp.w + "/" + sprCap(), "#bfe9ff"); if (R3.glow) R3.glow(done.slice(0, 8), "#7fd6ff", 700);
+    gainXp(done.length * XP.water); SFX.play("water"); questEv("water", done.length); dailyEv("water", done.length); pop(t.cell, done.length + " ekin sulandı, su " + sp.w + "/" + sprCap(), "#bfe9ff"); if (R3.glow) R3.glow(done.slice(0, 8), "#7fd6ff", 700);
     saveNow();
   }
   else if (t.k === "tree") {
     const tr = treeAt(S, t.cell); if (!treeRipe(tr)) return;
     if (depFree(S) < 1) { depotFullHint(); return; }
-    tr.t = now; S.store.apple = (+S.store.apple || 0) + 1; questEv("harvest", 1); dailyEv("harv:apple", 1); saveNow();
+    tr.t = now; S.store.apple = (+S.store.apple || 0) + 1; questEv("harvest", 1); dailyEv("harv:apple", 1); SFX.play("pick"); saveNow();
     try { gainXp(XP.apple); pop(t.cell, "+1 elma", "#ffb3a8"); } catch (e) { console.error(e); }
   }
   else {
@@ -1821,15 +1872,15 @@ function doAction(t) {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || q2.c) continue;
         adminTopUp();
-        if (S.gold < C.seed) { hint("Yeterli altının yok. " + C.name + " tohumu " + C.seed + " altın."); break; }
-        S.gold = round1(S.gold - C.seed); q2.c = cr; q2.p = now; q2.w = 0; gainXp(XP[cr] || XP.wheat); questEv("plant", 1); dailyEv("plant", 1);
+        if (S.gold < C.seed) { hint("Yeterli altının yok. " + C.name + " tohumu " + C.seed + " altın."); SFX.play("error"); break; }
+        S.gold = round1(S.gold - C.seed); q2.c = cr; q2.p = now; q2.w = 0; gainXp(XP[cr] || XP.wheat); questEv("plant", 1); dailyEv("plant", 1); SFX.play("plant");
         pop(c, "-" + fmtG(C.seed) + " altın", "#ffd0c4");
       }
     } else if (t.k === "water") {
       for (const c of taskCells(t)) {
         const q2 = plotAt(S, c); if (!q2 || !q2.c || q2.w) continue;
-        if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); break; }
-        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); dailyEv("water", 1); pop(c, "Sulandı", "#bfe9ff");
+        if (S.bucket <= 0) { hint("Kovan boş. Su kuyusuna dokun."); SFX.play("error"); break; }
+        S.bucket--; q2.w = now; gainXp(XP.water); questEv("water", 1); dailyEv("water", 1); pop(c, "Sulandı", "#bfe9ff"); SFX.play("water");
       }
     } else if (t.k === "harvest") {
       if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
@@ -1837,7 +1888,7 @@ function doAction(t) {
       taskCells(t).forEach(c => {
         const q = c == null ? null : plotAt(S, c); if (!ripe(q)) return;
         if (depFree(S) < 1) { full = true; return; }
-        const key = q.c; q.c = null; q.p = 0; q.w = 0; S.store[key] = (+S.store[key] || 0) + 1; questEv("harvest", 1); dailyEv("harv:" + key, 1);
+        const key = q.c; q.c = null; q.p = 0; q.w = 0; S.store[key] = (+S.store[key] || 0) + 1; if (typeof luckMul === "function" && Math.random() < luckMul() - 1 && depFree(S) >= 1) S.store[key]++; questEv("harvest", 1); dailyEv("harv:" + key, 1); SFX.play("harvest");
         try { gainXp(XP[key] || XP.wheat); pop(c, "+1 " + CROPS[key].name.toLocaleLowerCase("tr"), "#ffe27a"); } catch (e) { console.error(e); }
         if (depFree(S) >= 1 && Math.random() < woodChance(S)) { S.store.wood = (+S.store.wood || 0) + 1; setTimeout(() => { try { pop(c, "+1 tahta 🪵", "#f1c98a"); } catch (e) {} }, 450); }
       });
@@ -1919,6 +1970,7 @@ async function processClaims() {
   if (procAgain) { procAgain = false; processClaims(); }
 }
 async function writeJobAd() {
+  try { achEvent("jobad"); } catch (e) {}
   if (!db || !uid || !online) return false;
   const h = S.hire || { open: false, wage: 2 };
   try { await db.doc("jobs/" + uid).set({ owner: uid, name: S.name, lvl: S.level, wage: h.wage, open: adListed(), ts: +h.at || 0 }); return true; }
@@ -2521,7 +2573,7 @@ function showLoader(text, ms, hold) {
 function enterScene(sc) {
   try { objMenuHide(); } catch (e) {}
   setTimeout(() => { try { renderHotbar(); sendPos(true); } catch (e) {} }, 0);
-  showLoader(firstScene ? "Çiftliğin hazırlanıyor" : sc.kind === "plaza" ? "Meydana gidiliyor" : sc.kind === "visit" ? (sc.farm && sc.farm.name ? sc.farm.name : "Çiftçi") + " Çiftliğine gidiliyor" : "Çiftliğine dönülüyor", firstScene ? 2600 : 3300);
+  showLoader(firstScene ? "Çiftliğin hazırlanıyor" : sc.kind === "plaza" ? "Meydana gidiliyor" : sc.kind === "visit" ? (sc.farm && sc.farm.name ? sc.farm.name : "Çiftçi") + " Çiftliğine gidiliyor" : "Çiftliğine dönülüyor", firstScene ? 1400 : 2000);
   firstScene = false;
   if (visitUnsub) { visitUnsub(); visitUnsub = null; }
   if (!(sc.kind === "visit" && sc.job)) { workJob = null; pending.clear(); }
@@ -2594,6 +2646,7 @@ function cleanFarm(d) {
 }
 const cleanFarmFull = cleanFarm;
 async function visitFarm(fuid, job) {
+  try { achEvent("visit"); ANALYTICS.log("screen_view", { s: "visit" }); } catch (e) {}
   if (fuid === BOT_UID) { closeAll(); closeProfile(); workJob = null; enterScene({ kind: "visit", owner: BOT_UID, farm: botFarm(), job: false });
     const tick = setInterval(() => { if (!alive() || scene.kind !== "visit" || scene.owner !== BOT_UID) { clearInterval(tick); return; } scene.farm = botFarm(); renderPlots(); renderFences(); }, 20000);
     visitUnsub = () => clearInterval(tick); return; }
@@ -2695,7 +2748,7 @@ function collectAnimals(kind) {
   animalsOf(S, kind).forEach(a => { if (a.f && now - a.f >= A.ms) { ready++; if (free > 0) { a.f = 0; n++; free--; } } });
   if (ready && !n) { depotFullHint(); return 0; }
   if (!n) { const I = animalInfo(S, kind, now); hint(I.n ? (I.hungry === I.n ? "Hayvanların aç, önce yem ver." : A.prodName + " henüz hazır değil, " + fmt(I.next) + " kaldı.") : "Önce " + A.one.toLocaleLowerCase("tr") + " almalısın."); return 0; }
-  S.store[A.prod] = (+S.store[A.prod] || 0) + n; gainXp(n * XP[A.prod]); dailyEv("prod:" + A.prod, n);
+  S.store[A.prod] = (+S.store[A.prod] || 0) + n * (typeof prodMul === "function" ? prodMul() : 1); gainXp(n * XP[A.prod]); SFX.play("animal"); dailyEv("prod:" + A.prod, n);
   popAt(colOf(S.layout[kind]) + 1, rowOf(S.layout[kind]), "+" + n + " " + A.prodName.toLocaleLowerCase("tr"), "#fff6c9");
   saveNow(); renderHud(); renderPlots(); return n;
 }
@@ -2743,7 +2796,7 @@ $("farmbBody").addEventListener("click", e => {
   if (A("data-acollect")) collectAnimals(kind);
   else if (A("data-afeed")) feedAnimals(kind);
   else if (A("data-abuy")) { const An = ANIMALS[kind]; adminTopUp(); if (animalsOf(S, kind).length >= An.cap || S.gold < An.price) return;
-    S.gold = round1(S.gold - An.price); S[An.list] = animalsOf(S, kind).concat([{ f: 0 }]); saveNow(); renderHud(); renderPlots(); R3.dirty = true; toast(An.one + " alındı, onu doyurmayı unutma"); }
+    S.gold = round1(S.gold - An.price); SFX.play("buy"); S[An.list] = animalsOf(S, kind).concat([{ f: 0 }]); saveNow(); renderHud(); renderPlots(); R3.dirty = true; toast(An.one + " alındı, onu doyurmayı unutma"); }
   else if (A("data-mminus")) { const k = A("data-mminus"); millAmt[k] = Math.max(1, millAmt[k] - 1); }
   else if (A("data-mplus")) { const k = A("data-mplus"); millAmt[k]++; }
   else if (A("data-mmax")) { millAmt[A("data-mmax")] = 999; }
@@ -2845,7 +2898,7 @@ function fenceTap(i) {
   if (!layoutOk(H, cellAt(me))) { hint("Bu çit topraklarına, ağaçlarına, suya, eve ya da depoya giden yolu kapatır."); return; }
   const price = fencePrice(S.fencesBought);
   if (S.gold < price) { hint("Bu çit için " + price + " altın gerekiyor."); return; }
-  S.gold = round1(S.gold - price); S.fencesBought++; S.fences.push(i);
+  S.gold = round1(S.gold - price); SFX.play("buy"); S.fencesBought++; S.fences.push(i);
   pop(i, "-" + price + " altın", "#ffd0c4"); renderHud(); setMode("fence"); save();
 }
 function landTap(i) {
@@ -2854,7 +2907,7 @@ function landTap(i) {
   if (!freeCell(S, i, occMap(S))) { if (inOwned(S, i)) hint("Toprağı sadece boş çimenli karelere açabilirsin."); else offerExpand(); return; }
   adminTopUp(); const lp = landPrice(S.landBought);
   if (S.gold < lp) { hint("Bir toprak için " + lp + " altın gerekiyor."); return; }
-  S.gold = round1(S.gold - lp); S.landBought = (S.landBought || 0) + 1;
+  S.gold = round1(S.gold - lp); SFX.play("buy"); S.landBought = (S.landBought || 0) + 1;
   S.plots.push({ cell: i, c: null, p: 0, w: 0 });
   pop(i, "-" + lp + " altın", "#ffd0c4"); renderHud(); save();
   setMode(S.landBought >= landMax(S) ? "none" : "land");
@@ -2919,7 +2972,7 @@ function sprTap(i) {
   if (S.gold < SPR_PRICE) { hint("Fıskiye " + SPR_PRICE + " altın."); setMode("none"); return; }
   const H = tryFarm(); H.spr.push({ cell: i, w: sprCap() });
   if (!layoutOk(H, cellAt(me))) { hint("Buraya koyarsan bir yolu kapatır."); return; }
-  S.gold = round1(S.gold - SPR_PRICE); S.spr = H.spr;
+  S.gold = round1(S.gold - SPR_PRICE); SFX.play("buy"); S.spr = H.spr;
   pop(i, "-" + SPR_PRICE + " altın", "#ffd0c4"); renderHud(); saveNow(); setMode("none"); renderPlots(); renderFences();
 }
 let decorKind = null;
@@ -2931,7 +2984,7 @@ function decorTap(i) {
   if (S.gold < D.price) { hint(D.name + " " + fmtBig(D.price) + " altın."); setMode("none"); return; }
   const H = tryFarm(); H.decor.push({ t: decorKind, cell: i });
   if (!layoutOk(H, cellAt(me))) { hint("Buraya koyarsan bir yolu kapatır."); return; }
-  S.gold = round1(S.gold - D.price); S.decor = H.decor;
+  S.gold = round1(S.gold - D.price); SFX.play("buy"); S.decor = H.decor;
   pop(i, "-" + fmtBig(D.price) + " altın", "#ffd0c4"); renderHud(); saveNow(); setMode("none"); renderPlots(); renderFences();
 }
 function treeTap(i) {
@@ -2940,7 +2993,7 @@ function treeTap(i) {
   if (S.gold < TREE_PRICE) { hint("Bir elma ağacı " + TREE_PRICE + " altın."); return; }
   const H = tryFarm(); H.trees.push({ cell: i, t: Date.now() });
   if (!layoutOk(H, cellAt(me))) { hint("Buraya ağaç dikersen bir yolu kapatır."); return; }
-  S.gold = round1(S.gold - TREE_PRICE); S.trees.push({ cell: i, t: Date.now() });
+  S.gold = round1(S.gold - TREE_PRICE); SFX.play("buy"); S.trees.push({ cell: i, t: Date.now() });
   pop(i, "-" + TREE_PRICE + " altın", "#ffd0c4"); renderHud(); save(); setMode("tree");
 }
 // where an item would land if dropped on cell i (multi-cell buildings centre on the finger)
@@ -3011,7 +3064,7 @@ function sellSelected() {
   else if (OVENS.includes(sel.t)) { S.layout[sel.t] = -1; S[sel.t] = false; if (S.bakes) delete S.bakes[sel.t]; if (S.ovenLv) delete S.ovenLv[sel.t]; }
   else if (sel.t === "fence") { S.fences = S.fences.filter(f => f !== sel.from); S.fencesBought = Math.max(0, (S.fencesBought || 0) - 1); }
   else if (sel.t === "plot") { S.plots = S.plots.filter(p => p.cell !== sel.from); S.landBought = Math.max(0, (S.landBought || 0) - 1); }
-  S.gold = round1(S.gold + back); pop(sel.from, "+" + fmtG(back) + " altın", "#ffe27a");
+  S.gold = round1(S.gold + back); SFX.seq("sell", "coin"); pop(sel.from, "+" + fmtG(back) + " altın", "#ffe27a");
   moveSel = null; saveNow(); renderHud(); setMode("move"); spawnHens();
 }
 $("modeSell").onclick = sellSelected;
@@ -3685,7 +3738,7 @@ function renderMarket0() {
         : !placed ? `<button class="big green sm" data-oplace="${id}">Yerleştir</button>` : `<span class="pill">Çiftliğinde · ${ovenLv(S, id)}. seviye</span>`}</div></div></div>`; }).join("");
     const go = id => { closeAll(); placeKind = id; setMode("place"); };
     body.querySelectorAll("[data-obuy]").forEach(b => b.onclick = () => { const id = b.getAttribute("data-obuy"); if (ovenOwned(S, id) || S.gold < OVEN_PRICE || (id === "oven2" && S.level < OVEN2_LEVEL && !isAdmin())) return;
-      S.gold = round1(S.gold - OVEN_PRICE); S[id] = true; renderHud(); saveNow(); go(id); });
+      S.gold = round1(S.gold - OVEN_PRICE); SFX.play("buy"); S[id] = true; renderHud(); saveNow(); go(id); });
     body.querySelectorAll("[data-oplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-oplace")));
   } else if (mtab === "animals") {
     const info = { coop: `${COOP_CAP} tavuk sığar. Tavuklar yem yiyince ${EGG_MS / MIN} dakikada yumurtlar.`, cowbarn: `${COW_CAP} inek sığar. İnekler yem yiyince ${MILK_MS / MIN} dakikada süt verir.`, mill: "Buğdaydan tavuk yemi, mısır ve buğdaydan inek yemi yapar." };
@@ -3695,7 +3748,7 @@ function renderMarket0() {
           : !placed ? `<button class="big green sm" data-bplace="${k}">Yerleştir</button>` : `<span class="pill">Çiftliğinde</span>`}</div></div></div>`; }).join("");
     const go = k => { closeAll(); placeKind = k; setMode("place"); };
     body.querySelectorAll("[data-bbuy]").forEach(b => b.onclick = () => { const k = b.getAttribute("data-bbuy"); adminTopUp(); if (ownedB(S, k) || S.gold < bPrice(k) || (S.level < bLevel(k) && !isAdmin())) return;
-      S.gold = round1(S.gold - bPrice(k)); S[k] = true; renderHud(); saveNow(); go(k); });
+      S.gold = round1(S.gold - bPrice(k)); SFX.play("buy"); S[k] = true; renderHud(); saveNow(); go(k); });
     body.querySelectorAll("[data-bplace]").forEach(b => b.onclick = () => go(b.getAttribute("data-bplace")));
   } else if (mtab === "tools") {
     body.innerHTML = Object.keys(TOOLS).map(k => { const T = TOOLS[k], own = S.tools.includes(k), sel = S.slot === k;
@@ -3710,7 +3763,7 @@ function renderMarket0() {
     body.querySelectorAll("[data-tbuy]").forEach(b => b.onclick = () => {
       const k = b.getAttribute("data-tbuy"), T = TOOLS[k];
       if (S.tools.includes(k) || S.gold < T.price || S.level < (TOOL_LEVEL[k] || 0)) return;
-      S.gold = round1(S.gold - T.price); S.tools.push(k); renderHud(); saveNow(); selectTool(k); renderMarket();
+      S.gold = round1(S.gold - T.price); SFX.play("buy"); S.tools.push(k); renderHud(); saveNow(); selectTool(k); renderMarket();
       toast(T.name + " alındı, alttaki çubukta");
     });
   } else if (mtab === "land") {
@@ -3728,7 +3781,7 @@ function renderMarket0() {
     $("buyLand").onclick = () => { if (S.level < LAND_LEVEL || (S.landBought || 0) >= landMax(S)) return; closeAll(); setMode("land"); };
     $("expand").onclick = () => {
       adminTopUp(); if (farmSize(S) >= EXPAND_MAX || S.gold < expandPrice(S) || S.level < expandLevel(S)) return;
-      S.gold = round1(S.gold - expandPrice(S)); S.size = farmSize(S) + 1;
+      S.gold = round1(S.gold - expandPrice(S)); SFX.play("buy"); S.size = farmSize(S) + 1;
       renderHud(); renderPlots(); renderFences(); spawnHens(); saveNow(); renderMarket();
       toast(farmSize(S) < EXPAND_MAX ? "Yeni bölge açıldı. Sisin ardında bir bölge daha var." : "Bütün arazi artık senin");
     };
@@ -3745,13 +3798,13 @@ function renderMarket0() {
       ${sprLv(S) >= SPR_MAX ? `<p>Fıskiyelerin en üst seviyede.</p>` : `<p><span class="price">${SPR_UP[sprLv(S)]} altın</span> ile ${sprLv(S) + 1}. seviye: ${SPR_CAPS[sprLv(S) + 1]} su, ${SPR_NS[sprLv(S) + 1]} ekin</p>
       <div class="row"><button class="big green sm" id="upSpr_v8" ${S.gold >= SPR_UP[sprLv(S)] ? "" : "disabled"}>${S.gold >= SPR_UP[sprLv(S)] ? "Geliştir" : "Altının yetmiyor"}</button></div>`}</div></div>`;
     { const us = $("upSpr"); if (us) us.onclick = () => { adminTopUp(); const l = sprLv(S), c = SPR_UP[l]; if (l >= SPR_MAX || S.gold < c) return;
-      S.gold = round1(S.gold - c); S.sprLv = l + 1; (S.spr || []).forEach(sp => sp.w = sprCap()); saveNow(); toast("Fıskiyeler " + S.sprLv + ". seviye oldu ve suları doldu"); renderHud(); renderPlots(); save(); renderMarket(); }; }
+      S.gold = round1(S.gold - c); SFX.play("buy"); S.sprLv = l + 1; (S.spr || []).forEach(sp => sp.w = sprCap()); saveNow(); toast("Fıskiyeler " + S.sprLv + ". seviye oldu ve suları doldu"); renderHud(); renderPlots(); save(); renderMarket(); }; }
     $("buySpr").onclick = () => { adminTopUp(); if (S.gold < SPR_PRICE) return; closeAll(); setMode("spr"); };
     const b = $("upWell");
     if (b) b.onclick = () => {
       adminTopUp(); const lv2 = wellLv(S), c2 = wellCost(lv2);
       if (lv2 >= WELL_MAX || S.gold < c2) return;
-      S.gold = round1(S.gold - c2); S.well = lv2 + 1; S.bucket = bucketMax(); saveNow();
+      S.gold = round1(S.gold - c2); SFX.play("buy"); S.well = lv2 + 1; S.bucket = bucketMax(); saveNow();
       renderHud(); renderPlots(); save(); renderMarket();
     };
   } else {
@@ -3877,7 +3930,7 @@ $("ovenBody").addEventListener("click", e => {
   }
   if (A("data-oup")) {
     adminTopUp(); const lv = ovenLv(S, id); if (lv >= OVEN_MAX || S.gold < OVEN_UP[lv]) return;
-    S.gold = round1(S.gold - OVEN_UP[lv]); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderOven();
+    S.gold = round1(S.gold - OVEN_UP[lv]); SFX.play("buy"); S.ovenLv = S.ovenLv || {}; S.ovenLv[id] = lv + 1; saveNow(); renderHud(); renderOven();
     toast(OBJ[id].name + " " + (lv + 1) + ". seviye oldu"); return;
   }
 });
@@ -3907,7 +3960,7 @@ function depotUpgrade() {
   const up = DEPOT_UP[lv - 1];
   if (S.gold < up.g) { hint("Depoyu geliştirmek için " + fmtG(up.g) + " altın gerekiyor."); return; }
   if ((+S.store.wood || 0) < up.wood) { hint("Depoyu geliştirmek için " + up.wood + " tahta gerekiyor."); return; }
-  S.gold = round1(S.gold - up.g); S.store.wood -= up.wood; S.depLv = lv + 1;
+  S.gold = round1(S.gold - up.g); SFX.play("buy"); S.store.wood -= up.wood; S.depLv = lv + 1;
   saveNow(); renderHud(); renderDepot(); toast("Depon " + S.depLv + ". seviye oldu! Kapasite: " + depCap(S) + " 📦");
 }
 function renderDepot() {
@@ -3941,9 +3994,9 @@ $("depotBody").addEventListener("click", e => {
   const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr || pr.key === "wood") return;
   const have = +S.store[pr.key] || 0, k = b.getAttribute("data-n") === "all" ? have : Math.min(1, have);
   if (!k) return;
-  S.store[pr.key] = have - k; S.gold = round1(S.gold + k * pr.price); questEv("sell", k); dailyEv("sellg", k * pr.price);
+  S.store[pr.key] = have - k; const gv = k * pr.price * (typeof goldMul === "function" ? goldMul() : 1); S.gold = round1(S.gold + gv); questEv("sell", k); dailyEv("sellg", gv); try { achEvent("earn", gv); } catch (e) {} SFX.seq("sell", "coin");
   renderHud(); renderPlots(); save(); renderDepot();
-  popAt(me.x, me.y - .3, "+" + fmtG(k * pr.price) + " altın", "#ffe27a");
+  popAt(me.x, me.y - .3, "+" + fmtG(gv) + " altın", "#ffe27a");
 });
 
 // ---------- Pazar: players sell their products to each other on the plaza stalls ----------
@@ -3979,6 +4032,7 @@ async function pzCollect() {
   }
 }
 async function pzBuy(id) {
+  try { achEvent("pazar"); ANALYTICS.log("pazar_trade", { t: "buy" }); } catch (e) {}
   const l = pzAll.find(x => x.id === id); if (pzBusy || !l || l.buyer || l.seller === uid) return;
   if (S.gold < l.price) { hint("Yeterli altının yok."); return; }
   pzBusy = true; renderPazar();
@@ -3988,13 +4042,14 @@ async function pzBuy(id) {
     if (S.gold < +d.price) { hint("Yeterli altının yok."); return; }
     if (depFree(S) < Math.floor(+d.q)) { hint("Depoda yeterli yer yok. Önce yer aç ya da depoyu geliştir."); return; }
     await db.doc("market/" + id).update({ buyer: uid, bn: String(S.name || "Çiftçi").slice(0, 24), bt: Date.now() });
-    S.gold = round1(S.gold - (+d.price)); S.store[d.item] = (+S.store[d.item] || 0) + Math.floor(+d.q);
+    S.gold = round1(S.gold - (+d.price)); SFX.play("buy"); S.store[d.item] = (+S.store[d.item] || 0) + Math.floor(+d.q);
     saveNow(); renderHud(); renderPlots(); coinBurst($("pazarBody"), 6);
     toast(d.q + " " + itemName(d.item).toLocaleLowerCase("tr") + " aldın, depona kondu 📦");
   } catch (e) { toast("Satın alınamadı, başka bir çiftçi almış olabilir."); }
   finally { pzBusy = false; renderPazar(); }
 }
 async function pzPut() {
+  try { achEvent("pazar"); ANALYTICS.log("pazar_trade", { t: "put" }); } catch (e) {}
   const f = pzForm; if (pzBusy || !f) return;
   const have = +S.store[f.k] || 0, q = Math.min(have, Math.max(1, Math.floor(f.q))), p = Math.min(pzMax(f.k, q), Math.max(1, Math.floor(+f.p || 0)));
   if (!have || q < 1) return; if (pzMine.length >= PAZAR_SLOTS) { hint("Bütün tezgahların dolu."); return; }
@@ -4031,7 +4086,7 @@ function renderPazar() {
       <p>Satıcı: <b>${esc(String(l.sn || "Çiftçi").slice(0, 24))}</b> · ${pzAgo(l.ts)}</p>
       <p><span class="price">${fmtG(l.price)} altın</span> <small class="${cheap ? "pzcheap" : "pzunit"}">tanesi ${fmtG(round1(unit))}${cheap ? " · depodan ucuz!" : ""}</small></p>
       <div class="row"><button class="big green sm" data-pzbuy="${l.id}" ${S.gold < l.price || pzBusy ? "disabled" : ""}>${S.gold < l.price ? "Altının yetmiyor" : "Satın al"}</button></div></div></div>`; }).join("")
-      : `<p class="empty">Şu an pazarda satılan ürün yok.<br>Sen de <b>Tezgahım</b> bölümünden ürün satabilirsin.</p>`;
+      : `<p class="empty">🛒<br>Şu an pazarda satılan ürün yok.<br>Sen de <b>Tezgahım</b> bölümünden ürün satabilirsin.</p>`;
     body.innerHTML = h; return;
   }
   let h = `<p class="note pznote">Ürününü kendi belirlediğin fiyatla tezgaha koy. Bir çiftçi satın alınca altın kendiliğinden sana gelir.${sold ? "" : ""}</p>`;
@@ -4042,7 +4097,7 @@ function renderPazar() {
   else if (!pzForm) h += `<button class="big green" data-pznew="1">+ Tezgaha ürün koy</button>`;
   else {
     const stock = PAZAR_KEYS.filter(k => (+S.store[k] || 0) > 0);
-    if (!stock.length) h += `<p class="empty">Depoda satacak ürünün yok.</p><button class="big ghost" data-pzx="1">Vazgeç</button>`;
+    if (!stock.length) h += `<p class="empty">📦<br>Depoda satacak ürünün yok.</p><button class="big ghost" data-pzx="1">Vazgeç</button>`;
     else {
       if (!stock.includes(pzForm.k)) Object.assign(pzForm, { k: stock[0], q: Math.min(+S.store[stock[0]], 10), pe: false });
       const f = pzForm, have = +S.store[f.k] || 0; f.q = Math.min(have, Math.max(1, f.q)); if (!f.pe) f.p = f.k === "wood" ? f.q * WOOD_REF : Math.max(1, Math.round(pzVal(f.k, f.q) * 1.2)); f.p = Math.min(pzMax(f.k, f.q), Math.max(1, f.p));
@@ -4264,11 +4319,11 @@ function designAdminFarm() {
 }
 // the admin's own farm gets the show layout (gold, store, tools and name are kept)
 function makeAdminFarm() {
-  if (!S || !isAdmin() || S.adminFarm >= 5) return;
+  if (!S || !isAdmin() || S.adminFarmDone) return;
   const d = designAdminFarm();
   S.size = EXPAND_MAX; S.layout = Object.assign({ oven2: -1 }, d.layout); S.oven = true; S.well = 3; S.bucket = 20;
   S.plots = d.plots; S.trees = d.trees.map(t => ({ cell: t.cell, t: Date.now() - TREE_MS })); S.fences = d.fences; S.decor = d.decor; S.spr = d.spr;
-  S.landBought = Math.max(0, S.plots.length - DEFAULT_SOIL.length); S.fencesBought = S.fences.length; S.adminFarm = 5;
+  S.landBought = Math.max(0, S.plots.length - DEFAULT_SOIL.length); S.fencesBought = S.fences.length; S.adminFarmDone = true;
   S.pos = null; saveNow();
 }
 const pcache = new Map();
@@ -4350,11 +4405,11 @@ async function renderFriends() {
   const body = $("friendsBody");
   if (!db || !uid || !online) { body.innerHTML = personRow(BOT_UID, botFarm(), `<button class="big green sm" data-visit="${BOT_UID}">Ziyaret et</button>`) + `<p class="empty">Diğer arkadaşlar için oyunun bir sunucuya bağlı olması gerekiyor.</p>`; return; }
   if (ftab === "list") {
-    if (!S.friends.length) { body.innerHTML = `<p class="empty">Henüz arkadaşın yok. Meydanda bir çiftçiye dokun ya da Oyuncu ara sekmesinden bul.</p>`; return; }
+    if (!S.friends.length) { body.innerHTML = `<p class="empty">👥<br>Henüz arkadaşın yok. Meydanda bir çiftçiye dokun ya da Oyuncu ara sekmesinden bul.</p>`; return; }
     if (!body.querySelector(".frow")) body.innerHTML = `<p class="empty">Arkadaşların yükleniyor</p>`;
     const infos = await Promise.all(S.friends.map(f => getPlayer(f).then(d => [f, d])));
     if (ftab !== "list") return;
-    body.innerHTML = infos.map(([f, d]) => personRow(f, d, `<button class="big green sm" data-visit="${esc(f)}">Ziyaret et</button>`)).join("");
+    body.innerHTML = infos.map(([f, d]) => personRow(f, d, `<button class="big green sm" data-visit="${esc(f)}">Ziyaret et</button><button class="big sm" data-dm="${esc(f)}">Mesaj</button>`)).join("");
   } else if (ftab === "req") {
     const inc = reqIn.filter(r => r.status === "pending"), out = reqOut.filter(r => r.status === "pending");
     let h = `<h3 class="sub">Sana gelen istekler</h3>`;
@@ -4410,6 +4465,7 @@ $("pfBtns").addEventListener("click", handlePersonAction);
 // ---------- Profile ----------
 let profileUid = null;
 async function openProfile(puid) {
+  try { ANALYTICS.log("screen_view", { s: "profile" }); } catch (e) {}
   if (!puid || puid === uid || !S) return;
   if (puid !== BOT_UID && (!db || !online)) { hint("Profiller için oyunun sunucuya bağlı olması gerekiyor."); return; }
   profileUid = puid;
@@ -4429,6 +4485,7 @@ async function openProfile(puid) {
   else if (inPending(puid)) h = `<button class="big green" data-accept="${esc(puid)}">İsteği kabul et</button>`;
   else h = `<button class="big green" data-add="${esc(puid)}">Arkadaş ekle</button>`;
   if (visitorHere(puid)) h += `<button class="big kick" data-kick="${esc(puid)}">Çiftlikten kov</button>`;
+  if (puid !== BOT_UID) h += `<button class="big" data-sendgift="${esc(puid)}">🎁 Hediye gönder</button>`;
   $("pfBtns").innerHTML = h;
 }
 function closeProfile() { $("profile").classList.remove("on"); profileUid = null; }
@@ -4554,6 +4611,7 @@ $("whoBtn").onclick = () => { if (entered) openAccount(); };
 setInterval(() => { if (alive() && entered && S && isAdmin() && (S.gold < ADMIN_GOLD || S.level < MAX_LEVEL)) { adminTopUp(); renderHud(); renderChatFoot(); save(); } }, 1000);
 function enterGame() {
   S.friends = toArr(S.friends).filter(f => typeof f === "string" && f !== BOT_UID); S.friends.unshift(BOT_UID);
+  if (S.adminFarm >= 5) S.adminFarmDone = true;   // eski kayıtlarla uyum
   try { makeAdminFarm(); } catch (e) { console.error(e); }
   if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
   if (!S.earned || typeof S.earned !== "object") S.earned = {};
@@ -4575,6 +4633,10 @@ function enterGame() {
   Object.keys(ANIMALS).forEach(k => { const A = ANIMALS[k]; S[A.list] = animalsOf(S, k).slice(0, A.cap).map(a => ({ f: Math.max(0, +a.f || 0) })); });
   if (!S.millQ || !(+S.millQ.q > 0) || !FEEDS[S.millQ.r]) S.millQ = null;
   if (!S.rot || typeof S.rot !== "object") S.rot = {};
+  if (!S.ach || typeof S.ach !== "object") S.ach = { unlocked: [], progress: {}, totalClaimed: 0 };
+  if (!S.weekly || typeof S.weekly !== "object") S.weekly = { lastWeek: null, progress: {}, bonuses: {} };
+  if (!S.giftSent || typeof S.giftSent !== "object") S.giftSent = { day: null, total: 0 };
+  try { loginEnsure(); } catch (e) { S.login = { streak: 0, lastDay: null, totalClaims: 0 }; }   // günlük giriş ödülü kaydı
   S.tools = toArr(S.tools).filter(t => TOOLS[t]); if (!S.tools.includes("scythe")) S.tools.unshift("scythe");
   if (!S.tools.includes(S.slot)) S.slot = "scythe";
   S.plots = cleanPlots(S.plots, mv);
@@ -4605,7 +4667,11 @@ function enterGame() {
   $("start").classList.remove("on");
   if (mv !== MAPV) save();
   renderHotbar(); renderQuest();
-  renderNotif(); if (NOTIF.on && online) notifEnable(true); else notifAsk();   // keep the subscription fresh, or ask once on the first entry
+  try { achInit(); } catch (e) {}
+  setTimeout(() => { try { initWeekly(); } catch (e) {} }, 100); setTimeout(() => { try { listenGifts(); } catch (e) {} }, 1500); setTimeout(() => { try { checkUnreadDM(); } catch (e) {} }, 2000);
+  try { ANALYTICS.log("session_start", { scene: "home" }); } catch (e) {}
+  renderNotif(); if (NOTIF.on && online) notifEnable(true); else notifAsk();
+  setTimeout(() => { try { checkLoginOnStart(); } catch (e) { console.error(e); } }, 900);   // günlük giriş ödülü takvimi   // keep the subscription fresh, or ask once on the first entry
   try { if (localStorage.getItem("lucky-was-reset")) { localStorage.removeItem("lucky-was-reset"); setTimeout(() => toast("Çiftliğin sıfırlandı. Görevleri takip ederek yeniden başla!"), 1200); } } catch (e) {}
 
   if (online) { Object.keys(S.earned).slice(-20).forEach(listenPay); processClaims(); if (S.hire.open) writeJobAd(); }
@@ -4713,12 +4779,175 @@ const MUSIC = (() => {
     set(on, vol) { if (vol != null) st.vol = vol; if (on != null) st.on = on; save(); if (master) master.gain.value = st.vol * .5; if (st.on) { if (started) start(); } else stop(); }
   };
 })();
+// ---------- Ses efektleri (SFX): Web Audio ile sentezlenen 18 kısa efekt; müzikten bağımsız çalışır ----------
+// Dosya yok: her ses osilatör + gain zarfı (+ gerektiğinde filtre / gürültü) ile anında üretilir.
+// Ayarlar localStorage'da "lucky-sfx" anahtarında saklanır: { on: true, vol: 0.7 }
+const SFX = (() => {
+  let st = { on: true, vol: .7 };
+  try {
+    const j = JSON.parse(localStorage.getItem("lucky-sfx") || "{}");
+    if (typeof j.on === "boolean") st.on = j.on;
+    if (typeof j.vol === "number" && isFinite(j.vol)) st.vol = Math.min(1, Math.max(0, j.vol));
+  } catch (e) {}
+  let ac = null, master = null, noiseBuf = null;
+  const last = {};                                              // aynı sesin art arda gelip üst üste binmesini önler
+  const save = () => { try { localStorage.setItem("lucky-sfx", JSON.stringify({ on: st.on, vol: st.vol })); } catch (e) {} };
+  const gainOf = () => st.vol * st.vol;                         // kaydırıcı daha doğal hissettirsin diye eğri
+
+  // AudioContext'i (ilk kullanıcı dokunuşunda) oluşturur ve iOS/Android için resume eder
+  function ensure() {
+    try {
+      if (!ac) {
+        const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+        ac = new C();
+        master = ac.createGain(); master.gain.value = gainOf();
+        const comp = ac.createDynamicsCompressor();             // üst üste binen sesler patlamasın
+        comp.threshold.value = -14; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = .003; comp.release.value = .15;
+        master.connect(comp); comp.connect(ac.destination);
+        // iOS'ta sesi açmak için sessiz bir tampon çal
+        try { const b = ac.createBuffer(1, 1, 22050), s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.start(0); } catch (e) {}
+      }
+      if (ac.state !== "running") { const p = ac.resume(); if (p && p.catch) p.catch(() => {}); }   // "suspended" / iOS "interrupted"
+      return ac;
+    } catch (e) { return null; }
+  }
+
+  // osilatör + gain zarfı (+ isteğe bağlı alçak geçiren filtre)
+  // o: type, v (ses), a (atak), to (hedef frekans, kayma), lp (filtre frekansı)
+  function tone(t, f0, dur, o) {
+    o = o || {};
+    const osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = o.type || "sine"; osc.frequency.setValueAtTime(f0, t);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    let out = osc;
+    if (o.lp) { const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = o.lp; osc.connect(f); out = f; }
+    out.connect(g); g.connect(master);
+    const v = o.v || .25, a = o.a || .004;
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(dur, a + .01));
+    osc.start(t); osc.stop(t + dur + .03);
+  }
+  // filtrelenmiş gürültü (su, hışırtı, "şak" için)
+  // o: type (bandpass/highpass/lowpass), f (frekans), to (frekans kayması), q, v, a
+  function noise(t, dur, o) {
+    o = o || {};
+    if (!noiseBuf) { noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * .6), ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noiseBuf; f.type = o.type || "bandpass"; f.Q.value = o.q || 1;
+    f.frequency.setValueAtTime(o.f || 1500, t); if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    s.connect(f); f.connect(g); g.connect(master);
+    const v = o.v || .2, a = o.a || .003;
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(dur, a + .01));
+    s.start(t, Math.random() * .1); s.stop(t + dur + .03);
+  }
+
+  // 18 ses efekti. Her biri t (başlangıç zamanı) alır.
+  const FX = {
+    // tohum ekme: yumuşak "tık" + hafif yükselen ton
+    plant: t => { noise(t, .04, { type: "lowpass", f: 900, v: .25 }); tone(t, 180, .06, { to: 90, v: .3 }); tone(t + .05, 330, .14, { to: 560, v: .2, type: "triangle" }); },
+    // sulama: akışkan gürültü + alçalan ton + küçük kabarcık
+    water: t => { noise(t, .34, { f: 1400, to: 500, q: .9, v: .22, a: .04 }); tone(t, 720, .3, { to: 320, v: .12, a: .03 }); tone(t + .09, 900, .08, { to: 500, v: .08 }); },
+    // hasat: kuru "şak" + kısa yüksek ton
+    harvest: t => { noise(t, .06, { type: "highpass", f: 2500, v: .3 }); tone(t, 140, .07, { to: 70, v: .25 }); tone(t + .04, 1180, .12, { type: "triangle", v: .2 }); tone(t + .04, 1770, .08, { v: .05 }); },
+    // elma toplama: küçük "pop" + hışırtı
+    pick: t => { tone(t, 420, .09, { to: 900, v: .3, a: .003 }); noise(t + .02, .07, { type: "highpass", f: 3000, v: .08 }); tone(t + .07, 1400, .07, { v: .1 }); },
+    // altın: iki notalı "ding-ding"
+    coin: t => { tone(t, 988, .22, { type: "square", v: .09, lp: 3000 }); tone(t, 1976, .15, { v: .07 }); tone(t + .09, 1319, .3, { type: "square", v: .09, lp: 3500 }); tone(t + .09, 2638, .2, { v: .06 }); },
+    // satın alma: iki kısa yükselen nota
+    buy: t => { tone(t, 523, .12, { type: "triangle", v: .25 }); tone(t + .07, 784, .18, { type: "triangle", v: .25 }); noise(t, .03, { type: "highpass", f: 4000, v: .1 }); },
+    // satış: hışırtı + hızlı üç nota
+    sell: t => { noise(t, .12, { type: "highpass", f: 3500, to: 6000, v: .12, a: .02 }); [659, 784, 988].forEach((f, i) => tone(t + i * .055, f, .1, { type: "triangle", v: .18 })); },
+    // seviye atlama: C-E-G-C yükselen melodi
+    levelup: t => { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => { const tt = t + i * .1, d = i === 3 ? .42 : .16; tone(tt, f, d, { type: "triangle", v: .28 }); tone(tt, f * 2, d * .7, { v: .07 }); }); },
+    // hata: alçalan bas ton
+    error: t => { tone(t, 170, .22, { type: "sawtooth", to: 85, v: .22, lp: 700 }); tone(t + .01, 85, .2, { v: .2 }); },
+    // buton tıklaması: çok kısa tık
+    click: t => { tone(t, 1300, .035, { to: 700, v: .14, type: "triangle", a: .001 }); },
+    // panel açılma: yükselen hafif süpürme
+    open: t => { tone(t, 380, .12, { to: 760, v: .14 }); noise(t, .12, { f: 900, to: 2200, q: .8, v: .06, a: .03 }); },
+    // panel kapanma: alçalan hafif süpürme
+    close: t => { tone(t, 700, .11, { to: 340, v: .13 }); noise(t, .1, { f: 2000, to: 800, q: .8, v: .05, a: .02 }); },
+    // sohbet mesajı: iki yumuşak "bip"
+    chat: t => { tone(t, 880, .06, { v: .14 }); tone(t + .07, 1175, .09, { v: .14 }); },
+    // bildirim: çan sesi
+    notify: t => { tone(t, 1047, .3, { v: .2 }); tone(t, 2093, .2, { v: .06 }); tone(t + .12, 1319, .3, { v: .2 }); },
+    // dilek kazanma: hızlı yükselen arpej + parıltı
+    wish_win: t => { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => { tone(t + i * .065, f, i === 4 ? .45 : .18, { type: "triangle", v: .22 }); tone(t + i * .065, f * 2, .15, { v: .06 }); }); noise(t + .2, .3, { type: "highpass", f: 6000, v: .05, a: .05 }); },
+    // dilek kaybetme: alçalan "bwaa"
+    wish_lose: t => { [392, 330, 262].forEach((f, i) => tone(t + i * .12, f, i === 2 ? .3 : .14, { type: "sawtooth", v: .14, lp: 900 })); },
+    // hayvan toplama: iki sevimli cıvıltı
+    animal: t => { tone(t, 600, .09, { to: 1000, v: .2, type: "triangle" }); tone(t + .1, 700, .1, { to: 1150, v: .2, type: "triangle" }); },
+    // görev tamamlandı: kısa fanfar
+    quest: t => { [392, 523.25, 659.25].forEach((f, i) => tone(t + i * .09, f, .14, { type: "triangle", v: .22 })); tone(t + .27, 783.99, .35, { type: "triangle", v: .25 }); tone(t + .27, 1568, .25, { v: .06 }); }
+  };
+  // yaklaşık süreler (saniye): seq() ardışık sesleri buna göre sıralar
+  const DUR = { plant: .2, water: .34, harvest: .17, pick: .15, coin: .39, buy: .25, sell: .27, levelup: .72, error: .22, click: .04, open: .12, close: .11, chat: .16, notify: .42, wish_win: .65, wish_lose: .5, animal: .22, quest: .6 };
+
+  // tek ses çal (off: gecikme, saniye). Hata olursa oyun devam eder.
+  function play(name, off) {
+    try {
+      if (!st.on || st.vol <= 0 || !FX[name] || document.hidden) return;
+      const a = ensure(); if (!a) return;
+      const now = performance.now(); if (last[name] && now - last[name] < 60) return; last[name] = now;
+      if (a.state !== "running") {
+        // iOS'ta resume asenkron: dokunuştan hemen sonra çalmayı dene, eski sesleri biriktirme
+        const req = now, p = a.resume();
+        if (p && p.then) p.then(() => { try { if (a.state === "running" && performance.now() - req < 400) FX[name](a.currentTime + .005 + (off || 0)); } catch (e) {} }).catch(() => {});
+        return;
+      }
+      FX[name](a.currentTime + .005 + (off || 0));
+    } catch (e) {}
+  }
+  // ardışık sesler: SFX.seq("sell", "coin")
+  function seq() {
+    let off = 0;
+    for (let i = 0; i < arguments.length; i++) { play(arguments[i], off); off += (DUR[arguments[i]] || .2) * .7; }
+  }
+
+  // iOS / Android: ilk dokunuşta AudioContext'i başlat (resume)
+  const unlock = () => { if (!alive() || !st.on) return; ensure(); };
+  ["pointerdown", "pointerup", "touchend", "click", "keydown"].forEach(ev => document.addEventListener(ev, unlock, { capture: true, passive: true }));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && ac && ac.state !== "running" && st.on) { try { ac.resume().catch(() => {}); } catch (e) {} } });
+
+  return {
+    get on() { return st.on; }, get vol() { return st.vol; }, names: Object.keys(FX),
+    set(on, vol) {
+      if (vol != null) st.vol = Math.min(1, Math.max(0, +vol || 0));
+      if (on != null) st.on = !!on;
+      save();
+      try { if (master) master.gain.setTargetAtTime(gainOf(), ac.currentTime, .01); } catch (e) {}
+      if (st.on) ensure();
+    },
+    play, seq, unlock
+  };
+})();
+// butonlara otomatik tıklama sesi: normal butonlarda "click", devre dışı butonlarda "error"
+(() => {
+  const SEL = "button, [role='button'], .tab, .seg button, .chips button";
+  document.addEventListener("pointerdown", e => {
+    try {
+      if (!alive()) return;
+      const el = e.target && e.target.closest ? e.target.closest(SEL) : null; if (!el || el.closest("[data-nosfx]")) return;
+      if (el.disabled || el.getAttribute("aria-disabled") === "true") SFX.play("error"); else SFX.play("click");
+    } catch (err) {}
+  }, true);
+  // paneller (.modal / .sheet) açılıp kapanınca "open" / "close" sesi
+  const seen = new WeakMap(); let ready = false; setTimeout(() => { ready = true; }, 1500);   // oyun açılırken çalmasın
+  try {
+    const mo = new MutationObserver(list => {
+      if (!alive()) { mo.disconnect(); return; }
+      try { for (const m of list) { const el = m.target, on = el.classList.contains("on"); if (seen.get(el) === on) continue; seen.set(el, on); if (ready) SFX.play(on ? "open" : "close"); } } catch (e) {}
+    });
+    document.querySelectorAll(".modal, .sheet").forEach(el => { seen.set(el, el.classList.contains("on")); mo.observe(el, { attributes: true, attributeFilter: ["class"] }); });
+  } catch (e) {}
+})();
 // ---------- Settings ----------
 function renderSettings() {
   try { renderNotif(); } catch (e) {}
   document.querySelectorAll("#gfxSeg_v8 [data-gfx]").forEach(b => b.setAttribute("aria-pressed", String(b.getAttribute("data-gfx")) === String(GFX.mode)));
   $("gfxNow").textContent = !R3.on ? "3D görünüm bu cihazda kapalı" : GFX.mode === "auto" ? "Şu an: " + ["Düşük", "Orta", "Yüksek"][GFX.level] + (GFX.frameMs > 20 ? ", 30 kare" : ", 60 kare") : "Telefonun zorlanırsa Otomatik'i seç";
   $("musicSw").setAttribute("aria-checked", MUSIC.on); $("musicVol").value = Math.round(MUSIC.vol * 100); $("musicVol").disabled = !MUSIC.on;
+  // ses efektleri satırları
+  $("sfxSw").setAttribute("aria-checked", SFX.on); $("sfxVol").value = Math.round(SFX.vol * 100); $("sfxVol").disabled = !SFX.on;
   const a = window.LUCKY_AUTH, btns = $("setBtns");
   $("setVer").textContent = "Lucky Farm, sürüm " + VERSION + (S ? " · " + S.name : "");
   if (!a || !online) {
@@ -4791,7 +5020,7 @@ $("mSend").onclick = async () => {
   $("mSend").disabled = false;
 };
 // ---------- Wishing fountain: throw any amount, 35% chance to get double back, 3 throws a day ----------
-const WISH_PER_DAY = 3, WISH_MAX = 20000, WISH_LEVEL = 5;   // 100x of 20.000 stays inside the server's per-save gold limit
+const WISH_PER_DAY_BASE = 3, WISH_MAX = 20000, WISH_LEVEL = 5;   // 100x of 20.000 stays inside the server's per-save gold limit
 // outcome odds: 1% 100x, 20% 2x, 34% the gold comes back ("Tekrar"), 45% nothing
 const WISH_ODDS = [["x100", .01], ["x2", .20], ["back", .34], ["none", .45]];
 const WHEEL = ["x100", "none", "x2", "back", "none", "x2", "back", "none", "x2", "back", "none", "back"], WHEEL_N = WHEEL.length;
@@ -4810,10 +5039,10 @@ function wheelSvg() {
 }
 let wheelRot = 0, wheelBusy = false;
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
-const wishLeft = () => { if (isAdmin()) return WISH_PER_DAY; const w = S && S.wish; return w && w.d === today() ? Math.max(0, WISH_PER_DAY - (+w.n || 0)) : WISH_PER_DAY; };
+const wishLeft = () => { if (isAdmin()) return wishPerDay(); const w = S && S.wish; return w && w.d === today() ? Math.max(0, wishPerDay() - (+w.n || 0)) : wishPerDay(); };
 function renderWish() {
   const left = wishLeft();
-  $("wishInfo").textContent = (isAdmin() ? "Sınırsız hak" : "Kalan hak: " + left + "/" + WISH_PER_DAY) + " · En fazla " + fmtBig(WISH_MAX) + " altın";
+  $("wishInfo").textContent = (isAdmin() ? "Sınırsız hak" : "Kalan hak: " + left + "/" + wishPerDay()) + " · En fazla " + fmtBig(WISH_MAX) + " altın";
   $("wishBtn").disabled = !left || wheelBusy; $("wishIn").disabled = !left || wheelBusy;
   if (!left) $("wishRes").textContent = $("wishRes").textContent || "Bugünkü hakların bitti. Yarın tekrar gel.";
 }
@@ -4847,10 +5076,10 @@ $("wishBtn").onclick = () => {
     wheelRot = from + (to - from) * e; el.setAttribute("transform", `rotate(${wheelRot.toFixed(2)})`);
     if (u < 1) { requestAnimationFrame(tick); return; }
     wheelBusy = false; renderHud();
-    if (out === "x100") { res.className = "wishres win"; res.textContent = "BÜYÜK İKRAMİYE! 100 kat kazandın: " + fmtBig(amt * 100) + " altın!"; popAt(me.x, me.y - .3, "+" + fmtBig(delta) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ff6a3d", 1600); winShow(true, amt * 100); }
-    else if (out === "x2") { res.className = "wishres win"; res.textContent = "Dileğin kabul oldu! " + fmtBig(amt * 2) + " altın geri geldi."; popAt(me.x, me.y - .3, "+" + fmtBig(amt) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ffd54a", 900); winShow(false, amt * 2); }
+    if (out === "x100") { try { achEvent("wishJack"); ANALYTICS.log("wish_jackpot", { amt }); } catch (e) {} res.className = "wishres win"; res.textContent = "BÜYÜK İKRAMİYE! 100 kat kazandın: " + fmtBig(amt * 100) + " altın!"; popAt(me.x, me.y - .3, "+" + fmtBig(delta) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ff6a3d", 1600); SFX.play("wish_win"); winShow(true, amt * 100); }
+    else if (out === "x2") { try { achEvent("wishWin"); } catch (e) {} res.className = "wishres win"; res.textContent = "Dileğin kabul oldu! " + fmtBig(amt * 2) + " altın geri geldi."; popAt(me.x, me.y - .3, "+" + fmtBig(amt) + " altın", "#ffe27a"); if (R3.glow) R3.glow(P_FOUNTAIN, "#ffd54a", 900); SFX.play("wish_win"); winShow(false, amt * 2); }
     else if (out === "back") { res.className = "wishres"; res.textContent = "Çeşme altınlarını geri verdi. Ne kazandın ne kaybettin."; }
-    else { res.className = "wishres lose"; res.textContent = "Altınların çeşmenin dibinde parlıyor. Belki bir dahaki sefere!"; popAt(me.x, me.y - .3, "-" + fmtBig(amt) + " altın", "#ffd0c4"); }
+    else { res.className = "wishres lose"; res.textContent = "Altınların çeşmenin dibinde parlıyor. Belki bir dahaki sefere!"; popAt(me.x, me.y - .3, "-" + fmtBig(amt) + " altın", "#ffd0c4"); SFX.play("wish_lose"); }
     renderWish();
   };
   requestAnimationFrame(tick);
@@ -4879,6 +5108,90 @@ function winShow(jackpot, total) {
 }
 function winHide() { clearTimeout(winT); $("winfx").classList.remove("on"); }
 $("winfx").onclick = winHide;
+
+// ---------- Günlük giriş ödülü: her gün ilk girişte açılan 7 günlük takvim ----------
+// S.login = { streak: üst üste alınan gün sayısı, lastDay: son ödülün alındığı gün (today() biçimi), totalClaims: toplam alım }
+// (Günlük GÖREVLER olan S.daily ve tutorial olan S.tut ile ilgisi yoktur.)
+const LOGIN_REWARDS = [
+  { e: "🥉", gold: 10 }, { e: "🥈", gold: 25 }, { e: "🥇", gold: 50 }, { e: "💰", gold: 100 },
+  { e: "🍎", gold: 250, apple: 1 }, { e: "🍞", gold: 500, bread: 1 }, { e: "🎁", gold: 1000, chest: 1 }
+];
+// Gizemli Sandık olasılıkları: [eşik, altın] (%50 / %30 / %15 / %4 / %1)
+const LOGIN_CHEST = [[.50, 500], [.30, 1500], [.15, 3000], [.04, 5000], [.01, 10000]];
+let loginBusy = false;
+// takvim günü bazlı anahtar (24 saat değil): off = -1 dün; today() ile aynı biçim
+const loginKey = off => { const d = new Date(); d.setDate(d.getDate() + off); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+function loginEnsure() {
+  const L = S.login && typeof S.login === "object" ? S.login : {};
+  S.login = { streak: Math.max(0, Math.floor(+L.streak) || 0), lastDay: typeof L.lastDay === "string" ? L.lastDay : null, totalClaims: Math.max(0, Math.floor(+L.totalClaims) || 0) };
+  return S.login;
+}
+// bugünkü durum: seri (dün gelmediyse sıfır), bugünün ödül günü (1-7) ve ödül alınabilir mi
+function loginInfo() {
+  const L = loginEnsure(), t = today(), claimed = L.lastDay === t;
+  let streak = L.streak;
+  if (!claimed && L.lastDay !== loginKey(-1)) streak = 0;
+  return { streak, day: (streak % 7) + 1, can: !claimed || isAdmin() };
+}
+function loginRewardText(R) {
+  return fmtBig(R.gold) + " altın" + (R.apple ? "<br>+ " + R.apple + " elma" : "") + (R.bread ? "<br>+ " + R.bread + " ekmek" : "") + (R.chest ? "<br>+ Gizemli Sandık" : "");
+}
+function renderLogin() {
+  const I = loginInfo();
+  $("loginStreak").textContent = (I.streak + 1) + " gün üst üste geliyorsun!";
+  $("loginGrid").innerHTML = LOGIN_REWARDS.map((R, k) => {
+    const d = k + 1, cls = d < I.day ? "done" : d === I.day ? "today" : "future";
+    return `<div class="lg-card ${cls}${d === 7 ? " d7" : ""}">${cls === "today" ? `<i class="tag">BUGÜN</i>` : ""}${cls === "done" ? `<i class="st">✅</i>` : cls === "future" ? `<i class="st">🔒</i>` : ""}<div class="ic">${R.e}</div><b>${d}. gün</b><span>${loginRewardText(R)}</span></div>`;
+  }).join("");
+  $("loginBtn").disabled = !I.can;
+}
+function openLogin() {
+  try { ANALYTICS.log("screen_view", { s: "login" }); } catch (e) {} renderLogin(); $("login").classList.add("on"); }
+// oyuna girişten sonra çağrılır: bugün ödül alınmadıysa takvimi açar (X ile kapatılırsa ödül alınmaz, sonraki girişte tekrar açılır)
+function checkLoginOnStart() {
+  try {
+    if (!alive() || !S || !entered) return;
+    if (!loginInfo().can) return;
+    openLogin();
+  } catch (e) { console.error(e); }
+}
+function loginChestPick() {
+  let r = Math.random();
+  for (const [p, g] of LOGIN_CHEST) { if (r < p) return g; r -= p; }
+  return LOGIN_CHEST[0][1];
+}
+function loginClaim() {
+  if (loginBusy || !S) return;
+  try {
+    const I = loginInfo(); if (!I.can) return;
+    loginBusy = true;
+    const R = LOGIN_REWARDS[I.day - 1], L = loginEnsure();
+    S.login = { streak: I.streak + 1, lastDay: today(), totalClaims: L.totalClaims + 1 };   // 7. günden sonra (streak % 7) tekrar 1. güne döner
+    if (!S.store || typeof S.store !== "object") S.store = { wheat: 0 };
+    S.gold = round1(S.gold + R.gold);
+    if (R.apple) S.store.apple = (+S.store.apple || 0) + R.apple;
+    if (R.bread) S.store.bread = (+S.store.bread || 0) + R.bread;
+    const chest = R.chest ? loginChestPick() : 0;
+    if (chest) S.gold = round1(S.gold + chest);
+    saveNow(); renderHud();
+    try { coinBurst($("loginBtn"), Math.min(14, R.gold)); } catch (e) {}
+    $("login").classList.remove("on");
+    const extra = (R.apple ? ", +" + R.apple + " elma" : "") + (R.bread ? ", +" + R.bread + " ekmek" : "");
+    toast("Günlük ödül: +" + fmtBig(R.gold) + " altın" + extra);
+    SFX.seq("quest", "coin");
+    if (chest) setTimeout(() => {
+      try {
+        winShow(false, chest);
+        $("winBig").textContent = "SANDIK AÇILDI!"; $("winSub").textContent = "Gizemli sandıktan altın çıktı";
+        SFX.play("wish_win"); toast("Gizemli Sandık: +" + fmtBig(chest) + " altın 🎁");
+      } catch (e) { console.error(e); }
+    }, 700);
+  } catch (e) { console.error(e); }
+  loginBusy = false;
+}
+$("loginBtn").onclick = loginClaim;
+$("loginLater").onclick = $("loginX").onclick = () => $("login").classList.remove("on");
+$("login").addEventListener("click", e => { if (e.target === $("login")) $("login").classList.remove("on"); });
 
 // ---------- Harvest notifications (Web Push) ----------
 // The game writes push/{uid} = { sub, due, sent, on }: "due" is when the next crop, apple tree or bread is ready.
@@ -4971,7 +5284,7 @@ function questEv(id, n) {
   renderQuest();
 }
 function questDone(q) {
-  toast("Görev tamamlandı: " + q.t + "! Ödülünü al");
+  SFX.play("notify"); toast("Görev tamamlandı: " + q.t + "! Ödülünü al");
   const t = $("qtrack"); if (t) { t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); }
 }
 function questLine(q) {
@@ -5051,7 +5364,7 @@ function claimQuest(k) {
   if (!tutOn() || k !== S.tut.i) return;
   const q = QUESTS[k]; if (!questReady(q)) return;
   S.tut.i++; S.gold = round1(S.gold + q.gold); saveNow(); renderHud();
-  coinBurst($("questList").querySelector(`[data-qclaim="${k}"]`) || $("qtrack"), q.gold);
+  coinBurst($("questList").querySelector(`[data-qclaim="${k}"]`) || $("qtrack"), q.gold); SFX.seq("quest", "coin");
   try { popAt(me.x, me.y - .3, "+" + q.gold + " altın", "#ffe27a"); } catch (e) {}
   if (S.tut.i >= QUESTS.length) toast("Tebrikler! Bütün görevleri bitirdin");
   else { const n = QUESTS[S.tut.i]; toast("+" + q.gold + " altın. Yeni görev: " + n.t); if (questReady(n)) questDone(n); }
@@ -5144,19 +5457,21 @@ function dailyEv(k, n) {
   let changed = false;
   D.list.forEach((t, j) => { if (t.k !== k || D.got[j]) return; const was = dailyReady(D, j);
     D.c[j] = Math.min(t.n, (+D.c[j] || 0) + Math.max(0, +n || 0)); changed = true;
+    if (!was && dailyReady(D, j)) SFX.play("notify");
     if (!was && dailyReady(D, j)) toast("Günlük görev tamam: " + dailyTpl(t.k).t(t.n) + "! Ödülünü al"); });
   if (changed) renderQuest();
 }
 function dailyClaim(j) {
+  try { ANALYTICS.log("daily_complete", { j }); } catch (e) {}
   const D = dailyEnsure(); if (!D || !dailyReady(D, j)) return;
   const t = D.list[j]; D.got[j] = 1; S.gold = round1(S.gold + t.g); gainXp(t.x);
-  coinBurst($("questList").querySelector(`[data-dclaim="${j}"]`), t.g); saveNow(); renderHud(); renderQuest(); renderQuestList();
+  coinBurst($("questList").querySelector(`[data-dclaim="${j}"]`), t.g); SFX.seq("quest", "coin"); saveNow(); renderHud(); renderQuest(); renderQuestList();
   toast("+" + t.g + " altın, +" + t.x + " XP");
 }
 function dailyBonusClaim() {
   const D = dailyEnsure(); if (!D || D.b || !D.got.every(Boolean)) return;
   D.b = 1; S.gold = round1(S.gold + D.bg); gainXp(dailyXp(D.bg));
-  coinBurst($("questList").querySelector("[data-dbonus]"), 14); saveNow(); renderHud(); renderQuest(); renderQuestList();
+  coinBurst($("questList").querySelector("[data-dbonus]"), 14); SFX.seq("quest", "coin"); saveNow(); renderHud(); renderQuest(); renderQuestList();
   toast("Günün sandığı açıldı: +" + D.bg + " altın 🎁");
 }
 // ---- orders ----
@@ -5201,7 +5516,7 @@ function orderGive(j) {
   const O = ordersEnsure(), o = O && O[j]; if (!orderCan(o)) return;
   Object.entries(o.it).forEach(([k, q]) => S.store[k] -= q);
   S.gold = round1(S.gold + o.g); gainXp(o.x);
-  coinBurst($("questList").querySelector(`[data-ogive="${j}"]`), Math.min(14, 5 + Math.round(o.g / 20)));
+  coinBurst($("questList").querySelector(`[data-ogive="${j}"]`), Math.min(14, 5 + Math.round(o.g / 20))); SFX.seq("quest", "coin");
   toast(ORDER_NPC[o.p][1] + " çok sevindi! +" + fmtG(o.g) + " altın, +" + o.x + " XP");
   O[j] = { w: Date.now() + ORDER_NEXT }; dailyEv("order", 1);
   saveNow(); renderHud(); renderPlots(); renderQuest(); renderQuestList();
@@ -5275,7 +5590,7 @@ function listenAdminForMe() {
   try { db.doc("admin/" + uid).onSnapshot(s => { adminData = s.exists ? s.data() || {} : {}; applyAdminForMe(); }, () => {}); } catch (e) {}
 }
 // the admin can restart every farm from zero; the name, character, friends and already-claimed mail gifts stay
-const RESET_KEEP = ["friends", "nameKey", "nameAt", "mailRead", "mailGot", "adminOps", "wish", "created", "kicks"];
+const RESET_KEEP = ["ach", "weekly", "friends", "nameKey", "nameAt", "mailRead", "mailGot", "adminOps", "wish", "created", "kicks", "login"];
 function resetMe(ts) {
   const keep = {}; RESET_KEEP.forEach(k => { if (S[k] !== undefined) keep[k] = S[k]; });
   const fresh = newPlayer(S.name, S.g);
@@ -5329,6 +5644,7 @@ const where = id => { for (const pp of lastPeers) if ((pp.by || (pp.presence && 
 const onlineUids = () => new Set(lastPeers.filter(p => p.kind === "viewer").map(p => p.by || (p.presence && p.presence.u)).filter(Boolean));
 let admOpenedAt = 0;
 async function openAdmin(e) {
+  try { ANALYTICS.log("screen_view", { s: "admin" }); } catch (e) {}
   if (e && e.preventDefault) e.preventDefault();
   if (Date.now() - admOpenedAt < 600) return; admOpenedAt = Date.now();
   $("admin").classList.add("on");
@@ -5427,6 +5743,7 @@ function renderAdminBtn() { const a = isAdmin() && !!db; $("adminBtn").hidden = 
 // ---------- Rankings: this week, this month and all time (by XP / level); the admin is not listed ----------
 let rankTab = "w", rankCache = null, rankAt = 0;
 async function openRank() {
+  try { ANALYTICS.log("screen_view", { s: "rank" }); } catch (e) {}
   $("rank").classList.add("on");
   if (!db) { $("rankNote").textContent = ""; $("rankList").innerHTML = `<p class="empty">Sıralama için oyunun sunucuya bağlı olması gerekiyor.</p>`; return; }
   if (!rankCache || Date.now() - rankAt > 60000) {
@@ -5634,6 +5951,7 @@ function renderNameRow() {
 }
 let nameBusy = false;
 async function changeName() {
+  try { ANALYTICS.log("name_change"); } catch (e) {}
   if (!S || nameWaitLeft() || nameBusy) return;
   const n = $("newName").value.trim().replace(/\s+/g, " ").slice(0, 16);
   if (n.length < 2) { toast("Ad en az 2 harf olmalı"); return; }
@@ -5655,7 +5973,8 @@ async function changeName() {
 }
 $("nameBtn").onclick = changeName;
 $("newName").addEventListener("keydown", e => { if (e.key === "Enter") changeName(); });
-function openMailbox() { renderMail(); $("mailbox").classList.add("on"); }
+function openMailbox() {
+  try { ANALYTICS.log("screen_view", { s: "mail" }); } catch (e) {} renderMail(); $("mailbox").classList.add("on"); }
 $("mailBtn").onclick = openMailbox;
 $("mailClose").onclick = () => $("mailbox").classList.remove("on");
 $("mailbox").addEventListener("click", e => { if (e.target === $("mailbox")) $("mailbox").classList.remove("on"); });
@@ -5666,6 +5985,10 @@ $("setClose").onclick = () => $("settings").classList.remove("on");
 $("settings").addEventListener("click", e => { if (e.target === $("settings")) $("settings").classList.remove("on"); });
 $("musicSw").onclick = () => { MUSIC.set(!MUSIC.on); renderSettings(); };
 $("musicVol").addEventListener("input", () => MUSIC.set(null, $("musicVol").value / 100));
+// ses efektleri: aç/kapa ve seviye (bırakınca örnek ses çalar)
+$("sfxSw").onclick = () => { SFX.set(!SFX.on); renderSettings(); if (SFX.on) SFX.play("coin"); };
+$("sfxVol").addEventListener("input", () => SFX.set(null, $("sfxVol").value / 100));
+$("sfxVol").addEventListener("change", () => SFX.play("coin"));
 $("setBtns").addEventListener("click", async e => {
   const b = e.target.closest("[data-acc]"), a = window.LUCKY_AUTH; if (!b || !a) return;
   const k = b.getAttribute("data-acc"), i = a.info();
@@ -7320,7 +7643,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
 }
 
 async function init() {
-  showLoader("Oyun yükleniyor", 7000, true);
+  showLoader("Oyun yükleniyor", 4000, true);
   setTimeout(() => { if (bootLd && !entered) { endBootLoader(); $("start").classList.add("on"); } }, 30000);
   start3D();
   const claude = await getClaude();
@@ -7354,6 +7677,7 @@ async function init() {
       fresh.forEach(m => bubbleFor(m.uid, censor(String(m.text || ""))));
       const others = fresh.filter(m => m.uid !== uid).length;
       if (others && !chatOpen) { unread += others; renderBadges(); }
+      if (others) SFX.play("chat");
       renderChat();
     }, () => { $("msgs").innerHTML = `<div class="empty">Sohbete bağlanılamadı. Sayfayı yenile.</div>`; });
   } else renderChat();
@@ -7387,6 +7711,220 @@ init();
 // a long press must not open the browser's copy / save-image menu (the game should feel like an app)
 document.addEventListener("contextmenu", e => { if (!(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) e.preventDefault(); });
 document.addEventListener("selectstart", e => { if (!(e.target && e.target.closest && e.target.closest("input,textarea"))) e.preventDefault(); });
+/* ===== v8 eklentileri ===== */
+/* ===== v8 eklentileri: HAPTIC, ANALYTICS, WEEKLY, ACHIEVEMENTS, UX ===== */
+const $id = id => document.getElementById(id);
+const HAPTIC = { on: localStorage.getItem("lucky-haptic") !== "0",
+  P: { tap: 10, success: 20, levelup: [30, 20, 30], achievement: [50, 30, 50], error: 100, wish_win: [60, 40, 60, 40, 120], coin: 15, notify: [20, 40, 20] },
+  buzz(n) { try { if (this.on && navigator.vibrate) navigator.vibrate(this.P[n] || 10); } catch (e) {} } };
+function friendlyError(e) { const m = String((e && (e.code || e.message)) || e || "").toLowerCase();
+  if (m.includes("permission")) return "Bağlantı hatası, sayfayı yenile"; if (m.includes("network") || m.includes("offline") || m.includes("unavailable")) return "İnternet bağlantını kontrol et";
+  if (m.includes("timeout")) return "Sunucu yavaş, bekle"; return "Bir şeyler ters gitti"; }
+function emptyState(el, emoji, msg) { if (el && !el.children.length) el.innerHTML = '<div class="empty-v8"><b>' + emoji + '</b>' + msg + '</div>'; }
+document.addEventListener("click", e => { if (e.target.closest("button")) HAPTIC.buzz("tap"); }, true);
+(function sw(id, get, set) { const b = $id(id); if (!b) return; const r = () => b.setAttribute("aria-checked", get() ? "true" : "false"); r(); b.addEventListener("click", () => { set(!get()); r(); }); return r; })
+  ("hapSw_v8", () => HAPTIC.on, v => { HAPTIC.on = v; localStorage.setItem("lucky-haptic", v ? "1" : "0"); HAPTIC.buzz("success"); });
+// Android geri tuşu
+history.pushState({ g: 1 }, ""); addEventListener("popstate", () => { history.pushState({ g: 1 }, "");
+  const open = document.querySelector(".modal.on, .sheet.on"); if (open) { open.classList.remove("on"); try { closeAll(); } catch (e) {} } });
+// SFX → haptic köprüsü
+try { const _p = SFX.play.bind(SFX), M = { buy: "success", sell: "coin", coin: "coin", levelup: "levelup", error: "error", wish_win: "wish_win", notify: "notify", quest: "success" };
+  SFX.play = function (n) { if (M[n]) HAPTIC.buzz(M[n]); return _p.apply(this, arguments); }; } catch (e) {}
+
+/* ---- ANALYTICS ---- */
+const ANALYTICS = { q: [], on: localStorage.getItem("lucky-analytics") !== "0",
+  today() { return today(); },
+  log(ev, params) { if (!this.on) return; try { this.q.push({ event: ev, params: params || {}, ts: Date.now(), name: (S && S.name) || "" }); if (this.q.length > 100) this.q.shift();
+    localStorage.setItem("lucky-ana-q", JSON.stringify(this.q)); } catch (e) {} },
+  flush() { try { if (!this.q.length || !db || !uid) return; const q = this.q.splice(0); localStorage.setItem("lucky-ana-q", "[]");
+    q.forEach(l => { try { db.doc("analytics/" + this.today() + "/" + uid + "/" + l.ts + "_" + Math.random().toString(36).slice(2, 6)).set(l).catch(() => {}); } catch (e) {} }); } catch (e) {} } };
+try { ANALYTICS.q = JSON.parse(localStorage.getItem("lucky-ana-q") || "[]").slice(-100); } catch (e) {}
+setInterval(() => ANALYTICS.flush(), 30000);
+(function () { const b = $id("anaSw_v8"); if (!b) return; const r = () => b.setAttribute("aria-checked", ANALYTICS.on ? "true" : "false"); r();
+  b.addEventListener("click", () => { ANALYTICS.on = !ANALYTICS.on; localStorage.setItem("lucky-analytics", ANALYTICS.on ? "1" : "0"); r(); }); })();
+
+/* ---- HAFTALIK ETKİNLİKLER ---- */
+const WK = (id, ic, n, d, c, t) => ({ id, ic, n, d, c, t: t.map((x, i) => ({ id: "t" + i, k: x[0], goal: x[1], gold: x[2], n: x[3] })) });
+const WEEK_EV = [
+  WK("xp2", "⚡", "2x XP Haftası", "Kazandığın tüm XP 2 katı!", "#7650dc", [["xp", 500, 200, "500 XP kazan"], ["harvest", 100, 300, "100 ekin topla"], ["sell", 10, 250, "10 satış yap"]]),
+  WK("gold2", "💰", "2x Altın Haftası", "Depo satışlarından 2 kat altın kazan.", "#f0a01a", [["sell", 30, 300, "30 satış yap"], ["xp", 300, 200, "300 XP kazan"], ["harvest", 60, 250, "60 ekin topla"]]),
+  WK("grow2", "🌱", "Hızlı Büyume", "Ekinler 2 kat hızlı büyür.", "#3f9a2f", [["plant", 80, 250, "80 tohum ek"], ["water", 80, 250, "80 ekin sula"], ["harvest", 60, 300, "60 ekin topla"]]),
+  WK("luck10", "🍀", "Şanslı Hasat", "Her hasatta %10 ekstra ürün şansı.", "#e0473a", [["harvest", 120, 350, "120 ekin topla"], ["plant", 100, 250, "100 tohum ek"], ["sell", 15, 250, "15 satış yap"]]),
+  WK("wish5", "⛲", "Dilek Festivali", "Günde 5 dilek hakkın var.", "#3f8fb5", [["wish", 5, 300, "5 dilek tut"], ["xp", 400, 250, "400 XP kazan"], ["sell", 10, 200, "10 satış yap"]]),
+  WK("prod2", "🐔", "Çifte Ürün", "Hayvanlar 2 kat ürün verir.", "#d9a628", [["animal", 40, 350, "40 hayvan ürünü topla"], ["sell", 20, 300, "20 satış yap"], ["harvest", 50, 250, "50 ekin topla"]]),
+  WK("dex2", "🌾", "Bereketli Toprak", "Ekinler %25 hızlı büyür, XP %25 ekstra.", "#8a5a2e", [["xp", 600, 300, "600 XP kazan"], ["harvest", 100, 300, "100 ekin topla"], ["plant", 100, 250, "100 tohum ek"]])];
+function weekEvent() { const k = weekKey(); let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0; return WEEK_EV[h % WEEK_EV.length]; }
+const wkId = () => { try { return weekEvent().id; } catch (e) { return ""; } }, wkIs = id => wkId() === id;
+function weeklyXpMul() { const i = wkId(); return i === "xp2" ? 2 : i === "dex2" ? 1.25 : 1; }
+function growMul() { const i = wkId(); return i === "grow2" ? 2 : i === "dex2" ? 1.25 : 1; }
+function goldMul() { return wkIs("gold2") ? 2 : 1; } function prodMul() { return wkIs("prod2") ? 2 : 1; } function luckMul() { return wkIs("luck10") ? 1.1 : 1; } function wishPerDay() { return wkIs("wish5") ? 5 : 3; }
+function weekEnd() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + 7); return d; }
+function weekRoll() { if (!S.weekly || typeof S.weekly !== "object") S.weekly = { lastWeek: null, progress: {}, bonuses: {} }; const w = S.weekly, k = weekKey(); if (w.lastWeek !== k) { w.lastWeek = k; w.progress = {}; w.bonuses = {}; } return w; }
+function renderWkBadge() { const e = weekEvent(), b = $id("wkBadge_v8"); if (!b) return; const days = Math.max(1, Math.ceil((weekEnd() - Date.now()) / 864e5)); b.hidden = false; b.textContent = e.ic + " " + days + "g"; b.style.borderColor = e.c; b.title = e.n; b.onclick = openWeekly; }
+function initWeekly() { weekRoll(); renderWkBadge(); }
+function weeklyEvent(k, n) { try { const w = weekRoll(), e = weekEvent();
+  e.t.forEach(t => { if (t.k === k && !w.bonuses[t.id]) { w.progress[k] = (+w.progress[k] || 0) + (n || 1); } });
+  if (!e.t.some(t => t.k === k)) return;
+  e.t.forEach(t => { if (t.k === k && !w.bonuses[t.id] && (+w.progress[k] || 0) >= t.goal) { w.bonuses[t.id] = 1; toast("📅 Haftalık görev tamamlandı! Ödül için rozete dokun"); SFX.play("quest"); HAPTIC.buzz("notify"); } }); } catch (er) {} }
+function weeklyClaim(id) { try { const w = weekRoll(), t = weekEvent().t.find(x => x.id === id); if (!t || w.bonuses[id] !== 1) return; w.bonuses[id] = 2; S.gold = round1(S.gold + t.gold); renderHud(); SFX.seq("quest", "coin"); HAPTIC.buzz("success"); toast("+" + fmtBig(t.gold) + " altın 🎉");
+  try { achEvent("weeklyTask", 1); } catch (er) {} saveNow(); openWeekly(); } catch (er) {} }
+function openWeekly() { const e = weekEvent(), w = weekRoll(), ms = Math.max(0, weekEnd() - Date.now()), days = Math.floor(ms / 864e5), hrs = Math.floor(ms % 864e5 / 36e5);
+  $id("weeklyBody_v8").innerHTML = '<h1 style="color:' + e.c + '">' + e.ic + ' ' + e.n + '</h1><p>' + e.d + '</p><p><b>Kalan süre:</b> ' + days + ' gün ' + hrs + ' saat</p>' +
+    e.t.map(t => { const p = Math.min(t.goal, +w.progress[t.k] || 0), st = w.bonuses[t.id] || 0; return '<div class="ach-c ' + (st === 2 ? 'done' : '') + '"><div style="flex:1"><b>' + t.n + '</b><div class="bar"><i style="width:' + p / t.goal * 100 + '%;background:' + e.c + '"></i></div><small>' + p + '/' + t.goal + ' · 🪙 ' + fmtBig(t.gold) + '</small></div>' + (st === 1 ? '<button class="claim" data-wkclaim="' + t.id + '">Al</button>' : st === 2 ? '✅' : '') + '</div>'; }).join("") +
+    '<button class="big ghost" onclick="closeWeekly()" style="width:100%;margin-top:8px">Kapat</button>';
+  (closeAll(), $id("weekly_v8").classList.add("on")); ANALYTICS.log("screen_view", { s: "weekly" }); }
+function closeWeekly() { ($id("weekly_v8").classList.remove("on"), closeAll()); }
+$id("weeklyBody_v8").addEventListener("click", ev => { const b = ev.target.closest("[data-wkclaim]"); if (b) weeklyClaim(b.dataset.wkclaim); });
+setInterval(() => { try { if (S && entered) { weekRoll(); renderWkBadge(); } } catch (e) {} }, 60000);
+
+/* ---- BAŞARILAR (durumdan okunan + achEvent sayaçları) ---- */
+const ACH_CATS = ["Tümü", "Çiftçilik", "Ekonomi", "Hayvancılık", "İnşaat", "Sosyal", "Seviye", "Özel"];
+const A = (id, cat, ic, n, d, tr, goal, gold, xp) => ({ id, cat, ic, n, d, tr, goal, gold, xp: xp || Math.max(5, Math.round(gold / 10)) });
+let achTab = "Tümü";
+function achInit() { renderAchDot(); clearInterval(achInit.t); achInit.t = setInterval(() => { try { renderAchDot(); } catch (e) {} }, 4000); }
+function achEvent(tr, n) { try { S.ach.progress[tr] = (+S.ach.progress[tr] || 0) + (n === undefined ? 1 : n); { const wm = { harvest: "harvest", wishN: "wish", sell: "sell", plant: "plant", water: "water", egg: "animal", milk: "animal" }[tr]; if (wm) weeklyEvent(wm, n === undefined ? 1 : n); } renderAchDot(); } catch (e) {} }
+const achCheck = id => { const a = ACH.find(x => x.id === id); return !!a && achVal(a) >= a.goal; };
+function achUnlock(id) { const a = ACH.find(x => x.id === id); if (!a || S.ach.unlocked.includes(id) || !achCheck(id)) return false;
+  S.ach.unlocked.push(id); S.ach.totalClaimed++; S.gold += a.gold; try { gainXp(a.xp); } catch (e) {} renderHud(); SFX.play("levelup"); HAPTIC.buzz("achievement"); toast("🏆 " + a.n + " · +" + a.gold + " altın");
+  ANALYTICS.log("achievement_unlock", { id }); saveNow(); renderAchDot(); return true; }
+function renderAchievements() { const done = S.ach.unlocked.length; $id("achCnt_v8").textContent = done + " / " + ACH.length + " başarı";
+  $id("achTabs_v8").innerHTML = ACH_CATS.map(c => '<button class="' + (c === achTab ? "on" : "") + '" data-c="' + c + '">' + c + '</button>').join("");
+  $id("achTabs_v8").querySelectorAll("button").forEach(b => b.onclick = () => { achTab = b.dataset.c; renderAchievements(); });
+  const L = $id("achList_v8"); L.innerHTML = "";
+  ACH.filter(a => achTab === "Tümü" || a.cat === achTab).forEach(a => { const v = Math.min(a.goal, achVal(a)), got = S.ach.unlocked.includes(a.id), rdy = !got && v >= a.goal;
+    const c = document.createElement("div"); c.className = "ach-c " + (got ? "done" : rdy ? "" : "lock");
+    c.innerHTML = '<div class="ic">' + a.ic + '</div><div style="flex:1"><b>' + a.n + '</b><br><small>' + a.d + '</small><div class="bar"><i style="width:' + v / a.goal * 100 + '%"></i></div><small>' + fmtBig(v) + '/' + fmtBig(a.goal) + ' · 🪙' + fmtBig(a.gold) + '</small></div>' + (got ? '<b style="color:var(--leaf)">✓</b>' : rdy ? '<button class="claim">Ödülü Al</button>' : '');
+    const bt = c.querySelector(".claim"); if (bt) bt.onclick = () => { achUnlock(a.id); renderAchievements(); }; L.appendChild(c); });
+  emptyState(L, "🏆", "Henüz başarı yok."); }
+function openAchModal() { renderAchievements(); (closeAll(), $id("ach_v8").classList.add("on")); ANALYTICS.log("screen_view", { s: "ach" }); }
+function closeAch() { ($id("ach_v8").classList.remove("on"), closeAll()); }
+$id("achBtn_v8") && ($id("achBtn_v8").onclick = openAchModal);
+
+/* ===== v8 eklentileri - 2. bölüm: tam başarı listesi, olay bağlantıları, DM, hediye, analytics paneli ===== */
+const cntAn = k => { try { return (S[ANIMALS[k].list] || []).length; } catch (e) { return 0; } };
+const ovenN = () => { try { return OVENS.filter(id => S[id]).length; } catch (e) { return 0; } };
+const ovenTop = () => { try { return Math.max(0, ...OVENS.map(id => (S.ovenLv && +S.ovenLv[id]) || 0)); } catch (e) { return 0; } };
+const friendCnt = () => { try { return (S.friends || []).filter(f => f !== BOT_UID).length; } catch (e) { return 0; } };
+const ST = { level: () => S.level || 0, friends: friendCnt, chickens: () => cntAn("coop"), cows: () => cntAn("cowbarn"), ovenN, ovenTop, well: () => S.well || 0,
+  spr: () => (S.spr || []).length, sprLv: () => S.sprLv || 0, depLv: () => S.depLv || 0, fences: () => S.fencesBought || 0, land: () => S.landBought || 0, decor: () => (S.decor || []).length };
+const ACH = [
+  A("harv1", "Çiftçilik", "🌾", "İlk Hasat", "1 hasat yap", "harvest", 1, 20), A("harv100", "Çiftçilik", "🧑‍🌾", "Çiftçi", "100 hasat yap", "harvest", 100, 200), A("harv1000", "Çiftçilik", "🌽", "Bereket", "1000 hasat yap", "harvest", 1000, 2000),
+  A("plant1", "Çiftçilik", "🌱", "İlk Tohum", "1 tohum ek", "plant", 1, 10), A("plant500", "Çiftçilik", "🌻", "Bahçıvan", "500 tohum ek", "plant", 500, 500), A("water1000", "Çiftçilik", "💧", "Su Ustası", "1000 kez sula", "water", 1000, 500),
+  A("apple50", "Çiftçilik", "🍎", "Elma Bahçesi", "50 elma topla", "apple", 50, 300), A("bread50", "Çiftçilik", "🍞", "Fırıncı", "50 ekmek pişir", "bread", 50, 400), A("fries50", "Çiftçilik", "🍟", "Şef", "50 kızartma pişir", "fries", 50, 500),
+  A("sell1", "Ekonomi", "🪙", "İlk Kuruş", "İlk satışını yap", "sell", 1, 15), A("sell100", "Ekonomi", "🏪", "Tüccar", "100 ürün sat", "sell", 100, 200),
+  A("earn1e4", "Ekonomi", "💵", "Zengin", "10.000 altın kazan", "earn", 1e4, 1000), A("earn1e5", "Ekonomi", "💎", "Milyoner", "100.000 altın kazan", "earn", 1e5, 5000), A("earn1e6", "Ekonomi", "👑", "Milyarder", "1.000.000 altın kazan", "earn", 1e6, 25000), A("spend5e4", "Ekonomi", "🛍️", "Harcayan", "50.000 altın harca", "spend", 5e4, 2000),
+  A("chick1", "Hayvancılık", "🐔", "İlk Tavuk", "Bir tavuk satın al", "st:chickens", 1, 50), A("chick10", "Hayvancılık", "🏡", "Kümes Sahibi", "10 tavuğun olsun", "st:chickens", 10, 500), A("egg100", "Hayvancılık", "🥚", "Yumurta Ustası", "100 yumurta topla", "egg", 100, 300),
+  A("cow1", "Hayvancılık", "🐄", "İlk İnek", "Bir inek satın al", "st:cows", 1, 100), A("cow4", "Hayvancılık", "🏚️", "Ahır Sahibi", "4 ineğin olsun", "st:cows", 4, 500), A("milk100", "Hayvancılık", "🥛", "Süt Ustası", "100 süt topla", "milk", 100, 500), A("feed100", "Hayvancılık", "🌾", "Yem Fabrikası", "100 yem üret", "feed", 100, 400),
+  A("oven1", "İnşaat", "🔥", "İlk Fırın", "İlk fırını kur", "st:ovenN", 1, 50), A("oven2", "İnşaat", "🔥", "İkinci Fırın", "İkinci fırını kur", "st:ovenN", 2, 200), A("ovenlv3", "İnşaat", "♨️", "Fırın Ustası", "Fırını 3. seviyeye çıkar", "st:ovenTop", 3, 500),
+  A("well2", "İnşaat", "🪣", "Su Kuyusu", "Kuyuyu geliştir (2. sv)", "st:well", 2, 30), A("well5", "İnşaat", "⛲", "Kuyu Ustası", "Kuyuyu 5. seviyeye çıkar", "st:well", 5, 1000),
+  A("spr1", "İnşaat", "🚿", "Fıskiye Sahibi", "İlk fıskiyeyi kur", "st:spr", 1, 50), A("sprlv6", "İnşaat", "🌦️", "Sulama Ustası", "Fıskiyeleri 6. seviyeye çıkar", "st:sprLv", 6, 1500),
+  A("dep2", "İnşaat", "📦", "Depocu", "Depoyu 2. seviyeye çıkar", "st:depLv", 2, 100), A("fence50", "İnşaat", "🧱", "Çit Ustası", "50 çit yap", "st:fences", 50, 300),
+  A("land5", "İnşaat", "🗺️", "Genişleyen", "5 toprak parçası al", "st:land", 5, 2000), A("land100", "İnşaat", "🏞️", "Toprak Ağası", "100 toprak parçası al", "st:land", 100, 1000), A("decor20", "İnşaat", "🌷", "Dekoratör", "20 süs yerleştir", "st:decor", 20, 300),
+  A("fr1", "Sosyal", "🤝", "İlk Arkadaş", "1 arkadaş edin", "st:friends", 1, 50), A("fr5", "Sosyal", "😊", "Popüler", "5 arkadaşın olsun", "st:friends", 5, 200), A("fr20", "Sosyal", "🌟", "Ünlü", "20 arkadaşın olsun", "st:friends", 20, 1000),
+  A("chat1", "Sosyal", "💬", "Sohbetçi", "İlk mesajını yaz", "chat", 1, 20), A("chat100", "Sosyal", "🗣️", "Konuşkan", "100 mesaj yaz", "chat", 100, 300), A("visit1", "Sosyal", "🚪", "Ziyaretçi", "İlk çiftlik ziyaretin", "visit", 1, 30), A("visit50", "Sosyal", "🧭", "Gezgin", "50 ziyaret yap", "visit", 50, 400),
+  A("pz1", "Sosyal", "🛒", "Pazar Ustası", "İlk pazar işlemin", "pazar", 1, 100), A("pz50", "Sosyal", "🏬", "Tüccar Başı", "50 pazar işlemi", "pazar", 50, 1000), A("jobad1", "Sosyal", "📢", "İşveren", "İlk iş ilanını ver", "jobad", 1, 50), A("job1", "Sosyal", "🧰", "İşçi", "İlk işini yap", "job", 1, 50),
+  A("lv5", "Seviye", "🔰", "Yeni Başlayan", "5. seviye", "st:level", 5, 50), A("lv10", "Seviye", "📘", "Çırak", "10. seviye", "st:level", 10, 100), A("lv25", "Seviye", "🎓", "Deneyimli", "25. seviye", "st:level", 25, 500), A("lv50", "Seviye", "🏅", "Uzman", "50. seviye", "st:level", 50, 2000), A("lv100", "Seviye", "🏆", "Efsane", "100. seviye", "st:level", 100, 10000),
+  A("wish1", "Özel", "⛲", "İlk Dilek", "İlk dileğini tut", "wishN", 1, 20), A("wishw2", "Özel", "🍀", "Şanslı", "Dilekte 2x kazan", "wishWin", 1, 100), A("wishj", "Özel", "🌠", "Çok Şanslı", "Dilekte 100x kazan", "wishJack", 1, 1000), A("wish100", "Özel", "🪄", "Dilekçi", "100 dilek tut", "wishN", 100, 500),
+  A("chest1", "Özel", "🎁", "Gizemli", "Gizemli sandığı aç", "chest", 1, 100), A("wk1", "Özel", "📅", "Haftalık", "Haftalık görev tamamla", "weeklyTask", 1, 100), A("lg7", "Özel", "🔥", "Günlük Seri", "7. gün ödülünü al", "loginDay7", 1, 300)];
+function achVal(a) { try { if (a.tr.startsWith("st:")) return +ST[a.tr.slice(3)]() || 0; } catch (e) { return 0; } return +S.ach.progress[a.tr] || 0; }
+let achReady = [], achReadyInit = false;
+function renderAchDot() { const r = ACH.filter(a => !S.ach.unlocked.includes(a.id) && achCheck(a.id)), d = $id("achDot_v8"); if (d) d.style.display = r.length ? "block" : "none";
+  const ids = r.map(a => a.id), fresh = ids.filter(id => !achReady.includes(id));
+  if (achReadyInit && fresh.length) { HAPTIC.buzz("achievement"); toast("🏆 Başarı hazır: " + ACH.find(a => a.id === fresh[0]).n); SFX.play("notify"); }
+  achReady = ids; achReadyInit = true; }
+
+/* ---- olay bağlantıları (mevcut fonksiyonlar sarılır, oyun koduna dokunulmaz) ---- */
+const QMAP = { harvest: "harvest", plant: "plant", water: "water", sell: "sell", wish: "wishN", jobs: "job" };
+const DMAP = { "harv:apple": "apple", "prod:egg": "egg", "prod:milk": "milk", "bake:bread": "bread", "bake:fries": "fries", feed: "feed" };
+try { const _q = questEv; questEv = function (id, n) { try { if (QMAP[id]) achEvent(QMAP[id], n === undefined ? 1 : n);
+    if (id === "sell" && !S.ach.progress.firstSale) { S.ach.progress.firstSale = 1; ANALYTICS.log("first_sale"); } if (id === "wish") ANALYTICS.log("wish_spin"); } catch (e) {} return _q.apply(this, arguments); }; } catch (e) {}
+try { const _d = dailyEv; dailyEv = function (k, n) { try { if (DMAP[k]) achEvent(DMAP[k], n === undefined ? 1 : n); } catch (e) {} return _d.apply(this, arguments); }; } catch (e) {}
+try { const _g = gainXp; gainXp = function (n) { const l = S.level; const r = _g.apply(this, arguments); try { if (S.level > l) ANALYTICS.log("level_up", { level: S.level }); } catch (e) {} return r; }; } catch (e) {}
+try { const _l = loginClaim; loginClaim = function () { let I = null, c0 = 0; try { I = loginInfo(); c0 = S.login.totalClaims; if (I.can && (+S.login.streak || 0) > 0 && I.streak === 0) ANALYTICS.log("login_streak_broken"); } catch (e) {}
+    const r = _l.apply(this, arguments); try { if (S.login.totalClaims > c0) { ANALYTICS.log("login_reward", { day: I && I.day }); if (I && I.day === 7) { achEvent("loginDay7", 1); achEvent("chest", 1); } } } catch (e) {} return r; }; } catch (e) {}
+document.addEventListener("submit", e => { if (e.target && e.target.id === "chatForm_v8") { const v = ($id("chatIn_v8") || {}).value; if (v && v.trim()) { achEvent("chat"); ANALYTICS.log("chat_send"); } } }, true);
+let lastF = null; setInterval(() => { try { if (!S || !entered) return; const n = friendCnt(); if (lastF !== null && n > lastF) ANALYTICS.log("friend_add"); lastF = n; } catch (e) {} }, 3000);
+try { const _p = SFX.play; SFX.play = function (n) { if (n === "buy") { const g0 = S.gold; setTimeout(() => { try { const d = g0 - S.gold; if (d > 0) achEvent("spend", d); if (!S.ach.progress.firstBuy) { S.ach.progress.firstBuy = 1; ANALYTICS.log("first_purchase"); } } catch (e) {} }, 0); } return _p.apply(this, arguments); }; } catch (e) {}
+
+/* ---- ÖZEL MESAJ ---- */
+const pairKey = (a, b) => a < b ? a + "_" + b : b + "_" + a;
+let dmWith = null, dmUnsub = null, dmBoxes = [], dmFirst = true, giftList = [], giftFirst = true, socialOn = false, dmLast = 0;
+const ago = ts => { const m = Math.floor((Date.now() - ts) / 6e4); return m < 1 ? "şimdi" : m < 60 ? m + " dk" : m < 1440 ? Math.floor(m / 60) + " sa" : Math.floor(m / 1440) + " gün"; };
+function initSocial() { if (socialOn || !db || !uid || !online) return; socialOn = true;
+  try { db.collection("dmbox").where("to", "==", uid).onSnapshot(s => { dmBoxes = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const u = dmBoxes.filter(b => b.unread).length, c = $id("dmCnt_v8"); c.style.display = u ? "inline-block" : "none"; c.textContent = u;
+    if (!dmFirst && u && !(dmWith && $id("dm_v8").classList.contains("on"))) { SFX.play("notify"); HAPTIC.buzz("notify"); toast((dmBoxes.find(x => x.unread) || {}).fromName + " sana mesaj gönderdi"); } dmFirst = false;
+    if ($id("dm_v8").classList.contains("on") && !dmWith) renderDmInbox(); }, () => {}); } catch (e) {}
+  try { db.collection("gifts/" + uid).onSnapshot(s => { giftList = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).filter(g => g && !g.claimed);
+    const b = $id("giftBadge_v8"); b.hidden = !giftList.length; b.textContent = "🎁 " + giftList.length;
+    if (giftFirst && giftList.length) { const g = giftList[0]; toast("🎁 " + (g.fromName || "Bir çiftçi") + " sana " + fmtBig(g.gold || 0) + " altın gönderdi" + (g.items ? " + ürün" : "")); HAPTIC.buzz("notify"); setTimeout(openGiftInbox, 2600); } giftFirst = false;
+    if ($id("gift_v8").classList.contains("on") && $id("giftBody_v8").dataset.v === "inbox") renderGiftInbox(); try { renderMailDot(); if ($id("mailbox_v8") && $id("mailbox_v8").classList.contains("on")) renderMail(); } catch (e) {} }, () => {}); } catch (e) {} }
+function renderDmInbox() { dmWith = null; $id("dmTitle_v8").textContent = "💬 Mesajlar"; $id("dmForm_v8").hidden = true; const L = $id("dmList_v8");
+  L.innerHTML = dmBoxes.map(b => '<button class="ach-c" style="width:100%;text-align:left" data-dmopen="' + esc(b.from) + '"><div style="flex:1"><b>' + esc(b.fromName || "Çiftçi") + '</b>' + (b.unread ? ' 🔴' : '') + '<br><small>' + esc(b.text || "") + '</small></div><small>' + ago(b.ts || 0) + '</small></button>').join("");
+  emptyState(L, "💬", "Henüz mesajın yok. Arkadaş listesinden mesaj yazabilirsin."); }
+async function openDm(who) { if (!who || !db || !uid) return; if (!$id("dm_v8").classList.contains("on")) (closeAll(), $id("dm_v8").classList.add("on")); dmWith = who; $id("dmForm_v8").hidden = false; $id("dmList_v8").innerHTML = '<p class="empty">Yükleniyor</p>';
+  let nm = "Çiftçi", av = ""; try { const d = await getPlayer(who); if (d) { nm = d.name; av = '<div class="av" style="display:inline-block;width:34px;height:34px;vertical-align:middle;margin-right:6px">' + avatar(d.g) + '</div>'; } } catch (e) {} $id("dmTitle_v8").innerHTML = av + esc(nm); ANALYTICS.log("screen_view", { s: "dm" });
+  const base = "dm/" + pairKey(uid, who) + "/messages"; if (dmUnsub) { try { dmUnsub(); } catch (e) {} }
+  dmUnsub = db.collection(base).limit(100).onSnapshot(s => { if (dmWith !== who) return; const ms = s.docs.filter(d => d.exists).map(d => Object.assign({ id: d.id }, d.data())).sort((a, b) => (a.ts || 0) - (b.ts || 0)); const L = $id("dmList_v8");
+    L.innerHTML = ms.map(m => '<div style="display:flex;justify-content:' + (m.from === uid ? 'flex-end' : 'flex-start') + '"><div style="max-width:78%;margin:3px 0;padding:6px 10px;border-radius:12px;background:' + (m.from === uid ? 'var(--me)' : 'var(--panel2)') + '">' + esc(m.text) + '<br><small style="opacity:.7">' + ago(m.ts || 0) + (m.from === uid ? ' <span style="color:' + (m.read ? '#2f8fe0' : 'inherit') + '">' + (m.read ? '✓✓' : '✓') + '</span>' : '') + '</small></div></div>').join("");
+    emptyState(L, "✉️", "Henüz mesaj yok. İlk mesajı sen yaz!"); L.scrollTop = L.scrollHeight;
+    const un = ms.filter(m => m.to === uid && !m.read); if (un.length) { un.forEach(m => { try { db.doc(base + "/" + m.id).update({ read: true }); } catch (e) {} }); try { db.doc("dmbox/" + uid + "_" + who).update({ unread: false }); } catch (e) {} } }, () => { $id("dmList_v8").innerHTML = '<p class="empty">' + friendlyError({ code: "PERMISSION_DENIED" }) + '</p>'; }); }
+function closeDm() { ($id("dm_v8").classList.remove("on"), closeAll()); if (dmUnsub) { try { dmUnsub(); } catch (e) {} dmUnsub = null; } dmWith = null; }
+$id("dmForm_v8").addEventListener("submit", async e => { e.preventDefault(); const inp = $id("dmIn_v8"), t = inp.value.trim().slice(0, 200), btn = $id("dmSend_v8"); if (!t || !dmWith || Date.now() - dmLast < 800) return;
+  if (!isFriend(dmWith)) { toast("Sadece arkadaşlarına mesaj yazabilirsin"); return; } dmLast = Date.now(); btn.classList.add("loading"); const to = dmWith, ts = Date.now();
+  try { await db.doc("dm/" + pairKey(uid, to) + "/messages/" + ts.toString(36) + Math.random().toString(36).slice(2, 5)).set({ from: uid, to, text: t, ts, read: false });
+    await db.doc("dmbox/" + to + "_" + uid).set({ to, from: uid, fromName: S.name, text: t.slice(0, 60), ts, unread: true }); inp.value = ""; achEvent("chat"); ANALYTICS.log("chat_send", { dm: 1 }); }
+  catch (er) { toast(friendlyError(er)); SFX.play("error"); } btn.classList.remove("loading"); });
+$id("dmList_v8").addEventListener("click", e => { const b = e.target.closest("[data-dmopen]"); if (b) openDm(b.dataset.dmopen); });
+$id("dmBadge_v8").onclick = () => { (closeAll(), $id("dm_v8").classList.add("on")); renderDmInbox(); };
+function listenGifts() { initSocial(); }
+function checkUnreadDM() { try { const u = dmBoxes.filter(b => b.unread).length; if (u) { toast("📬 " + u + " okunmamış mesajın var"); HAPTIC.buzz("notify"); } } catch (e) {} }
+
+/* ---- HEDİYE ---- */
+let giftTo = null;
+async function openGift(to) { giftTo = to; let nm = "Çiftçi"; try { const d = await getPlayer(to); if (d) nm = d.name; } catch (e) {}
+  const items = (typeof PRODUCTS !== "undefined" ? PRODUCTS : []).filter(p => (+S.store[p.key] || 0) > 0);
+  const B = $id("giftBody_v8"); B.dataset.v = "send";
+  B.innerHTML = '<h1>🎁 ' + esc(nm) + ' için hediye</h1><label><b>Altın (günlük en fazla 5000)</b><br><input id="gGold" type="number" min="1" max="5000" placeholder="0" style="width:100%;padding:8px;border-radius:10px"></label>' +
+    '<p><b>Depodan ürün (isteğe bağlı)</b></p><div style="display:flex;gap:6px"><select id="gItem" style="flex:1;padding:8px"><option value="">Ürün seç</option>' + items.map(p => '<option value="' + p.key + '">' + esc(p.name) + ' (' + S.store[p.key] + ')</option>').join("") + '</select><input id="gQty" type="number" min="1" value="1" style="width:70px;padding:8px"></div>' +
+    '<button class="big green" id="gSend" style="margin-top:12px;width:100%">Hediyeyi gönder</button>'; (closeAll(), $id("gift_v8").classList.add("on"));
+  $id("gSend").onclick = async () => { const gs = (S.giftSent && S.giftSent.day === today()) ? S.giftSent : { day: today(), total: 0 }, left5 = Math.max(0, 5000 - (+gs.total || 0)), gold = Math.max(0, Math.min(left5, Math.floor(+$id("gGold").value || 0))), key = $id("gItem").value, qty = key ? Math.max(1, Math.floor(+$id("gQty").value || 1)) : 0;
+    if (+$id("gGold").value > left5) { toast("Günlük hediye sınırı 5000 altın. Kalan: " + fmtBig(left5)); SFX.play("error"); return; } if (!gold && !key) { toast("Altın ya da ürün seç"); SFX.play("error"); return; } if (gold > S.gold && !isAdmin()) { toast("O kadar altının yok"); SFX.play("error"); return; } if (key && qty > (+S.store[key] || 0)) { toast("Depoda o kadar ürün yok"); SFX.play("error"); return; }
+    const btn = $id("gSend"); btn.classList.add("loading"); const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    if (!isAdmin()) S.gold = round1(S.gold - gold); if (key) S.store[key] -= qty; S.giftSent = { day: today(), total: (+gs.total || 0) + gold }; saveNow(); renderHud();
+    try { await db.doc("gifts/" + to + "/" + id).set({ from: uid, fromName: S.name, gold, items: key ? { [key]: qty } : null, ts: Date.now(), claimed: false }); SFX.play("coin"); HAPTIC.buzz("success"); toast("Hediye gönderildi 🎁"); ANALYTICS.log("gift_send", { gold }); closeGift(); }
+    catch (er) { if (!isAdmin()) S.gold = round1(S.gold + gold); if (key) S.store[key] += qty; S.giftSent = { day: gs.day, total: Math.max(0, (+S.giftSent.total || 0) - gold) }; saveNow(); renderHud(); toast(friendlyError(er)); SFX.play("error"); btn.classList.remove("loading"); } }; }
+function renderGiftInbox() { const B = $id("giftBody_v8"); B.dataset.v = "inbox";
+  B.innerHTML = '<h1>🎁 Gelen hediyeler</h1>' + (giftList.length ? giftList.map(g => '<div class="ach-c"><div style="flex:1"><b>' + esc(g.fromName || "Çiftçi") + '</b><br><small>' + (g.gold ? fmtBig(g.gold) + ' altın' : '') + (g.items ? ' ' + Object.entries(g.items).map(([k, v]) => v + ' ' + k).join(', ') : '') + '</small></div><button class="claim" data-gclaim="' + g.id + '">Al</button></div>').join("") : '<div class="empty-v8"><b>🎁</b>Henüz hediyen yok.</div>'); }
+function openGiftInbox() { renderGiftInbox(); (closeAll(), $id("gift_v8").classList.add("on")); }
+function closeGift() { ($id("gift_v8").classList.remove("on"), closeAll()); }
+document.addEventListener("click", async e => { const b = e.target.closest("[data-gclaim]"); if (!b) return; const g = giftList.find(x => x.id === b.dataset.gclaim); if (!g) return; const path = "gifts/" + uid + "/" + g.id;
+  const need = g.items ? Object.values(g.items).reduce((a, v) => a + (+v || 0), 0) : 0; if (need && depFree(S) < need) { depotFullHint(); return; } b.classList.add("loading");
+  try { const cur = await db.doc(path).get(); if (!cur.exists || cur.data().claimed) { toast("Bu hediye zaten alınmış"); return; } await db.doc(path).update({ claimed: true });
+    S.gold = round1(S.gold + Math.min(5000, +g.gold || 0)); if (g.items) Object.entries(g.items).forEach(([k, v]) => { S.store[k] = (+S.store[k] || 0) + (+v || 0); }); saveNow(); renderHud(); SFX.seq("quest", "coin"); HAPTIC.buzz("success"); toast("Hediye alındı 🎁"); ANALYTICS.log("gift_claim"); }
+  catch (er) { toast(friendlyError(er)); b.classList.remove("loading"); } });
+$id("giftBadge_v8").onclick = openGiftInbox;
+document.addEventListener("click", e => { const d = e.target.closest("[data-dm]"), g = e.target.closest("[data-sendgift]"); if (d) { try { closeProfile(); } catch (x) {} openDm(d.dataset.dm); } else if (g) { try { closeProfile(); } catch (x) {} openGift(g.dataset.sendgift); } });
+
+/* ---- ADMIN ANALYTICS ---- */
+async function openAnalytics() { if (!isAdmin()) return; const B = $id("anaBody_v8"); (closeAll(), $id("analytics_v8").classList.add("on")); B.innerHTML = '<p class="empty">Yükleniyor</p>';
+  try { const { all, players } = await ANALYTICS.loadToday();
+    const cnt = {}; all.forEach(l => cnt[l.event] = (cnt[l.event] || 0) + 1); const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 10), last = all.sort((a, b) => b.ts - a.ts).slice(0, 20);
+    B.innerHTML = '<p><b>Bugünkü event:</b> ' + all.length + ' · <b>Aktif oyuncu:</b> ' + players.length + '</p><h3>En çok 10 event</h3>' + (top.map(([k, v]) => '<div>' + esc(k) + ': <b>' + v + '</b></div>').join("") || '—') +
+      '<h3>Son 20 event</h3>' + (last.map(l => '<div><small>' + new Date(l.ts).toLocaleTimeString("tr") + ' · ' + esc(l.name || "?") + ' · <b>' + esc(l.event) + '</b></small></div>').join("") || '—'); }
+  catch (e) { B.innerHTML = '<p class="empty">' + friendlyError(e) + '</p>'; } }
+$id("admAnaBtn_v8") && ($id("admAnaBtn_v8").onclick = openAnalytics);
+$id("anaClose_v8") && ($id("anaClose_v8").onclick = () => ($id("analytics_v8").classList.remove("on"), closeAll()));
+
+
+try { const _rm = renderMail; renderMail = function () { const r = _rm.apply(this, arguments); try { const box = $("mailList"); if (box) { if (giftList.length) box.insertAdjacentHTML("afterbegin", giftList.map(g => '<div class="mailrow new"><b>🎁 Hediye</b><p>' + esc(g.fromName || "Bir çiftçi") + ' sana ' + (g.gold ? fmtBig(g.gold) + ' altın' : '') + (g.items ? ' + ürün' : '') + ' gönderdi.</p><div class="row"><button class="big green" data-gclaim="' + esc(g.id) + '">Al</button></div></div>').join("")); emptyState(box, "📬", "Henüz mektubun yok."); } } catch (e) {} return r; }; } catch (e) {}
+try { const _rd = renderMailDot; renderMailDot = function () { const r = _rd.apply(this, arguments); try { const m = $("mailDot"); if (m) m.classList.toggle("on", m.classList.contains("on") || giftList.length > 0); } catch (e) {} return r; }; } catch (e) {}
+try { const _dp = renderDepot; renderDepot = function () { const r = _dp.apply(this, arguments); try { const b = $("depotBody"); if (b && PRODUCTS.every(p => !(+S.store[p.key] > 0)) && !b.querySelector(".depempty")) b.insertAdjacentHTML("beforeend", '<p class="empty depempty">📦<br>Deponda henüz ürün yok.</p>'); } catch (e) {} return r; }; } catch (e) {}
+ANALYTICS.loadToday = async function () { const all = [], snap = await db.doc("analytics/" + today()).get(), data = (snap.exists && snap.data()) || {}, players = Object.keys(data);
+  players.forEach(u => Object.values(data[u] || {}).forEach(l => l && l.event && all.push(l))); this.q.forEach(l => all.push(l)); return { all, players }; };
+Object.assign(window, { visitFarm, pzBuy, pzPut, writeJobAd, dailyClaim, changeName, openMailbox, openRank, openAdmin, openProfile, openLogin });
+Object.assign(window, { closeAch, closeWeekly, closeDm, closeGift, openAchModal, openWeekly, openAnalytics });
+
 })();
 </script>
 
