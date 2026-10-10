@@ -1285,7 +1285,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "113";
+const VERSION = "114";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1532,6 +1532,13 @@ const COOP_LEVEL = 10, COOP_PRICE = 500, COOP_CAP = 10, HEN_PRICE = 100, EGG_MS 
 const COWBARN_LEVEL = 13, COWBARN_PRICE = 750, COW_CAP = 4, COW_PRICE = 200, MILK_MS = 8 * MIN, MILK_PRICE = 40;
 const MILL_LEVEL = 10, MILL_PRICE = 300, MILL_CAP = 10;
 // feed recipes: what one batch uses, how many feeds it gives, how long one batch takes
+// Yem çuvalları: üstünde tavuk ya da inek resmi olan, bize özgü çuvallar (hem 2B kartlarda hem 3B rozetlerde kullanılır)
+const SACK = {
+  body: "M56 50Q78 40 100 50L112 74Q122 100 108 112Q78 120 48 112Q34 100 44 74Z", flap: "M50 56L44 40L60 48L70 36L80 48L92 36L98 48L112 40L106 56", rope: "M52 60Q78 70 104 60",
+  chickfeed: { fill: "#f0cf7e", rope: "#f08a1a", art: [["M62 96a16 14 0 1 0 32 0a16 14 0 1 0-32 0Z", "#fff", "#7a4a1c", 3], ["M71 84q2-9 6-4q3-8 7 0q-6 5-13 4Z", "#e0301f", "#7a1f14", 2], ["M91 92l10 3l-10 3Z", "#f2a31a", "#8a5a10", 2], ["M82 90a2.2 2.2 0 1 0 .1 0Z", "#222", "none", 0], ["M65 98q8-7 15 2q-7 8-15-2Z", "#f1d9a5", "#8a6a3a", 2]] },
+  cowfeed: { fill: "#d3dde8", rope: "#3f86d6", art: [["M56 86l-9-6l2 12Z", "#fff", "#333", 2.5], ["M100 86l9-6l-2 12Z", "#fff", "#333", 2.5], ["M58 80q20-10 40 0q4 22-6 32q-14 6-28 0q-10-10-6-32Z", "#fff", "#333", 3], ["M62 82q9-4 11 4q-5 8-11 3Z", "#3a3a3a", "none", 0], ["M64 102a14 9 0 1 0 28 0a14 9 0 1 0-28 0Z", "#f4a6a6", "#a85a5a", 2], ["M71 102a2 2.5 0 1 0 .1 0ZM85 102a2 2.5 0 1 0 .1 0Z", "#7a3a3a", "none", 0], ["M65 90a2.4 2.4 0 1 0 .1 0ZM87 90a2.4 2.4 0 1 0 .1 0Z", "#222", "none", 0]] },
+};
+const sackSvg = k => { const a = SACK[k]; return `<path d="${SACK.body}" fill="${a.fill}" stroke="#6e4a1c" stroke-width="5" stroke-linejoin="round"/><path d="${SACK.flap}" fill="${a.fill}" stroke="#6e4a1c" stroke-width="5" stroke-linejoin="round"/><path d="${SACK.rope}" fill="none" stroke="${a.rope}" stroke-width="7" stroke-linecap="round"/>` + a.art.map(([d, f, st, w]) => `<path d="${d}" fill="${f}" ${st !== "none" ? `stroke="${st}" stroke-width="${w}" stroke-linejoin="round"` : ""}/>`).join(""); };
 const FEEDS = {
   chickfeed: { name: "Tavuk yemi", need: { wheat: 2 }, out: 1, ms: 2 * MIN, emoji: "🐔" },
   cowfeed: { name: "İnek yemi", need: { corn: 1, wheat: 1 }, out: 3, ms: 3 * MIN, emoji: "🐄" },
@@ -4059,7 +4066,7 @@ function renderDepot() {
 $("depotTabs").addEventListener("click", e => { const b = e.target.closest("[data-dtab]"); if (!b) return; dtab = b.getAttribute("data-dtab"); renderDepot(); });
 const eggThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M14 70q36 22 72 0l-6 18H20z" fill="#c8964a" stroke="#7b5128" stroke-width="3"/><ellipse cx="36" cy="60" rx="13" ry="17" fill="#fff6e8" stroke="#c8a77a" stroke-width="2.5"/><ellipse cx="62" cy="58" rx="13" ry="17" fill="#f3dcbc" stroke="#b98d5a" stroke-width="2.5"/><ellipse cx="49" cy="66" rx="12" ry="15" fill="#fffaf0" stroke="#c8a77a" stroke-width="2.5"/></svg>`;
 const milkThumb = () => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M34 18h32v10l8 12v44a6 6 0 0 1-6 6H32a6 6 0 0 1-6-6V40l8-12z" fill="#fff" stroke="#5a7a9a" stroke-width="3" stroke-linejoin="round"/><path d="M26 54h48v16H26z" fill="#4f93d8"/><text x="50" y="66" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-weight="700" font-size="12" fill="#fff">SÜT</text><rect x="32" y="12" width="36" height="8" rx="3" fill="#e0473a"/></svg>`;
-const feedThumb = k => `<svg viewBox="0 0 100 100" width="70" height="70"><rect width="100" height="100" fill="#8cbf4f"/><path d="M28 30q22-10 44 0l6 52a6 6 0 0 1-6 6H28a6 6 0 0 1-6-6z" fill="${k === "cowfeed" ? "#e9d29a" : "#f3e2b4"}" stroke="#8a6a3a" stroke-width="3"/><path d="M30 30q20 8 40 0" fill="none" stroke="#8a6a3a" stroke-width="3"/><text x="50" y="68" text-anchor="middle" font-size="26">${FEEDS[k].emoji}</text></svg>`;
+const feedThumb = k => `<svg viewBox="22 22 112 104" width="70" height="70" aria-hidden="true"><rect x="22" y="22" width="112" height="104" fill="#8cbf4f"/>${sackSvg(k)}</svg>`;
 $("depotBody").addEventListener("click", e => {
   if (e.target.closest("[data-depup]")) { depotUpgrade(); return; }
   const b = e.target.closest("[data-sell]"); if (!b || !S) return;
@@ -6019,6 +6026,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 114, d: "11 Ekim 2026", e: "🐔", t: "Hayvan resimli yem çuvalları", c: "#8a5a1e", b: "#faead0", items: [
+    "Tavuk ya da inekler acıkınca kümesin ve ahırın üstünde, kendi resimli yem çuvalı çıkıyor.",
+    "Ambardaki tavuk yemi tavuk resimli, inek yemi inek resimli çuval oldu. Depoda ve ambar ekranında da aynı çuvalları görürsün.",
+  ] },
   { v: 113, d: "11 Ekim 2026", e: "🔤", t: "Okunaklı isimler", c: "#4a5a7a", b: "#e2e8f3", items: [
     "Karakter isimleri sade ve kalın bir yazı tipiyle, daha yüksek çözünürlükte çiziliyor; uzaktan net okunuyor.",
   ] },
@@ -6473,8 +6484,8 @@ function setup3D(T) {
       x.fillStyle = "#1d2a1b"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(text, w / 2, 74, w - 60);
     });
   }
-  function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a" }[e] || "#ffd24a";
-    return canvasTex("emo3" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
+  function emojiBadge(e, n) { const col = { "🥚": "#ffb43a", "🥛": "#63b8ff", "🍽️": "#ff7a6a", "📋": "#ffd24a", "🌾": "#8fd44a", "🐔🌾": "#ff9a3c", "🐄🌾": "#9bd65a" }[e] || "#ffd24a";
+    return canvasTex("emo4" + e + n, 160, 160, (x, w, h) => { x.fillStyle = "rgba(0,0,0,.35)"; x.beginPath(); x.arc(82, 88, 66, 0, 6.283); x.fill();
     x.fillStyle = "#3a2410"; x.beginPath(); x.arc(78, 78, 68, 0, 6.283); x.fill();
     x.fillStyle = "#fff"; x.beginPath(); x.arc(78, 78, 62, 0, 6.283); x.fill();
     x.fillStyle = col; x.beginPath(); x.arc(78, 78, 52, 0, 6.283); x.fill();
@@ -6488,6 +6499,11 @@ function setup3D(T) {
       x.beginPath(); x.moveTo(44, 62); x.lineTo(112, 62); x.lineTo(103, 108); x.quadraticCurveTo(78, 116, 53, 108); x.closePath(); x.fillStyle = "#b8c7d6"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#3d4650"; x.stroke();
       x.beginPath(); x.ellipse(78, 62, 34, 9, 0, 0, 6.283); x.fillStyle = "#fffdf6"; x.fill(); x.stroke();
       x.fillStyle = "#e0473a"; x.fillRect(50, 82, 56, 7); x.fillStyle = "rgba(255,255,255,.5)"; x.fillRect(56, 66, 6, 36);
+    } else if (e === "🐔🌾" || e === "🐄🌾") {   // hayvan resimli yem çuvalı
+      const a = SACK[e === "🐔🌾" ? "chickfeed" : "cowfeed"]; x.lineWidth = 5; x.strokeStyle = "#6e4a1c";
+      const body = new Path2D(SACK.body), flap = new Path2D(SACK.flap); x.fillStyle = a.fill; x.fill(body); x.stroke(body); x.fill(flap); x.stroke(flap);
+      x.lineWidth = 7; x.strokeStyle = a.rope; x.stroke(new Path2D(SACK.rope));
+      a.art.forEach(([d, f, st, w]) => { const pth = new Path2D(d); x.fillStyle = f; x.fill(pth); if (st !== "none") { x.lineWidth = w; x.strokeStyle = st; x.stroke(pth); } });
     } else if (e === "🌾") {   // yem çuvalı
       x.beginPath(); x.moveTo(56, 50); x.quadraticCurveTo(78, 40, 100, 50); x.lineTo(112, 74); x.quadraticCurveTo(122, 100, 108, 112); x.quadraticCurveTo(78, 120, 48, 112); x.quadraticCurveTo(34, 100, 44, 74); x.closePath();
       x.fillStyle = "#e0b968"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#6e4a1c"; x.stroke();
@@ -7685,10 +7701,10 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     if (isMe) for (const oid of OVENS) if (L[oid] >= 0) { const B = bakeInfo(S, now, oid); if (B.done > 0) { const s = sprite(badgeTex(B.done, "bread"), 1.05, .52, { fog: false }); s.position.set(colOf(L[oid]) + 1.7, 1.75, rowOf(L[oid]) + 1); dyn.add(s); } }
     if (isMe) {
       [["coop", "🥚"], ["cowbarn", "🥛"]].forEach(([k, e]) => { if (!(L[k] >= 0)) return; const I = animalInfo(S, k, now), o = OBJ[k];
-        const em = I.ready ? e : I.hungry && I.hungry === I.n ? "🍽️" : null; if (!em) return;
+        const em = I.ready ? e : I.hungry && I.hungry === I.n ? (k === "coop" ? "🐔🌾" : "🐄🌾") : null; if (!em) return;
         const sp = sprite(emojiBadge(em, I.ready || 0), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L[k]) + o.w / 2, 2.25 + (k === "cowbarn" ? .3 : 0), rowOf(L[k]) + o.h / 2); sp.renderOrder = 7; sp.userData.bob = Math.random() * 6; fx.dstars.push(sp); dyn.add(sp); });
       if (L.sign >= 0 && orderAny()) { const n = S.orders.filter(orderCan).length, sp = sprite(emojiBadge("📋", n), 1.15, 1.15, { fog: false, depthTest: false }); sp.position.set(colOf(L.sign) + .5, 2.3, rowOf(L.sign) + .5); sp.renderOrder = 7; sp.userData.bob = 2; fx.dstars.push(sp); dyn.add(sp); }
-      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge("🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
+      if (L.mill >= 0) { const M0 = millInfo(S, now); if (M0.done) { const sp = sprite(emojiBadge(M0.r === "cowfeed" ? "🐄🌾" : "🐔🌾", M0.done * FEEDS[M0.r].out), 1.2, 1.2, { fog: false, depthTest: false }); sp.position.set(colOf(L.mill) + 1, 2.2, rowOf(L.mill) + 1); sp.renderOrder = 7; sp.userData.bob = 1; fx.dstars.push(sp); dyn.add(sp); } }
     }
     // empty sprinklers show a small red "!"
     (f.spr || []).forEach(s => { if (s.w > 0) return; const sp = sprite(alertTex, .36, .36); sp.position.set(colOf(s.cell) + .5, 1.05, rowOf(s.cell) + .5); sp.renderOrder = 6; dyn.add(sp); });

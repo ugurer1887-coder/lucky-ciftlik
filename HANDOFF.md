@@ -183,3 +183,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v113
 - İsim etiketi (`labelTex`): 1024x256, kalın sade sans yazı tipi (Roboto/Segoe/Arial), kalın koyu çerçeve.
+
+## v114
+- Hayvan resimli yem çuvalları: `SACK` (SVG yol verisi) hem `feedThumb` (2B) hem `emojiBadge` (3B, "🐔🌾"/"🐄🌾") tarafından kullanılır. Aç hayvan ve ambar rozeti bunu gösterir.
