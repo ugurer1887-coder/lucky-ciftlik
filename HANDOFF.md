@@ -240,3 +240,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Sabitler: MINE_LEVEL 10, DYN_PRICE 150, GOLDORE_SELL 250, MINE_DROPS (goldore x1, axe x3, drill x3, eşit şans), MINE_CELL (sanal hücre, proxy ile tıklanır). Depo "goods" (Malzemeler) sekmesinde dynamite/goldore/axe/drill, NOSELL.
 - Maden 3B: `buildMine` yolun altında (z>ROWS), zemin RH +600 uzatıldı, mapBox home için +500 aşağı. 2B yedekte maden YOK.
 - Engeller: S.obst {cell:"t"|"r"}, `genObstacles` (genişletmede), `clearObst` (balta/matkap harcar), occMap/solidOf'a dahil. 3B `buildRock`, buildTree. UYARI: 3B doğrulanmadı.
+
+## v131 — Lucky parası
+- HUD'da altının yanında Lucky parası (`S.lucky`) + "+" düğmesi; `#lucky_sh_v8` mağaza sayfası, 5 paket (`LUCKY_PKGS`: lucky_50/100/150/500/1000 = 19/37/49/179/349 TL).
+- `buyLucky`: Digital Goods API + PaymentRequest (Play Billing, TWA). Satın alma onaylanıp `consume` edilince `luckyGrant`; token `S.luckyTok` ile çift verilmeyi önler; `luckyRecover` açılışta tüketilmemiş alımları tamamlar.
+- Play Console'da aynı ID'lerle yönetilen ürünler oluşturulmalı. Sunucu doğrulaması YOK (client S.lucky yazılabilir) — para harcanan bir şey eklenmeden önce Netlify function ile doğrulama gerekir.
