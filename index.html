@@ -1315,7 +1315,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "128";
+const VERSION = "129";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1346,10 +1346,14 @@ const QUESTS = [
   { id: "tree", e: "🍎", t: "Elma ağacı", s: "Ağaç dik", d: "<b>1.</b> <b>Market &gt; Ekinler</b> sekmesine gir.<br><b>2.</b> Listenin sonundaki <b>Elma ağacı</b>'nı al.<br><b>3.</b> Boş bir yere dokunup dik. Ağaç kendi büyür, sulamaya gerek yok.", need: 1, gold: 25, xp: 4, go: "market", mk: { tab: "crops", card: "Elma ağacı", msg: "👉 Aşağıdaki <b>Elma ağacı</b>'nı al, sonra boş bir yere dokun." }, chk: () => (S.trees && S.trees.length) ? 1 : 0 },
   { id: "decor", e: "🌼", t: "Çiftliğini süsle", s: "Süs yerleştir", d: "<b>1.</b> <b>Market &gt; Dekor</b> sekmesine gir.<br><b>2.</b> <b>Ahşap çit</b> ya da bir süs al.<br><b>3.</b> Çiftliğinde boş bir yere dokun. Ziyarete gelenler görür.", need: 1, gold: 25, xp: 4, go: "market", mk: { tab: "decor", card: "Ahşap çit", msg: "👉 <b>Ahşap çit</b> ya da bir süs seç, sonra çiftliğine dokunarak koy." }, chk: () => ((S.fences && S.fences.length) || (S.decor && S.decor.length)) ? 1 : 0 },
   { id: "bread", e: "🍞", t: "Fırıncı", s: "Ekmek topla", d: "Fırının üstündeki ekmek hazır olunca fırına dokun, ekmekler direkt depoya girer. Ekmek buğdaydan çok daha pahalı satılır.", need: 2, gold: 30, xp: 4 },
+  { id: "sellbread", ev: "sellbread", e: "🥖", t: "Ekmeği sat", s: "Ekmek sat", d: "Ekmek buğdaydan çok daha pahalı! <b>Depoya</b> dokun, <b>Ürünler</b> sekmesine geç ve ekmekleri <b>Hepsini sat</b> ile sat.", need: 2, gold: 15, xp: 3, go: "barn" },
   { id: "daily", e: "📅", t: "Günlük görevler", s: "Görevlere bak", d: "3. seviyede <b>günlük görevler</b> ve <b>siparişler</b> açılır. Soldaki görev düğmesine bas, <b>Günlük</b> sekmesine geç, görevleri yapıp altın ve sandık kazan.", need: 1, gold: 30, xp: 5, lv: 3 },
+  { id: "plazavisit", ev: "plaza", e: "🏘️", t: "Meydanı gez", s: "Meydana git", d: "Sağdaki <b>Meydan</b> düğmesine bas. Orada diğer çiftçiler, dilek çeşmesi, iş ilanları ve pazar var.", need: 1, gold: 10, xp: 2, go: "plaza" },
+  { id: "friend", e: "🤝", t: "Arkadaş edin", s: "Arkadaş ekle", d: "Meydandaki bir çiftçiye dokun ve <b>Arkadaş ekle</b>'ye bas. Arkadaşlarının çiftliğini ziyaret edebilirsin.", need: 1, gold: 20, xp: 3, go: "plaza", chk: () => (S.friends && S.friends.length) ? 1 : 0 },
   { id: "lvl", e: "⭐", t: "5. seviyeye ulaş", s: "Seviye", d: "Ekin ekip toplayarak, ekmek pişirerek ve siparişleri teslim ederek XP kazan. <b>5. seviyede</b> sohbet, patates, toprak satın alma, dilek çeşmesi, pazar ve iş ilanları açılır.", need: 5, gold: 50, xp: 0, chk: () => S.level },
   { id: "wish", e: "⛲", t: "Dilek tut", s: "Dilek tut", d: "Alttan <b>Meydan</b>'a git, ortadaki dilek çeşmesine dokun ve altın atıp dilek tut.", need: 1, gold: 35, xp: 5, go: "plaza" },
   { id: "jobs", e: "📋", t: "İş ilanları", s: "İlanlara bak", d: "Meydandaki <b>İş ilanı</b> tabelasına bak. Başka çiftçilerin tarlasında çalışıp altın kazanabilirsin.", need: 1, gold: 40, xp: 5, go: "jobs" },
+  { id: "pazar", ev: "pzput", e: "🛒", t: "Pazarda sat", s: "Tezgaha koy", d: "Meydandaki <b>Pazar</b>'a gir, <b>Tezgahım</b> sekmesinden depondaki bir ürünü kendi fiyatınla tezgaha koy. Başka oyuncular senden alır, altının sana gelir. Depoya satmaktan çok daha kazançlı.", need: 1, gold: 40, xp: 5, lv: 5, go: "pazar" },
 ];
 const FRIES_PRICE = 60, OVEN_PRICE = 40, BREAD_MS = 150 * 1000, WHEAT_PER_BREAD = 2, BREAD_PRICE = 20, JOB_LEVEL = 5;
 const TREE_PRICE = 20, APPLE_PRICE = 45, TREE_MS = 30 * 60 * 1000;   // apple trees grow on their own, no watering
@@ -2626,7 +2630,7 @@ function setMode(m) {
       : "Kaldırmak istediğin çite dokun.";
   }
   const si = m === "move" && moveSel && moveSel.ghost == null ? sellInfo(moveSel) : null;
-  $("modeCancel").textContent = m === "place" ? "✕ İptal" : "Bitir"; $("modeCancel").classList.toggle("cancel", m === "place");
+  { const pm = ["place", "fence", "land", "tree", "spr", "decor"].includes(m); $("modeCancel").textContent = pm ? "✕ İptal" : "Bitir"; $("modeCancel").classList.toggle("cancel", pm); }
   $("modeOk").hidden = !(m === "place" && placeKind && moveSel && moveSel.ghost != null);
   $("modeSell").hidden = !si; if (si) $("modeSell").textContent = "Sat, " + fmtG(sellBack(si.price)) + " altın";
   renderPlots(); renderFences(); renderHotbar();
@@ -2729,7 +2733,7 @@ function enterScene(sc) {
   firstScene = false;
   if (visitUnsub) { visitUnsub(); visitUnsub = null; }
   if (!(sc.kind === "visit" && sc.job)) { workJob = null; pending.clear(); }
-  scene = sc;
+  scene = sc; if (sc.kind === "plaza") try { questEv("plaza", 1); } catch (e) {}
   clearBusy();
   cancelAll(true);
   const sp = sc.kind === "plaza" ? SPAWN_PLAZA : spawnOf(sc.kind === "visit" ? sc.farm : S);
@@ -4249,7 +4253,7 @@ $("depotBody").addEventListener("click", e => {
   const pr = PRODUCTS.find(x => x.key === b.getAttribute("data-sell")); if (!pr || pr.key === "wood") return;
   const have = +S.store[pr.key] || 0, k = b.getAttribute("data-n") === "all" ? have : Math.min(1, have);
   if (!k) return;
-  S.store[pr.key] = have - k; const gv = k * pr.price * (typeof goldMul === "function" ? goldMul() : 1); S.gold = round1(S.gold + gv); questEv("sell", k); dailyEv("sellg", gv); try { achEvent("earn", gv); } catch (e) {} SFX.seq("sell", "coin");
+  S.store[pr.key] = have - k; const gv = k * pr.price * (typeof goldMul === "function" ? goldMul() : 1); S.gold = round1(S.gold + gv); questEv("sell", k); if (pr.key === "bread") questEv("sellbread", k); dailyEv("sellg", gv); try { achEvent("earn", gv); } catch (e) {} SFX.seq("sell", "coin");
   renderHud(); renderPlots(); save(); renderDepot();
   popAt(me.x, me.y - .3, "+" + fmtG(gv) + " altın", "#ffe27a");
 });
@@ -4310,7 +4314,7 @@ async function pzPut() {
   if (!have || q < 1) return; if (pzMine.length >= PAZAR_SLOTS) { hint("Bütün tezgahların dolu."); return; }
   pzBusy = true; S.store[f.k] = have - q; saveNow(); renderPlots();
   try { await db.doc("market/" + uid + "_" + Date.now().toString(36)).set({ seller: uid, sn: String(S.name || "Çiftçi").slice(0, 24), item: f.k, q, price: p, ts: Date.now() });
-    toast(q + " " + itemName(f.k).toLocaleLowerCase("tr") + " tezgaha kondu 🛒"); pzForm = null; }
+    toast(q + " " + itemName(f.k).toLocaleLowerCase("tr") + " tezgaha kondu 🛒"); pzForm = null; questEv("pzput", 1); }
   catch (e) { S.store[f.k] = (+S.store[f.k] || 0) + q; saveNow(); renderPlots(); toast(e && e.code === "PERMISSION_DENIED" ? "Pazar sunucuda henüz açılmadı." : "Tezgaha konamadı, tekrar dene."); }
   finally { pzBusy = false; renderPazar(); }
 }
@@ -5765,7 +5769,8 @@ function renderQuest() {
 // the dock button that leads to the current quest gently pulses
 function questPulse(q) {
   let act = q && q.go;
-  if (act === "jobs") act = scene.kind === "plaza" ? "jobs" : "plaza";
+  if (act === "jobs" || act === "pazar") act = scene.kind === "plaza" ? act : "plaza";
+  if (act === "barn") act = null;
   if (act === "plaza" && scene.kind === "plaza") act = null;
   if (act === "market" && scene.kind !== "home") act = "home";
   if (q && questLocked(q)) act = null;
@@ -5781,6 +5786,8 @@ function questTarget() {
   if (scene.kind === "plaza") {
     if (q.id === "wish") return { x: PFX + .5, y: 2.2, z: PFZ, txt: "Çeşmeye dokun" };
     if (q.id === "jobs") return cell(P_JOBS[0], .5, .5, 2, "İş ilanına bak");
+    if (q.id === "friend") { const st = [...peers.values()].find(p => p.bot && isFinite(p.x)) || [...peers.values()].find(p => isFinite(p.x)); return st ? { x: st.x + .5, y: 2.3, z: st.y + .5, txt: "Çiftçiye dokun" } : null; }
+    if (q.id === "pazar") { const d = P_DECOR.find(d => d.t === "stall"); return d ? cell(d.cell, .5, .5, 2, "Pazara dokun") : null; }
     return null;
   }
   if (scene.kind !== "home") return null;
@@ -5796,7 +5803,7 @@ function questTarget() {
   }
   if (q.id === "water") { const p = plots.find(p => p.c && !p.w); return p ? cell(p.cell, .5, .5, .8, "Ekine dokun") : null; }
   if (q.id === "harvest") { if (!HARVEST_TOOLS(S.slot)) return null; const p = plots.find(p => ripe(p)) || plots.find(p => p.c); return p ? cell(p.cell, .5, .5, .9, ripe(p) ? "Topla" : "Büyüyor...") : null; }
-  if (q.id === "sell") return L.barn >= 0 ? cell(L.barn, 1.5, 1, 2.2, "Depoya dokun") : null;
+  if (q.id === "sell" || q.id === "sellbread") return L.barn >= 0 ? cell(L.barn, 1.5, 1, 2.2, "Depoya dokun") : null;
   if (q.id === "bakestart" || q.id === "bread") { const o = OVENS.find(id => S[id] && L[id] >= 0 && id !== "icecart"); if (!o) return null; return cell(L[o], 1, 1, 1.9, q.id === "bread" && !bakeInfo(S, now, o).done ? "Pişiyor..." : "Fırına dokun"); }
   if (q.id === "tree") return mode === "tree" ? nearFree() : null;
   if (q.id === "decor") return mode === "fence" || mode === "decor" ? nearFree() : null;
@@ -5817,11 +5824,12 @@ function questGuide() {
       else if (open) { const t = document.querySelector('#qtabs_v8 [data-qtab="daily"]'); if (t) t.classList.add("qtarget"); return; }
       else if (!document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on")) { const b = $("questBtn"); if (b) b.classList.add("qtarget"); return; }
     }
-    if (tutOn() && S && entered && questCur().id === "sell" && !questReady(questCur()) && $("depot").classList.contains("on")) {   // in the depot: point at "Hepsini sat"
-      const b = document.querySelector('#depotBody_v8 [data-sell="wheat"][data-n="all"]') || document.querySelector('#depotBody_v8 [data-sell][data-n="all"]');
-      const tab = !b ? [...document.querySelectorAll("#depotTabs_v8 [data-dtab]")].find(x => (DEPOT_TABS[x.getAttribute("data-dtab")] || []).includes("wheat")) : null;
+    if (tutOn() && S && entered && (questCur().id === "sell" || questCur().id === "sellbread") && !questReady(questCur()) && $("depot").classList.contains("on")) {   // in the depot: point at "Hepsini sat"
+      const sk = questCur().id === "sellbread" ? "bread" : "wheat";
+      const b = document.querySelector('#depotBody_v8 [data-sell="' + sk + '"][data-n="all"]') || (sk === "bread" ? null : document.querySelector('#depotBody_v8 [data-sell][data-n="all"]')) || document.querySelector('#depotBody_v8 [data-sell][data-n="all"]');
+      const tab = !b ? [...document.querySelectorAll("#depotTabs_v8 [data-dtab]")].find(x => (DEPOT_TABS[x.getAttribute("data-dtab")] || []).includes(sk)) : null;
       const el = b || tab; if (el) el.classList.add("qtarget"); return; }
-    if (tutOn() && S && entered && questCur().id === "sell" && !questReady(questCur()) && $("objMenu").classList.contains("on")) { const b = document.querySelector('#objMenu_v8 [data-ot="Depo"]'); if (b) { b.classList.add("qtarget"); return; } }
+    if (tutOn() && S && entered && (questCur().id === "sell" || questCur().id === "sellbread") && !questReady(questCur()) && $("objMenu").classList.contains("on")) { const b = document.querySelector('#objMenu_v8 [data-ot="Depo"]'); if (b) { b.classList.add("qtarget"); return; } }
     const q = tutOn() && S && entered ? questCur() : null, live = !!q && !questLocked(q) && !questReady(q) && !document.querySelector("#root_v8 .modal.on, #root_v8 .sheet.on");
     if (!live) return;
     if ((q.id === "harvest" || (q.id === "bakewheat" && S.plots.some(p => p.c && p.w))) && S.slot && !HARVEST_TOOLS(S.slot)) { const b = document.querySelector('#root_v8 .slot[data-slot]:not([data-slot=""])'); const sc = [...document.querySelectorAll("#root_v8 .slot[data-slot]")].find(e => HARVEST_TOOLS(e.getAttribute("data-slot"))); if (sc) sc.classList.add("qtarget"); }
@@ -6270,6 +6278,10 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 129, d: "11 Ekim 2026", e: "🛒", t: "Yeni görevler", c: "#b9770e", b: "#fdf0d5", items: [
+    "Ağaç, süs, çit, fıskiye ve toprak yerleştirirken de kırmızı İptal düğmesi var.",
+    "Başlangıç görevlerine ekmek satma, meydanı gezme, arkadaş edinme ve pazarda satış eklendi. Oyuncu 5. seviyeye kadar hep yapacak bir şey buluyor.",
+  ] },
   { v: 128, d: "11 Ekim 2026", e: "🧹", t: "Sadeleştirme", c: "#3b7a4a", b: "#e3f3e6", items: [
     "Fırının içindeki geliştirme kartı kaldırıldı, geliştirme sadece fırına dokununca çıkan menüden.",
     "Sunucu yazısı oyunculardan tamamen kaldırıldı.",

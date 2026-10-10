@@ -232,3 +232,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v128
 - Fırın sheet'inde geliştir kartı yok; `ovenUpgrade(id)` menüden. Sunucu yazısı HTML'de gizli (admin için renderOnline). Place modunda `#modeCancel` kırmızı "✕ İptal".
+
+## v129
+- Yeni görevler: sellbread, plazavisit, friend, pazar (ev: pzput). Yerleştirme modlarında kırmızı İptal.
