@@ -225,3 +225,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v126
 - Başlangıç görev altınları: 10,12,15,20,20,25,15,20,25,25,30,30,50,35,40 (toplam ~372).
+
+## v127
+- 3B taşıma: `objG` (kind->group) + `dragObjs` frame'de akıcı kaydırır (eski viewLayout 3B'de işe yaramıyordu çünkü staticSig f.layout kullanıyor). `fpShow` ayak izi kareleri. Yeni yapı: `beginPlace/ppSet/ppConfirm` (moveSel from:-1 = saydam hayalet, `ghostUpdate`), ✓ #modeOk. `panTo` kamera kaydırma, questGuide ile.
+- UYARI: 3B kod headless testte çalışmıyor, telefonda doğrulanmalı.
