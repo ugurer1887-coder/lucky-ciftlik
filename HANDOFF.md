@@ -193,3 +193,6 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v116
 - İsimler 3B sprite yerine DOM katmanında (`drawNames`, `.nlayer/.nlab`): her kare `R3.toScreen` ile konumlanır, her uzaklıkta keskin. Eski `charLabel` devre dışı.
+
+## v118
+- `.nlab` isim yazısı: -webkit-text-stroke kaldırıldı (Android'de paint-order desteklenmediği için harfler bozuluyordu), text-shadow ile 8 yönlü ince çerçeve, oyunun --body (Nunito) yazı tipi.
