@@ -8155,18 +8155,18 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
   }
   // the mine across the road and the dynamite stall beside it
   // ---------- train station on the south side of the road, with a train that passes by, stops and smokes ----------
-  const TR_Z = ROWS + .62, TR_XPARK = 11.4, TR_SC = 1.3, TR_LEN = 4 * TR_SC;
+  const TR_Z = ROWS + .62, TR_XPARK = 33.5, TR_SC = 1.3, TR_LEN = 4 * TR_SC;
   function buildStation() {
-    const g = new T.Group(), WD = TM("#7a5230", "wood", 1, 2), cx = 11.4, bz = TR_Z;
+    const g = new T.Group(), WD = TM("#7a5230", "wood", 1, 2), cx = TR_XPARK, bz = TR_Z;
     g.add(mesh(G.box, M("#8d8578"), COLS / 2, .03, bz, COLS + 10, .06, .9, false));
     [-.23, .23].forEach(dz => g.add(mesh(G.box, M("#6d6f73"), COLS / 2, .08, bz + dz, COLS + 10, .06, .06, false)));
     for (let x = -4; x <= COLS + 4; x += 1.1) g.add(mesh(G.box, WD, x, .06, bz, .14, .05, .8, false));
     // platform, building and lamps
-    g.add(mesh(G.box, TM("#b98a56", "wood", 1, 1), cx, .2, bz + 1.15, 7.4, .3, 1.25));
+    g.add(mesh(G.box, TM("#b98a56", "wood", 1, 1), cx, .2, bz + 1.15, 5.6, .3, 1.25));
     g.add(mesh(G.box, M("#e6d6ad"), cx, 1.15, bz + 2.55, 3.4, 1.5, 1.3));
     [-1, 1].forEach(sd => { const r = mesh(G.box, M("#b5402f"), cx, 2.15, bz + 2.55 + sd * .52, 3.8, .12, 1.0); r.rotation.x = sd * .55; g.add(r); });
     g.add(mesh(G.box, M("#5a3a22"), cx + .9, .85, bz + 3.22, .55, 1.0, .06, false)); g.add(mesh(G.box, M("#bfe8ff"), cx - .75, 1.25, bz + 3.22, .6, .5, .06, false));
-    [cx - 3.1, cx + 3.1].forEach(x => { g.add(mesh(G.box, M("#3a3a3a"), x, .95, bz + 1.15, .08, 1.5, .08)); g.add(mesh(G.ico, M("#ffe08a"), x, 1.78, bz + 1.15, .16, .16, .16, false)); });
+    [cx - 2.5, cx + 2.5].forEach(x => { g.add(mesh(G.box, M("#3a3a3a"), x, .95, bz + 1.15, .08, 1.5, .08)); g.add(mesh(G.ico, M("#ffe08a"), x, 1.78, bz + 1.15, .16, .16, .16, false)); });
     const tx = canvasTex("trainsign", 512, 128, (x, w, h) => { x.fillStyle = "#1f6a45"; x.fillRect(0, 0, w, h); x.strokeStyle = "#f4e6b4"; x.lineWidth = 9; x.strokeRect(7, 7, w - 14, h - 14); x.fillStyle = "#fff6d0"; x.font = "800 62px Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("🚂 İSTASYON", w / 2, h / 2 + 4); });
     const sg = boardMesh(2.7, .68, tx); sg.position.set(cx, 2.78, bz + 3.3); g.add(sg);
     // the train (origin = centre of its length, facing +x)
@@ -8198,7 +8198,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     const ph = trainPhase(Date.now()), want = ph === "offer" || ph === "ready";
     if (want) { if (t.mode === "gone" || t.mode === "pass" || t.mode === "leave") { t.mode = "arrive"; t.x = Math.min(t.x, -TR_LEN); if (t.x > TR_XPARK) t.x = -TR_LEN; } }
     else if (t.mode === "park" || t.mode === "arrive") { t.mode = "leave"; t.v = .6; }
-    if (t.mode === "arrive") { const v = Math.max(.6, (TR_XPARK - t.x) * .8); t.x += v * dt; if (t.x >= TR_XPARK - .02) { t.x = TR_XPARK; t.mode = "park"; } t.v = v; }
+    if (t.mode === "arrive") { const v = Math.min(7, Math.max(.6, (TR_XPARK - t.x) * .8)); t.x += v * dt; if (t.x >= TR_XPARK - .02) { t.x = TR_XPARK; t.mode = "park"; } t.v = v; }
     else if (t.mode === "leave") { t.v = Math.min(7, t.v + 2.2 * dt); t.x += t.v * dt; if (t.x > COLS + TR_LEN) { t.mode = "gone"; t.v = 0; t.next = sec + 8; } }
     else if (t.mode === "gone") { t.v = 0; if (sec > t.next && !REDUCED) { t.mode = "pass"; t.x = -TR_LEN; t.v = 6; } else if (!t.next) t.next = sec + 6; }
     else if (t.mode === "pass") { t.x += 6 * dt; t.v = 6; if (t.x > COLS + TR_LEN) { t.mode = "gone"; t.v = 0; t.next = sec + 40; } }
@@ -8209,7 +8209,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     t.star.visible = (ph === "offer" || ph === "ready"); t.star.position.y = 3.9 + Math.sin(sec * 3) * .12; t.star.material.rotation = Math.sin(sec * 2) * .3;
   }
   function buildMine(open) {
-    const g = new T.Group(), mg = new T.Group(), zc = ROWS + 2.7, cx = 25, SC = 1.2;
+    const g = new T.Group(), mg = new T.Group(), zc = ROWS + 2.7, cx = 21, SC = 1.2;
     mg.scale.set(SC, SC, SC); mg.position.set(cx * (1 - SC), 0, zc * (1 - SC)); g.add(mg);
     const WD = TM("#7a5230", "wood", 1, 2), DK = M("#17110c");
     [[0, 0, -.7, 2.7, 2.1, 1.9, "#8a8478"], [-1.9, 0, -.4, 1.7, 1.35, 1.5, "#7d776b"], [1.9, 0, -.3, 1.8, 1.45, 1.5, "#948d80"], [-.9, 0, -1.4, 2, 1.7, 1.4, "#807a6e"], [1, 0, -1.3, 1.9, 1.6, 1.4, "#8f887b"]].forEach(([dx, y, dz, rx, ry, rz, col], i) => { const m = mesh(G.half, M(col), cx + dx, y, zc + dz, rx, ry, rz); m.rotation.y = i * .8; mg.add(m); });
@@ -8274,8 +8274,8 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     for (const c in (f.obst || {})) { const i = +c, x = colOf(i) + .5, z = rowOf(i) + .5;
       world.add(f.obst[c] === "t" ? buildTree(x, z, false, i % 11, 0) : buildRock(x, z, i % 13)); proxy(x, .6, z, 1, 1.3, 1, i); }
     // the mine across the road (only on my own farm)
-    if (f === S && scene.kind === "home") { world.add(buildStation()); proxy(11.4, 1.1, ROWS + 2.2, 8, 2.8, 3.6, TRAIN_CELL); world.add(buildMine(S.level >= MINE_LEVEL));
-      proxy(25, 1.4, ROWS + 3.5, 7.6, 3.2, 4, MINE_CELL); proxy(31, .9, ROWS + 2.3, 2.2, 1.9, 1.5, MARKET_CELL); }
+    if (f === S && scene.kind === "home") { world.add(buildStation()); proxy(TR_XPARK, 1.1, ROWS + 2.2, 6.4, 2.8, 3.6, TRAIN_CELL); world.add(buildMine(S.level >= MINE_LEVEL));
+      proxy(21, 1.4, ROWS + 3.5, 7.6, 3.2, 4, MINE_CELL); proxy(27, .9, ROWS + 2.3, 2.2, 1.9, 1.5, MARKET_CELL); }
     // fences
     const F = new Set(f.fences || []);
     (f.fences || []).forEach(i => { const x = colOf(i) + .5, z = rowOf(i) + .5;

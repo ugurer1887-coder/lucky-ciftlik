@@ -264,3 +264,4 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Tren (`TRAIN_CELL`): `S.train = {day, used, offers[3], pend:{k,n,t0}}`. 07:00 sıfırlanır (`trainDayKey`), 3 rastgele armağan (`TRAIN_POOL`, seviyeye göre), seçince 30 dk sonra teslim; hak bitince 15 Lucky ile çağrı (`TRAIN_CALL_COST`). Depo doluysa teslim engellenir. Fazlar: offer/away/ready/done (`trainPhase`).
 - 3D: `buildStation()` (ray, platform, istasyon binası, tren: lokomotif + 2 vagon, duman), `stepTrain()` animasyonu (geçiş, duruş, ayrılış), yıldız işareti hak varken. Güney orman şeridi (yolun altı) temizlendi: önceden maden ve tezgah ağaçların arkasında kalıyordu.
 - Gerçek 3D'yi headless'ta çalıştırmak için three r160 `mrdoob/three.js` klonundan (`/home/claude/mrdoob/three.js/build/three.module.min.js`) route ile sunuldu (swiftshader, yükleme ~1 dk).
+- Tren istasyonu x=33.5 (ortaya taşındı), maden cx=21, tezgah x=27; varış hızı 7 ile sınırlı.
