@@ -251,4 +251,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 
 ## v132 — Lucky parası görselleri + altına çevirme
 - Mağaza paketleri 5 SVG resimle (LUCKY_ART: madeni para, yığın, iki yığın, kese, taçlı sandık). Aynı resimler Play Console ürün simgeleri olarak PNG yüklendi.
-- convertLucky: 1 Lucky parası = 10 altın (LUCKY_RATE), mağaza sayfasında 1/10/50/hepsi düğmeleri.
+- convertLucky: 1 Lucky parası = 5 altın (LUCKY_RATE, v133'te 10 -> 5), mağaza sayfasında 1/10/50/hepsi düğmeleri.
+
+## v133 — Maden / market ayrımı
+- Maden (`MINE_CELL`) ve dinamit tezgahı (`MARKET_CELL`) ayrı dokunma hedefleri; `openMine` (dinamit at, balta/matkap sayısı) ve `openDynMarket` (dinamit al, `dynmk_v8` sayfası).
+- Madenden altın külçe yok: `MINE_DROPS` = gold (30-100 altın doğrudan `S.gold`), axe 1, drill 1 (eşit şans). Eski kayıtlardaki `goldore` depoda kalır.
+- 3D: maden grubu %20 büyük (`SC`), fenerler, büyük tabela, madenin ve tezgahın üstünde dönen yıldız (fx.stars); tezgah x=31. Gerçek cihazda görsel kontrol edilmedi.
