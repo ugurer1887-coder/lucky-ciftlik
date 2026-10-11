@@ -410,7 +410,32 @@ body{font-family:var(--body);letter-spacing:.1px}
 .lpk{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:9px}
 .lpk .ic{width:62px;height:62px;flex:none}.lpk .ic svg{width:100%;height:100%;display:block}
 .lcv{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 14px}.lcv button{flex:1 1 30%;background:#f2c14e;color:#5a3a06;border:0;border-radius:10px;padding:9px 6px;font-weight:800;cursor:pointer}.lcv button:disabled{opacity:.4}
-.lh{font-weight:800;margin:12px 2px 6px}.lpk .am{flex:1;font-weight:800}.lpk .am small{display:block;font-weight:600;opacity:.65}
+.lh{font-weight:800;margin:12px 2px 6px}
+.lcr{display:flex;gap:8px;margin:0 0 4px}.lcr input{flex:1;min-width:0;border:2px solid var(--line);border-radius:10px;padding:9px 10px;font-weight:800;font-size:1rem;background:var(--panel);color:inherit}
+.lcr button{background:#f2c14e;color:#5a3a06;border:0;border-radius:10px;padding:9px 16px;font-weight:800;cursor:pointer}.lcr button:disabled{opacity:.4}
+#reward_v8{position:absolute;inset:0;z-index:9100;display:none;place-items:center;background:rgba(10,15,25,.62);padding:14px;touch-action:none;overflow:hidden}
+#reward_v8.on{display:grid}
+#reward_v8 .rwrays{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;background:repeating-conic-gradient(rgba(255,240,170,.34) 0 7deg,rgba(255,240,170,0) 7deg 22deg);animation:rwspin 14s linear infinite;pointer-events:none;-webkit-mask-image:radial-gradient(circle,#000 0,transparent 42%);mask-image:radial-gradient(circle,#000 0,transparent 42%)}
+#reward_v8 .rwbox{position:relative;width:min(320px,100%);padding:18px 16px 14px;border-radius:26px;text-align:center;font-family:Nunito,sans-serif;color:#3b2606;border:4px solid #f2b821;background:linear-gradient(160deg,#fffbe0,#ffe27a);box-shadow:0 0 0 4px rgba(255,255,255,.35),0 14px 44px rgba(0,0,0,.5);animation:rwpop .55s cubic-bezier(.2,1.5,.4,1) both}
+#reward_v8[data-t=axe] .rwbox{background:linear-gradient(160deg,#eef7ff,#9ccbff);border-color:#4a8fd8}
+#reward_v8[data-t=drill] .rwbox{background:linear-gradient(160deg,#fff1de,#ffb872);border-color:#e0802a}
+#reward_v8[data-t=train] .rwbox{background:linear-gradient(160deg,#effcf2,#8fe0a8);border-color:#2f9a5a}
+#reward_v8 .rwart{width:136px;height:136px;margin:-52px auto 4px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));animation:rwbob 1.6s ease-in-out infinite}
+#reward_v8 .rwart svg{width:100%;height:100%;display:block}
+#reward_v8 .rwt{font:800 1.9rem/1.1 Fredoka,Nunito,sans-serif;color:#b55a00;text-shadow:0 2px 0 rgba(255,255,255,.7)}
+#reward_v8[data-t=axe] .rwt{color:#1f5fa8}#reward_v8[data-t=drill] .rwt{color:#a8530a}#reward_v8[data-t=train] .rwt{color:#17703a}
+#reward_v8 .rws{font-weight:800;margin:4px 0 12px;opacity:.8}
+#reward_v8 .rwok{border:0;border-radius:14px;padding:10px 26px;font:800 1.05rem Nunito,sans-serif;color:#fff;background:linear-gradient(#58c46c,#2f9a43);box-shadow:0 4px 0 #1f6a2d;cursor:pointer}
+#reward_v8 .cf{position:absolute;top:-8%;font-size:1.5rem;animation:rwfall linear infinite;pointer-events:none}
+@keyframes rwpop{0%{transform:scale(.3) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes rwbob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+@keyframes rwspin{to{transform:rotate(360deg)}}
+@keyframes rwfall{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(115vh) rotate(540deg);opacity:1}}
+.trc{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:9px}
+.trc .ic{width:62px;height:62px;flex:none;border-radius:12px;overflow:hidden;display:grid;place-items:center;background:#8cbf4f}.trc .ic svg{width:100%;height:100%;display:block}
+.trc .am{flex:1;font-weight:800}.trc .am small{display:block;font-weight:600;opacity:.65}
+.trc button,.trbtn{background:#2f9a43;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.trc button:disabled,.trbtn:disabled{opacity:.45}
+.trbig{text-align:center;padding:10px 4px}.trbig .tt{font-weight:800;font-size:1.1rem;margin:6px 0}.trbig p{margin:4px 0;opacity:.8}.lpk .am{flex:1;font-weight:800}.lpk .am small{display:block;font-weight:600;opacity:.65}
 .lpk button{background:#1f9d57;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
 .lpk button:disabled{opacity:.5}
 .lnote{font-size:.82rem;opacity:.7;margin:4px 2px 10px}
@@ -863,6 +888,10 @@ button:active{transform:scale(.96);filter:brightness(.96)}
   <section class="sheet" id="oven_v8" aria-label="Fırın">
     <div class="sheet-head"><h2>Fırın</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
     <div class="sheet-body" id="ovenBody_v8"></div>
+  </section>
+  <section class="sheet" id="train_v8" aria-label="Tren istasyonu">
+    <div class="sheet-head"><h2>🚂 Tren istasyonu</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
+    <div class="sheet-body" id="trainBody_v8"></div>
   </section>
   <section class="sheet" id="dynmk_v8" aria-label="Maden marketi">
     <div class="sheet-head"><h2>🧨 Maden marketi</h2><button class="sheet-close" data-close aria-label="Kapat">×</button></div>
@@ -1342,7 +1371,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "133";
+const VERSION = "134";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -1615,7 +1644,7 @@ const ANIMALS = {
 const BUILDINGS = ["coop", "cowbarn", "mill"];
 const CROP_KEYS = Object.keys(CROPS), STORE_KEYS = [...CROP_KEYS, "apple", "bread", "fries", "egg", "milk", "icecream", "chickfeed", "cowfeed", "wood", "dynamite", "goldore", "axe", "drill"];
 // mine (across the road, level 10): a stick of dynamite (bought at the stall) brings out one of three finds, 1/3 each
-const MINE_LEVEL = 10, DYN_PRICE = 150, GOLDORE_SELL = 250, MINE_DROPS = [["gold", 0], ["axe", 1], ["drill", 1]], MINE_GOLD = [30, 100], MINE_CELL = COLS * ROWS + 1, MARKET_CELL = COLS * ROWS + 2;
+const MINE_LEVEL = 10, DYN_PRICE = 150, GOLDORE_SELL = 250, MINE_DROPS = [["gold", 0], ["axe", 1], ["drill", 1]], MINE_GOLD = [30, 100], MINE_CELL = COLS * ROWS + 1, MARKET_CELL = COLS * ROWS + 2, TRAIN_CELL = COLS * ROWS + 3;
 const NOSELL = { wood: "Depoya satılmaz. Pazar'da kendi koyduğun fiyatla satabilir ya da depoyu geliştirmek için kullanabilirsin.", dynamite: "Madene atılır. Maden yolun karşısında, dinamit tezgahı yanında.", axe: "Genişlettiğin arazideki ağaçları keser. Ağaca dokun, her kesişte 1 balta gider.", drill: "Genişlettiğin arazideki taşları kırar. Taşa dokun, her kırışta 1 matkap gider." };
 // depot: capacity per level (everything in the depot counts, one slot per item); level 2 costs gold + planks (tahta)
 const DEPOT_CAP = [100, 200], DEPOT_UP = [{ g: 600, wood: 4 }];
@@ -2875,6 +2904,7 @@ function walkPlain(i) { cancelAll(); if (!walkTo(new Set([i]), null)) hint("Oray
 function tapHome(i) {
   if (i === MINE_CELL) { if (mode === "none") openMine(); return; }
   if (i === MARKET_CELL) { if (mode === "none") openDynMarket(); return; }
+  if (i === TRAIN_CELL) { if (mode === "none") openTrain(); return; }
   if (mode === "move") return moveTap(i);
   if (mode === "place") return placeTap(i);
   if (mode === "tree") return treeTap(i);
@@ -3887,7 +3917,7 @@ $("dock").addEventListener("click", e => {
   else if (a === "chat") { openSheet($("chat")); chatOpen = true; unread = 0; tabDot[chatTab] = false; renderBadges(); try { watchRoom(); } catch (e) {} renderChat(); renderChatFoot(); scrollChat(); }
 });
 function openSheet(el) { closeAll(); $("scrim").classList.add("on"); el.classList.add("on"); }
-function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "mine", "farmb", "jobs", "pazar", "friends", "chat", "lucky_sh", "dynmk"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
+function closeAll() { $("scrim").classList.remove("on"); ["market", "hire", "depot", "oven", "mine", "farmb", "jobs", "pazar", "friends", "chat", "lucky_sh", "dynmk", "train"].forEach(id => $(id).classList.remove("on")); chatOpen = false; }
 $("scrim").onclick = closeAll;
 document.querySelectorAll("#root_v8 [data-close]").forEach(b => b.onclick = closeAll);
 
@@ -4141,6 +4171,25 @@ function clearObst(i) {
   delete S.obst[i]; SFX.play("harvest"); gainXp(2); pop(i, k === "t" ? "Ağaç kesildi" : "Taş kırıldı", "#ffe27a");
   saveNow(); renderHud(); renderPlots(); R3.dirty = true;
 }
+// ---------- Colourful reward popup (mine finds, train deliveries) ----------
+const RW_ART = {
+  gold: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="90" rx="38" ry="6" fill="rgba(0,0,0,.2)"/><circle cx="20" cy="78" r="12" fill="#f7c948" stroke="#a8741a" stroke-width="3"/><circle cx="82" cy="76" r="13" fill="#f7c948" stroke="#a8741a" stroke-width="3"/><circle cx="50" cy="50" r="36" fill="#f7c948" stroke="#a8741a" stroke-width="5"/><circle cx="50" cy="50" r="27" fill="none" stroke="#e0a526" stroke-width="4"/><path d="M50 33l4.9 10.4 11.3 1.4-8.3 7.8 2.2 11.2-10.1-5.6-10.1 5.6 2.2-11.2-8.3-7.8 11.3-1.4z" fill="#fff3b0" stroke="#c8902a" stroke-width="2" stroke-linejoin="round"/><path d="M26 34a32 32 0 0 1 14-13" stroke="#fff" stroke-opacity=".75" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+  axe: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="92" rx="30" ry="5" fill="rgba(0,0,0,.2)"/><path d="M28 88L68 24" stroke="#6b4423" stroke-width="12" stroke-linecap="round"/><path d="M28 88L68 24" stroke="#b9824a" stroke-width="7" stroke-linecap="round"/><path d="M50 30C56 12 78 8 90 22C82 26 80 36 82 46C70 46 58 42 50 30Z" fill="#c9d3dc" stroke="#4a5560" stroke-width="4" stroke-linejoin="round"/><path d="M58 24C66 16 76 15 84 21" stroke="#fff" stroke-opacity=".8" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="44" y="36" width="16" height="9" rx="2" transform="rotate(-32 52 40)" fill="#7a838c" stroke="#4a5560" stroke-width="3"/></svg>`,
+  drill: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="93" rx="26" ry="5" fill="rgba(0,0,0,.2)"/><g transform="rotate(-28 50 50)"><rect x="32" y="10" width="36" height="42" rx="9" fill="#f08a24" stroke="#8a4a10" stroke-width="4"/><rect x="38" y="14" width="24" height="9" rx="3" fill="#ffc47a"/><rect x="38" y="2" width="24" height="12" rx="4" fill="#4a4f55" stroke="#2a2d31" stroke-width="3"/><rect x="26" y="26" width="9" height="20" rx="3" fill="#4a4f55"/><rect x="43" y="52" width="14" height="10" fill="#9aa5ad" stroke="#56606a" stroke-width="3"/><path d="M43 62h14l-7 32z" fill="#dbe2e8" stroke="#56606a" stroke-width="4" stroke-linejoin="round"/><path d="M45 70l10 4M46.5 79l7 3" stroke="#56606a" stroke-width="2.5"/></g></svg>`,
+  train: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="90" rx="42" ry="5" fill="rgba(0,0,0,.2)"/><rect x="8" y="46" width="46" height="30" rx="5" fill="#2f8f5b" stroke="#17533a" stroke-width="4"/><rect x="12" y="30" width="22" height="20" rx="3" fill="#2f8f5b" stroke="#17533a" stroke-width="4"/><rect x="16" y="34" width="14" height="10" rx="2" fill="#bfe8ff"/><rect x="58" y="52" width="34" height="24" rx="4" fill="#d9a066" stroke="#7a4a22" stroke-width="4"/><rect x="40" y="26" width="10" height="22" fill="#4a4f55" stroke="#2a2d31" stroke-width="3"/><circle cx="26" cy="80" r="8" fill="#e0402f" stroke="#7a1f14" stroke-width="3"/><circle cx="46" cy="80" r="8" fill="#e0402f" stroke="#7a1f14" stroke-width="3"/><circle cx="70" cy="80" r="8" fill="#e0402f" stroke="#7a1f14" stroke-width="3"/><circle cx="84" cy="80" r="8" fill="#e0402f" stroke="#7a1f14" stroke-width="3"/><circle cx="46" cy="16" r="7" fill="#fff" opacity=".8"/><circle cx="54" cy="8" r="5" fill="#fff" opacity=".6"/></svg>`,
+};
+let rwTimer = 0;
+function showReward(o) {
+  if (!entered) return;
+  let ov = $("reward");
+  if (!ov) { ov = document.createElement("div"); ov.id = "reward_v8"; $("root").appendChild(ov); ov.addEventListener("pointerdown", e => { e.preventDefault(); ov.classList.remove("on"); clearTimeout(rwTimer); }); }
+  ov.dataset.t = o.theme || "gold";
+  const em = o.confetti || ["✨", "🪙", "⭐", "🎉", "💫"];
+  let cf = ""; for (let k = 0; k < 20; k++) cf += `<span class="cf" style="left:${Math.round(Math.random() * 96)}%;animation-duration:${(2.2 + Math.random() * 2).toFixed(2)}s;animation-delay:${(Math.random() * 1.6).toFixed(2)}s">${em[k % em.length]}</span>`;
+  ov.innerHTML = `<div class="rwrays"></div>${cf}<div class="rwbox"><div class="rwart">${o.art}</div><div class="rwt">${o.title}</div><div class="rws">${o.sub || ""}</div><button class="rwok">${o.btn || "Süper!"}</button></div>`;
+  ov.classList.add("on"); try { SFX.play("levelup"); } catch (e) {}
+  clearTimeout(rwTimer); rwTimer = setTimeout(() => ov.classList.remove("on"), 6000);
+}
 // ---------- Mine ----------
 let mineBusy = false;
 function openMine() {
@@ -4178,16 +4227,88 @@ $("mineBody").addEventListener("click", e => {
 });
 function mineBlast() {
   if (mineBusy || !(+S.store.dynamite > 0)) return;
-  const drop = MINE_DROPS[Math.floor(Math.random() * MINE_DROPS.length)], key = drop[0];
+  const key = MINE_DROPS[Math.floor(Math.random() * MINE_DROPS.length)][0];
   if (key !== "gold" && depFree(S) + 1 < 1) { depotFullHint(); return; }   // the dynamite itself frees one slot
   mineBusy = true; S.store.dynamite -= 1; SFX.play("error"); HAPTIC && HAPTIC.buzz && HAPTIC.buzz("success");
   renderMine(); try { R3.shake && R3.shake(); } catch (e) {}
-  setTimeout(() => { mineBusy = false; let msg;
-    if (key === "gold") { const g = MINE_GOLD[0] + Math.floor(Math.random() * (MINE_GOLD[1] - MINE_GOLD[0] + 1)); S.gold = round1(S.gold + g); msg = "💥 Madenden " + g + " altın çıktı!"; }
-    else { S.store[key] = (+S.store[key] || 0) + 1; msg = "💥 Madenden 1 " + (key === "axe" ? "balta" : "matkap") + " çıktı!"; }
+  setTimeout(() => { mineBusy = false;
+    if (key === "gold") { const g = MINE_GOLD[0] + Math.floor(Math.random() * (MINE_GOLD[1] - MINE_GOLD[0] + 1)); S.gold = round1(S.gold + g); showReward({ art: RW_ART.gold, title: "+" + g + " ALTIN!", sub: "Madenden altın çıktı, paranın üstüne eklendi", theme: "gold" }); }
+    else { S.store[key] = (+S.store[key] || 0) + 1; showReward(key === "axe" ? { art: RW_ART.axe, title: "BALTA!", sub: "Madenden 1 balta çıktı. Ağaçları keser.", theme: "axe", confetti: ["✨", "🌲", "⭐", "💫"] } : { art: RW_ART.drill, title: "MATKAP!", sub: "Madenden 1 matkap çıktı. Taşları kırar.", theme: "drill", confetti: ["✨", "🪨", "⭐", "💫"] }); }
     SFX.seq("quest", "coin"); saveNow(); renderHud(); renderPlots();
-    toast(msg); if ($("mine").classList.contains("on")) renderMine(); }, 900);
+    if ($("mine").classList.contains("on")) renderMine(); }, 900);
 }
+// ---------- Train station: one free delivery a day (resets 07:00), 15 Lucky parası for an extra train ----------
+const TRAIN_MS = 30 * 60 * 1000, TRAIN_CALL_COST = 15, TRAIN_RESET_H = 7;
+const TRAIN_POOL = [
+  { k: "gold", n: [100, 250] }, { k: "wood", n: [5, 10] }, { k: "wheat", n: [20, 40] },
+  { k: "bread", n: [8, 14], lv: 3 }, { k: "potato", n: [12, 20], lv: 5 }, { k: "carrot", n: [10, 16], lv: 6 }, { k: "lettuce", n: [8, 12], lv: 8 },
+  { k: "corn", n: [8, 12], lv: 10 }, { k: "egg", n: [10, 16], lv: 10 }, { k: "chickfeed", n: [4, 8], lv: 10 }, { k: "axe", n: [1, 2], lv: 10 }, { k: "drill", n: [1, 2], lv: 10 }, { k: "dynamite", n: [1, 2], lv: 10 },
+  { k: "milk", n: [5, 8], lv: 13 }, { k: "cowfeed", n: [4, 8], lv: 13 }, { k: "eggplant", n: [5, 8], lv: 14 }, { k: "pumpkin", n: [4, 7], lv: 18 },
+];
+const trainDayKey = now => { const d = new Date(now - TRAIN_RESET_H * 3600e3); return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); };
+const trainNextReset = now => { const d = new Date(now); d.setHours(TRAIN_RESET_H, 0, 0, 0); if (d.getTime() <= now) d.setDate(d.getDate() + 1); return d.getTime(); };
+function trainGen() {
+  const pool = TRAIN_POOL.filter(x => !x.lv || S.level >= x.lv), out = [];
+  while (out.length < 3 && pool.length) { const x = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; out.push({ k: x.k, n: x.n[0] + Math.floor(Math.random() * (x.n[1] - x.n[0] + 1)) }); }
+  return out;
+}
+function trainSync(now) {
+  const key = trainDayKey(now); let T = S.train;
+  if (!T || typeof T !== "object") T = S.train = { day: key, used: false, offers: null, pend: null };
+  if (T.day !== key) { T.day = key; T.used = false; T.offers = null; save(); }   // 07:00 reset (a delivery already on its way stays)
+  if (!Array.isArray(T.offers) || !T.offers.length) T.offers = null;
+  if (!T.pend || !TRAIN_POOL.some(x => x.k === T.pend.k)) T.pend = null;
+  if (!T.pend && !T.used && !T.offers) { T.offers = trainGen(); save(); }
+  return T;
+}
+function trainPhase(now) {
+  if (!S) return "gone"; const T = trainSync(now);
+  if (T.pend) return now - T.pend.t0 >= TRAIN_MS ? "ready" : "away";
+  return T.offers ? "offer" : "done";
+}
+function trainArt(k) {
+  if (k === "gold") return RW_ART.gold;
+  if (k === "axe" || k === "drill") return RW_ART[k];
+  const pr = PRODUCTS.find(x => x.key === k); try { if (pr) return pr.thumb(); } catch (e) {}
+  return mineThumb(k === "dynamite" ? "dynamite" : "goldore");
+}
+const trainName = k => k === "gold" ? "Altın" : ({ chickfeed: "Tavuk yemi", cowfeed: "İnek yemi", dynamite: "Dinamit", axe: "Balta", drill: "Matkap" }[k] || (PRODUCTS.find(x => x.key === k) || {}).name || k);
+function openTrain() {
+  if (!S || scene.kind !== "home") return;
+  renderTrain(); openSheet($("train"));
+}
+function renderTrain() {
+  const body = $("trainBody"); if (!body || !S) return; const now = Date.now(), ph = trainPhase(now), T = S.train, lk = S.lucky || 0;
+  let h = "";
+  if (ph === "offer") {
+    h = `<div class="trbig"><div class="tt">Tren istasyona geldi!</div><p>Bugünkü armağanını seç. Seçtiğin ürünü tren bedava getirir, 30 dakika sürer.</p></div>` +
+      T.offers.map((o, i) => `<div class="trc"><div class="ic">${trainArt(o.k)}</div><div class="am">${o.k === "gold" ? o.n + " altın" : o.n + " " + esc(trainName(o.k))}<small>Bedava</small></div><button data-trpick="${i}">Seç</button></div>`).join("");
+  } else if (ph === "away") {
+    const left = T.pend.t0 + TRAIN_MS - now;
+    h = `<div class="trbig"><div style="width:110px;margin:0 auto">${RW_ART.train}</div><div class="tt">Tren yolda</div><p><b>${trainName(T.pend.k)}</b> ürününü getiriyor. Gelmesine <b>${fmt(left)}</b> var.</p></div>`;
+  } else if (ph === "ready") {
+    h = `<div class="trbig"><div class="tt">Tren geldi!</div><p>Kargon hazır.</p></div><div class="trc"><div class="ic">${trainArt(T.pend.k)}</div><div class="am">${T.pend.k === "gold" ? T.pend.n + " altın" : T.pend.n + " " + esc(trainName(T.pend.k))}<small>Bedava</small></div><button data-trtake="1">Teslim al</button></div>`;
+  } else {
+    h = `<div class="trbig"><div style="width:110px;margin:0 auto">${RW_ART.train}</div><div class="tt">Bugünkü hakkını kullandın</div><p>Yeni tren yarın sabah ${String(TRAIN_RESET_H).padStart(2, "0")}:00'de gelir (<b>${fmtLong(Math.max(0, trainNextReset(now) - now))}</b>).</p><p>Beklemek istemezsen treni hemen çağırabilirsin.</p></div>
+      <div class="trc"><div class="ic" style="background:#e3f7ea">${RW_ART.train}</div><div class="am">Treni şimdi çağır<small>${TRAIN_CALL_COST} Lucky parası · Bakiyen: 🍀 ${lk}</small></div><button data-trcall="1" ${lk >= TRAIN_CALL_COST ? "" : "disabled"}>${TRAIN_CALL_COST} 🍀</button></div>
+      ${lk < TRAIN_CALL_COST ? '<p class="keep" style="text-align:center">Lucky parasını yukarıdaki 🍀 + düğmesinden alabilirsin.</p>' : ""}`;
+  }
+  body.innerHTML = h;
+}
+$("trainBody").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !S) return; const now = Date.now(), ph = trainPhase(now), T = S.train;
+  if (b.hasAttribute("data-trpick") && ph === "offer") { const o = T.offers[+b.getAttribute("data-trpick")]; if (!o) return;
+    T.pend = { k: o.k, n: o.n, t0: now }; T.offers = null; T.used = true; SFX.play("buy"); saveNow(); renderTrain(); toast("🚂 Tren yola çıktı, 30 dakika sonra gelir"); return; }
+  if (b.hasAttribute("data-trcall") && ph === "done") {
+    if ((S.lucky || 0) < TRAIN_CALL_COST) { toast("Yeterli Lucky paran yok"); SFX.play("error"); return; }
+    S.lucky -= TRAIN_CALL_COST; T.offers = trainGen(); saveNow(); renderHud(); renderTrain(); toast("🚂 Tren çağrıldı"); return; }
+  if (b.hasAttribute("data-trtake") && ph === "ready") { const pd = T.pend;
+    if (pd.k !== "gold" && depFree(S) < pd.n) { depotFullHint(); return; }
+    if (pd.k === "gold") S.gold = round1(S.gold + pd.n); else S.store[pd.k] = (+S.store[pd.k] || 0) + pd.n;
+    T.pend = null; saveNow(); renderHud(); renderPlots(); renderTrain();
+    showReward({ art: trainArt(pd.k), title: "+" + pd.n + " " + (pd.k === "gold" ? "ALTIN" : trainName(pd.k).toUpperCase()) + "!", sub: "Tren seni unutmadı, bedava kargon teslim edildi", theme: pd.k === "gold" ? "gold" : "train", confetti: ["✨", "🚂", "⭐", "🎉", "💫"] }); }
+});
+setInterval(() => { try { if (alive() && S && $("train") && $("train").classList.contains("on")) renderTrain(); } catch (e) {} }, 1000);
 function openOven(id) { ovenSel = id; renderOven(); openSheet($("oven")); }
 // hand-drawn ingredient and product pictures for the oven (no emoji): a tied wheat sheaf, a crusty loaf, potatoes, fries in a carton
 let artN = 0;
@@ -5113,7 +5234,7 @@ const LUCKY_PKGS = [
   { id: "lucky_500", n: 500, tl: 179 }, { id: "lucky_1000", n: 1000, tl: 349 },
 ];
 const LUCKY_ART = {"50": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"lk_g\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#9af5b9\"/><stop offset=\"1\" stop-color=\"#1f9d57\"/></linearGradient><linearGradient id=\"lk_bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#cfeefb\"/><stop offset=\"1\" stop-color=\"#eaf8d9\"/></linearGradient><linearGradient id=\"lk_wd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#b9824a\"/><stop offset=\"1\" stop-color=\"#7a4a22\"/></linearGradient><linearGradient id=\"lk_sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#d9a566\"/><stop offset=\"1\" stop-color=\"#a8733a\"/></linearGradient><radialGradient id=\"lk_gl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#fff7c2\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#fff7c2\" stop-opacity=\"0\"/></radialGradient><filter id=\"lk_sh\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\"><feDropShadow dx=\"0\" dy=\"6\" stdDeviation=\"5\" flood-color=\"#1b3a2a\" flood-opacity=\".35\"/></filter></defs><g filter=\"url(#lk_sh)\"><circle cx=\"256\" cy=\"270\" r=\"150\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"10.5\"/><circle cx=\"256\" cy=\"270\" r=\"120.0\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"6.0\" stroke-dasharray=\"18.0 13.5\"/><circle cx=\"256.0\" cy=\"225.0\" r=\"40.5\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"6.0\"/><circle cx=\"256.0\" cy=\"315.0\" r=\"40.5\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"6.0\"/><circle cx=\"211.0\" cy=\"270.0\" r=\"40.5\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"6.0\"/><circle cx=\"301.0\" cy=\"270.0\" r=\"40.5\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"6.0\"/><circle cx=\"256\" cy=\"270\" r=\"28.5\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"6.0\"/><path d=\"M166.0 217.5 A105.0 105.0 0 0 1 241.0 157.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"10.5\" stroke-linecap=\"round\"/></g><path d=\"M100 84 L107.28 102.72 L126 110 L107.28 117.28 L100 136 L92.72 117.28 L74 110 L92.72 102.72Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M420 110 L425.6 124.4 L440 130 L425.6 135.6 L420 150 L414.4 135.6 L400 130 L414.4 124.4Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/></svg>", "100": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"lk_g\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#9af5b9\"/><stop offset=\"1\" stop-color=\"#1f9d57\"/></linearGradient><linearGradient id=\"lk_bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#cfeefb\"/><stop offset=\"1\" stop-color=\"#eaf8d9\"/></linearGradient><linearGradient id=\"lk_wd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#b9824a\"/><stop offset=\"1\" stop-color=\"#7a4a22\"/></linearGradient><linearGradient id=\"lk_sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#d9a566\"/><stop offset=\"1\" stop-color=\"#a8733a\"/></linearGradient><radialGradient id=\"lk_gl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#fff7c2\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#fff7c2\" stop-opacity=\"0\"/></radialGradient><filter id=\"lk_sh\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\"><feDropShadow dx=\"0\" dy=\"6\" stdDeviation=\"5\" flood-color=\"#1b3a2a\" flood-opacity=\".35\"/></filter></defs><g filter=\"url(#lk_sh)\"><ellipse cx=\"256\" cy=\"407.0\" rx=\"150\" ry=\"63.0\" fill=\"#12683a\"/><ellipse cx=\"256\" cy=\"380.0\" rx=\"150\" ry=\"63.0\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"256\" cy=\"380.0\" rx=\"108.0\" ry=\"42.00000000000001\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"256\" cy=\"365.0\" rx=\"150\" ry=\"63.0\" fill=\"#12683a\"/><ellipse cx=\"256\" cy=\"338.0\" rx=\"150\" ry=\"63.0\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"256\" cy=\"338.0\" rx=\"108.0\" ry=\"42.00000000000001\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"256\" cy=\"323.0\" rx=\"150\" ry=\"63.0\" fill=\"#12683a\"/><ellipse cx=\"256\" cy=\"296.0\" rx=\"150\" ry=\"63.0\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"256\" cy=\"296.0\" rx=\"108.0\" ry=\"42.00000000000001\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"256\" cy=\"215\" r=\"110\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"7.700000000000001\"/><circle cx=\"256\" cy=\"215\" r=\"88.0\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"4.4\" stroke-dasharray=\"13.200000000000001 9.9\"/><circle cx=\"256.0\" cy=\"182.0\" r=\"29.700000000000003\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"4.4\"/><circle cx=\"256.0\" cy=\"248.0\" r=\"29.700000000000003\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"4.4\"/><circle cx=\"223.0\" cy=\"215.0\" r=\"29.700000000000003\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"4.4\"/><circle cx=\"289.0\" cy=\"215.0\" r=\"29.700000000000003\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"4.4\"/><circle cx=\"256\" cy=\"215\" r=\"20.900000000000002\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"4.4\"/><path d=\"M190.0 176.5 A77.0 77.0 0 0 1 245.0 132.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"7.700000000000001\" stroke-linecap=\"round\"/></g><path d=\"M90 76 L96.72 93.28 L114 100 L96.72 106.72 L90 124 L83.28 106.72 L66 100 L83.28 93.28Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M430 128 L436.16 143.84 L452 150 L436.16 156.16 L430 172 L423.84 156.16 L408 150 L423.84 143.84Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/></svg>", "150": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"lk_g\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#9af5b9\"/><stop offset=\"1\" stop-color=\"#1f9d57\"/></linearGradient><linearGradient id=\"lk_bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#cfeefb\"/><stop offset=\"1\" stop-color=\"#eaf8d9\"/></linearGradient><linearGradient id=\"lk_wd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#b9824a\"/><stop offset=\"1\" stop-color=\"#7a4a22\"/></linearGradient><linearGradient id=\"lk_sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#d9a566\"/><stop offset=\"1\" stop-color=\"#a8733a\"/></linearGradient><radialGradient id=\"lk_gl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#fff7c2\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#fff7c2\" stop-opacity=\"0\"/></radialGradient><filter id=\"lk_sh\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\"><feDropShadow dx=\"0\" dy=\"6\" stdDeviation=\"5\" flood-color=\"#1b3a2a\" flood-opacity=\".35\"/></filter></defs><g filter=\"url(#lk_sh)\"><ellipse cx=\"160\" cy=\"418.9\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"160\" cy=\"400.0\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"160\" cy=\"400.0\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"160\" cy=\"389.5\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"160\" cy=\"370.6\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"160\" cy=\"370.6\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"160\" cy=\"360.09999999999997\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"160\" cy=\"341.2\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"160\" cy=\"341.2\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"350\" cy=\"418.9\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"350\" cy=\"400.0\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"350\" cy=\"400.0\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"350\" cy=\"389.5\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"350\" cy=\"370.6\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"350\" cy=\"370.6\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><ellipse cx=\"350\" cy=\"360.09999999999997\" rx=\"105\" ry=\"44.1\" fill=\"#12683a\"/><ellipse cx=\"350\" cy=\"341.2\" rx=\"105\" ry=\"44.1\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"5\"/><ellipse cx=\"350\" cy=\"341.2\" rx=\"75.6\" ry=\"29.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"3\" stroke-dasharray=\"9 7\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"256\" cy=\"235\" r=\"125\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"8.75\"/><circle cx=\"256\" cy=\"235\" r=\"100.0\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"5.0\" stroke-dasharray=\"15.0 11.25\"/><circle cx=\"256.0\" cy=\"197.5\" r=\"33.75\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"5.0\"/><circle cx=\"256.0\" cy=\"272.5\" r=\"33.75\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"5.0\"/><circle cx=\"218.5\" cy=\"235.0\" r=\"33.75\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"5.0\"/><circle cx=\"293.5\" cy=\"235.0\" r=\"33.75\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"5.0\"/><circle cx=\"256\" cy=\"235\" r=\"23.75\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"5.0\"/><path d=\"M181.0 191.25 A87.5 87.5 0 0 1 243.5 141.25\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"8.75\" stroke-linecap=\"round\"/></g><path d=\"M80 88 L86.16 103.84 L102 110 L86.16 116.16 L80 132 L73.84 116.16 L58 110 L73.84 103.84Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M440 86 L446.72 103.28 L464 110 L446.72 116.72 L440 134 L433.28 116.72 L416 110 L433.28 103.28Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M256 52 L261.04 64.96 L274 70 L261.04 75.04 L256 88 L250.96 75.04 L238 70 L250.96 64.96Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/></svg>", "500": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"lk_g\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#9af5b9\"/><stop offset=\"1\" stop-color=\"#1f9d57\"/></linearGradient><linearGradient id=\"lk_bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#cfeefb\"/><stop offset=\"1\" stop-color=\"#eaf8d9\"/></linearGradient><linearGradient id=\"lk_wd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#b9824a\"/><stop offset=\"1\" stop-color=\"#7a4a22\"/></linearGradient><linearGradient id=\"lk_sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#d9a566\"/><stop offset=\"1\" stop-color=\"#a8733a\"/></linearGradient><radialGradient id=\"lk_gl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#fff7c2\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#fff7c2\" stop-opacity=\"0\"/></radialGradient><filter id=\"lk_sh\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\"><feDropShadow dx=\"0\" dy=\"6\" stdDeviation=\"5\" flood-color=\"#1b3a2a\" flood-opacity=\".35\"/></filter></defs><g filter=\"url(#lk_sh)\"><path d=\"M136 400 C86 310 166 240 206 195 L306 195 C346 240 426 310 376 400 Z\" fill=\"url(#lk_sk)\" stroke=\"#6b4420\" stroke-width=\"7\"/><path d=\"M194 198 Q256 228 318 198\" fill=\"none\" stroke=\"#6b4420\" stroke-width=\"9\" stroke-linecap=\"round\"/><path d=\"M186 190 L161 155 L221 178 L256 150 L291 178 L351 155 L326 190Z\" fill=\"#c79152\" stroke=\"#6b4420\" stroke-width=\"6\" stroke-linejoin=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"256\" cy=\"310\" r=\"66\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"4.62\"/><circle cx=\"256\" cy=\"310\" r=\"52.800000000000004\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"2.64\" stroke-dasharray=\"7.92 5.94\"/><circle cx=\"256.0\" cy=\"290.2\" r=\"17.82\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.64\"/><circle cx=\"256.0\" cy=\"329.8\" r=\"17.82\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.64\"/><circle cx=\"236.2\" cy=\"310.0\" r=\"17.82\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.64\"/><circle cx=\"275.8\" cy=\"310.0\" r=\"17.82\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.64\"/><circle cx=\"256\" cy=\"310\" r=\"12.540000000000001\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"2.64\"/><path d=\"M216.4 286.9 A46.199999999999996 46.199999999999996 0 0 1 249.4 260.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"4.62\" stroke-linecap=\"round\"/></g><path d=\"M90 96 L96.72 113.28 L114 120 L96.72 126.72 L90 144 L83.28 126.72 L66 120 L83.28 113.28Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M430 106 L436.72 123.28 L454 130 L436.72 136.72 L430 154 L423.28 136.72 L406 130 L423.28 123.28Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M420 362 L425.04 374.96 L438 380 L425.04 385.04 L420 398 L414.96 385.04 L402 380 L414.96 374.96Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/></svg>", "1000": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"lk_g\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#9af5b9\"/><stop offset=\"1\" stop-color=\"#1f9d57\"/></linearGradient><linearGradient id=\"lk_bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#cfeefb\"/><stop offset=\"1\" stop-color=\"#eaf8d9\"/></linearGradient><linearGradient id=\"lk_wd\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#b9824a\"/><stop offset=\"1\" stop-color=\"#7a4a22\"/></linearGradient><linearGradient id=\"lk_sk\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#d9a566\"/><stop offset=\"1\" stop-color=\"#a8733a\"/></linearGradient><radialGradient id=\"lk_gl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#fff7c2\" stop-opacity=\".9\"/><stop offset=\"1\" stop-color=\"#fff7c2\" stop-opacity=\"0\"/></radialGradient><filter id=\"lk_sh\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\"><feDropShadow dx=\"0\" dy=\"6\" stdDeviation=\"5\" flood-color=\"#1b3a2a\" flood-opacity=\".35\"/></filter></defs><path d=\"M256 250 L676.0 250.0 L667.9298177693568 331.93793524677386Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L644.0294036547405 410.72704159333773 L605.217237167069 483.3394978682329Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L552.98484809835 546.9848480983499 L489.33949786823297 599.217237167069Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L416.72704159333773 638.0294036547405 L337.9379352467739 661.9298177693568Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L256.0 670.0 L174.06206475322614 661.9298177693568Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L95.27295840666233 638.0294036547405 L22.660502131767174 599.217237167069Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L-40.984848098349914 546.98484809835 L-93.21723716706907 483.3394978682329Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L-132.0294036547404 410.72704159333773 L-155.92981776935676 331.93793524677403Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L-164.0 250.00000000000006 L-155.92981776935676 168.06206475322608Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L-132.02940365474046 89.27295840666233 L-93.21723716706907 16.660502131767174Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L-40.98484809835003 -46.984848098349914 L22.66050213176709 -99.21723716706902Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L95.27295840666207 -138.02940365474035 L174.06206475322597 -161.92981776935676Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L255.99999999999991 -170.0 L337.9379352467739 -161.92981776935676Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L416.7270415933378 -138.0294036547404 L489.33949786823314 -99.2172371670689Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L552.9848480983499 -46.98484809835003 L605.217237167069 16.66050213176709Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><path d=\"M256 250 L644.0294036547403 89.27295840666204 L667.9298177693568 168.06206475322594Z\" fill=\"#fff7c2\" fill-opacity=\".35\"/><g filter=\"url(#lk_sh)\"><circle cx=\"110\" cy=\"300\" r=\"48\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"3.36\"/><circle cx=\"110\" cy=\"300\" r=\"38.400000000000006\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"1.92\" stroke-dasharray=\"5.76 4.32\"/><circle cx=\"110.0\" cy=\"285.6\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"110.0\" cy=\"314.4\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"95.6\" cy=\"300.0\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"124.4\" cy=\"300.0\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"110\" cy=\"300\" r=\"9.12\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"1.92\"/><path d=\"M81.2 283.2 A33.599999999999994 33.599999999999994 0 0 1 105.2 264.0\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"3.36\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"402\" cy=\"300\" r=\"48\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"3.36\"/><circle cx=\"402\" cy=\"300\" r=\"38.400000000000006\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"1.92\" stroke-dasharray=\"5.76 4.32\"/><circle cx=\"402.0\" cy=\"285.6\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"402.0\" cy=\"314.4\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"387.6\" cy=\"300.0\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"416.4\" cy=\"300.0\" r=\"12.959999999999999\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.92\"/><circle cx=\"402\" cy=\"300\" r=\"9.12\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"1.92\"/><path d=\"M373.2 283.2 A33.599999999999994 33.599999999999994 0 0 1 397.2 264.0\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"3.36\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"165\" cy=\"255\" r=\"56\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"3.9200000000000004\"/><circle cx=\"165\" cy=\"255\" r=\"44.800000000000004\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"2.24\" stroke-dasharray=\"6.720000000000001 5.040000000000001\"/><circle cx=\"165.0\" cy=\"238.2\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"165.0\" cy=\"271.8\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"148.2\" cy=\"255.0\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"181.8\" cy=\"255.0\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"165\" cy=\"255\" r=\"10.64\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"2.24\"/><path d=\"M131.4 235.4 A39.199999999999996 39.199999999999996 0 0 1 159.4 213.0\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"3.9200000000000004\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"347\" cy=\"255\" r=\"56\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"3.9200000000000004\"/><circle cx=\"347\" cy=\"255\" r=\"44.800000000000004\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"2.24\" stroke-dasharray=\"6.720000000000001 5.040000000000001\"/><circle cx=\"347.0\" cy=\"238.2\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"347.0\" cy=\"271.8\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"330.2\" cy=\"255.0\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"363.8\" cy=\"255.0\" r=\"15.120000000000001\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.24\"/><circle cx=\"347\" cy=\"255\" r=\"10.64\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"2.24\"/><path d=\"M313.4 235.4 A39.199999999999996 39.199999999999996 0 0 1 341.4 213.0\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"3.9200000000000004\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"256\" cy=\"225\" r=\"70\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"4.8999999999999995\"/><circle cx=\"256\" cy=\"225\" r=\"56.0\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"2.8\" stroke-dasharray=\"8.399999999999999 6.3\"/><circle cx=\"256.0\" cy=\"204.0\" r=\"18.9\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.8\"/><circle cx=\"256.0\" cy=\"246.0\" r=\"18.9\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.8\"/><circle cx=\"235.0\" cy=\"225.0\" r=\"18.9\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.8\"/><circle cx=\"277.0\" cy=\"225.0\" r=\"18.9\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"2.8\"/><circle cx=\"256\" cy=\"225\" r=\"13.299999999999999\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"2.8\"/><path d=\"M214.0 200.5 A49.0 49.0 0 0 1 249.0 172.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"4.8999999999999995\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><path d=\"M102 191.6 L116.0 177.6 L144.0 177.6 L158 191.6 L130 228 Z\" fill=\"#ff7aa8\" stroke=\"#a31f55\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M102 191.6 L158 191.6 M121.6 191.6 L130 228 L138.4 191.6\" fill=\"none\" stroke=\"#a31f55\" stroke-width=\"3\" stroke-opacity=\".7\"/></g><g filter=\"url(#lk_sh)\"><path d=\"M357 196.6 L371.0 182.6 L399.0 182.6 L413 196.6 L385 233 Z\" fill=\"#7ad0ff\" stroke=\"#1f5fa3\" stroke-width=\"5\" stroke-linejoin=\"round\"/><path d=\"M357 196.6 L413 196.6 M376.6 196.6 L385 233 L393.4 196.6\" fill=\"none\" stroke=\"#1f5fa3\" stroke-width=\"3\" stroke-opacity=\".7\"/></g><g filter=\"url(#lk_sh)\"><path d=\"M201.0 166.5 L201.0 108.75 L228.5 137.625 L256 89.5 L283.5 137.625 L311.0 108.75 L311.0 166.5 Z\" fill=\"#f7c948\" stroke=\"#a8741a\" stroke-width=\"6\" stroke-linejoin=\"round\"/><rect x=\"201.0\" y=\"152.5\" width=\"110\" height=\"14\" fill=\"#e0a526\" stroke=\"#a8741a\" stroke-width=\"5\"/><circle cx=\"256\" cy=\"89.5\" r=\"9\" fill=\"#ff5d73\" stroke=\"#a8741a\" stroke-width=\"4\"/><circle cx=\"201.0\" cy=\"108.75\" r=\"8\" fill=\"#5bc0ff\" stroke=\"#a8741a\" stroke-width=\"4\"/><circle cx=\"311.0\" cy=\"108.75\" r=\"8\" fill=\"#5bc0ff\" stroke=\"#a8741a\" stroke-width=\"4\"/><circle cx=\"256\" cy=\"140.83333333333334\" r=\"8\" fill=\"#7be08f\" stroke=\"#a8741a\" stroke-width=\"4\"/></g><g filter=\"url(#lk_sh)\"><rect x=\"81\" y=\"320\" width=\"350\" height=\"165\" rx=\"16\" fill=\"url(#lk_wd)\" stroke=\"#4a2a10\" stroke-width=\"8\"/><rect x=\"81\" y=\"338\" width=\"350\" height=\"20\" fill=\"#f2c14e\" stroke=\"#4a2a10\" stroke-width=\"5\"/><rect x=\"81\" y=\"440\" width=\"350\" height=\"18\" fill=\"#f2c14e\" stroke=\"#4a2a10\" stroke-width=\"5\"/><rect x=\"230\" y=\"326\" width=\"52\" height=\"70\" rx=\"9\" fill=\"#f2c14e\" stroke=\"#4a2a10\" stroke-width=\"6\"/><circle cx=\"256\" cy=\"358\" r=\"8\" fill=\"#4a2a10\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"70\" cy=\"430\" r=\"38\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"2.66\"/><circle cx=\"70\" cy=\"430\" r=\"30.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"1.52\" stroke-dasharray=\"4.5600000000000005 3.42\"/><circle cx=\"70.0\" cy=\"418.6\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"70.0\" cy=\"441.4\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"58.6\" cy=\"430.0\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"81.4\" cy=\"430.0\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"70\" cy=\"430\" r=\"7.22\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"1.52\"/><path d=\"M47.2 416.7 A26.599999999999998 26.599999999999998 0 0 1 66.2 401.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"2.66\" stroke-linecap=\"round\"/></g><g filter=\"url(#lk_sh)\"><circle cx=\"442\" cy=\"435\" r=\"38\" fill=\"url(#lk_g)\" stroke=\"#12683a\" stroke-width=\"2.66\"/><circle cx=\"442\" cy=\"435\" r=\"30.400000000000002\" fill=\"none\" stroke=\"#e9fff1\" stroke-width=\"1.52\" stroke-dasharray=\"4.5600000000000005 3.42\"/><circle cx=\"442.0\" cy=\"423.6\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"442.0\" cy=\"446.4\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"430.6\" cy=\"435.0\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"453.4\" cy=\"435.0\" r=\"10.26\" fill=\"#fff\" stroke=\"#12683a\" stroke-width=\"1.52\"/><circle cx=\"442\" cy=\"435\" r=\"7.22\" fill=\"#f2c14e\" stroke=\"#a8741a\" stroke-width=\"1.52\"/><path d=\"M419.2 421.7 A26.599999999999998 26.599999999999998 0 0 1 438.2 406.5\" fill=\"none\" stroke=\"#fff\" stroke-opacity=\".55\" stroke-width=\"2.66\" stroke-linecap=\"round\"/></g><path d=\"M70 84 L77.28 102.72 L96 110 L77.28 117.28 L70 136 L62.72 117.28 L44 110 L62.72 102.72Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M445 72 L452.84 92.16 L473 100 L452.84 107.84 L445 128 L437.16 107.84 L417 100 L437.16 92.16Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M50 232 L55.04 244.96 L68 250 L55.04 255.04 L50 268 L44.96 255.04 L32 250 L44.96 244.96Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M465 240 L470.6 254.4 L485 260 L470.6 265.6 L465 280 L459.4 265.6 L445 260 L459.4 254.4Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/><path d=\"M256 27 L261.04 39.96 L274 45 L261.04 50.04 L256 63 L250.96 50.04 L238 45 L250.96 39.96Z\" fill=\"#fff7c2\" stroke=\"#f2c14e\" stroke-width=\"3\"/></svg>"};
-const LUCKY_RATE = 5;   // 1 Lucky parası = 5 altın
+const LUCKY_RATE = 5, LUCKY_GOLD_PRICE = 1000;   // 1 Lucky parası = 5 altın; 1000 altın = 1 Lucky parası
 const PLAY_BILLING = "https://play.google.com/billing";
 let luckyBusy = false;
 function luckyGrant(pk, tok) {
@@ -5126,6 +5247,11 @@ function convertLucky(n) {
   n = Math.floor(+n || 0); if (n < 1 || n > (S.lucky || 0)) return;
   S.lucky -= n; S.gold = round1((+S.gold || 0) + n * LUCKY_RATE); saveNow(); renderHud(); renderLucky();
   toast("🍀 " + n + " Lucky parası → " + (n * LUCKY_RATE) + " altın");
+}
+function goldToLucky(n) {
+  n = Math.floor(+n || 0); if (n < 1) return; adminTopUp();
+  const cost = n * LUCKY_GOLD_PRICE; if (S.gold < cost) { toast("Yeterli altının yok. " + n + " Lucky parası " + cost + " altın"); SFX.play("error"); return; }
+  S.gold = round1(S.gold - cost); S.lucky = (S.lucky || 0) + n; saveNow(); renderHud(); renderLucky(); toast("🍀 " + cost + " altın → " + n + " Lucky parası");
 }
 async function buyLucky(id) {
   const pk = LUCKY_PKGS.find(p => p.id === id); if (!pk || luckyBusy) return;
@@ -5154,11 +5280,16 @@ async function luckyRecover() {   // yarım kalan (tüketilmemiş) satın almala
 function renderLucky() {
   const b = $("luckyBody"); if (!b) return;
   b.innerHTML = '<div class="lnote">Bakiyen: <b>🍀 ' + (S.lucky || 0) + '</b> Lucky parası. Ödeme Google Play üzerinden kartınla güvenle yapılır.</div>' +
-    (S.lucky > 0 ? '<div class="lh">Altına çevir (1 Lucky parası = ' + LUCKY_RATE + ' altın)</div><div class="lcv">' + [1, 10, 50].filter(n => n < S.lucky).concat([S.lucky]).map(n => '<button data-lc="' + n + '">' + n + ' → ' + (n * LUCKY_RATE) + ' altın' + (n === S.lucky ? " (hepsi)" : "") + '</button>').join("") + '</div>' : '') +
+    (S.lucky > 0 ? '<div class="lh">Lucky parasını altına çevir</div><div class="lcr"><input id="lcIn_v8" type="number" inputmode="numeric" min="1" max="' + S.lucky + '" placeholder="Kaç Lucky parası?"><button id="lcGo_v8">Çevir</button></div><div class="lnote" id="lcPrev_v8">1 Lucky parası = ' + LUCKY_RATE + ' altın</div>' : '') +
+    '<div class="lh">Altını Lucky parasına çevir</div><div class="lcr"><input id="lgIn_v8" type="number" inputmode="numeric" min="1" placeholder="Kaç Lucky parası almak istiyorsun?"><button id="lgGo_v8">Çevir</button></div><div class="lnote" id="lgPrev_v8">1 Lucky parası = ' + LUCKY_GOLD_PRICE + ' altın</div>' +
     '<div class="lh">Lucky parası al</div>' +
     LUCKY_PKGS.map(p => '<div class="lpk"><span class="ic">' + LUCKY_ART[p.n] + '</span><div class="am">' + p.n + ' Lucky parası<small>' + p.tl + ' TL</small></div><button data-lk="' + p.id + '"' + (luckyBusy ? " disabled" : "") + '>' + p.tl + ' TL</button></div>').join("");
   b.querySelectorAll("[data-lk]").forEach(x => x.onclick = () => buyLucky(x.dataset.lk));
-  b.querySelectorAll("[data-lc]").forEach(x => x.onclick = () => convertLucky(+x.dataset.lc));
+  const lcIn = $("lcIn"), lgIn = $("lgIn");
+  if (lcIn) { lcIn.oninput = () => { const n = Math.floor(+lcIn.value || 0); $("lcPrev").textContent = n > 0 ? n + " Lucky parası = " + (n * LUCKY_RATE) + " altın" + (n > S.lucky ? " (yeterli Lucky paran yok)" : "") : "1 Lucky parası = " + LUCKY_RATE + " altın"; };
+    $("lcGo").onclick = () => { const n = Math.floor(+lcIn.value || 0); if (n < 1 || n > S.lucky) { toast("Geçerli bir miktar yaz"); return; } convertLucky(n); }; }
+  if (lgIn) { lgIn.oninput = () => { const n = Math.floor(+lgIn.value || 0); $("lgPrev").textContent = n > 0 ? n + " Lucky parası = " + (n * LUCKY_GOLD_PRICE) + " altın" + (!isAdmin() && n * LUCKY_GOLD_PRICE > S.gold ? " (yeterli altının yok)" : "") : "1 Lucky parası = " + LUCKY_GOLD_PRICE + " altın"; };
+    $("lgGo").onclick = () => { const n = Math.floor(+lgIn.value || 0); if (n < 1) { toast("Geçerli bir miktar yaz"); return; } goldToLucky(n); }; }
 }
 $("luckyPlus").onclick = () => { if (!entered) return; renderLucky(); openSheet($("lucky_sh")); };
 $("whoBtn").onclick = () => { if (entered) openAccount(); };
@@ -5177,6 +5308,7 @@ function enterGame() {
   S.well = wellLv(S); S.sprLv = sprLv(S); (S.spr || []).forEach(sp => { if (sp.w > sprCap()) sp.w = sprCap(); });
   S.gold = Math.max(0, round1(S.gold)); S.paidOut = round1(S.paidOut);
   S.lucky = Math.max(0, Math.floor(+S.lucky || 0)); S.luckyTok = toArr(S.luckyTok).slice(-40);
+  { const T = S.train && typeof S.train === "object" ? S.train : {}; S.train = { day: String(T.day || ""), used: !!T.used, offers: Array.isArray(T.offers) ? T.offers.filter(o => o && TRAIN_POOL.some(x => x.k === o.k)).map(o => ({ k: o.k, n: Math.max(1, Math.floor(+o.n || 1)) })).slice(0, 3) : null, pend: T.pend && TRAIN_POOL.some(x => x.k === T.pend.k) ? { k: T.pend.k, n: Math.max(1, Math.floor(+T.pend.n || 1)), t0: +T.pend.t0 || Date.now() } : null }; }
   S.level = Math.max(1, Math.min(MAX_LEVEL, Math.floor(+S.level || 1))); S.xp = Math.max(0, Math.floor(+S.xp || 0));
   if ((S.xpv || 1) < 3) { S.xp = Math.round(S.xp * ((S.xpv || 1) < 2 ? 1.56 : .2)); S.xpv = 3; } Object.keys(S.earned || {}).forEach(k => S.earned[k] = round1(S.earned[k]));
   const mv = S.mapv;
@@ -6439,6 +6571,12 @@ function renderRank() {
 $("rankBtn").onclick = openRank;
 // ---------- What's new: every update is told to the players here (newest first) ----------
 const UPDATES = [
+  { v: 134, d: "11 Ekim 2026", e: "🚂", t: "Tren istasyonu", c: "#2f8f5b", b: "#e3f7ea", items: [
+    "Yolun altına bir tren istasyonu geldi. Tren zaman zaman geçiyor. İstasyona dokun, günlük armağanın için 3 üründen birini seç. Tren seçtiğini 30 dakika sonra bedava getirir. Hak her sabah 07:00'de yenilenir.",
+    "Hakkın bittiyse treni 15 Lucky parasıyla tekrar çağırabilirsin.",
+    "Madenden ne çıkarsa renkli bir ödül ekranı gösteriliyor: altın, balta ya da matkap resmiyle. Maden artık orman ağaçlarının arkasında kalmıyor.",
+    "Lucky parasını altına çevirmek için istediğin miktarı yazabilirsin (1 Lucky = 5 altın). Altınla da Lucky parası alabilirsin (1000 altın = 1 Lucky parası).",
+  ] },
   { v: 133, d: "11 Ekim 2026", e: "⛏️", t: "Maden ve market ayrıldı", c: "#6b5a44", b: "#efe7da", items: [
     "Maden büyüdü, önünde fenerler ve parlayan bir yıldız var. Maden marketi yanında ayrı bir tezgah oldu. Madene dokunursan maden menüsü, tezgaha dokunursan market menüsü açılır.",
     "Madenden artık altın külçe çıkmıyor, doğrudan 30 ile 100 arası altın çıkıp paranın üstüne eklenir. Balta ve matkap 1'er tane çıkar.",
@@ -7917,7 +8055,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     const now = Date.now(), f = farmData(), sig = staticSigOf(f, now);
     if (sig !== staticSig) {
       staticSig = sig;
-      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = []; fx.pens = [];
+      disposeTree(world); scene3.remove(world); world = new T.Group(); scene3.add(world); proxies = []; fx.stars = []; fx.flames = []; fx.clouds = []; fx.sprites = []; fx.mills = []; fx.flags = []; fx.fount = null; fx.ovens = []; fx.pens = []; fx.train = null;
       if (scene.kind === "plaza") buildPlaza(); else if (f) buildFarm(f, now, "s");
       if (scene.kind !== "plaza" && GFX.level > 0) roadsideDetails();
       const scs = sceneryKey(f);
@@ -7955,7 +8093,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     for (let k = 0; k < 290; k++) {
       const side = k % 4; let x, z;
       if (side === 0) { x = -1.5 - r1() * 7; z = -6 + r1() * (ROWS + 12); } else if (side === 1) { x = COLS + 1.5 + r1() * 7; z = -6 + r1() * (ROWS + 12); }
-      else if (side === 2) { x = -6 + r1() * (COLS + 12); z = -1.8 - r1() * 6; } else { x = -6 + r1() * (COLS + 12); z = ROWS + 1.6 + r1() * 6; }
+      else if (side === 2) { x = -6 + r1() * (COLS + 12); z = -1.8 - r1() * 6; } else { x = -6 + r1() * (COLS + 12); z = ROWS + 5.6 + r1() * 2.4; }   // the strip just below the road stays clear for the station and the mine
       const s = .9 + r1() * .9; P.ftrunk.add(x, .55 * s, z, .1 * s, 1.1 * s, .1 * s, "#6e4a2c");
       [[0, 1.5, 0, .7], [-.4, 1.15, .15, .5], [.42, 1.2, -.1, .52], [0, 1.95, -.05, .45]].forEach(([dx, y, dz, rr2], i) =>
         P.fleaf.add(x + dx * s, y * s, z + dz * s, rr2 * s, rr2 * s * .92, rr2 * s, LEAF[(k + i) % 4], k + i, i));
@@ -8016,6 +8154,60 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     return g;
   }
   // the mine across the road and the dynamite stall beside it
+  // ---------- train station on the south side of the road, with a train that passes by, stops and smokes ----------
+  const TR_Z = ROWS + .62, TR_XPARK = 11.4, TR_SC = 1.3, TR_LEN = 4 * TR_SC;
+  function buildStation() {
+    const g = new T.Group(), WD = TM("#7a5230", "wood", 1, 2), cx = 11.4, bz = TR_Z;
+    g.add(mesh(G.box, M("#8d8578"), COLS / 2, .03, bz, COLS + 10, .06, .9, false));
+    [-.23, .23].forEach(dz => g.add(mesh(G.box, M("#6d6f73"), COLS / 2, .08, bz + dz, COLS + 10, .06, .06, false)));
+    for (let x = -4; x <= COLS + 4; x += 1.1) g.add(mesh(G.box, WD, x, .06, bz, .14, .05, .8, false));
+    // platform, building and lamps
+    g.add(mesh(G.box, TM("#b98a56", "wood", 1, 1), cx, .2, bz + 1.15, 7.4, .3, 1.25));
+    g.add(mesh(G.box, M("#e6d6ad"), cx, 1.15, bz + 2.55, 3.4, 1.5, 1.3));
+    [-1, 1].forEach(sd => { const r = mesh(G.box, M("#b5402f"), cx, 2.15, bz + 2.55 + sd * .52, 3.8, .12, 1.0); r.rotation.x = sd * .55; g.add(r); });
+    g.add(mesh(G.box, M("#5a3a22"), cx + .9, .85, bz + 3.22, .55, 1.0, .06, false)); g.add(mesh(G.box, M("#bfe8ff"), cx - .75, 1.25, bz + 3.22, .6, .5, .06, false));
+    [cx - 3.1, cx + 3.1].forEach(x => { g.add(mesh(G.box, M("#3a3a3a"), x, .95, bz + 1.15, .08, 1.5, .08)); g.add(mesh(G.ico, M("#ffe08a"), x, 1.78, bz + 1.15, .16, .16, .16, false)); });
+    const tx = canvasTex("trainsign", 512, 128, (x, w, h) => { x.fillStyle = "#1f6a45"; x.fillRect(0, 0, w, h); x.strokeStyle = "#f4e6b4"; x.lineWidth = 9; x.strokeRect(7, 7, w - 14, h - 14); x.fillStyle = "#fff6d0"; x.font = "800 62px Nunito, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("🚂 İSTASYON", w / 2, h / 2 + 4); });
+    const sg = boardMesh(2.7, .68, tx); sg.position.set(cx, 2.78, bz + 3.3); g.add(sg);
+    // the train (origin = centre of its length, facing +x)
+    const tr = new T.Group(), RED = M("#e0402f"), DARK = M("#2a2d31");
+    tr.add(mesh(G.cyl, M("#2f8f5b"), 1.25, .55, 0, .36, 1.5, .36)); tr.children[0].rotation.z = Math.PI / 2;
+    tr.add(mesh(G.box, M("#3a3f45"), 1.25, .27, 0, 1.7, .14, .56));
+    tr.add(mesh(G.box, M("#d9483a"), .66, .78, 0, .62, .8, .6)); tr.add(mesh(G.box, M("#3a2a24"), .66, 1.2, 0, .74, .08, .7));
+    tr.add(mesh(G.box, M("#bfe8ff"), .66, .82, .31, .3, .26, .02, false)); tr.add(mesh(G.box, M("#bfe8ff"), .66, .82, -.31, .3, .26, .02, false));
+    tr.add(mesh(G.cyl, DARK, 1.85, 1.05, 0, .12, .5, .12)); tr.add(mesh(G.cyl, M("#f2c14e"), 1.85, 1.33, 0, .17, .08, .17));
+    tr.add(mesh(G.cyl, M("#f2c14e"), 1.38, .96, 0, .09, .16, .09));
+    const cow = mesh(G.box, M("#f2c14e"), 2.2, .22, 0, .24, .2, .5); cow.rotation.z = -.5; tr.add(cow);
+    tr.add(mesh(G.sph, M("#ffe08a"), 2.12, .62, 0, .09, .09, .09, false));
+    const wheel = (x, r, mat) => [-.3, .3].forEach(z => { const w = mesh(G.cyl, mat, x, r, z, r, .06, r); w.rotation.x = Math.PI / 2; tr.add(w); });
+    [1.8, 1.3].forEach(x => wheel(x, .16, RED)); wheel(.65, .22, RED); [-.2, -1.35].forEach(x => { wheel(x - .35, .14, DARK); wheel(x + .35, .14, DARK); });
+    const crates = new T.Group();
+    [-.2, -1.35].forEach((x, k) => { tr.add(mesh(G.box, TM("#c98f52", "wood", 1, 1), x, .36, 0, 1.0, .4, .62)); tr.add(mesh(G.box, M("#7a4a22"), x, .6, 0, 1.04, .06, .66, false));
+      crates.add(mesh(G.box, M(k ? "#f2c14e" : "#e05a3a"), x - .2, .78, 0, .34, .3, .34)); crates.add(mesh(G.box, M(k ? "#8fd44a" : "#63b8ff"), x + .2, .74, 0, .3, .24, .3)); });
+    tr.add(crates); [.35, -.85].forEach(x => tr.add(mesh(G.box, DARK, x, .26, 0, .2, .05, .06, false)));
+    const puffs = []; for (let k = 0; k < 6; k++) { const sm = sprite(smokeTex, .3, .3, { opacity: .8, color: "#e4e4e4" }); sm.userData.ph = k / 6; sm.renderOrder = 6; tr.add(sm); puffs.push(sm); }
+    tr.scale.set(TR_SC, TR_SC, TR_SC); tr.position.set(TR_XPARK, 0, bz); g.add(tr);
+    const star = sprite(starTex, 1.2, 1.2); star.position.set(cx, 3.9, bz + 3); star.renderOrder = 8; g.add(star);
+    fx.train = { g: tr, puffs, crates, star, x: TR_XPARK, v: 0, mode: "gone", next: 0, last: 0 };
+    const ph = trainPhase(Date.now()); if (ph === "offer" || ph === "ready") { fx.train.mode = "park"; }
+    tr.visible = fx.train.mode !== "gone";
+    return g;
+  }
+  function stepTrain(sec) {
+    const t = fx.train; if (!t) return; const dt = Math.min(.1, Math.max(0, sec - (t.last || sec))); t.last = sec;
+    const ph = trainPhase(Date.now()), want = ph === "offer" || ph === "ready";
+    if (want) { if (t.mode === "gone" || t.mode === "pass" || t.mode === "leave") { t.mode = "arrive"; t.x = Math.min(t.x, -TR_LEN); if (t.x > TR_XPARK) t.x = -TR_LEN; } }
+    else if (t.mode === "park" || t.mode === "arrive") { t.mode = "leave"; t.v = .6; }
+    if (t.mode === "arrive") { const v = Math.max(.6, (TR_XPARK - t.x) * .8); t.x += v * dt; if (t.x >= TR_XPARK - .02) { t.x = TR_XPARK; t.mode = "park"; } t.v = v; }
+    else if (t.mode === "leave") { t.v = Math.min(7, t.v + 2.2 * dt); t.x += t.v * dt; if (t.x > COLS + TR_LEN) { t.mode = "gone"; t.v = 0; t.next = sec + 8; } }
+    else if (t.mode === "gone") { t.v = 0; if (sec > t.next && !REDUCED) { t.mode = "pass"; t.x = -TR_LEN; t.v = 6; } else if (!t.next) t.next = sec + 6; }
+    else if (t.mode === "pass") { t.x += 6 * dt; t.v = 6; if (t.x > COLS + TR_LEN) { t.mode = "gone"; t.v = 0; t.next = sec + 40; } }
+    else t.v = 0;
+    t.g.visible = t.mode !== "gone"; t.g.position.x = t.x; t.crates.visible = ph === "ready" && t.mode === "park";
+    const mv = t.v > .2;
+    t.puffs.forEach(sm => { const u = (sec * (mv ? .9 : .45) + sm.userData.ph) % 1; sm.position.set(1.85 - u * (mv ? 1.5 : .3), 1.45 + u * 1.3, 0); const z = .38 + u * .95; sm.scale.set(z, z, 1); sm.material.opacity = (mv ? .85 : .75) * (1 - u * u); sm.visible = t.g.visible && !REDUCED; });
+    t.star.visible = (ph === "offer" || ph === "ready"); t.star.position.y = 3.9 + Math.sin(sec * 3) * .12; t.star.material.rotation = Math.sin(sec * 2) * .3;
+  }
   function buildMine(open) {
     const g = new T.Group(), mg = new T.Group(), zc = ROWS + 2.7, cx = 25, SC = 1.2;
     mg.scale.set(SC, SC, SC); mg.position.set(cx * (1 - SC), 0, zc * (1 - SC)); g.add(mg);
@@ -8082,7 +8274,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     for (const c in (f.obst || {})) { const i = +c, x = colOf(i) + .5, z = rowOf(i) + .5;
       world.add(f.obst[c] === "t" ? buildTree(x, z, false, i % 11, 0) : buildRock(x, z, i % 13)); proxy(x, .6, z, 1, 1.3, 1, i); }
     // the mine across the road (only on my own farm)
-    if (f === S && scene.kind === "home") { world.add(buildMine(S.level >= MINE_LEVEL));
+    if (f === S && scene.kind === "home") { world.add(buildStation()); proxy(11.4, 1.1, ROWS + 2.2, 8, 2.8, 3.6, TRAIN_CELL); world.add(buildMine(S.level >= MINE_LEVEL));
       proxy(25, 1.4, ROWS + 3.5, 7.6, 3.2, 4, MINE_CELL); proxy(31, .9, ROWS + 2.3, 2.2, 1.9, 1.5, MARKET_CELL); }
     // fences
     const F = new Set(f.fences || []);
@@ -8633,6 +8825,7 @@ gl_Position = projectionMatrix * mvPosition;`); }; m.customProgramCacheKey = () 
     const sec = t / 1000;
     fx.stars.concat(fx.dstars || []).forEach(s => { s.position.y += Math.sin(sec * 3 + s.userData.bob) * .002; s.material.rotation = Math.sin(sec * 2 + s.userData.bob) * .3; });
     fx.mills.forEach(h => { h.rotation.z -= .016 * h.userData.spin; });
+    try { stepTrain(sec); } catch (e) {}
     fx.flags.forEach((f, i) => { f.rotation.y = Math.sin(sec * 2.2 + i) * .18; });
     if (scene.kind === "plaza") stepFountain(sec); else { stepOven(sec); stepPens(Math.min(.1, Math.max(0, sec - (R3.lastSec || sec))), sec); }
     R3.lastSec = sec;

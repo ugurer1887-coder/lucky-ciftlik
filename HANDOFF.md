@@ -257,3 +257,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Maden (`MINE_CELL`) ve dinamit tezgahı (`MARKET_CELL`) ayrı dokunma hedefleri; `openMine` (dinamit at, balta/matkap sayısı) ve `openDynMarket` (dinamit al, `dynmk_v8` sayfası).
 - Madenden altın külçe yok: `MINE_DROPS` = gold (30-100 altın doğrudan `S.gold`), axe 1, drill 1 (eşit şans). Eski kayıtlardaki `goldore` depoda kalır.
 - 3D: maden grubu %20 büyük (`SC`), fenerler, büyük tabela, madenin ve tezgahın üstünde dönen yıldız (fx.stars); tezgah x=31. Gerçek cihazda görsel kontrol edilmedi.
+
+## v134 — Tren istasyonu, ödül ekranı, Lucky ↔ altın
+- `showReward({art,title,sub,theme,confetti})` renkli ödül ekranı (`#reward_v8`, `RW_ART` SVG: gold/axe/drill/train). Mine drops + tren teslimi kullanır.
+- Lucky ↔ altın: kullanıcı miktar yazar (`lcIn_v8` Lucky→altın, 1=5; `lgIn_v8` altın→Lucky, 1 Lucky=1000 altın). `convertLucky`, `goldToLucky`.
+- Tren (`TRAIN_CELL`): `S.train = {day, used, offers[3], pend:{k,n,t0}}`. 07:00 sıfırlanır (`trainDayKey`), 3 rastgele armağan (`TRAIN_POOL`, seviyeye göre), seçince 30 dk sonra teslim; hak bitince 15 Lucky ile çağrı (`TRAIN_CALL_COST`). Depo doluysa teslim engellenir. Fazlar: offer/away/ready/done (`trainPhase`).
+- 3D: `buildStation()` (ray, platform, istasyon binası, tren: lokomotif + 2 vagon, duman), `stepTrain()` animasyonu (geçiş, duruş, ayrılış), yıldız işareti hak varken. Güney orman şeridi (yolun altı) temizlendi: önceden maden ve tezgah ağaçların arkasında kalıyordu.
+- Gerçek 3D'yi headless'ta çalıştırmak için three r160 `mrdoob/three.js` klonundan (`/home/claude/mrdoob/three.js/build/three.module.min.js`) route ile sunuldu (swiftshader, yükleme ~1 dk).
