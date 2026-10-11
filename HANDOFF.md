@@ -269,3 +269,10 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v135 — Lucky paketi yeni fiyatlar + fiyat Play'den
 - `LUCKY_PKGS` tl: 50=24,99 / 100=44,99 / 150=64,99 / 500=199,99 / 1000=379,99 TL (yedek fiyat).
 - `luckyLoadPrices()`: Play uygulaması içinde Digital Goods `getDetails` ile gerçek fiyatı okur (`LUCKY_PRICE`), `luckyPriceTxt` gösterir; okunamazsa yedek TL görünür. Play Console'daki ürün fiyatları da aynı değerlere ayarlanmalı.
+
+## v136 — Biçme makinesi, pazar sadeleşme, tren kilidi
+- `TOOLS.mower` (Biçme makinesi, n=3, 8000 altın), `TOOL_LEVEL.mower = 16`; 3D elde escythe modeli yeşil renkte (`k === "escythe" || k === "mower"`); çok oyunculu `t` kodu mower:5.
+- Pazar: kartlar `.pzgrid` 3 sütun (`.pzc`); koyma formunda fiyat kaydırıcı `pzMin` (depo değeri) – `pzMax` (3x) arası, varsayılan en düşük fiyat. Notlar kaldırıldı.
+- Tren `TRAIN_LEVEL = 7`: `trainPhase` "locked" döner, istasyonda kilit simgesi, dokununca ipucu.
+- Ödül penceresi (`#reward_v8`) küçültüldü.
+- Lucky mağazası yeniden tasarlandı (`.lhero`, kademe renkleri `.lpk.t0-t4`, rozetler, avantaj %'si). Başlık "🍀 Lucky Mağaza".
