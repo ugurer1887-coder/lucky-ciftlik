@@ -290,3 +290,8 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - `walkDo(kind, fn)`: bina üstüne dokunup toplama ve nesne menüsünden Topla/Yem ver artık çiftçiyi binanın yanına yürütür, sonra yapar (`quickCollect`, `objMenu` "collect"/"feed").
 - Paketler: Lucky Mağaza'da "Paketler" sekmesi (`luckyTab`). `PACKS` (bronze: 25 Lucky, 7 gün, 5 tahta bir kerelik, `S.packs.bronze` = bitiş zamanı). Aktifken tekrar alınamaz, bitince alınır; depoda 5 yer yoksa engellenir. Sohbette `pk: 1` alanı eklenir (sunucu kuralı reddederse alansız tekrar gönderilir); `.msg.pk`, `.pkname` parlayan isim.
 - Firebase: `chat` / `chatx` kuralları `pk` alanına izin vermiyorsa renkli ismi diğer oyuncular görmez (mesaj yine gider). Kuralda `pk` alanını (number/1) izin verin.
+
+## v139
+- Biçme makinası artık sürülüyor (buildRideMower, syncChar riding = tractor|mower). Mutfak 3D/2D yeniden çizildi (aşçı şapkası, MUTFAK tabelası, tente). Bronz Paket 75 Lucky.
+- Bronz sahibinin karakter ismi renkli/kabarık (.nlab.pk). Başkalarına görünmesi için presence `n` alanının sonuna görünmez "⁣" ekleniyor (Firebase kuralı yeni alana izin vermesin diye).
+- Ambar yükseltme: S.millLv 1-3, yuva sayısı = seviye, S.millQs[3] (eski S.millQ geçişle taşınır), lvl3 üretim x0.7 süre. Fiyat 400/1200 altın, oyuncu lvl 8/14. millTake(slot|-1) "harvest" sesi çalar.
