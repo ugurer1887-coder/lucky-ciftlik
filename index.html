@@ -1400,7 +1400,7 @@ const R3 = { on: false, dirty: true, pops: [] };   // 3D view state (see "3D vie
 const NS = "http://www.w3.org/2000/svg";
 const RUN = {}; window.__luckyRun = RUN;
 const alive = () => window.__luckyRun === RUN;
-const VERSION = "139";
+const VERSION = "140";
 // ---------- Game constants ----------
 const COLS = 56, ROWS = 30, CELL = 100, SPEED = 3.2, MAPV = 5;
 const SX = 8, SY = 8;   // where the previous 40 x 22 map sits inside this one (the road stays at the bottom)
@@ -6116,7 +6116,7 @@ $("notifNo").onclick = () => $("notifAsk").classList.remove("on");
 // ---------- Tutorial quests ----------
 // S.tut = { i: index of the current quest, d: ids of claimed quests, c: { questId: progress }, v: 2, o: window shown once }
 // progress counts for every quest that is not claimed yet, so nothing done early is lost
-const tutOn = () => !!(S && S.tut && S.tut.i < QUESTS.length);
+const tutOn = () => !!(S && S.tut && S.tut.i < QUESTS.length && (+S.level || 1) <= 10);
 const OLD_QUESTS = ["plant", "water", "harvest", "sell", "oven", "bread", "wish", "jobs"];
 function tutInit() {
   if (!S) return;
@@ -6560,6 +6560,8 @@ function applyAdminForMe() {
     S.adminOps = S.adminOps || {}; let ch = false;
     let lvGiven = 0, more = false;
     Object.entries(a.ops).forEach(([id, op]) => { if (S.adminOps[id] || !op) return;
+      const lk = Math.round(+op.lucky || 0);
+      if (lk) { S.adminOps[id] = 1; ch = true; S.lucky = Math.max(0, (+S.lucky || 0) + lk); toast(lk > 0 ? "Yönetici sana " + lk + " Lucky parası gönderdi 🍀" : "Yönetici hesabından " + (-lk) + " Lucky parası aldı"); return; }
       const lv = Math.max(0, Math.min(5, Math.round(+op.lv || 0)));
       if (lv) { if (lvGiven + lv > 5 || S.level >= MAX_LEVEL) { more = more || S.level < MAX_LEVEL; if (S.level >= MAX_LEVEL) S.adminOps[id] = 1; return; }   // the server allows +5 levels per save
         S.adminOps[id] = 1; ch = true; lvGiven += lv; S.level = Math.min(MAX_LEVEL, S.level + lv); S.xp = 0; toast("Yönetici seni " + S.level + ". seviyeye çıkardı 🎉"); return; }
@@ -6622,6 +6624,7 @@ function renderAdmin() {
       <small>Seviye (şu an ${p.level})</small>
       <div class="chips"><button data-alv="${esc(p.id)}" data-n="1">+1 seviye</button><button data-alv="${esc(p.id)}" data-n="5">+5 seviye</button><button data-alv="${esc(p.id)}" data-n="10">+10 seviye</button></div>
       <div class="ln"><input class="n" type="number" min="1" inputmode="numeric" placeholder="Altın" id="aGold_v8"><button class="big green" data-agive="${esc(p.id)}">Altın ver</button><button class="big ghost" data-atake="${esc(p.id)}">Altın al</button></div>
+      <div class="ln"><input class="n" type="number" min="1" inputmode="numeric" placeholder="Lucky parası" id="aLucky_v8"><button class="big green" data-agivel="${esc(p.id)}">Lucky ver 🍀</button><button class="big ghost" data-atakel="${esc(p.id)}">Lucky al</button></div>
       ${me ? "" : `<small>Ceza süresi</small>
       <div class="chips">${PUN_LEN.map(([ms, t]) => `<button data-adur="${ms}" aria-pressed="${admSel.dur === ms}">${t}</button>`).join("")}</div>
       <div class="ln"><input class="n" type="number" min="1" inputmode="numeric" placeholder="Sayı" id="aDurN_v8"><select id="aDurU_v8"><option value="60000">dakika</option><option value="3600000">saat</option><option value="86400000">gün</option></select><small>ya da kendin yaz</small></div>
@@ -6664,12 +6667,17 @@ $("admList").addEventListener("click", async e => {
     try { for (let left = n; left > 0; left -= 5) { const opId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); await db.doc("admin/" + id + "/ops/" + opId).set({ lv: Math.min(5, left), ts: Date.now() }); }
       pl.level = Math.min(MAX_LEVEL, pl.level + n); toast(pl.name + " " + n + " seviye atlatıldı (" + pl.level + ")"); }
     catch (err) { toast("Seviye verilemedi"); } renderAdmin(); return; }
-  const b = e.target.closest("[data-agive],[data-atake],[data-apun],[data-afree]"); if (!b) return;
-  const id = b.getAttribute("data-agive") || b.getAttribute("data-atake") || b.getAttribute("data-apun") || b.getAttribute("data-afree");
+  const b = e.target.closest("[data-agive],[data-atake],[data-agivel],[data-atakel],[data-apun],[data-afree]"); if (!b) return;
+  const id = b.getAttribute("data-agive") || b.getAttribute("data-atake") || b.getAttribute("data-agivel") || b.getAttribute("data-atakel") || b.getAttribute("data-apun") || b.getAttribute("data-afree");
   const pl = admPlayers.find(x => x.id === id) || { name: "Oyuncu", gold: 0 }, base = "admin/" + id, a = admPun[id] || (admPun[id] = {});
   b.disabled = true;
   try {
-    if (b.hasAttribute("data-agive") || b.hasAttribute("data-atake")) {
+    if (b.hasAttribute("data-agivel") || b.hasAttribute("data-atakel")) {
+      const n = Math.min(100000, Math.floor(+($("aLucky") || {}).value || 0)); if (n < 1) { toast("Bir Lucky miktarı yaz"); b.disabled = false; return; }
+      const lk = b.hasAttribute("data-agivel") ? n : -n, opId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      await db.doc(base + "/ops/" + opId).set({ lucky: lk, ts: Date.now() });
+      toast(pl.name + (lk > 0 ? " oyuncusuna " + n + " Lucky parası gönderildi" : " oyuncusundan " + n + " Lucky parası alındı"));
+    } else if (b.hasAttribute("data-agive") || b.hasAttribute("data-atake")) {
       const n = Math.min(1000000, Math.floor(+($("aGold") || {}).value || 0)); if (n < 1) { toast("Bir altın miktarı yaz"); b.disabled = false; return; }
       const delta = b.hasAttribute("data-agive") ? n : -n, opId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       await db.doc(base + "/ops/" + opId).set({ delta, ts: Date.now() });

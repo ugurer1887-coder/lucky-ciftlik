@@ -295,3 +295,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Biçme makinası artık sürülüyor (buildRideMower, syncChar riding = tractor|mower). Mutfak 3D/2D yeniden çizildi (aşçı şapkası, MUTFAK tabelası, tente). Bronz Paket 75 Lucky.
 - Bronz sahibinin karakter ismi renkli/kabarık (.nlab.pk). Başkalarına görünmesi için presence `n` alanının sonuna görünmez "⁣" ekleniyor (Firebase kuralı yeni alana izin vermesin diye).
 - Ambar yükseltme: S.millLv 1-3, yuva sayısı = seviye, S.millQs[3] (eski S.millQ geçişle taşınır), lvl3 üretim x0.7 süre. Fiyat 400/1200 altın, oyuncu lvl 8/14. millTake(slot|-1) "harvest" sesi çalar.
+
+## v140
+- Admin paneli: Lucky ver/al (ops {lucky:n}, oyuncu bir sonraki bağlanışta uygular). Firebase kuralları admin/{id}/ops içinde `lucky` alanına izin vermeli.
+- tutOn(): öğretici görevler seviye 10 üstünde gösterilmez.
