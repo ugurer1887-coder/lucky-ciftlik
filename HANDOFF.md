@@ -265,3 +265,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - 3D: `buildStation()` (ray, platform, istasyon binası, tren: lokomotif + 2 vagon, duman), `stepTrain()` animasyonu (geçiş, duruş, ayrılış), yıldız işareti hak varken. Güney orman şeridi (yolun altı) temizlendi: önceden maden ve tezgah ağaçların arkasında kalıyordu.
 - Gerçek 3D'yi headless'ta çalıştırmak için three r160 `mrdoob/three.js` klonundan (`/home/claude/mrdoob/three.js/build/three.module.min.js`) route ile sunuldu (swiftshader, yükleme ~1 dk).
 - Tren istasyonu x=33.5 (ortaya taşındı), maden cx=21, tezgah x=27; varış hızı 7 ile sınırlı.
+
+## v135 — Lucky paketi yeni fiyatlar + fiyat Play'den
+- `LUCKY_PKGS` tl: 50=24,99 / 100=44,99 / 150=64,99 / 500=199,99 / 1000=379,99 TL (yedek fiyat).
+- `luckyLoadPrices()`: Play uygulaması içinde Digital Goods `getDetails` ile gerçek fiyatı okur (`LUCKY_PRICE`), `luckyPriceTxt` gösterir; okunamazsa yedek TL görünür. Play Console'daki ürün fiyatları da aynı değerlere ayarlanmalı.
