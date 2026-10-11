@@ -276,3 +276,11 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Tren `TRAIN_LEVEL = 7`: `trainPhase` "locked" döner, istasyonda kilit simgesi, dokununca ipucu.
 - Ödül penceresi (`#reward_v8`) küçültüldü.
 - Lucky mağazası yeniden tasarlandı (`.lhero`, kademe renkleri `.lpk.t0-t4`, rozetler, avantaj %'si). Başlık "🍀 Lucky Mağaza".
+
+## v137 — Kümes/ambar erken, Mutfak, görev zinciri, boş maden
+- `COOP_LEVEL=3, COOP_PRICE=50`, `MILL_LEVEL=3, MILL_PRICE=100` (Ambar = `mill`, yem yapar). Tren havuzunda yumurta/tavuk yemi 4. seviyeye çekildi.
+- Madende `MINE_NONE = .25`: dinamit harcanır, %25 hiçbir şey çıkmaz (toast).
+- Mutfak: `kitchen` ocak türü (OVENS içinde, `isSpecial(id)` = icecart/kitchen), `KITCHEN_LEVEL=4`, `KITCHEN_PRICE=100`, tarif `omelet` (2 yumurta, 3 dk, `OMELET_SELL=50`). Omlet STORE_KEYS/PRODUCTS/Pazar/Depo'ya eklendi. 2D `kitchenBody`, 3D `buildKitchen`.
+- Görev zinciri (daily'den sonra): coopbuy(lv3) → henbuy → millbuy → feedmake → feedhen → eggs(3) → kitchenbuy(lv4) → omelet → omelettake(2). Olaylar: `millmake`, `feedhen`, `egg`, `omeletstart`, `omelettake`; çoğu `chk` ile geriye dönük.
+- Biçme makinesi 3D modeli (`buildTool("mower")`): gövde group'u elde yere paralel durur.
+- `ovenN` başarımı artık sadece taş fırınları sayar.
