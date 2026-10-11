@@ -299,3 +299,7 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 ## v140
 - Admin paneli: Lucky ver/al (ops {lucky:n}, oyuncu bir sonraki bağlanışta uygular). Firebase kuralları admin/{id}/ops içinde `lucky` alanına izin vermeli.
 - tutOn(): öğretici görevler seviye 10 üstünde gösterilmez.
+
+## v141
+- Gümüş Paket (190 Lucky, 500 altın + 5 tahta, 7 gün), pkTier() 0/1/2; Bronz 3 tahta ve sade isim. Presence işareti: bronz \u2063, gümüş \u2064. Chat pk alanı 1/2.
+- Ambar: yuvalar küçük chip + "+" ile yem seçimi (millPick); yükseltme tahta ister (20/60).
