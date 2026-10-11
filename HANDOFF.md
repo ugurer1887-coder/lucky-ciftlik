@@ -284,3 +284,9 @@ Bu dosya, oyunu yeni bir sohbette geliştirmeye devam edecek kişi (veya Claude)
 - Görev zinciri (daily'den sonra): coopbuy(lv3) → henbuy → millbuy → feedmake → feedhen → eggs(3) → kitchenbuy(lv4) → omelet → omelettake(2). Olaylar: `millmake`, `feedhen`, `egg`, `omeletstart`, `omelettake`; çoğu `chk` ile geriye dönük.
 - Biçme makinesi 3D modeli (`buildTool("mower")`): gövde group'u elde yere paralel durur.
 - `ovenN` başarımı artık sadece taş fırınları sayar.
+
+## v138 — Un, pasta, yürüyerek toplama, Bronz Paket
+- Taş fırında `flour` tarifi (2 buğday -> 1 un, 90 sn, `FLOUR_LEVEL=4`); mutfakta `cake` tarifi (2 un + 1 süt + 2 yumurta, 6 dk, `CAKE_SELL=180`). Tarifler artık 3 malzemeye kadar: `from/from2/from3`, yardımcılar `recParts/recStock/recIn/recMeta`. Un/pasta depo, pazar, ürün listelerinde.
+- `walkDo(kind, fn)`: bina üstüne dokunup toplama ve nesne menüsünden Topla/Yem ver artık çiftçiyi binanın yanına yürütür, sonra yapar (`quickCollect`, `objMenu` "collect"/"feed").
+- Paketler: Lucky Mağaza'da "Paketler" sekmesi (`luckyTab`). `PACKS` (bronze: 25 Lucky, 7 gün, 5 tahta bir kerelik, `S.packs.bronze` = bitiş zamanı). Aktifken tekrar alınamaz, bitince alınır; depoda 5 yer yoksa engellenir. Sohbette `pk: 1` alanı eklenir (sunucu kuralı reddederse alansız tekrar gönderilir); `.msg.pk`, `.pkname` parlayan isim.
+- Firebase: `chat` / `chatx` kuralları `pk` alanına izin vermiyorsa renkli ismi diğer oyuncular görmez (mesaj yine gider). Kuralda `pk` alanını (number/1) izin verin.
